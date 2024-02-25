@@ -1,11 +1,31 @@
 {
-	"required": true,
-	"package": "com.imoonday.mixin",
-	"compatibilityLevel": "JAVA_17",
-	"mixins": [
-		"ExampleMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "com.imoonday.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "BlazeEntity$ShootFireballGoalMixin",
+    "BowAttackGoalMixin",
+    "CreeperEntityMixin",
+    "CreeperIgniteGoalMixin",
+    "CrossbowAttackGoalMixin",
+    "DamageTrackerMixin",
+    "GhastEntity$ShootFireballGoalMixin",
+    "GuardianEntity$FireBeamGoalMixin",
+    "ItemStackMixin",
+    "LivingEntityMixin",
+    "MeleeAttackGoalMixin",
+    "PlayerEntityMixin",
+    "ProjectileAttackGoalMixin",
+    "ServerPlayerEntityMixin",
+    "ShulkerEntity$ShootBulletGoalMixin",
+    "StatusEffectInstanceAccessor",
+    "WardenEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "ClientPlayerEntityMixin",
+    "InGameHudMixin"
+  ]
 }

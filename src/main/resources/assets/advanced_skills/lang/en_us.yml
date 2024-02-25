@@ -1,0 +1,218 @@
+advancedSkills:
+  key:
+    category: Advanced Skills
+    openGalleryScreen: View the Skill Atlas
+    openListScreen: View the list of skills
+    openSlotScreen: Adjust the position of the skill bar
+    useSkill1: Use Skill 1
+    useSkill2: Use Skill 2
+    useSkill3: Use Skill 3
+    useSkill4: Use Skill 4
+  useSkill:
+    cooling: '%s is cooling: %s'
+    failed: Use %s failed
+    silenced: You are silenced and cannot use skills
+    passive: '%s is passive skill'
+    active: '%s is active'
+  learnSkill:
+    toast: Learned a new skill!
+    message: 'Learned %s'
+    all: All skills learned
+    failed: '%s already know %s'
+    failedSelf: 'You already know %s'
+  forgetSkill:
+    message: 'Forgotten %s'
+    failed: "%s don't know %s"
+  equipSkill:
+    success: '%s equipped %s to Slot %d'
+    failed: '%s already equipped %s on Slot %d'
+  resetCooldown: '%s reset all skills cooldown'
+  skillExp:
+    give:
+      single: Gave %d skill experience points to %s
+      multiple: Gave %d skill experience points to %d players
+    set:
+      single: Set %d skill experience points on %s
+      multiple: Set %d skill experience points on %d players
+    query: '%s has %d skill experience points'
+  command:
+    invalid: Invalid Skill id
+  skill:
+    empty:
+      name: Empty
+    fireball:
+      name: Fireball
+      description: Fire a fireball
+    horizontal_dash:
+      name: Horizontal Dash
+      description: Dash forward horizontally
+    teleport:
+      name: Teleport
+      description: Teleport forward
+      collide: No space
+    jump:
+      name: Jump
+      description: Jump without the help of the ground
+    double_jump:
+      name: Double Jump
+      description: Double height jump without the help of the ground
+    triple_jump:
+      name: Triple Jump
+      description: Triple height jump without the help of the ground
+    dash:
+      name: Dash
+      description: Dash forward
+    ground_whack:
+      name: Ground Whack
+      description: Smash to the ground while in the air
+      failed: Not in the air!
+    absolute_defense:
+      name: Absolute Defense
+      description: Block any damage once. The skill lasts for 30s
+    extreme_reflection:
+      name: Extreme Reflection
+      description: Reflects the first arbitrary damage within 0.25 seconds at a 75% probability, and resets the cooldown immediately after the reflection
+      success: Successful Deflection!
+      failed: Failed Deflection
+      active: Reflection is not finished
+      early: '%ds early!'
+      late: '%ds late!'
+    rapid_reflection:
+      name: Rapid Reflection
+      description: Reflects the first arbitrary damage with a 50% damage reduction within 0.5 seconds at a 50% probability, and halves the cooldown immediately after the reflection
+    micro_reflection:
+      name: Micro Reflection
+      description: Reflects 50% of the first arbitrary damage with a 25% reduction within 1 seconds at a 25% probability
+    perfect_reflection:
+      name: Perfect Reflection
+      description: Reflects 150% of the first arbitrary damage with a 100% reduction with a 10% healing within 0.1 seconds at a 100% probability, and resets the cooldown immediately and the source of damage is bounced after the reflection
+      success: Perfect Deflection!%s
+    wall_climbing:
+      name: Wall Climbing
+      description: Allow to climb the wall
+      active: '%s Active'
+      inactive: '%s Inactive'
+    piercing:
+      name: Piercing
+      description: Dash forward for a distance, dealing damage and knocking back creatures on contact
+    primary_healing:
+      name: Primary Healing
+      description: Instantly heals 4 HP, and then all healing skills enter cooldown
+    intermediate_healing:
+      name: Intermediate Healing
+      description: Instantly heals 8 HP, and then all healing skills enter cooldown
+    advanced_healing:
+      name: Advanced Healing
+      description: Instantly heals 12 HP, and then all healing skills enter cooldown
+    top_healing:
+      name: Top Healing
+      description: Instantly heals 16 HP, and then all healing skills enter cooldown
+    extreme_evasion:
+      name: Extreme Evasion
+      description: Dodge based on the direction of your movement, making you immune to any damage while moving
+    self_healing:
+      name: Self Healing
+      description: Naturally regenerates 2 HP every 10 seconds, resetting time when injured
+    strong_physique:
+      name: Strong Physique
+      description: Increases 4 max health
+    agility:
+      name: Agility
+      description: Slightly increases movement speed
+    resuscitation:
+      name: Resuscitation
+      description: Blocks fatal damage, becomes invincible for 2 seconds and gains 30 seconds health regeneration
+    dying_counterattack:
+      name: Dying Counterattack
+      description: 'When receiving fatal damage, the HP returns to the upper limit, and then enters death mode: HP is continuously deducted, and HP can be sucked by attacking other creatures. When the HP is insufficient, you will die'
+    disarm:
+      name: Disarm
+      description: The next attack has a 45% chance of disarming the target.
+      success: Disarm Successful!
+      failed: Disarm Failed
+      disarmed: You are disarmed!
+    primary_silence:
+      name: Primary Silence
+      description: Fires an energy ball with a 30% probability of silencing and a 100% probability of slowing down creatures within a small area
+    last_ditch_effort:
+      name: Last Ditch Effort
+      description: When the HP is lower than 30%, the HP will be restored to 50%, the movement speed will be greatly increased, the damage will increase 1, and the damage received will increase 1, lasting for 15 seconds
+    mastery:
+      name: Mastery
+      description: Reduce the cooldown time of all skills by 20%
+    primary_purification:
+      name: Primary Purification
+      description: Randomly reduces the remaining time of a negative effect by 20%, up to 15 seconds
+      success: '%s has been reduced by %d seconds'
+      failed: No negative effects
+    advanced_purification:
+      name: Advanced Purification
+      description: Remove the longest negative effect within 30 seconds remaining. If there is no negative effect within 30 seconds, the remaining time of a random negative effect will be reduced by 30 seconds
+      success: 'Successfully purified %s'
+      failed: No matching negative effects
+    absolute_domain:
+      name: Absolute Domain
+      description: Break the blocks within 1 square around
+    charged_sweep:
+      name: Charged Sweep
+      description: After charging, it will cause damage to entities within the fan-shaped range in front
+    active_defense:
+      name: Active Defense
+      description: Reduce damage by 20% when long pressed
+  skillType:
+    attack: Attack Skill
+    defense: Defense Skill
+    healing: Healing Skill
+    control: Control Skill
+    passive: Passive Skill
+    enhancement: Enhancement Skill
+    summon: Summon Skill
+    restoration: Restoration Skill
+    movement: Movement Skill
+    destruction: Destruction Skill
+  skillRarity:
+    useless: Useless
+    common: Common
+    uncommon: Uncommon
+    rare: Rare
+    veryRare: Very Rare
+    epic: Epic
+    legendary: Legendary
+    mythic: Mythic
+    unique: Unique
+  screen:
+    gallery:
+      title: Skill Atlas
+      info:
+        name: 'Name: %s'
+        type: 'Type: %s'
+        description: 'Description: %s'
+        cooldown: 'Cooldown: %s'
+        rarity: 'Rarity: %s'
+    list:
+      level: 'Level: %d'
+      exp: 'Exp: %d'
+      button:
+        tooltip: Displayed in Creative Mode Only
+        learnAll: Learn All
+        forgetAll: Forget All
+        resetCooldown: Reset Cooldown
+item:
+  advanced_skills:
+    skill_fruit: Skill Fruit
+effect:
+  advanced_skills:
+    disarm: Disarm
+    silence: Silence
+entity:
+  advanced_skills:
+    silence_energy_ball: Silence Energy Ball
+subtitles:
+  advanced_skills:
+    heal: Heal
+    purify: Purify
+    notice: Notice
+    dash: Dash
+    disarm: Disarm
+    piercing: Piercing
+    fire: Fire

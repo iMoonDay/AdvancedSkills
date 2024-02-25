@@ -1,0 +1,218 @@
+advancedSkills:
+  key:
+    category: 进阶技能
+    openGalleryScreen: 查看技能图鉴
+    openListScreen: 查看技能列表
+    openSlotScreen: 调整技能栏位置
+    useSkill1: 使用技能 1
+    useSkill2: 使用技能 2
+    useSkill3: 使用技能 3
+    useSkill4: 使用技能 4
+  useSkill:
+    cooling: '%s 正在冷却：%s'
+    failed: 使用 %s 失败
+    silenced: 沉默中，无法使用技能
+    passive: '%s 是被动技能'
+    active: '%s 已激活'
+  learnSkill:
+    toast: 学到了一项新技能！
+    message: '学习了 %s'
+    all: 所有技能已学完
+    failed: '%s 已学习 %s'
+    failedSelf: '你已学习 %s'
+  forgetSkill:
+    message: '遗忘了 %s'
+    failed: "%s 未学习 %s"
+  equipSkill:
+    success: '%s 已装备 %s 至插槽 %d'
+    failed: '%s 已经装备了 %s 在插槽 %d 上'
+  resetCooldown: '%s 重置了所有技能的冷却时间'
+  skillExp:
+    give:
+      single: 已增加 %s %d 点技能经验值
+      multiple: 已为 %d 名玩家增加 %d 点技能经验值
+    set:
+      single: 设置 %s %d 点技能经验值
+      multiple: 为 %d 名玩家设置 %d 点技能经验值
+    query: '%s 拥有 %d 点技能经验值'
+  command:
+    invalid: 无效的技能ID
+  skill:
+    empty:
+      name: 空
+    fireball:
+      name: 火球术
+      description: 发射火球
+    horizontal_dash:
+      name: 水平冲刺
+      description: 水平向前冲刺
+    teleport:
+      name: 传送
+      description: 向前传送
+      collide: 无容纳空间
+    jump:
+      name: 跳跃
+      description: 无需地面的跳跃
+    double_jump:
+      name: 二级跳跃
+      description: 无需地面的双倍高度跳跃
+    triple_jump:
+      name: 三级跳跃
+      description: 无需地面的三倍高度跳跃
+    dash:
+      name: 冲刺
+      description: 向前冲刺
+    ground_whack:
+      name: 地面重击
+      description: 从空中砸向地面
+      failed: 不在空中！
+    absolute_defense:
+      name: 绝对防御
+      description: 格挡一次任意伤害，持续30s
+    extreme_reflection:
+      name: 极限反弹
+      description: 以75%的概率在0.25秒内反弹首个任意伤害，反弹后立即重置冷却时间，免伤100%
+      success: 成功反弹!
+      failed: 反弹失败
+      active: 反弹未结束
+      early: 早了 %d 秒
+      late: 晚了 %d 秒
+    rapid_reflection:
+      name: 快速反弹
+      description: 以50%的概率在0.5秒内反弹首个任意伤害，反弹后立即将冷却时间减半，免伤50%
+    micro_reflection:
+      name: 微反弹
+      description: 以25%的概率在1秒内反弹首个任意伤害的50%，免伤25%
+    perfect_reflection:
+      name: 完美反弹
+      description: 以100%的概率在0.1秒内反弹首个任意伤害的150%，反弹后立即重置冷却时间，并弹开伤害来源，免伤100%，治疗伤害量的10%
+      success: 完美反弹!%s
+    wall_climbing:
+      name: 爬墙
+      description: 允许爬墙
+      active: '%s 已激活'
+      inactive: '%s 已关闭'
+    piercing:
+      name: 突刺
+      description: 向前冲刺一段距离，并对接触的生物造成伤害并击退
+    primary_healing:
+      name: 初级治疗术
+      description: 瞬间恢复4点血量，然后所有治疗术进入冷却
+    intermediate_healing:
+      name: 中级治疗术
+      description: 瞬间恢复8点血量，然后所有治疗术进入冷却
+    advanced_healing:
+      name: 高级治疗术
+      description: 瞬间恢复12点血量，然后所有治疗术进入冷却
+    top_healing:
+      name: 顶级治疗术
+      description: 瞬间恢复16点血量，然后所有治疗术进入冷却
+    extreme_evasion:
+      name: 极限闪避
+      description: 根据自身移动方向闪避，移动期间免疫任何伤害
+    self_healing:
+      name: 自愈
+      description: 每10秒自然恢复2点血量，受伤时重置时间
+    strong_physique:
+      name: 强健体魄
+      description: 增加4点血量上限
+    agility:
+      name: 身手敏捷
+      description: 略微增加移动速度
+    resuscitation:
+      name: 起死回生
+      description: 抵挡致命伤害，触发后无敌2s，并获得30s生命恢复
+    dying_counterattack:
+      name: 垂死反击
+      description: 受到致命伤害时，血量恢复到上限，然后进入死亡模式：持续扣血，攻击其他生物可以吸血，当血量不足时死亡
+    disarm:
+      name: 缴械
+      description: 下一次攻击有45%概率对目标施加缴械
+      success: 缴械成功！
+      failed: 缴械失败
+      disarmed: 你被缴械了！
+    primary_silence:
+      name: 初级沉默术
+      description: 发射一个30%概率沉默并100%概率减速小范围内生物的能量球
+    last_ditch_effort:
+      name: 回光返照
+      description: 血量低于30%时，血量恢复至50%，大幅增加移动速度，伤害+1，受到的伤害+1，持续15s
+    mastery:
+      name: 技能精通
+      description: 所有技能进入冷却时减少20%时间
+    primary_purification:
+      name: 初级净化术
+      description: 随机减少一个负面效果的20%剩余时间，最多15秒
+      success: '%s 已减少 %d 秒'
+      failed: 没有负面效果
+    advanced_purification:
+      name: 高级净化术
+      description: 去除时间剩余30秒以内时间最长的一个负面效果，若没有，则随机减少一个负面效果的剩余时间30秒
+      success: '成功净化 %s'
+      failed: 没有符合的负面效果
+    absolute_domain:
+      name: 绝对领域
+      description: 将周围1格内方块击碎
+    charged_sweep:
+      name: 蓄力横扫
+      description: 蓄力后对前方扇形范围内实体造成伤害
+    active_defense:
+      name: 主动防御
+      description: 长按使用时减伤20%
+  skillType:
+    attack: 攻击技能
+    defense: 防御技能
+    healing: 治疗技能
+    control: 控制技能
+    passive: 被动技能
+    enhancement: 强化技能
+    summon: 召唤技能
+    restoration: 恢复技能
+    movement: 移动技能
+    destruction: 破坏技能
+  skillRarity:
+    useless: 无用
+    common: 普通
+    uncommon: 罕见
+    rare: 稀有
+    veryRare: 非常稀有
+    epic: 史诗
+    legendary: 传奇
+    mythic: 神话
+    unique: 唯一
+  screen:
+    gallery:
+      title: 技能图鉴
+      info:
+        name: '名称：%s'
+        type: '类型：%s'
+        description: '描述：%s'
+        cooldown: '冷却：%s'
+        rarity: '稀有度：%s'
+    list:
+      level: '等级：%d'
+      exp: '经验：%d'
+      button:
+        tooltip: 仅在创造模式下显示
+        learnAll: 学习全部
+        forgetAll: 忘记全部
+        resetCooldown: 重置冷却
+item:
+  advanced_skills:
+    skill_fruit: 技能果实
+effect:
+  advanced_skills:
+    disarm: 缴械
+    silence: 沉默
+entity:
+  advanced_skills:
+    silence_energy_ball: 沉默能量球
+subtitles:
+  advanced_skills:
+    heal: 治愈
+    purify: 净化
+    notice: 通知
+    dash: 冲刺
+    disarm: 缴械
+    piercing: 突刺
+    fire: 发射

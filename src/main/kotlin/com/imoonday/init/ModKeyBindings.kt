@@ -1,0 +1,84 @@
+package com.imoonday.init
+
+import com.imoonday.network.UseSkillC2SRequest
+import com.imoonday.screen.SkillGalleryScreen
+import com.imoonday.screen.SkillListScreen
+import com.imoonday.screen.SkillSlotScreen
+import com.imoonday.skills.Skills
+import com.imoonday.utils.SkillSlot
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.option.KeyBinding
+import org.lwjgl.glfw.GLFW
+
+object ModKeyBindings {
+    @JvmField
+    val OPEN_LIST_SCREEN = register("openListScreen", GLFW.GLFW_KEY_K) { client ->
+        client.setScreen(SkillListScreen(client.player!!))
+    }
+
+    @JvmField
+    val OPEN_GALLERY_SCREEN = register("openGalleryScreen", GLFW.GLFW_KEY_G) {
+        it.setScreen(SkillGalleryScreen().apply {
+            selectedSkill = Skills.FIREBALL
+        })
+    }
+
+    @JvmField
+    val OPEN_SLOT_SCREEN = register("openSlotScreen", GLFW.GLFW_KEY_N) {
+        it.setScreen(SkillSlotScreen())
+    }
+
+    fun init() {
+        (1..4).forEach { i ->
+            registerSkill(GLFW.GLFW_KEY_KP_0 + i) { client, keyState ->
+                if (client.player?.isSpectator == false) ClientPlayNetworking.send(
+                    UseSkillC2SRequest(SkillSlot.fromIndex(i), keyState)
+                )
+            }
+        }
+    }
+
+    val pressStates = mutableMapOf<KeyBinding, Boolean>()
+
+    private fun register(name: String, code: Int, callbacks: (MinecraftClient) -> Unit): KeyBinding {
+        val key = KeyBindingHelper.registerKeyBinding(
+            KeyBinding(
+                "advancedSkills.key.$name",
+                code,
+                "advancedSkills.key.category"
+            )
+        )
+        ClientTickEvents.END_CLIENT_TICK.register {
+            if (key.wasPressed()) callbacks.invoke(it)
+        }
+        return key
+    }
+
+    private fun registerSkill(
+        code: Int,
+        callbacks: (MinecraftClient, UseSkillC2SRequest.KeyState) -> Unit,
+    ): KeyBinding {
+        val key = KeyBindingHelper.registerKeyBinding(
+            KeyBinding(
+                "advancedSkills.key.useSkill${pressStates.size + 1}",
+                code,
+                "advancedSkills.key.category"
+            )
+        )
+        pressStates[key] = false
+        ClientTickEvents.END_CLIENT_TICK.register {
+            if (key.isPressed && pressStates[key] == false) {
+                callbacks.invoke(it, UseSkillC2SRequest.KeyState.PRESS)
+                pressStates[key] = true
+            } else if (!key.isPressed && pressStates[key] == true) {
+                callbacks.invoke(it, UseSkillC2SRequest.KeyState.RELEASE)
+                pressStates[key] = false
+            }
+        }
+        return key
+    }
+
+}

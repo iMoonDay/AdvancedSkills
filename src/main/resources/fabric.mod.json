@@ -1,38 +1,60 @@
 {
-	"schemaVersion": 1,
-	"id": "advanced_skills",
-	"version": "${version}",
-	"name": "Advanced Skills",
-	"description": "This is an example description! Tell everyone what your mod is about!",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/advanced_skills/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			{
-				"value": "com.imoonday.AdvancedSkills",
-				"adapter": "kotlin"
-			}
-		]
-	},
-	"mixins": [
-		"advanced_skills.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.15.7",
-		"minecraft": "~1.20.1",
-		"java": ">=17",
-		"fabric-api": "*",
-		"fabric-language-kotlin": ">=1.9.22"
-	},
-	"suggests": {
-		"another-mod": "*"
-	}
+  "schemaVersion": 1,
+  "id": "advanced_skills",
+  "version": "${version}",
+  "name": "Advanced Skills",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/advanced_skills/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      {
+        "value": "com.imoonday.AdvancedSkillsClient",
+        "adapter": "kotlin"
+      }
+    ],
+    "main": [
+      {
+        "value": "com.imoonday.AdvancedSkills",
+        "adapter": "kotlin"
+      }
+    ],
+    "cardinal-components": [
+      {
+        "value": "com.imoonday.init.ModComponents",
+        "adapter": "kotlin"
+      }
+    ]
+  },
+  "mixins": [
+    "advanced_skills.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.24",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*",
+    "fabric-language-kotlin": ">=1.9.22"
+  },
+  "suggests": {
+    "another-mod": "*"
+  },
+  "custom": {
+    "cardinal-components": [
+      "advanced_skills:exp",
+      "advanced_skills:skills",
+      "advanced_skills:equipped_skills",
+      "advanced_skills:using_skills",
+      "advanced_skills:damaged_time"
+    ]
+  },
+  "accessWidener": "advanced_skills.accesswidener"
 }
