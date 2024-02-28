@@ -1,6 +1,6 @@
 package com.imoonday.skills
 
-import com.imoonday.trigger.CooldownTrigger
+import com.imoonday.triggers.CooldownTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult

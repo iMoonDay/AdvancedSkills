@@ -1,6 +1,6 @@
 package com.imoonday.network
 
-import com.imoonday.AdvancedSkills
+import com.imoonday.utils.id
 import com.imoonday.init.ModSounds
 import com.imoonday.screen.components.SkillToast
 import com.imoonday.skills.Skills
@@ -16,7 +16,7 @@ class LearnSkillS2CPacket(
     val skill: Skill,
 ) : FabricPacket {
     companion object {
-        val id = AdvancedSkills.id("learn_skill_s2c")
+        val id = id("learn_skill_s2c")
         val pType = PacketType.create(id) {
             LearnSkillS2CPacket(Skills.get(it.readIdentifier()))
         }!!

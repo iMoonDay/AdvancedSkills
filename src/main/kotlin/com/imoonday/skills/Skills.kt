@@ -1,6 +1,6 @@
 package com.imoonday.skills
 
-import com.imoonday.trigger.InitTrigger
+import com.imoonday.triggers.InitTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillItem
 import net.minecraft.registry.Registries
@@ -115,6 +115,33 @@ object Skills {
 
     @JvmField
     val ACTIVE_DEFENSE = ActiveDefenseSkill().register()
+
+    @JvmField
+    val SELF_REPAIR = SelfRepairSkill().register()
+
+    @JvmField
+    val INSTANT_EXPLOSIVE = InstantExplosiveSkill().register()
+
+    @JvmField
+    val PRIMARY_FREEZE = PrimaryFreezeSkill().register()
+
+    @JvmField
+    val PRIMARY_SLOWNESS = PrimarySlownessSkill().register()
+
+    @JvmField
+    val PRIMARY_CONFINEMENT = PrimaryConfinementSkill().register()
+
+    @JvmField
+    val EXCLUSIVE_MOUNT = ExclusiveMountSkill().register()
+
+    @JvmField
+    val NIGHT_VISION = NightVisionSkill().register()
+
+    @JvmField
+    val UNDEAD_SUMMONING = UndeadSummoningSkill().register()
+
+    @JvmField
+    val TAUNT = TauntSkill().register()
 
     fun init() {
         SKILLS.filterIsInstance<InitTrigger>().forEach { it.init() }

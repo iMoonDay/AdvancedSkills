@@ -25,10 +25,10 @@ class UseResult(
         fun of(success: Boolean, successMessage: Text? = null, failMessage: Text? = null) =
             if (success) success(successMessage) else fail(failMessage)
 
-        fun passive(name: String) = fail(Text.translatable("advancedSkills.useSkill.passive", name))
+        fun passive(name: String) = fail(translate("useSkill", "passive", name))
         fun startUsing(user: PlayerEntity, skill: Skill, failedMessage: Text? = null) = of(
             user.startUsingSkill(skill), null,
-            failedMessage ?: Text.translatable("advancedSkills.useSkill.active", skill.name.string)
+            failedMessage ?: translate("useSkill", "active", skill.name.string)
         )
     }
 }

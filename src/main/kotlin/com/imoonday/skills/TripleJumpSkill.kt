@@ -13,6 +13,7 @@ class TripleJumpSkill : Skill(
 ) {
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
+            stopFallFlying()
             jump()
             velocityDirty = true
             velocity = velocity.multiply(1.0, 1.7, 1.0)

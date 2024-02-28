@@ -3,7 +3,7 @@ package com.imoonday.skills
 import com.imoonday.components.isCooling
 import com.imoonday.components.isUsingSkill
 import com.imoonday.components.startCooling
-import com.imoonday.trigger.*
+import com.imoonday.triggers.*
 import com.imoonday.utils.*
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute

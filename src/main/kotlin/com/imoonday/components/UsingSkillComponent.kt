@@ -2,14 +2,17 @@ package com.imoonday.components
 
 import com.imoonday.init.ModComponents
 import com.imoonday.skills.Skills
+import com.imoonday.triggers.ClientUseTrigger
 import com.imoonday.utils.Skill
 import dev.onyxstudios.cca.api.v3.component.Component
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
+import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtElement
 import net.minecraft.nbt.NbtList
 import net.minecraft.nbt.NbtString
+import net.minecraft.network.PacketByteBuf
 import net.minecraft.util.Identifier
 
 interface Skill2NbtComponent : Component {
@@ -40,6 +43,18 @@ class UsingSkillComponent(private val provider: PlayerEntity) : Skill2NbtCompone
             }
         })
         tag.put("skills", list)
+    }
+
+    override fun applySyncPacket(buf: PacketByteBuf?) {
+        val oldSkills = skills.keys.toSet()
+        super.applySyncPacket(buf)
+        val newSkills = skills.keys.toSet()
+        newSkills.subtract(oldSkills)
+            .filterIsInstance<ClientUseTrigger>()
+            .forEach { it.onUse(MinecraftClient.getInstance()) }
+        oldSkills.subtract(newSkills)
+            .filterIsInstance<ClientUseTrigger>()
+            .forEach { it.onStop(MinecraftClient.getInstance()) }
     }
 }
 

@@ -40,7 +40,7 @@ class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
             stack.decrement(1)
             return TypedActionResult.success(stack)
         }
-        user.sendMessage(Text.translatable("advancedSkills.learnSkill.failedSelf", skill.name.string))
+        user.sendMessage(translate("learnSkill", "failedSelf", skill.name.string))
         return TypedActionResult.fail(stack)
     }
 }

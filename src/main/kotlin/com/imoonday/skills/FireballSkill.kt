@@ -10,8 +10,8 @@ import net.minecraft.sound.SoundEvents
 class FireballSkill : Skill(
     id = "fireball",
     types = arrayOf(SkillType.DESTRUCTION),
-    cooldown = 3,
-    rarity = Rarity.COMMON,
+    cooldown = 5,
+    rarity = Rarity.VERY_RARE,
     sound = SoundEvents.ENTITY_ENDER_DRAGON_SHOOT
 ) {
     override fun use(user: ServerPlayerEntity): UseResult {

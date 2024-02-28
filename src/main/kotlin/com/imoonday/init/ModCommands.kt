@@ -4,12 +4,12 @@ import com.imoonday.components.*
 import com.imoonday.skills.Skills
 import com.imoonday.utils.SkillArgumentType
 import com.imoonday.utils.SkillSlot
+import com.imoonday.utils.translate
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.argument.EntityArgumentType
 import net.minecraft.server.command.CommandManager.argument
 import net.minecraft.server.command.CommandManager.literal
-import net.minecraft.text.Text
 
 object ModCommands {
     fun init() {
@@ -27,8 +27,8 @@ object ModCommands {
                                         if (!target.learnSkill(skill)) {
                                             it.source.sendFeedback(
                                                 {
-                                                    Text.translatable(
-                                                        "advancedSkills.learnSkill.failed",
+                                                    translate(
+                                                        "learnSkill", "failed",
                                                         target.displayName.string,
                                                         skill.name.string
                                                     )
@@ -56,8 +56,9 @@ object ModCommands {
                                         if (!target.forgetSkill(skill)) {
                                             it.source.sendFeedback(
                                                 {
-                                                    Text.translatable(
-                                                        "advancedSkills.forgetSkill.failed",
+                                                    translate(
+                                                        "forgetSkill",
+                                                        "failed",
                                                         target.displayName.string,
                                                         skill.name.string
                                                     )
@@ -91,8 +92,9 @@ object ModCommands {
                                         if (target.equipSkill(SkillSlot.fromIndex(slot), skill)) {
                                             it.source.sendFeedback(
                                                 {
-                                                    Text.translatable(
-                                                        "advancedSkills.equipSkill.success",
+                                                    translate(
+                                                        "equipSkill",
+                                                        "success",
                                                         target.displayName.string,
                                                         skill.name.string,
                                                         slot
@@ -103,8 +105,8 @@ object ModCommands {
                                         } else {
                                             it.source.sendFeedback(
                                                 {
-                                                    Text.translatable(
-                                                        "advancedSkills.equipSkill.failed",
+                                                    translate(
+                                                        "equipSkill", "failed",
                                                         target.displayName.string,
                                                         skill.name.string,
                                                         slot
@@ -123,8 +125,9 @@ object ModCommands {
                                     target.learnedSkills.forEach { target.stopCooling(it) }
                                     it.source.sendFeedback(
                                         {
-                                            Text.translatable(
-                                                "advancedSkills.resetCooldown",
+                                            translate(
+                                                "resetCooldown",
+                                                null,
                                                 target.displayName.string
                                             )
                                         },
@@ -151,16 +154,16 @@ object ModCommands {
                                     }
                                     if (targets.size == 1) {
                                         it.source.sendFeedback({
-                                            Text.translatable(
-                                                "advancedSkills.skillExp.give.single",
+                                            translate(
+                                                "skillExp", "give.single",
                                                 amount,
                                                 targets.first().displayName.string
                                             )
                                         }, true)
                                     } else {
                                         it.source.sendFeedback({
-                                            Text.translatable(
-                                                "advancedSkills.skillExp.give.multiple",
+                                            translate(
+                                                "skillExp", "give.multiple",
                                                 amount,
                                                 targets.size
                                             )
@@ -183,16 +186,16 @@ object ModCommands {
                                     }
                                     if (targets.size == 1) {
                                         it.source.sendFeedback({
-                                            Text.translatable(
-                                                "advancedSkills.skillExp.set.single",
+                                            translate(
+                                                "skillExp", "set.single",
                                                 amount,
                                                 targets.first().displayName.string
                                             )
                                         }, true)
                                     } else {
                                         it.source.sendFeedback({
-                                            Text.translatable(
-                                                "advancedSkills.skillExp.set.multiple",
+                                            translate(
+                                                "skillExp", "set.multiple",
                                                 amount,
                                                 targets.size
                                             )
@@ -210,8 +213,8 @@ object ModCommands {
 
                                 it.source.sendFeedback(
                                     {
-                                        Text.translatable(
-                                            "advancedSkills.skillExp.query",
+                                        translate(
+                                            "skillExp", "query",
                                             target.displayName.string, exp
                                         )
                                     },

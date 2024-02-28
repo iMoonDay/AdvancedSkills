@@ -3,10 +3,11 @@ package com.imoonday.components
 import com.imoonday.init.ModComponents
 import com.imoonday.network.LearnSkillS2CPacket
 import com.imoonday.skills.Skills
-import com.imoonday.trigger.CooldownTrigger
-import com.imoonday.trigger.UnequipTrigger
+import com.imoonday.triggers.CooldownTrigger
+import com.imoonday.triggers.UnequipTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillSlot
+import com.imoonday.utils.translate
 import com.imoonday.utils.updateScreen
 import dev.onyxstudios.cca.api.v3.component.Component
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
@@ -20,7 +21,6 @@ import net.minecraft.nbt.NbtString
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.HoverEvent
-import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import kotlin.math.min
 
@@ -116,7 +116,7 @@ fun PlayerEntity.learnSkill(skill: Skill): Boolean =
                     LearnSkillS2CPacket(skill)
                 )
             }
-            sendMessage(Text.translatable("advancedSkills.learnSkill.message", skill.name.string).styled {
+            sendMessage(translate("learnSkill", "message", skill.name.string).styled {
                 it.withHoverEvent(
                     HoverEvent(
                         HoverEvent.Action.SHOW_ITEM,
@@ -125,7 +125,9 @@ fun PlayerEntity.learnSkill(skill: Skill): Boolean =
                 )
             })
             if (it.keys.toSet() == Skills.SKILLS.filterNot { it.isEmpty }
-                    .toSet()) sendMessage(Text.translatable("advancedSkills.learnSkill.all"))
+                    .toSet()) sendMessage(
+                translate("learnSkill", "all")
+            )
             true
         } else false
 
@@ -145,7 +147,7 @@ fun PlayerEntity.forgetSkill(skill: Skill): Boolean =
                 }
             }
             it.remove(skill)
-            sendMessage(Text.translatable("advancedSkills.forgetSkill.message", skill.name.string).styled {
+            sendMessage(translate("forgetSkill", "message", skill.name.string).styled {
                 it.withHoverEvent(
                     HoverEvent(
                         HoverEvent.Action.SHOW_ITEM,

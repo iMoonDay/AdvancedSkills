@@ -1,10 +1,10 @@
 package com.imoonday.network
 
-import com.imoonday.AdvancedSkills
 import com.imoonday.skills.Skills
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillSlot
 import com.imoonday.components.equipSkill
+import com.imoonday.utils.id
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
 import net.fabricmc.fabric.api.networking.v1.PacketType
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -15,7 +15,7 @@ class EquipSkillC2SRequest(
     val skill: Skill,
 ) : FabricPacket {
     companion object {
-        val id = AdvancedSkills.id("equip_skill_c2s")
+        val id = id("equip_skill_c2s")
         val pType = PacketType.create(id) {
             EquipSkillC2SRequest(SkillSlot.fromIndex(it.readInt()), Skills.get(it.readIdentifier()))
         }!!

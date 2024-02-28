@@ -1,5 +1,6 @@
 package com.imoonday.utils
 
+import com.imoonday.MOD_ID
 import com.imoonday.mixin.StatusEffectInstanceAccessor
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.effect.StatusEffectInstance
@@ -9,6 +10,7 @@ import net.minecraft.network.packet.Packet
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import java.awt.Color
@@ -57,3 +59,9 @@ fun PlayerEntity.spawnParticles(
     (world as? ServerWorld)?.spawnParticles(type, x, y, z, count, deltaX, deltaY, deltaZ, speed)
         ?: world.addParticle(type, x, y, z, deltaX, deltaY, deltaZ)
 }
+
+fun id(name: String): Identifier = Identifier(MOD_ID, name)
+
+fun itemId(name: String): Identifier = id("textures/item/$name.png")
+
+fun Box.volume() = xLength * yLength * zLength

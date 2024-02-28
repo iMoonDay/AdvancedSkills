@@ -1,6 +1,10 @@
 package com.imoonday.utils
 
-import com.imoonday.AdvancedSkills
+import com.imoonday.components.*
+import com.imoonday.init.isSilenced
+import com.imoonday.network.UseSkillC2SRequest
+import com.imoonday.triggers.LongPressTrigger
+import com.imoonday.triggers.SynchronousCoolingTrigger
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.Registries
@@ -16,7 +20,7 @@ abstract class Skill(
     val id: Identifier,
     val name: Text,
     val description: Text,
-    val icon: Identifier = AdvancedSkills.id("unknown.png"),
+    val icon: Identifier = id("unknown.png"),
     vararg val types: SkillType,
     val cooldown: Int = 0,
     val rarity: Rarity,
@@ -31,10 +35,10 @@ abstract class Skill(
         rarity: Rarity,
         sound: SoundEvent? = null,
     ) : this(
-        AdvancedSkills.id(id),
-        TranslationUtil.skillName(id),
-        TranslationUtil.skillDescription(id),
-        AdvancedSkills.itemPath(id),
+        id(id),
+        translateSkill(id, "name"),
+        translateSkill(id, "description"),
+        itemId(id),
         types = types,
         20 * cooldown,
         rarity,
@@ -84,7 +88,7 @@ abstract class Skill(
     }
 
     protected fun reflectedFailed(player: ServerPlayerEntity) {
-        player.sendMessage(Text.translatable("advancedSkills.skill.extreme_reflection.failed"), true)
+        player.sendMessage(translateSkill("extreme_reflection", "failed"), true)
     }
 
     protected fun reflect(
@@ -95,28 +99,73 @@ abstract class Skill(
         player.world.playSound(null, player.blockPos, SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS)
         attacker?.damage(player.damageSources.thorns(player), amount)?.let {
             player.sendMessage(
-                Text.translatable("advancedSkills.skill.extreme_reflection.${if (it) "success" else "failed"}"),
+                translateSkill("extreme_reflection", if (it) "success" else "failed"),
                 true
             )
         }
     }
 
+    fun tryUse(
+        player: ServerPlayerEntity,
+        keyState: UseSkillC2SRequest.KeyState,
+    ) {
+        if ((this !is LongPressTrigger || !player.isUsingSkill(this)) && keyState == UseSkillC2SRequest.KeyState.RELEASE) return
+        if (player.isSilenced) {
+            player.sendMessage(translate("useSkill", "silenced"), true)
+            return
+        }
+        if (player.isCooling(this)) {
+            player.sendMessage(
+                translate("useSkill", "cooling", name.string, "${(player.getCooldown(this) / 20.0)}s"),
+                true
+            )
+        } else {
+            val result = (this as? LongPressTrigger)?.let {
+                if (keyState == UseSkillC2SRequest.KeyState.PRESS) it.onPress(player) else it.onRelease(
+                    player,
+                    player.getSkillUsedTime(this)
+                )
+            } ?: use(player)
+            handleResult(player, result)
+        }
+        return
+    }
+
+    fun handleResult(
+        serverPlayerEntity: ServerPlayerEntity,
+        result: UseResult,
+    ) {
+        if (result.success) {
+            playSound(serverPlayerEntity)
+            serverPlayerEntity.sendMessage(result.message ?: this.name, true)
+        } else {
+            val message =
+                result.message ?: translate("useSkill", "failed", name.string)
+            if (message != Text.empty())
+                serverPlayerEntity.sendMessage(message, true)
+        }
+        if (result.cooling) {
+            serverPlayerEntity.startCooling(this)
+            (this as? SynchronousCoolingTrigger)?.otherSkills?.forEach { serverPlayerEntity.startCooling(it) }
+        }
+    }
+
     enum class Rarity(
         val level: Int,
-        private val translationKey: String,
+        val id: String,
         val formatting: Formatting,
     ) {
-        USELESS(0, "advancedSkills.skillRarity.useless", Formatting.WHITE),
-        COMMON(1, "advancedSkills.skillRarity.common", Formatting.GRAY),
-        UNCOMMON(2, "advancedSkills.skillRarity.uncommon", Formatting.BLUE),
-        RARE(3, "advancedSkills.skillRarity.rare", Formatting.GOLD),
-        VERY_RARE(4, "advancedSkills.skillRarity.veryRare", Formatting.RED),
-        EPIC(5, "advancedSkills.skillRarity.epic", Formatting.LIGHT_PURPLE),
-        LEGENDARY(6, "advancedSkills.skillRarity.legendary", Formatting.DARK_PURPLE),
-        MYTHIC(7, "advancedSkills.skillRarity.mythic", Formatting.DARK_RED),
-        UNIQUE(8, "advancedSkills.skillRarity.unique", Formatting.BLACK);
+        USELESS(0, "useless", Formatting.WHITE),
+        COMMON(1, "common", Formatting.GRAY),
+        UNCOMMON(2, "uncommon", Formatting.BLUE),
+        RARE(3, "rare", Formatting.GOLD),
+        VERY_RARE(4, "veryRare", Formatting.RED),
+        EPIC(5, "epic", Formatting.LIGHT_PURPLE),
+        LEGENDARY(6, "legendary", Formatting.DARK_PURPLE),
+        MYTHIC(7, "mythic", Formatting.DARK_RED),
+        UNIQUE(8, "unique", Formatting.BLACK);
 
         val displayName: Text
-            get() = Text.translatable(translationKey)
+            get() = translate("skillRarity", id)
     }
 }

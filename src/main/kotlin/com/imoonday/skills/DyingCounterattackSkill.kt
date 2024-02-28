@@ -3,7 +3,7 @@ package com.imoonday.skills
 import com.imoonday.components.isUsingSkill
 import com.imoonday.components.startCooling
 import com.imoonday.components.startUsingSkill
-import com.imoonday.trigger.*
+import com.imoonday.triggers.*
 import com.imoonday.utils.*
 import net.minecraft.client.gui.hud.InGameHud.HeartType
 import net.minecraft.entity.LivingEntity

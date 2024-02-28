@@ -6,7 +6,6 @@ import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
 import net.minecraft.util.math.Direction
 
 class TeleportSkill : Skill(
@@ -20,7 +19,7 @@ class TeleportSkill : Skill(
             val offset = rotationVector.withAxis(Direction.Axis.Y, 0.0).normalize().multiply(2.0)
             val collisions = world.getBlockCollisions(this, boundingBox.offset(offset))
             if (!collisions.all { it.isEmpty }) {
-                return UseResult.fail(Text.translatable("advancedSkills.skill.teleport.collide"))
+                return UseResult.fail(translateSkill(this@TeleportSkill.id.path, "collide"))
             }
             val velocity = velocity
             val prevPos = pos

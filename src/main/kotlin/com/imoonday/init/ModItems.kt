@@ -1,6 +1,6 @@
 package com.imoonday.init
 
-import com.imoonday.AdvancedSkills
+import com.imoonday.utils.id
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillFruitItem
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
@@ -37,7 +37,7 @@ object ModItems {
         ItemGroupEvents.modifyEntriesEvent(ModItemGroups.ITEM_GROUP_KEY).register {
             it.add(this)
         }
-        return Registry.register(Registries.ITEM, AdvancedSkills.id(id), this)
+        return Registry.register(Registries.ITEM, id(id), this)
     }
 
     fun init() = Unit

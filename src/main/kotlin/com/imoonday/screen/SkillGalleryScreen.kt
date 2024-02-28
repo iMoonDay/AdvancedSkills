@@ -3,6 +3,7 @@ package com.imoonday.screen
 import com.imoonday.screen.components.ShiftScrollContainer
 import com.imoonday.skills.Skills
 import com.imoonday.utils.Skill
+import com.imoonday.utils.translate
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.component.LabelComponent
@@ -55,7 +56,7 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
 
         rootComponent.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.content()).apply {
             horizontalAlignment(HorizontalAlignment.CENTER)
-            child(Components.label(Text.translatable("advancedSkills.screen.gallery.title")))
+            child(Components.label(translate("screen", "gallery.title")))
         })
         rootComponent.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(95)).apply {
             child(skillScroll)
@@ -85,42 +86,17 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
                     alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
                     child(Components.texture(it.icon, 0, 0, 16, 16, 16, 16))
                 })
-                child(
-                    Components.label(Text.translatable("advancedSkills.screen.gallery.info.name", it.name.string))
-                        .trim()
-                )
-                child(
-                    Components.label(
-                        Text.translatable(
-                            "advancedSkills.screen.gallery.info.type",
-                            it.types.joinToString(" ") { it.displayName.string }
-                        )
-                    ).trim()
-                )
-                child(
-                    Components.label(
-                        Text.translatable(
-                            "advancedSkills.screen.gallery.info.description",
-                            it.description.string
-                        )
-                    ).trim()
-                )
-                child(
-                    Components.label(
-                        Text.translatable(
-                            "advancedSkills.screen.gallery.info.cooldown",
-                            "${it.cooldown / 20.0}s"
-                        )
-                    ).trim()
-                )
-                child(
-                    Components.label(
-                        Text.translatable(
-                            "advancedSkills.screen.gallery.info.rarity",
-                            it.rarity.displayName.string
-                        )
-                    ).trim()
-                )
+                child(Components.label(translate("screen", "gallery.info.name", it.name.string)).trim())
+                child(Components.label(
+                    translate(
+                        "screen",
+                        "gallery.info.type",
+                        it.types.joinToString(" ") { type -> type.displayName.string }
+                    )
+                ).trim())
+                child(Components.label(translate("screen", "gallery.info.description", it.description.string)).trim())
+                child(Components.label(translate("screen", "gallery.info.cooldown", "${it.cooldown / 20.0}s")).trim())
+                child(Components.label(translate("screen", "gallery.info.rarity", it.rarity.displayName.string)).trim())
             }
         }
     }

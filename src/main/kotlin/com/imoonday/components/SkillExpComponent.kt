@@ -47,8 +47,8 @@ var PlayerEntity.skillExp: Int
         if (level > i) {
             (i + 1..level).filter { shouldLearnSkill(level) }
                 .forEach { _ ->
-                learnRandomSkill()
-            }
+                    learnRandomSkill()
+                }
         }
     }
 
@@ -82,7 +82,7 @@ fun shouldLearnSkill(level: Int): Boolean {
         level <= 0 -> false
         level in 1..14 -> level % 5 == 0
         level in 15..29 -> level % 3 == 0
-        level in 30..99 -> level % 2 == 0
+        level in 30..80 -> level % 2 == 0
         else -> true
     }
 }

@@ -1,6 +1,5 @@
 package com.imoonday.entities
 
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffectInstance
@@ -58,11 +57,8 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
             world.getOtherEntities(this, this.boundingBox.expand(range)) { it.isLiving && it.isAlive }
                 .filterIsInstance<LivingEntity>()
                 .forEach {
-                    for (statusEffectInstance in effects) {
-                        if (random.nextFloat() < statusEffectInstance.value) it.addStatusEffect(
-                            statusEffectInstance.key,
-                            effectCause
-                        )
+                    for (entry in effects) {
+                        if (random.nextFloat() < entry.value) it.addStatusEffect(entry.key, effectCause)
                     }
                 }
             (world as ServerWorld).spawnParticles(
@@ -106,8 +102,6 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
     override fun isBurning(): Boolean = false
 
     override fun canHit(): Boolean = false
-
-    override fun canHit(entity: Entity?): Boolean = false
 
     override fun getDrag(): Float = 1.0f
 

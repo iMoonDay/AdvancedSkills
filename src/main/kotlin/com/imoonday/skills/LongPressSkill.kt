@@ -1,6 +1,6 @@
 package com.imoonday.skills
 
-import com.imoonday.trigger.LongPressTrigger
+import com.imoonday.triggers.LongPressTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult

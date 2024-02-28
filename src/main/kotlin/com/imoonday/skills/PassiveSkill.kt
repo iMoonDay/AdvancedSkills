@@ -1,8 +1,8 @@
 package com.imoonday.skills
 
-import com.imoonday.trigger.AttributeTrigger
-import com.imoonday.trigger.EquipTrigger
-import com.imoonday.trigger.RespawnTrigger
+import com.imoonday.triggers.AttributeTrigger
+import com.imoonday.triggers.EquipTrigger
+import com.imoonday.triggers.RespawnTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillSlot
 import com.imoonday.utils.SkillType

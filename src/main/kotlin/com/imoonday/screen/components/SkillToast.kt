@@ -1,13 +1,13 @@
 package com.imoonday.screen.components
 
 import com.imoonday.utils.Skill
+import com.imoonday.utils.translate
 import io.wispforest.owo.ui.base.BaseOwoToast
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
 import net.minecraft.client.toast.Toast
-import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
 class SkillToast(val skill: Skill, timeout: Long = 5000) : BaseOwoToast<FlowLayout>(
@@ -23,7 +23,7 @@ class SkillToast(val skill: Skill, timeout: Long = 5000) : BaseOwoToast<FlowLayo
                 alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
                 child(
                     Components.label(
-                        Text.translatable("advancedSkills.learnSkill.toast").formatted(Formatting.YELLOW)
+                        translate("learnSkill", "toast").copy().formatted(Formatting.YELLOW)
                     )
                 )
                 child(Components.label(skill.name.copy().formatted(Formatting.WHITE)))

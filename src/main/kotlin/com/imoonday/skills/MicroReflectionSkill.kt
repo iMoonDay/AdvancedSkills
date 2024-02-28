@@ -2,8 +2,8 @@ package com.imoonday.skills
 
 import com.imoonday.components.isUsingSkill
 import com.imoonday.components.stopUsingSkill
-import com.imoonday.trigger.PlayerDamageTrigger
-import com.imoonday.trigger.ReflectionTrigger
+import com.imoonday.triggers.PlayerDamageTrigger
+import com.imoonday.triggers.ReflectionTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult

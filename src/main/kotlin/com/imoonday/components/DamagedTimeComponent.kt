@@ -1,11 +1,10 @@
 package com.imoonday.components
 
 import com.imoonday.init.ModComponents
+import com.imoonday.utils.translateSkill
 import dev.onyxstudios.cca.api.v3.component.Component
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
 import net.minecraft.util.Util
 
 interface LongComponent : Component {
@@ -13,7 +12,7 @@ interface LongComponent : Component {
     var second: Long
 }
 
-class DamagedTimeComponent(private val provider: PlayerEntity) : LongComponent {
+class DamagedTimeComponent : LongComponent {
     override var first: Long = 0
     override var second: Long = 0
 
@@ -38,7 +37,7 @@ fun ServerPlayerEntity.onDamage() {
     lastDamagedTime = Util.getMeasuringTimeMs()
     val l = lastDamagedTime - lastReflectedTime
     if (l < 1000) {
-        sendMessage(Text.translatable("advancedSkills.skill.extreme_reflection.early", (l / 1000.0).toString()), true)
+        sendMessage(translateSkill("extreme_reflection", "early", (l / 1000.0).toString()), true)
         lastReflectedTime = 0
         lastDamagedTime = 0
     }

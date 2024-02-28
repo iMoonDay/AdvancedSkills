@@ -3,17 +3,17 @@ package com.imoonday.skills
 import com.imoonday.components.isUsingSkill
 import com.imoonday.components.stopCooling
 import com.imoonday.components.stopUsingSkill
-import com.imoonday.trigger.PlayerDamageTrigger
-import com.imoonday.trigger.ReflectionTrigger
+import com.imoonday.triggers.PlayerDamageTrigger
+import com.imoonday.triggers.ReflectionTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult
+import com.imoonday.utils.translateSkill
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
 import net.minecraft.util.Util
 
 class PerfectReflectionSkill : Skill(
@@ -44,8 +44,8 @@ class PerfectReflectionSkill : Skill(
         player.world.playSound(null, player.blockPos, SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS)
         player.heal(amount / 10)
         player.sendMessage(
-            Text.translatable(
-                "advancedSkills.skill.perfect_reflection.success",
+            translateSkill(
+                id.path, "success",
                 time?.let { " ${it / 1000.0}s" } ?: ""), true)
         attacker?.run {
             damage(player.damageSources.thorns(player), amount * 1.5f)

@@ -17,6 +17,7 @@ class HorizontalDashSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             velocityDirty = true
+            stopFallFlying()
             velocity = rotationVector.withAxis(Direction.Axis.Y, velocity.y).normalize().multiply(1.5)
             send(EntityVelocityUpdateS2CPacket(this))
             user.spawnParticles(

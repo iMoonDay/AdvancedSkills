@@ -9,13 +9,14 @@ import net.minecraft.server.network.ServerPlayerEntity
 class DashSkill : Skill(
     id = "dash",
     types = arrayOf(SkillType.MOVEMENT),
-    cooldown = 40,
+    cooldown = 2,
     rarity = Rarity.UNCOMMON,
     sound = ModSounds.DASH
 ) {
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             velocityDirty = true
+            stopFallFlying()
             velocity = rotationVector.normalize().multiply(1.5)
             send(EntityVelocityUpdateS2CPacket(this))
             user.spawnParticles(

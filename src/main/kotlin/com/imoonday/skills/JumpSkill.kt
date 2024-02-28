@@ -13,6 +13,7 @@ class JumpSkill : Skill(
 ) {
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
+            stopFallFlying()
             jump()
             send(EntityVelocityUpdateS2CPacket(this))
             user.spawnParticles(

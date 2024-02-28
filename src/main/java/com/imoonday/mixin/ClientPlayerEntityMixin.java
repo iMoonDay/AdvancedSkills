@@ -1,6 +1,6 @@
 package com.imoonday.mixin;
 
-import com.imoonday.trigger.SkillTriggerHandler;
+import com.imoonday.triggers.SkillTriggerHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

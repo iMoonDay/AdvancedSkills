@@ -2,7 +2,7 @@ package com.imoonday.skills
 
 import com.imoonday.components.startCooling
 import com.imoonday.components.stopUsingSkill
-import com.imoonday.trigger.AttributeTrigger
+import com.imoonday.triggers.AttributeTrigger
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult
 import net.minecraft.enchantment.EnchantmentHelper
@@ -54,8 +54,7 @@ class ChargedSweepSkill : LongPressSkill(
                         || it.boundingBox.minY <= player.boundingBox.maxY
                         && it.boundingBox.minY >= player.boundingBox.minY)
                         && player.calculateAngle(it) <= PI / 3
-            }
-            .forEach {
+            }.forEach {
                 val amount = (player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
                         + EnchantmentHelper.getAttackDamage(
                     player.mainHandStack,

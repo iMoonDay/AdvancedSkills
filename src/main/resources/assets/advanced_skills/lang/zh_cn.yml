@@ -64,7 +64,7 @@ advancedSkills:
       description: 向前冲刺
     ground_whack:
       name: 地面重击
-      description: 从空中砸向地面
+      description: 从空中砸向地面，免疫10格以下摔落伤害，10格以上摔落伤害减半
       failed: 不在空中！
     absolute_defense:
       name: 绝对防御
@@ -156,9 +156,48 @@ advancedSkills:
     charged_sweep:
       name: 蓄力横扫
       description: 蓄力后对前方扇形范围内实体造成伤害
+      charging: '%s 开始蓄力'
     active_defense:
       name: 主动防御
       description: 长按使用时减伤20%
+    self_repair:
+      name: 自我修复
+      description: 自动修复身上装备，最高修复至50%
+    instant_explosive:
+      name: 瞬爆炸药
+      description: 投掷一个不稳定的Tnt
+    primary_freeze:
+      name: 初级冰冻术
+      description: 发射一个30%概率冰冻周围生物的冰球
+    primary_slowness:
+      name: 初级迟缓术
+      description: 发射一个50%概率减缓周围生物速度的小冰球
+    primary_confinement:
+      name: 初级禁锢术
+      description: 在一定范围内，最高80%概率将指向的生物禁锢3s
+      success: 禁锢成功
+      failed: 禁锢失败
+      empty: 未选中目标
+    exclusive_mount:
+      name: 专属坐骑
+      description: 召唤一匹专属坐骑马，可以直接乘骑，仅本人可用，马的血量、防御、速度和跳跃高度提升。若马已存在一只，则销毁原先的，并召唤一只新的，这将重置所有状态。若马死亡，该技能进入冷却
+      unsupportedStatus: 当前状态无法召唤马
+      unsupportedPlace: 不能在这里召唤马
+      customName: "%s的专属坐骑"
+      notOwner: 你不是马的主人
+      dead: 你的特驯马在 %d %d %d 死亡，冷却后可以再次召唤它
+      killed: 你的特驯马在 %d %d %d 被 %s 击杀，冷却后可以再次召唤它
+      inventory: 你无法打开特驯马的物品栏
+    night_vision:
+      name: 夜视
+      description: 夜视效果
+    undead_summoning:
+      name: 死灵召唤
+      description: 召唤一些不死仆从
+      customName: "%s的奴仆"
+    taunt:
+      name: 嘲讽
+      description: 嘲讽其他玩家的奴仆，并获得奴仆伤害减伤，持续15s
   skillType:
     attack: 攻击技能
     defense: 防御技能
@@ -197,6 +236,8 @@ advancedSkills:
         learnAll: 学习全部
         forgetAll: 忘记全部
         resetCooldown: 重置冷却
+    slot:
+      title: 左键拖动移动，右键重置
 item:
   advanced_skills:
     skill_fruit: 技能果实
@@ -204,9 +245,15 @@ effect:
   advanced_skills:
     disarm: 缴械
     silence: 沉默
+    freeze: 冻结
+    confinement: 禁锢
 entity:
   advanced_skills:
     silence_energy_ball: 沉默能量球
+    unstable_tnt: 不稳定的TNT
+    special_tame_horse: 特驯马
+    servant_skeleton: 奴仆骷髅
+    servant_wither_skeleton: 奴仆凋零骷髅
 subtitles:
   advanced_skills:
     heal: 治愈

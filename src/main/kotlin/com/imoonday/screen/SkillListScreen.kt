@@ -1,12 +1,12 @@
 package com.imoonday.screen
 
-import com.imoonday.AdvancedSkills
 import com.imoonday.components.*
 import com.imoonday.screen.components.ShiftScrollContainer
 import com.imoonday.skills.Skills
 import com.imoonday.utils.AutoSyncedScreen
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillSlot
+import com.imoonday.utils.translate
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
@@ -49,8 +49,8 @@ class SkillListScreen(
         rootComponent.gap(3)
 
         rootComponent.child(Containers.verticalFlow(Sizing.fill(100), Sizing.content()).apply {
-            child(Components.label(Text.translatable("advancedSkills.screen.list.level", player.skillLevel)))
-            child(Components.label(Text.translatable("advancedSkills.screen.list.exp", player.skillExp)))
+            child(Components.label(translate("screen", "list.level", player.skillLevel)))
+            child(Components.label(translate("screen", "list.exp", player.skillExp)))
             child(Containers.grid(Sizing.fill(100), Sizing.fill(80), 1, 2).apply {
                 gap(3)
                 child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100)).apply {
@@ -75,17 +75,12 @@ class SkillListScreen(
                             (player as ClientPlayerEntity).networkHandler.sendCommand("skills @s $content")
                             close()
                         }.apply {
-                            tooltip(Text.translatable("advancedSkills.screen.list.button.tooltip"))
+                            tooltip(translate("screen", "list.button.tooltip"))
                         }
                     gap(5)
-                    child(createButton(Text.translatable("advancedSkills.screen.list.button.learnAll"), "learn-all"))
-                    child(createButton(Text.translatable("advancedSkills.screen.list.button.forgetAll"), "forget-all"))
-                    child(
-                        createButton(
-                            Text.translatable("advancedSkills.screen.list.button.resetCooldown"),
-                            "reset-cooldown"
-                        )
-                    )
+                    child(createButton(translate("screen", "list.button.learnAll"), "learn-all"))
+                    child(createButton(translate("screen", "list.button.forgetAll"), "forget-all"))
+                    child(createButton(translate("screen", "list.button.resetCooldown"), "reset-cooldown"))
                 })
             }
         })
@@ -105,7 +100,7 @@ class SkillListScreen(
         private val skill: Skill,
     ) : FlowLayout(Sizing.fill(98), Sizing.content(2), Algorithm.HORIZONTAL) {
         private val content: FlowLayout = Containers.horizontalFlow(Sizing.content(), Sizing.content())
-        private val equipButton = Components.texture(AdvancedSkills.id("equip.png"), 0, 0, 16, 16, 16, 16).apply {
+        private val equipButton = Components.texture(com.imoonday.utils.id("equip.png"), 0, 0, 16, 16, 16, 16).apply {
             mouseDown().subscribe { x, y, button ->
                 if (button == 0) {
                     val slot = getValidSlot()

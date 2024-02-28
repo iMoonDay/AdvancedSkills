@@ -5,7 +5,7 @@ import com.imoonday.components.isUsingSkill
 import com.imoonday.components.startUsingSkill
 import com.imoonday.components.stopUsingSkill
 import com.imoonday.init.ModSounds
-import com.imoonday.trigger.AutoStopTrigger
+import com.imoonday.triggers.AutoStopTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult
@@ -13,6 +13,7 @@ import com.imoonday.utils.send
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
 
 class PiercingSkill : Skill(
@@ -23,6 +24,7 @@ class PiercingSkill : Skill(
     sound = ModSounds.PIERCING
 ), AutoStopTrigger {
     override fun use(user: ServerPlayerEntity): UseResult {
+        user.stopFallFlying()
         user.velocityDirty = true
         user.velocity = user.rotationVector.normalize().multiply(1.5, 0.0, 1.5)
         val noGravity = user.hasNoGravity()
@@ -65,7 +67,7 @@ class PiercingSkill : Skill(
         }
         player.world.getOtherEntities(player, player.boundingBox) { it.isLiving && it.isAlive }.forEach {
             it.damage(player.damageSources.playerAttack(player), 6.0f)
-            it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(1.5))
+            it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(1.5).withAxis(Direction.Axis.Y, 1.0))
         }
         super.tick(player, usedTime)
     }

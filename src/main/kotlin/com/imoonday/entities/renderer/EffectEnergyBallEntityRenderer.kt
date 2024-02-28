@@ -24,6 +24,8 @@ abstract class EffectEnergyBallEntityRenderer<T : EffectEnergyBallEntity>(contex
         return super.getBlockLight(entity, pos)
     }
 
+    protected open var scale = 2.0f
+
     override fun render(
         entity: T,
         f: Float,
@@ -33,7 +35,7 @@ abstract class EffectEnergyBallEntityRenderer<T : EffectEnergyBallEntity>(contex
         i: Int,
     ) {
         matrixStack.push()
-        matrixStack.scale(2.0f, 2.0f, 2.0f)
+        matrixStack.scale(scale, scale, scale)
         matrixStack.multiply(dispatcher.rotation)
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f))
         val entry = matrixStack.peek()

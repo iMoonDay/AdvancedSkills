@@ -4,8 +4,8 @@ import com.imoonday.components.isUsingSkill
 import com.imoonday.components.modifyCooldown
 import com.imoonday.components.startCooling
 import com.imoonday.components.stopUsingSkill
-import com.imoonday.trigger.AttributeTrigger
-import com.imoonday.trigger.PlayerDamageTrigger
+import com.imoonday.triggers.AttributeTrigger
+import com.imoonday.triggers.PlayerDamageTrigger
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult
 import net.minecraft.entity.LivingEntity

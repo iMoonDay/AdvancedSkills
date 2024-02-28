@@ -1,13 +1,20 @@
 package com.imoonday.init
 
-import com.imoonday.AdvancedSkills
-import com.imoonday.entities.SilenceEnergyBallEntity
+import com.imoonday.entities.*
+import com.imoonday.entities.renderer.FreezeEnergyBallEntityRenderer
 import com.imoonday.entities.renderer.SilenceEnergyBallEntityRenderer
+import com.imoonday.entities.renderer.SlownessEnergyBallEntityRenderer
+import com.imoonday.utils.id
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
+import net.minecraft.client.render.entity.HorseEntityRenderer
+import net.minecraft.client.render.entity.SkeletonEntityRenderer
+import net.minecraft.client.render.entity.TntEntityRenderer
+import net.minecraft.client.render.entity.WitherSkeletonEntityRenderer
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.DefaultAttributeContainer
+import net.minecraft.entity.passive.AbstractHorseEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 
@@ -23,14 +30,67 @@ object ModEntities {
             .build()
             .register("silence_energy_ball")
 
+    @JvmField
+    val UNSTABLE_TNT: EntityType<UnstableTntEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.MISC, ::UnstableTntEntity)
+            .dimensions(EntityDimensions.fixed(0.98f, 0.98f))
+            .fireImmune()
+            .trackRangeChunks(10)
+            .trackedUpdateRate(10)
+            .build()
+            .register("unstable_tnt")
+
+    @JvmField
+    val FREEZE_ENERGY_BALL: EntityType<FreezeEnergyBallEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.MISC, ::FreezeEnergyBallEntity)
+            .dimensions(EntityDimensions.fixed(1.0f, 1.0f))
+            .trackRangeChunks(4)
+            .trackedUpdateRate(10)
+            .build()
+            .register("freeze_energy_ball")
+
+    @JvmField
+    val SLOWNESS_ENERGY_BALL: EntityType<SlownessEnergyBallEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.MISC, ::SlownessEnergyBallEntity)
+            .dimensions(EntityDimensions.fixed(1.0f, 1.0f))
+            .trackRangeChunks(4)
+            .trackedUpdateRate(10)
+            .build()
+            .register("slowness_energy_ball")
+
+    @JvmField
+    val SPECIAL_TAME_HORSE: EntityType<SpecialTameHorseEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, ::SpecialTameHorseEntity)
+            .dimensions(EntityDimensions.fixed(1.3964844f, 1.6f))
+            .trackRangeChunks(10)
+            .build()
+            .register("special_tame_horse", AbstractHorseEntity.createBaseHorseAttributes().build())
+
+    @JvmField
+    val SERVANT_SKELETON: EntityType<ServantSkeletonEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, ::ServantSkeletonEntity)
+            .dimensions(EntityDimensions.fixed(0.6f, 1.99f))
+            .trackRangeChunks(8)
+            .build()
+            .register("servant_skeleton", ServantSkeletonEntity.createAttributes().build())
+
+    @JvmStatic
+    val SERVANT_WITHER_SKELETON: EntityType<ServantWitherSkeletonEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, ::ServantWitherSkeletonEntity)
+            .dimensions(EntityDimensions.fixed(0.7f, 2.4f))
+            .fireImmune()
+            .trackRangeChunks(8)
+            .build()
+            .register("servant_wither_skeleton", ServantWitherSkeletonEntity.createAttributes().build())
+
     fun <T : Entity> EntityType<T>.register(name: String): EntityType<T> =
-        Registry.register(Registries.ENTITY_TYPE, AdvancedSkills.id(name), this)
+        Registry.register(Registries.ENTITY_TYPE, id(name), this)
 
     fun <T : LivingEntity> EntityType<T>.register(
         name: String,
         attributeContainer: DefaultAttributeContainer,
     ): EntityType<T> {
-        Registry.register(Registries.ENTITY_TYPE, AdvancedSkills.id(name), this)
+        Registry.register(Registries.ENTITY_TYPE, id(name), this)
         FabricDefaultAttributeRegistry.register(this, attributeContainer)
         return this
     }
@@ -39,5 +99,11 @@ object ModEntities {
 
     fun initClient() {
         EntityRendererRegistry.register(SILENCE_ENERGY_BALL, ::SilenceEnergyBallEntityRenderer)
+        EntityRendererRegistry.register(UNSTABLE_TNT, ::TntEntityRenderer)
+        EntityRendererRegistry.register(FREEZE_ENERGY_BALL, ::FreezeEnergyBallEntityRenderer)
+        EntityRendererRegistry.register(SLOWNESS_ENERGY_BALL, ::SlownessEnergyBallEntityRenderer)
+        EntityRendererRegistry.register(SPECIAL_TAME_HORSE, ::HorseEntityRenderer)
+        EntityRendererRegistry.register(SERVANT_SKELETON, ::SkeletonEntityRenderer)
+        EntityRendererRegistry.register(SERVANT_WITHER_SKELETON, ::WitherSkeletonEntityRenderer)
     }
 }

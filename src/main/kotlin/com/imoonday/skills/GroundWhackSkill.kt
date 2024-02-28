@@ -3,15 +3,15 @@ package com.imoonday.skills
 import com.imoonday.components.isUsingSkill
 import com.imoonday.components.startUsingSkill
 import com.imoonday.components.stopUsingSkill
-import com.imoonday.trigger.LandingTrigger
-import com.imoonday.trigger.PersistentTrigger
+import com.imoonday.triggers.FallTrigger
+import com.imoonday.triggers.LandingTrigger
+import com.imoonday.triggers.PersistentTrigger
 import com.imoonday.utils.*
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
 import kotlin.math.absoluteValue
 import kotlin.math.min
@@ -21,9 +21,9 @@ class GroundWhackSkill : Skill(
     types = arrayOf(SkillType.ATTACK, SkillType.MOVEMENT),
     cooldown = 8,
     rarity = Rarity.RARE
-), LandingTrigger, PersistentTrigger {
+), LandingTrigger, PersistentTrigger, FallTrigger {
     override fun use(user: ServerPlayerEntity): UseResult {
-        if (user.isOnGround) return UseResult.fail(Text.translatable("advancedSkills.skill.ground_whack.failed"))
+        if (user.isOnGround) return UseResult.fail(translateSkill(id.path, "failed"))
         user.run {
             velocity = Vec3d(0.0, min(velocity.y, -1.0), 0.0)
             send(EntityVelocityUpdateS2CPacket(this))
@@ -57,5 +57,10 @@ class GroundWhackSkill : Skill(
             player.world.playSound(null, player.blockPos, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS)
         }
         player.stopUsingSkill(this)
+    }
+
+    override fun onFall(amount: Int, player: ServerPlayerEntity, fallDistance: Float, damageMultiplier: Float): Int {
+        if (!player.isUsingSkill(this)) return amount
+        return if (fallDistance < 10) 0 else amount / 2
     }
 }

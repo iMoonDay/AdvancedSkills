@@ -1,7 +1,7 @@
 package com.imoonday.skills
 
 import com.imoonday.init.ModSounds
-import com.imoonday.trigger.SynchronousCoolingTrigger
+import com.imoonday.triggers.SynchronousCoolingTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult

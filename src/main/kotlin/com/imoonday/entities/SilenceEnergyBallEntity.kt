@@ -8,7 +8,7 @@ import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.world.World
 
-class SilenceEnergyBallEntity(entityType: EntityType<out EffectEnergyBallEntity>, world: World) :
+class SilenceEnergyBallEntity(entityType: EntityType<out SilenceEnergyBallEntity>, world: World) :
     EffectEnergyBallEntity(entityType, world) {
 
     override var effects = mutableMapOf(

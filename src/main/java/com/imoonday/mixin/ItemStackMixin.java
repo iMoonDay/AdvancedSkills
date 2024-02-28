@@ -1,6 +1,6 @@
 package com.imoonday.mixin;
 
-import com.imoonday.trigger.SkillTriggerHandler;
+import com.imoonday.triggers.SkillTriggerHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;

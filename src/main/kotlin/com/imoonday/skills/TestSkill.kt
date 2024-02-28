@@ -1,6 +1,6 @@
 package com.imoonday.skills
 
-import com.imoonday.AdvancedSkills
+import com.imoonday.utils.id
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult
@@ -10,7 +10,7 @@ import net.minecraft.text.Text
 class TestSkill(
     index: Int,
 ) : Skill(
-    id = AdvancedSkills.id("test_$index"),
+    id = id("test_$index"),
     name = Text.literal("Test $index"),
     description = Text.literal(generateRandomString((1..100).random())),
     cooldown = (0..20 * 10).random(),

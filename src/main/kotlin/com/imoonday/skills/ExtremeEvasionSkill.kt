@@ -3,9 +3,9 @@ package com.imoonday.skills
 import com.imoonday.components.isUsingSkill
 import com.imoonday.components.startUsingSkill
 import com.imoonday.init.ModSounds
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.PlayerDamageTrigger
-import com.imoonday.trigger.VelocitySyncTrigger
+import com.imoonday.triggers.AutoStopTrigger
+import com.imoonday.triggers.PlayerDamageTrigger
+import com.imoonday.triggers.VelocitySyncTrigger
 import com.imoonday.utils.Skill
 import com.imoonday.utils.SkillType
 import com.imoonday.utils.UseResult
@@ -31,6 +31,7 @@ class ExtremeEvasionSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
+            stopFallFlying()
             velocity = (if (velocity.x == 0.0 && velocity.z == 0.0) rotationVector else velocity).normalize()
                 .multiply(2.0, 0.0, 2.0)
             send(EntityVelocityUpdateS2CPacket(this))

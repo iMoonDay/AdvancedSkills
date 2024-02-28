@@ -3,9 +3,9 @@ package com.imoonday.skills
 import com.imoonday.components.isUsingSkill
 import com.imoonday.components.startCooling
 import com.imoonday.components.startUsingSkill
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.DeathTrigger
-import com.imoonday.trigger.PlayerDamageTrigger
+import com.imoonday.triggers.AutoStopTrigger
+import com.imoonday.triggers.DeathTrigger
+import com.imoonday.triggers.PlayerDamageTrigger
 import com.imoonday.utils.*
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource

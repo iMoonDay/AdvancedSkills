@@ -20,8 +20,8 @@ class AdvancedPurificationSkill : Skill(
         ?.let {
             user.removeStatusEffect(it.effectType)
             return UseResult.success(
-                Text.translatable(
-                    "advancedSkills.skill.advanced_purification.success",
+                translateSkill(
+                    id.path, "success",
                     Text.translatable(it.translationKey).string
                 )
             )
@@ -34,12 +34,12 @@ class AdvancedPurificationSkill : Skill(
             user.send(EntityStatusEffectS2CPacket(user.id, it))
             val amount = (duration - it.duration) / 20.0
             return UseResult.success(
-                Text.translatable(
-                    "advancedSkills.skill.primary_purification.success",
+                translateSkill(
+                    "primary_purification", "success",
                     Text.translatable(it.translationKey).string,
                     amount
                 )
             )
         }
-    ?: UseResult.fail(Text.translatable("advancedSkills.skill.advanced_purification.failed"))
+    ?: UseResult.fail(translateSkill(id.path, "failed"))
 }

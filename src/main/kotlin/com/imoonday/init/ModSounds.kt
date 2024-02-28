@@ -1,6 +1,6 @@
 package com.imoonday.init
 
-import com.imoonday.AdvancedSkills
+import com.imoonday.utils.id
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.SoundEvent
@@ -31,7 +31,7 @@ object ModSounds {
     fun init() = Unit
 
     fun register(name: String): SoundEvent {
-        val id = AdvancedSkills.id(name)
+        val id = id(name)
         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id))
     }
 }

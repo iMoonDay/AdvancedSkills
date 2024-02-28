@@ -1,6 +1,6 @@
 package com.imoonday.network
 
-import com.imoonday.AdvancedSkills
+import com.imoonday.utils.id
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
 import net.fabricmc.fabric.api.networking.v1.PacketType
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -11,7 +11,7 @@ class UpdateVelocityC2SPacket(
     val velocity: Vec3d,
 ) : FabricPacket {
     companion object {
-        val id = AdvancedSkills.id("update_velocity_c2s")
+        val id = id("update_velocity_c2s")
         val pType = PacketType.create(id) {
             UpdateVelocityC2SPacket(Vec3d(it.readDouble(), it.readDouble(), it.readDouble()))
         }!!

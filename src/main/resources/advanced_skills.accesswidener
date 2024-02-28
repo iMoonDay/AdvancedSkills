@@ -1,3 +1,11 @@
 accessWidener   v1  named
 
 accessible class net/minecraft/client/gui/hud/InGameHud$HeartType
+
+accessible field net/minecraft/client/render/entity/EntityRenderer shadowRadius F
+
+accessible field net/minecraft/client/render/entity/EntityRenderer shadowOpacity F
+
+accessible field net/minecraft/entity/TntEntity causingEntity Lnet/minecraft/entity/LivingEntity;
+
+extendable method net/minecraft/entity/TntEntity explode ()V

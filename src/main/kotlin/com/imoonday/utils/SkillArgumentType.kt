@@ -1,6 +1,5 @@
 package com.imoonday.utils
 
-import com.imoonday.AdvancedSkills
 import com.imoonday.skills.Skills
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
@@ -11,7 +10,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry
 import net.minecraft.command.CommandSource
 import net.minecraft.command.argument.serialize.ConstantArgumentSerializer
-import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.InvalidIdentifierException
 import java.util.concurrent.CompletableFuture
@@ -44,9 +42,9 @@ class SkillArgumentType : ArgumentType<Skill> {
     }
 
     companion object {
-        val UNKNOWN = SimpleCommandExceptionType(Text.translatable("advancedSkills.command.invalid"))
+        val UNKNOWN = SimpleCommandExceptionType(translate("command", "invalid"))
         fun register() = ArgumentTypeRegistry.registerArgumentType(
-            AdvancedSkills.id("skill"),
+            id("skill"),
             SkillArgumentType::class.java,
             ConstantArgumentSerializer.of(SkillArgumentType::skill)
         )

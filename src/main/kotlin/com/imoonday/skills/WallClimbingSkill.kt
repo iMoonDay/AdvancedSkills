@@ -2,12 +2,14 @@ package com.imoonday.skills
 
 import com.imoonday.components.isUsingSkill
 import com.imoonday.components.toggleUsingSkill
-import com.imoonday.trigger.ClimbingTrigger
-import com.imoonday.trigger.PersistentTrigger
-import com.imoonday.utils.*
+import com.imoonday.triggers.ClimbingTrigger
+import com.imoonday.triggers.PersistentTrigger
+import com.imoonday.utils.Skill
+import com.imoonday.utils.SkillType
+import com.imoonday.utils.UseResult
+import com.imoonday.utils.translateSkill
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
 
 class WallClimbingSkill : Skill(
     id = "wall_climbing",
@@ -18,8 +20,8 @@ class WallClimbingSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         val active = user.toggleUsingSkill(this)
         return UseResult.consume(
-            Text.translatable(
-                "advancedSkills.skill.wall_climbing.${if (active) "active" else "inactive"}",
+            translateSkill(
+                id.path, if (active) "active" else "inactive",
                 name.string
             )
         )

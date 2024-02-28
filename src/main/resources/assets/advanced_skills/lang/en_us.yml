@@ -64,7 +64,7 @@ advancedSkills:
       description: Dash forward
     ground_whack:
       name: Ground Whack
-      description: Smash to the ground while in the air
+      description: Smashed from the air to the ground, immune to fall damage below 10 blocks, and half damage from falls above 10 blocks
       failed: Not in the air!
     absolute_defense:
       name: Absolute Defense
@@ -156,9 +156,48 @@ advancedSkills:
     charged_sweep:
       name: Charged Sweep
       description: After charging, it will cause damage to entities within the fan-shaped range in front
+      charging: '%s start charging'
     active_defense:
       name: Active Defense
       description: Reduce damage by 20% when long pressed
+    self_repair:
+      name: Self Repair
+      description: Automatically repair your equipment, up to 50%
+    instant_explosive:
+      name: Instant Explosive
+      description: Throw a unstable tnt
+    primary_freeze:
+      name: Primary Freeze
+      description: Fires an ice ball with a 30% chance of freezing surrounding creatures
+    primary_slowness:
+      name: Primary Slowness
+      description: Fires an small ice ball with a 50% chance of slowing surrounding creatures
+    primary_confinement:
+      name: Primary Confinement
+      description: Within a certain range, there is a maximum 80% probability of confining the pointed creature for 3 seconds.
+      success: Confinement successful
+      failed: Confinement failed
+      empty: No Target selected
+    exclusive_mount:
+      name: Exclusive Mount
+      description: Summons an exclusive horse that can be ridden directly. It is only available to you. The horse's health, defense, speed and jumping height are increased. If a horse already exists, discard the original one and summon a new one, which will reset all states. If the horse dies, this skill will go on cooldown
+      unsupportedStatus: You can't summon the horse in your current state
+      unsupportedPlace: You can't summon the horse here
+      customName: "%s's exclusive mount"
+      notOwner: You are not the owner of the horse
+      dead: You exclusive horse is dead at %d %d %d. You can summon it again after the cooldown
+      killed: Your exclusive horse is killed by %s at %d %d %d. You can summon it again after the cooldown
+      inventory: You can't open the inventory of your exclusive mount
+    night_vision:
+      name: Night Vision
+      description: Night vision effect
+    undead_summoning:
+      name: Undead Summoning
+      description: Summon some undead minions
+      customName: "%s's servant"
+    taunt:
+      name: Taunt
+      description: Taunt other players' minions and gain minion damage reduction for 15 s
   skillType:
     attack: Attack Skill
     defense: Defense Skill
@@ -197,6 +236,8 @@ advancedSkills:
         learnAll: Learn All
         forgetAll: Forget All
         resetCooldown: Reset Cooldown
+    slot:
+      title: Left drag to move, right click to reset
 item:
   advanced_skills:
     skill_fruit: Skill Fruit
@@ -204,9 +245,15 @@ effect:
   advanced_skills:
     disarm: Disarm
     silence: Silence
+    freeze: Freeze
+    confinement: Confinement
 entity:
   advanced_skills:
     silence_energy_ball: Silence Energy Ball
+    unstable_tnt: Unstable TNT
+    special_tame_horse: Special Tame Horse
+    servant_skeleton: Servant Skeleton
+    servant_wither_skeleton: Servant Wither Skeleton
 subtitles:
   advanced_skills:
     heal: Heal
