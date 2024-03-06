@@ -1,8 +1,7 @@
 package com.imoonday.init
 
-import com.imoonday.skills.Skills
-import com.imoonday.utils.id
-import com.imoonday.utils.translate
+import com.imoonday.util.id
+import com.imoonday.util.translate
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.minecraft.item.ItemGroup
 import net.minecraft.item.Items
@@ -17,7 +16,8 @@ object ModItemGroups {
         .icon { ModItems.UNIQUE_SKILL_FRUIT.defaultStack ?: Items.BARRIER.defaultStack }
         .displayName(translate("key", "category"))
         .entries { _, entries ->
-            Skills.SKILLS.filterNot { it.isEmpty }.mapNotNull { it.item }.forEach { entries.add(it.defaultStack) }
+            ModItems.FRUITS.forEach { entries.add(it) }
+            ModSkills.SKILLS.filterNot { it.invalid }.mapNotNull { it.item }.forEach { entries.add(it) }
         }
         .build()!!
 

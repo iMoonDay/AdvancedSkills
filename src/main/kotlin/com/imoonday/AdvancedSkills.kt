@@ -1,10 +1,9 @@
 package com.imoonday
 
+import com.imoonday.config.Config
 import com.imoonday.init.*
-import com.imoonday.network.Channels
-import com.imoonday.skills.Skills
-import com.imoonday.utils.EventHandler
-import com.imoonday.utils.SkillArgumentType
+import com.imoonday.util.EventHandler
+import com.imoonday.util.SkillArgumentType
 import net.fabricmc.api.ModInitializer
 import org.slf4j.LoggerFactory
 
@@ -14,8 +13,9 @@ object AdvancedSkills : ModInitializer {
     private val logger = LoggerFactory.getLogger(MOD_ID)
 
     override fun onInitialize() {
-        Skills.init()
-        Channels.registerServer()
+        Config.load()
+        ModSkills.init()
+        ModChannels.registerServer()
         ModCommands.init()
         SkillArgumentType.register()
         ModItemGroups.init()

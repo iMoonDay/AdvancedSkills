@@ -1,11 +1,11 @@
 package com.imoonday.init
 
-import com.imoonday.components.*
-import com.imoonday.skills.Skills
-import com.imoonday.utils.SkillArgumentType
-import com.imoonday.utils.SkillSlot
-import com.imoonday.utils.translate
+import com.imoonday.component.*
+import com.imoonday.util.SkillArgumentType
+import com.imoonday.util.SkillSlot
+import com.imoonday.util.translate
 import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.LongArgumentType
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.argument.EntityArgumentType
 import net.minecraft.server.command.CommandManager.argument
@@ -42,7 +42,7 @@ object ModCommands {
                         )
                         .then(literal("learn-all").executes { context ->
                             val target = EntityArgumentType.getPlayer(context, "target")
-                            Skills.SKILLS.filterNot { it.isEmpty }.forEach { skill ->
+                            ModSkills.SKILLS.filterNot { it.invalid }.forEach { skill ->
                                 target.learnSkill(skill)
                             }
                             1
@@ -89,7 +89,7 @@ object ModCommands {
                                         val target = EntityArgumentType.getPlayer(it, "target")
                                         val slot = IntegerArgumentType.getInteger(it, "slot")
                                         val skill = SkillArgumentType.getSkill(it)
-                                        if (target.equipSkill(SkillSlot.fromIndex(slot), skill)) {
+                                        if (target.equipSkill(skill, SkillSlot.fromIndex(slot))) {
                                             it.source.sendFeedback(
                                                 {
                                                     translate(
@@ -145,8 +145,8 @@ object ModCommands {
                     literal("add")
                         .then(
                             argument("targets", EntityArgumentType.players())
-                                .then(argument("amount", IntegerArgumentType.integer()).executes {
-                                    val amount = IntegerArgumentType.getInteger(it, "amount")
+                                .then(argument("amount", LongArgumentType.longArg()).executes {
+                                    val amount = LongArgumentType.getLong(it, "amount")
                                     val targets = EntityArgumentType.getPlayers(it, "targets")
 
                                     for (entity in targets) {
@@ -177,8 +177,8 @@ object ModCommands {
                     literal("set")
                         .then(
                             argument("targets", EntityArgumentType.players()).then(
-                                argument("amount", IntegerArgumentType.integer()).executes {
-                                    val amount = IntegerArgumentType.getInteger(it, "amount")
+                                argument("amount", LongArgumentType.longArg(0)).executes {
+                                    val amount = LongArgumentType.getLong(it, "amount")
                                     val targets = EntityArgumentType.getPlayers(it, "targets")
 
                                     for (entity in targets) {

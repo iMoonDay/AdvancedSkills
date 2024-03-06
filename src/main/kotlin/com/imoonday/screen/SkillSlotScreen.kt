@@ -1,10 +1,11 @@
 package com.imoonday.screen
 
-import com.imoonday.config.Config
+import com.imoonday.config.UIConfigModel
 import com.imoonday.render.SkillSlotRenderer
-import com.imoonday.utils.translate
+import com.imoonday.util.translate
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
+import io.wispforest.owo.ui.component.SlimSliderComponent
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
@@ -27,10 +28,22 @@ class SkillSlotScreen : BaseOwoScreen<FlowLayout>() {
             )
         )
 
+        if (!SkillSlotRenderer.progressStrings.filterNotNull().all { it.fixed }) {
+            rootComponent.child(Components.slimSlider(SlimSliderComponent.Axis.HORIZONTAL).apply {
+                horizontalSizing(Sizing.fill(25))
+                min(0.25)
+                max(5.0)
+                value(UIConfigModel.instance.nameScrollRate)
+                onChanged().subscribe {
+                    UIConfigModel.instance.nameScrollRate = it
+                }
+            })
+        }
+
         rootComponent.mouseDrag().subscribe { mouseX, mouseY, deltaX, deltaY, button ->
             return@subscribe if (button == 0) {
-                Config.instance.offsetX = client!!.window.scaledWidth - mouseX.toInt() - 32
-                Config.instance.offsetY = mouseY.toInt() - client!!.window.scaledHeight / 2
+                UIConfigModel.instance.uiOffsetX = client!!.window.scaledWidth - mouseX.toInt() - 32
+                UIConfigModel.instance.uiOffsetY = mouseY.toInt() - client!!.window.scaledHeight / 2
                 true
             } else {
                 false
@@ -39,8 +52,8 @@ class SkillSlotScreen : BaseOwoScreen<FlowLayout>() {
 
         rootComponent.mouseDown().subscribe { mouseX, mouseY, button ->
             return@subscribe if (button == 1) {
-                Config.instance.offsetX = 0
-                Config.instance.offsetY = 0
+                UIConfigModel.instance.uiOffsetX = 0
+                UIConfigModel.instance.uiOffsetY = 0
                 true
             } else {
                 false
@@ -59,19 +72,19 @@ class SkillSlotScreen : BaseOwoScreen<FlowLayout>() {
         val amount = if (hasShiftDown()) 10 else 1
         when (keyCode) {
             GLFW.GLFW_KEY_LEFT -> {
-                Config.instance.offsetX += amount
+                UIConfigModel.instance.uiOffsetX += amount
             }
 
             GLFW.GLFW_KEY_RIGHT -> {
-                Config.instance.offsetX -= amount
+                UIConfigModel.instance.uiOffsetX -= amount
             }
 
             GLFW.GLFW_KEY_UP -> {
-                Config.instance.offsetY -= amount
+                UIConfigModel.instance.uiOffsetY -= amount
             }
 
             GLFW.GLFW_KEY_DOWN -> {
-                Config.instance.offsetY += amount
+                UIConfigModel.instance.uiOffsetY += amount
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers)

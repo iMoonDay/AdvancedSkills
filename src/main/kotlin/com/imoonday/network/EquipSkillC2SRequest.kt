@@ -1,10 +1,10 @@
 package com.imoonday.network
 
-import com.imoonday.skills.Skills
-import com.imoonday.utils.Skill
-import com.imoonday.utils.SkillSlot
-import com.imoonday.components.equipSkill
-import com.imoonday.utils.id
+import com.imoonday.component.equipSkill
+import com.imoonday.init.ModSkills
+import com.imoonday.skill.Skill
+import com.imoonday.util.SkillSlot
+import com.imoonday.util.id
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
 import net.fabricmc.fabric.api.networking.v1.PacketType
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -17,12 +17,12 @@ class EquipSkillC2SRequest(
     companion object {
         val id = id("equip_skill_c2s")
         val pType = PacketType.create(id) {
-            EquipSkillC2SRequest(SkillSlot.fromIndex(it.readInt()), Skills.get(it.readIdentifier()))
+            EquipSkillC2SRequest(SkillSlot.fromIndex(it.readInt()), ModSkills.get(it.readIdentifier()))
         }!!
 
         fun register() {
             ServerPlayNetworking.registerGlobalReceiver(pType) { packet, player, sender ->
-                player.equipSkill(packet.slot, packet.skill)
+                player.equipSkill(packet.skill, packet.slot)
             }
         }
     }

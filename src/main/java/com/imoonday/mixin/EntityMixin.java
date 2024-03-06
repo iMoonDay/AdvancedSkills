@@ -1,15 +1,25 @@
 package com.imoonday.mixin;
 
 import com.imoonday.init.ModEffectsKt;
+import com.imoonday.trigger.SkillTriggerHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.registry.tag.TagKey;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public class EntityMixin {
+
+    @Shadow
+    private float stepHeight;
 
     @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
     public void advanced_skills$changeLookDirection(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
@@ -44,5 +54,32 @@ public class EntityMixin {
         if ((Entity) (Object) this instanceof LivingEntity living && ModEffectsKt.isForceFrozen(living)) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "getStepHeight", at = @At("HEAD"), cancellable = true)
+    private void advanced_skills$getStepHeight(CallbackInfoReturnable<Float> cir) {
+        if ((Entity) (Object) this instanceof PlayerEntity player) {
+            Float height = SkillTriggerHandler.INSTANCE.getStepHeight(player);
+            if (height != null && height > this.stepHeight) {
+                cir.setReturnValue(height);
+            }
+        }
+    }
+
+    @Inject(method = "updateMovementInFluid", at = @At("HEAD"), cancellable = true)
+    private void advanced_skills$updateMovementInFluid(TagKey<Fluid> tag, double speed, CallbackInfoReturnable<Boolean> cir) {
+        if ((Entity) (Object) this instanceof PlayerEntity player) {
+            if (SkillTriggerHandler.INSTANCE.ignoreFluid(player, tag)) {
+                cir.setReturnValue(false);
+            }
+        }
+    }
+
+    @ModifyVariable(method = "updateMovementInFluid", at = @At("HEAD"), argsOnly = true, index = 2)
+    private double advanced_skills$modifySpeed(double value, TagKey<Fluid> tag, double speed) {
+        if ((Entity) (Object) this instanceof PlayerEntity player) {
+            return SkillTriggerHandler.INSTANCE.getMovementInFluid(player, tag, value);
+        }
+        return speed;
     }
 }

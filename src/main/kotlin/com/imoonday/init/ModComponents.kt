@@ -1,7 +1,7 @@
 package com.imoonday.init
 
-import com.imoonday.components.*
-import com.imoonday.utils.id
+import com.imoonday.component.*
+import com.imoonday.util.id
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry
@@ -12,8 +12,8 @@ import net.minecraft.entity.LivingEntity
 
 object ModComponents : EntityComponentInitializer {
     @JvmField
-    val EXP: ComponentKey<IntComponent> =
-        ComponentRegistry.getOrCreate(id("exp"), IntComponent::class.java)
+    val EXP: ComponentKey<LongComponent> =
+        ComponentRegistry.getOrCreate(id("exp"), LongComponent::class.java)
 
     @JvmField
     val SKILLS: ComponentKey<Skill2IntMapComponent> =
@@ -28,8 +28,8 @@ object ModComponents : EntityComponentInitializer {
         ComponentRegistry.getOrCreate(id("using_skills"), Skill2NbtComponent::class.java)
 
     @JvmField
-    val DAMAGED_TIME: ComponentKey<LongComponent> =
-        ComponentRegistry.getOrCreate(id("damaged_time"), LongComponent::class.java)
+    val DAMAGED_TIME: ComponentKey<PairLongComponent> =
+        ComponentRegistry.getOrCreate(id("damaged_time"), PairLongComponent::class.java)
 
     @JvmField
     val STATUS: ComponentKey<StatusComponent> =

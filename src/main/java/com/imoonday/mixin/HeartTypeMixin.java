@@ -1,6 +1,6 @@
 package com.imoonday.mixin;
 
-import com.imoonday.triggers.SkillTriggerHandler;
+import com.imoonday.trigger.SkillTriggerHandler;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.PlayerEntity;

@@ -1,6 +1,6 @@
 package com.imoonday.init
 
-import com.imoonday.utils.id
+import com.imoonday.util.id
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.sound.SoundEvent

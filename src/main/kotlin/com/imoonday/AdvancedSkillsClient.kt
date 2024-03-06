@@ -1,17 +1,17 @@
 package com.imoonday
 
-import com.imoonday.config.Config
+import com.imoonday.config.UIConfigModel
+import com.imoonday.init.ModChannels
 import com.imoonday.init.ModEntities
 import com.imoonday.init.ModKeyBindings
-import com.imoonday.network.Channels
-import com.imoonday.utils.EventHandler
+import com.imoonday.util.EventHandler
 import net.fabricmc.api.ClientModInitializer
 
 object AdvancedSkillsClient : ClientModInitializer {
     override fun onInitializeClient() {
-        Config.load()
+        UIConfigModel.load()
         ModKeyBindings.init()
-        Channels.registerClient()
+        ModChannels.registerClient()
         ModEntities.initClient()
         EventHandler.registerClient()
     }

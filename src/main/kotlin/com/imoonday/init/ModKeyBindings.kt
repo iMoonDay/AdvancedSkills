@@ -4,8 +4,7 @@ import com.imoonday.network.UseSkillC2SRequest
 import com.imoonday.screen.SkillGalleryScreen
 import com.imoonday.screen.SkillListScreen
 import com.imoonday.screen.SkillSlotScreen
-import com.imoonday.skills.Skills
-import com.imoonday.utils.SkillSlot
+import com.imoonday.util.SkillSlot
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
@@ -22,7 +21,7 @@ object ModKeyBindings {
     @JvmField
     val OPEN_GALLERY_SCREEN = register("openGalleryScreen", GLFW.GLFW_KEY_G) {
         it.setScreen(SkillGalleryScreen().apply {
-            selectedSkill = Skills.FIREBALL
+            selectedSkill = ModSkills.FIREBALL
         })
     }
 

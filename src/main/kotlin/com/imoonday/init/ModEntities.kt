@@ -1,10 +1,7 @@
 package com.imoonday.init
 
-import com.imoonday.entities.*
-import com.imoonday.entities.renderer.FreezeEnergyBallEntityRenderer
-import com.imoonday.entities.renderer.SilenceEnergyBallEntityRenderer
-import com.imoonday.entities.renderer.SlownessEnergyBallEntityRenderer
-import com.imoonday.utils.id
+import com.imoonday.entity.*
+import com.imoonday.util.id
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
@@ -98,10 +95,10 @@ object ModEntities {
     fun init() = Unit
 
     fun initClient() {
-        EntityRendererRegistry.register(SILENCE_ENERGY_BALL, ::SilenceEnergyBallEntityRenderer)
+        EntityRendererRegistry.register(SILENCE_ENERGY_BALL, SilenceEnergyBallEntity::Renderer)
         EntityRendererRegistry.register(UNSTABLE_TNT, ::TntEntityRenderer)
-        EntityRendererRegistry.register(FREEZE_ENERGY_BALL, ::FreezeEnergyBallEntityRenderer)
-        EntityRendererRegistry.register(SLOWNESS_ENERGY_BALL, ::SlownessEnergyBallEntityRenderer)
+        EntityRendererRegistry.register(FREEZE_ENERGY_BALL, FreezeEnergyBallEntity::Renderer)
+        EntityRendererRegistry.register(SLOWNESS_ENERGY_BALL, SlownessEnergyBallEntity::Renderer)
         EntityRendererRegistry.register(SPECIAL_TAME_HORSE, ::HorseEntityRenderer)
         EntityRendererRegistry.register(SERVANT_SKELETON, ::SkeletonEntityRenderer)
         EntityRendererRegistry.register(SERVANT_WITHER_SKELETON, ::WitherSkeletonEntityRenderer)

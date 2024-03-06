@@ -1,9 +1,9 @@
 package com.imoonday.screen
 
-import com.imoonday.screen.components.ShiftScrollContainer
-import com.imoonday.skills.Skills
-import com.imoonday.utils.Skill
-import com.imoonday.utils.translate
+import com.imoonday.init.ModSkills
+import com.imoonday.skill.Skill
+import com.imoonday.util.alpha
+import com.imoonday.util.translate
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.component.LabelComponent
@@ -24,11 +24,12 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
             refreshInfoBox()
         }
     private val skillScroll: ScrollContainer<FlowLayout> =
-        Containers.verticalScroll(Sizing.fill(60), Sizing.fill(100), Containers.verticalFlow(
+        Containers.verticalScroll(Sizing.fill(55), Sizing.fill(100), Containers.verticalFlow(
             Sizing.fill(100),
             Sizing.content()
         ).apply {
-            Skills.SKILLS.filterNot { it.isEmpty }.forEachIndexed { i: Int, skill: Skill ->
+            padding(Insets.right(1))
+            ModSkills.SKILLS.filterNot { it.invalid }.forEachIndexed { i: Int, skill: Skill ->
                 child(SkillLine(i + 1, skill))
             }
         }).apply {
@@ -59,6 +60,7 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
             child(Components.label(translate("screen", "gallery.title")))
         })
         rootComponent.child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(95)).apply {
+            horizontalAlignment(HorizontalAlignment.CENTER)
             child(skillScroll)
             child(infoBox)
         })
@@ -118,34 +120,31 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
         index: Int,
         val skill: Skill,
     ) : FlowLayout(Sizing.fill(98), Sizing.content(2), Algorithm.HORIZONTAL) {
-        private val content: FlowLayout = Containers.horizontalFlow(Sizing.content(), Sizing.content())
+        private val content: FlowLayout = Containers.horizontalFlow(Sizing.fill(95), Sizing.content())
 
         init {
             gap(5)
             surface(Surface.PANEL_INSET)
             content.gap(5)
                 .alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-                .padding(Insets.of(2).withLeft(0))
+                .padding(Insets.of(5))
             child(content)
             alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
 
-            content.child(Components.label(Text.literal(index.toString())))
+            content.child(Components.label(Text.literal(index.toString().padStart(3, '0'))))
             content.child(Components.texture(skill.icon, 0, 0, 16, 16, 16, 16))
-            content.child(Containers.verticalFlow(Sizing.fill(80), Sizing.content()).apply {
+            content.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
+                gap(2)
                 child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
                     gap(5)
                     child(Components.label(skill.formattedName))
-                    child(Components.label(Text.literal("(${skill.cooldown / 20.0}s)")))
                 })
-                child(
-                    ShiftScrollContainer.horizontalScroll(
-                        Sizing.fill(100),
-                        Sizing.content(),
-                        Components.label(skill.description)
-                    ).apply {
-                        scrollbarThiccness(0)
-                    }
-                )
+                child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
+                    gap(5)
+                    child(Components.label(skill.rarity.displayName))
+                    child(Components.label(Text.literal("|")))
+                    child(Components.label(Text.literal(skill.types.joinToString(" ") { it.displayName.string })))
+                })
             })
 
             mouseDown().subscribe { _, _, _ ->
@@ -162,7 +161,7 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
                     y,
                     x + width,
                     y + height,
-                    Color(255, 255, 255, (255 * if (selectedSkill == skill) 0.4 else 0.2).toInt()).rgb
+                    Color.WHITE.alpha(if (selectedSkill == skill) 0.4 else 0.2).rgb
                 )
             }
         }

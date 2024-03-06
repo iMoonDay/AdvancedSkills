@@ -1,12 +1,13 @@
 package com.imoonday.screen
 
-import com.imoonday.components.*
-import com.imoonday.screen.components.ShiftScrollContainer
-import com.imoonday.skills.Skills
-import com.imoonday.utils.AutoSyncedScreen
-import com.imoonday.utils.Skill
-import com.imoonday.utils.SkillSlot
-import com.imoonday.utils.translate
+import com.imoonday.component.*
+import com.imoonday.init.ModSkills
+import com.imoonday.screen.component.ShiftScrollContainer
+import com.imoonday.skill.Skill
+import com.imoonday.util.AutoSyncedScreen
+import com.imoonday.util.SkillSlot
+import com.imoonday.util.alpha
+import com.imoonday.util.translate
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
@@ -49,7 +50,15 @@ class SkillListScreen(
         rootComponent.gap(3)
 
         rootComponent.child(Containers.verticalFlow(Sizing.fill(100), Sizing.content()).apply {
-            child(Components.label(translate("screen", "list.level", player.skillLevel)))
+            child(
+                Components.label(
+                    translate(
+                        "screen",
+                        "list.level",
+                        "${player.skillLevel % 100}${if (player.skillLevel > 100) " (+${player.skillLevel / 100})" else ""}"
+                    )
+                )
+            )
             child(Components.label(translate("screen", "list.exp", player.skillExp)))
             child(Containers.grid(Sizing.fill(100), Sizing.fill(80), 1, 2).apply {
                 gap(3)
@@ -58,7 +67,7 @@ class SkillListScreen(
                         Sizing.fill(100),
                         Sizing.content()
                     ).apply {
-                        player.learnedSkills.filterNot { it.isEmpty }
+                        player.learnedSkills.filterNot { it.invalid }
                             .forEach { child(SkillLine(it)) }
                     }).apply {
                         scrollbar(ScrollContainer.Scrollbar.vanilla())
@@ -83,6 +92,11 @@ class SkillListScreen(
                     child(createButton(translate("screen", "list.button.resetCooldown"), "reset-cooldown"))
                 })
             }
+            child(Components.button(translate("screen", "list.button.inventory")) {
+                client!!.setScreen(SkillInventoryScreen(player, this@SkillListScreen))
+            }.apply {
+                positioning(Positioning.relative(100, 0))
+            })
         })
     }
 
@@ -98,14 +112,15 @@ class SkillListScreen(
 
     inner class SkillLine(
         private val skill: Skill,
-    ) : FlowLayout(Sizing.fill(98), Sizing.content(2), Algorithm.HORIZONTAL) {
+    ) : FlowLayout(Sizing.fill(98), Sizing.content(5), Algorithm.HORIZONTAL) {
         private val content: FlowLayout = Containers.horizontalFlow(Sizing.content(), Sizing.content())
-        private val equipButton = Components.texture(com.imoonday.utils.id("equip.png"), 0, 0, 16, 16, 16, 16).apply {
+        private val equipButton = Components.texture(com.imoonday.util.id("equip.png"), 0, 0, 16, 16, 16, 16).apply {
             mouseDown().subscribe { x, y, button ->
                 if (button == 0) {
                     val slot = getValidSlot()
                     return@subscribe if (slot != SkillSlot.INVALID) {
-                        player.equipSkill(slot, skill)
+                        player.equipSkill(skill, slot)
+                        selectedSlot = null
                         true
                     } else false
                 }
@@ -115,8 +130,8 @@ class SkillListScreen(
 
         private fun getValidSlot(): SkillSlot {
             val skills = player.equippedSkills
-            return if (selectedSlotSkill != null && selectedSlotSkill != skill || skills.any { it.isEmpty } && skills.none { it == skill }) selectedSlot
-                ?: SkillSlot.fromIndex(skills.indexOfFirst { it.isEmpty } + 1) else SkillSlot.INVALID
+            return if (selectedSlotSkill != null && selectedSlotSkill != skill || skills.any { it.invalid } && skills.none { it == skill }) selectedSlot
+                ?: SkillSlot.fromIndex(skills.indexOfFirst { it.invalid } + 1) else SkillSlot.INVALID
         }
 
         private var lastClickTime: Long = 0
@@ -124,15 +139,16 @@ class SkillListScreen(
         init {
             gap(5)
             surface(Surface.PANEL_INSET)
-            content.gap(5)
+            content.gap(7)
                 .alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-                .padding(Insets.of(2).withLeft(0))
+                .padding(Insets.of(5, 5, 2, 0))
             child(content)
             alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
             padding(Insets.horizontal(5))
 
             content.child(Components.texture(skill.icon, 0, 0, 16, 16, 16, 16))
             content.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
+                gap(5)
                 child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
                     gap(5)
                     child(Components.label(skill.formattedName))
@@ -140,7 +156,7 @@ class SkillListScreen(
                 })
                 child(
                     ShiftScrollContainer.horizontalScroll(
-                        Sizing.fill(77),
+                        Sizing.fill(85),
                         Sizing.content(),
                         Components.label(skill.description)
                     ).apply {
@@ -151,7 +167,9 @@ class SkillListScreen(
                     }
                 )
             })
-            content.child(equipButton)
+            child(equipButton.apply {
+                positioning(Positioning.relative(100, 50))
+            })
 
             mouseDown().subscribe { _, _, button ->
                 onMouseDown(button)
@@ -187,7 +205,7 @@ class SkillListScreen(
                     y,
                     x + width,
                     y + height,
-                    Color(255, 255, 255, (255 * if (selectedSkill == skill) 0.4 else 0.2).toInt()).rgb
+                    Color.WHITE.alpha(if (selectedSkill == skill) 0.4 else 0.2).rgb
                 )
             }
         }
@@ -218,8 +236,8 @@ class SkillListScreen(
 
         private fun onMouseDown(button: Int): Boolean {
             if (button != 0) return false
-            if (!skill.isEmpty && Util.getMeasuringTimeMs() - lastClickTime < 250L) {
-                player.equipSkill(slot, Skills.EMPTY)
+            if (!skill.invalid && Util.getMeasuringTimeMs() - lastClickTime < 250L) {
+                player.equipSkill(ModSkills.EMPTY, slot)
             }
             lastClickTime = Util.getMeasuringTimeMs()
             selectedSlot = if (selectedSlot != slot) slot else null
@@ -228,9 +246,10 @@ class SkillListScreen(
         }
 
         fun updateSkill(skill: Skill? = null) {
+            if (this.skill == skill) return
             this.skill = skill ?: this.skill
             clearChildren()
-            if (!this.skill.isEmpty) {
+            if (!this.skill.invalid) {
                 content.clearChildren()
                 child(content)
 
@@ -244,7 +263,7 @@ class SkillListScreen(
                     })
                     child(
                         ShiftScrollContainer.horizontalScroll(
-                            Sizing.fill(80),
+                            Sizing.fill(85),
                             Sizing.content(),
                             Components.label(this@SlotLine.skill.description)
                         ).apply {
@@ -263,7 +282,7 @@ class SkillListScreen(
                     y + 3,
                     x + width - 3,
                     y + height - 3,
-                    Color(255, 255, 255, (255 * if (selectedSlot == slot) 0.4 else 0.2).toInt()).rgb
+                    Color.WHITE.alpha(if (selectedSkill == skill) 0.4 else 0.2).rgb
                 )
             }
         }

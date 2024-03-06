@@ -40,7 +40,7 @@ dependencies {
 
     // modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
-    modImplementation "io.wispforest:owo-lib:${project.owo_version}"
+    annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
     include "io.wispforest:owo-sentinel:${project.owo_version}"
 
     modApi "fi.dy.masa.malilib:malilib-fabric-1.20.1:0.16.2"

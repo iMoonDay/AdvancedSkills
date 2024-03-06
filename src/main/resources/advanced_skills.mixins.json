@@ -9,7 +9,10 @@
     "CreeperIgniteGoalMixin",
     "CrossbowAttackGoalMixin",
     "DamageTrackerMixin",
+    "EndermanEntity$TeleportTowardsPlayerGoalMixin",
+    "EndermanEntityMixin",
     "EntityMixin",
+    "FluidBlockMixin",
     "GhastEntity$ShootFireballGoalMixin",
     "GuardianEntity$FireBeamGoalMixin",
     "ItemStackMixin",
@@ -27,8 +30,8 @@
   },
   "client": [
     "ClientPlayerEntityMixin",
-    "EntityRenderDispatcherMixin",
     "GameRendererMixin",
+    "HandledScreenMixin",
     "HeartTypeMixin",
     "InGameHudMixin"
   ]

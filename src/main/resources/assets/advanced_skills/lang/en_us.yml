@@ -20,6 +20,7 @@ advancedSkills:
     all: All skills learned
     failed: '%s already know %s'
     failedSelf: 'You already know %s'
+    invalid: 'Unable to learn %s'
   forgetSkill:
     message: 'Forgotten %s'
     failed: "%s don't know %s"
@@ -36,7 +37,8 @@ advancedSkills:
       multiple: Set %d skill experience points on %d players
     query: '%s has %d skill experience points'
   command:
-    invalid: Invalid Skill id
+    unknown: Unknown skill ID
+    invalid: Invalid skill ID
   skill:
     empty:
       name: Empty
@@ -127,7 +129,7 @@ advancedSkills:
       description: 'When receiving fatal damage, the HP returns to the upper limit, and then enters death mode: HP is continuously deducted, and HP can be sucked by attacking other creatures. When the HP is insufficient, you will die'
     disarm:
       name: Disarm
-      description: The next attack has a 45% chance of disarming the target.
+      description: The next attack has a 45% chance of disarming the target
       success: Disarm Successful!
       failed: Disarm Failed
       disarmed: You are disarmed!
@@ -174,7 +176,7 @@ advancedSkills:
       description: Fires an small ice ball with a 50% chance of slowing surrounding creatures
     primary_confinement:
       name: Primary Confinement
-      description: Within a certain range, there is a maximum 80% probability of confining the pointed creature for 3 seconds.
+      description: Within a certain range, there is a maximum 80% probability of confining the pointed creature for 3 seconds
       success: Confinement successful
       failed: Confinement failed
       empty: No Target selected
@@ -198,23 +200,32 @@ advancedSkills:
     taunt:
       name: Taunt
       description: Taunt other players' minions and gain minion damage reduction for 15 s
+    liquid_shield:
+      name: Liquid Shield
+      description: You will isolate the liquid
+    water_walker:
+      name: Water Walker
+      description: You can walk on water
+    automatic_uphill:
+      name: Automatic Uphill
+      description: You can step up blocks smoothly
   skillType:
-    attack: Attack Skill
-    defense: Defense Skill
-    healing: Healing Skill
-    control: Control Skill
-    passive: Passive Skill
-    enhancement: Enhancement Skill
-    summon: Summon Skill
-    restoration: Restoration Skill
-    movement: Movement Skill
-    destruction: Destruction Skill
+    attack: Attack
+    defense: Defense
+    healing: Healing
+    control: Control
+    passive: Passive
+    enhancement: Enhancement
+    summon: Summon
+    restoration: Restoration
+    movement: Movement
+    destruction: Destruction
   skillRarity:
     useless: Useless
     common: Common
     uncommon: Uncommon
     rare: Rare
-    veryRare: Very Rare
+    superb: Superb
     epic: Epic
     legendary: Legendary
     mythic: Mythic
@@ -229,15 +240,18 @@ advancedSkills:
         cooldown: 'Cooldown: %s'
         rarity: 'Rarity: %s'
     list:
-      level: 'Level: %d'
+      level: 'Level: %s'
       exp: 'Exp: %d'
       button:
         tooltip: Displayed in Creative Mode Only
         learnAll: Learn All
         forgetAll: Forget All
         resetCooldown: Reset Cooldown
+        inventory: Inventory
     slot:
       title: Left drag to move, right click to reset
+    inventory:
+      title: 'Skill Inventory | %d/%d'
 item:
   advanced_skills:
     skill_fruit: Skill Fruit

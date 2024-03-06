@@ -1,7 +1,7 @@
 package com.imoonday.api;
 
-import com.imoonday.utils.Skill;
-import com.imoonday.utils.SkillSlot;
+import com.imoonday.skill.Skill;
+import com.imoonday.util.SkillSlot;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;

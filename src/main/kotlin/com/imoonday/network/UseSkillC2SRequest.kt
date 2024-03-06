@@ -1,8 +1,8 @@
 package com.imoonday.network
 
-import com.imoonday.components.getSkill
-import com.imoonday.utils.id
-import com.imoonday.utils.SkillSlot
+import com.imoonday.component.getSkill
+import com.imoonday.util.SkillSlot
+import com.imoonday.util.id
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
 import net.fabricmc.fabric.api.networking.v1.PacketType
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking

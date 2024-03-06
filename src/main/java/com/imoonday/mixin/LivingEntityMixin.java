@@ -1,17 +1,17 @@
 package com.imoonday.mixin;
 
-import com.imoonday.components.EntityStatusComponentKt;
-import com.imoonday.components.UsingSkillComponentKt;
+import com.imoonday.component.EntityStatusComponentKt;
+import com.imoonday.component.UsingSkillComponentKt;
 import com.imoonday.init.ModEffectsKt;
-import com.imoonday.skills.Skills;
-import com.imoonday.triggers.SkillTriggerHandler;
+import com.imoonday.init.ModSkills;
+import com.imoonday.trigger.SkillTriggerHandler;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 
@@ -32,23 +33,14 @@ public class LivingEntityMixin {
     @ModifyReturnValue(method = "modifyAppliedDamage", at = @At("RETURN"))
     private float advanced_skills$modifyAppliedDamage(float original, DamageSource source, float amount) {
         if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || original <= 0.0f) return original;
-        float newAmount = original;
-        ServerPlayerEntity player = null;
-        if (source.getSource() instanceof ServerPlayerEntity entity) {
-            player = entity;
+        LivingEntity attacker = source.getSource() instanceof LivingEntity entity ? entity : source.getAttacker() instanceof LivingEntity entity1 ? entity1 : null;
+        LivingEntity target = (LivingEntity) (Object) this;
+        if (target instanceof ServerPlayerEntity player) {
+            return SkillTriggerHandler.INSTANCE.onDamaged(original, source, player, attacker);
+        } else if (attacker instanceof ServerPlayerEntity player) {
+            return SkillTriggerHandler.INSTANCE.onAttack(original, source, player, target);
         }
-        if (source.getSource() instanceof ProjectileEntity) {
-            if (source.getAttacker() instanceof ServerPlayerEntity entity) {
-                player = entity;
-            }
-        }
-        LivingEntity living = (LivingEntity) (Object) this;
-        if (player == null) {
-            return living instanceof ServerPlayerEntity serverPlayer ? SkillTriggerHandler.INSTANCE.onPlayerDamaged(original, source, serverPlayer, source.getSource() instanceof LivingEntity entity ? entity : source.getAttacker() instanceof LivingEntity entity1 ? entity1 : null) : original;
-        }
-        newAmount = SkillTriggerHandler.INSTANCE.onAttack(newAmount, source, player, living);
-        newAmount = living instanceof ServerPlayerEntity serverPlayer ? SkillTriggerHandler.INSTANCE.onPlayerDamaged(newAmount, source, serverPlayer, player) : SkillTriggerHandler.INSTANCE.onDamaged(newAmount, source, living, player);
-        return newAmount;
+        return original;
     }
 
     @ModifyReturnValue(method = "computeFallDamage", at = @At("RETURN"))
@@ -98,6 +90,13 @@ public class LivingEntityMixin {
     @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
     public boolean advanced_skills$hasStatusEffect(boolean original, StatusEffect effect) {
         if (effect != StatusEffects.NIGHT_VISION) return original;
-        return (LivingEntity) (Object) this instanceof PlayerEntity player && UsingSkillComponentKt.isUsingSkill(player, Skills.NIGHT_VISION) || original;
+        return (LivingEntity) (Object) this instanceof PlayerEntity player && UsingSkillComponentKt.isUsingSkill(player, ModSkills.NIGHT_VISION) || original;
+    }
+
+    @Inject(method = "canWalkOnFluid", at = @At("HEAD"), cancellable = true)
+    public void advanced_skills$canWalkOnFluid(FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
+        if ((LivingEntity) (Object) this instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.allowWalkOnFluid(player, fluidState)) {
+            cir.setReturnValue(true);
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.imoonday.mixin;
 
-import com.imoonday.components.SkillExpComponentKt;
-import com.imoonday.entities.Servant;
+import com.imoonday.component.SkillExpComponentKt;
+import com.imoonday.entity.Servant;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;

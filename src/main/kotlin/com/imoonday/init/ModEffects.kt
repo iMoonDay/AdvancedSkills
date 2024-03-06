@@ -1,17 +1,17 @@
 package com.imoonday.init
 
-import com.imoonday.components.status
-import com.imoonday.effects.ConfinementEffect
-import com.imoonday.effects.DisarmEffect
-import com.imoonday.effects.FreezeEffect
-import com.imoonday.effects.SilenceEffect
-import com.imoonday.utils.id
+import com.imoonday.component.status
+import com.imoonday.effect.*
+import com.imoonday.util.id
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffect
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 
 object ModEffects {
+
+    @JvmField
+    val SYNC_CLIENT_EFFECTS: MutableList<SyncClientEffect> = mutableListOf()
 
     @JvmField
     val DISARM = DisarmEffect().register("disarm")
@@ -25,20 +25,25 @@ object ModEffects {
     @JvmField
     val CONFINEMENT = ConfinementEffect().register("confinement")
 
-    fun <T : StatusEffect> T.register(id: String): T =
-        Registry.register(Registries.STATUS_EFFECT, id(id), this)
+    fun <T : StatusEffect> T.register(id: String): T {
+        if (this is SyncClientEffect) SYNC_CLIENT_EFFECTS.add(this)
+        return Registry.register(Registries.STATUS_EFFECT, id(id), this)
+    }
 
     fun init() = Unit
 }
 
 val LivingEntity.isDisarmed: Boolean
-    get() = hasStatusEffect(ModEffects.DISARM)
+    get() = hasStatusEffect(this, ModEffects.DISARM)
 
 val LivingEntity.isSilenced: Boolean
-    get() = hasStatusEffect(ModEffects.SILENCE)
+    get() = hasStatusEffect(this, ModEffects.SILENCE)
 
 val LivingEntity.isForceFrozen: Boolean
-    get() = if (!world.isClient) hasStatusEffect(ModEffects.FREEZE) else status.getBoolean("frozen")
+    get() = hasStatusEffect(this, ModEffects.FREEZE)
 
 val LivingEntity.isConfined: Boolean
-    get() = hasStatusEffect(ModEffects.CONFINEMENT)
+    get() = hasStatusEffect(this, ModEffects.CONFINEMENT)
+
+private fun hasStatusEffect(entity: LivingEntity, effect: StatusEffect): Boolean =
+    if (effect is SyncClientEffect) entity.status.getBoolean(effect.syncId) else entity.hasStatusEffect(effect)

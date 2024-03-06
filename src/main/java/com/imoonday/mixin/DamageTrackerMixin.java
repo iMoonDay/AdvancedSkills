@@ -1,6 +1,6 @@
 package com.imoonday.mixin;
 
-import com.imoonday.components.DamagedTimeComponentKt;
+import com.imoonday.component.DamagedTimeComponentKt;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTracker;
