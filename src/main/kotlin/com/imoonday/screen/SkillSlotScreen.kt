@@ -64,7 +64,7 @@ class SkillSlotScreen : BaseOwoScreen<FlowLayout>() {
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(context, mouseX, mouseY, delta)
         client?.let {
-            SkillSlotRenderer.render(it, context, delta)
+            SkillSlotRenderer.render(it, context)
         }
     }
 

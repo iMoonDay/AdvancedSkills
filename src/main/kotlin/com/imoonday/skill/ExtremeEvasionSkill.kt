@@ -1,11 +1,9 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.startUsingSkill
 import com.imoonday.init.ModSounds
 import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.trigger.DamageTrigger
-import com.imoonday.trigger.VelocitySyncTrigger
+import com.imoonday.trigger.SendPlayerVelocityTrigger
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.send
@@ -22,11 +20,9 @@ class ExtremeEvasionSkill : Skill(
     cooldown = 10,
     rarity = Rarity.EPIC,
     sound = ModSounds.DASH
-), AutoStopTrigger, DamageTrigger, VelocitySyncTrigger {
+), AutoStopTrigger, DamageTrigger, SendPlayerVelocityTrigger {
 
-    override val persistTime: Int = 10
-    override val skill: Skill
-        get() = this
+    override fun getPersistTime(): Int = 10
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
@@ -46,7 +42,7 @@ class ExtremeEvasionSkill : Skill(
                 0.0
             )
         }
-        return UseResult.of(user.startUsingSkill(skill))
+        return UseResult.startUsing(user, this)
     }
 
     override fun onDamaged(
@@ -54,5 +50,5 @@ class ExtremeEvasionSkill : Skill(
         source: DamageSource,
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
-    ): Float = if (!player.isUsingSkill(this)) amount else 0.0f
+    ): Float = if (!player.isUsing()) amount else 0.0f
 }

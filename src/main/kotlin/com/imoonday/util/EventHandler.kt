@@ -105,11 +105,11 @@ object EventHandler {
     }
 
     fun registerClient() {
-        HudRenderCallback.EVENT.register { context, delta ->
+        HudRenderCallback.EVENT.register { context, _ ->
             val client = MinecraftClient.getInstance()
-            SkillSlotRenderer.render(client, context, delta)
+            SkillSlotRenderer.render(client, context)
         }
-        LivingEntityFeatureRendererRegistrationCallback.EVENT.register { entityType, renderer, helper, context ->
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register { _, renderer, helper, context ->
             helper.register(StatusEffectLayer(renderer, context))
             helper.register(IceLayer(renderer, context))
             if (renderer is PlayerEntityRenderer) ModSkills.SKILLS.filterIsInstance<FeatureRendererTrigger>()

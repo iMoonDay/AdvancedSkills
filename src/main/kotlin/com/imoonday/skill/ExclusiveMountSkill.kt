@@ -1,6 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.startCooling
 import com.imoonday.component.status
 import com.imoonday.entity.SpecialTameHorseEntity
 import com.imoonday.init.ModComponents
@@ -41,7 +40,7 @@ class ExclusiveMountSkill : Skill(
             newHorse.requestTeleport(user.x, user.y, user.z)
             user.world.spawnEntity(newHorse)
             newHorse.putPlayerOnBack(user)
-            user.startCooling(this)
+            user.startCooling()
             return UseResult.consume()
         } else return UseResult.fail(translateSkill("exclusive_mount", "unsupportedPlace"))
     }

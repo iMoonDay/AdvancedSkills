@@ -3,20 +3,16 @@ package com.imoonday.trigger
 import com.imoonday.component.getSkillData
 import com.imoonday.component.lastDamagedTime
 import com.imoonday.component.lastReflectedTime
-import com.imoonday.component.startUsingSkill
 import com.imoonday.util.UseResult
 import com.imoonday.util.translateSkill
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Util
 
 interface ReflectionTrigger : AutoStopTrigger {
 
     fun startReflecting(user: PlayerEntity) = UseResult.of(
-        user.startUsingSkill(
-            skill,
-            NbtCompound().apply { putLong("startTime", Util.getMeasuringTimeMs()) }),
+        user.startUsing { it.putLong("startTime", Util.getMeasuringTimeMs()) },
         null,
         translateSkill("extreme_reflection", "active")
     )
@@ -38,5 +34,5 @@ interface ReflectionTrigger : AutoStopTrigger {
         super.onStop(player)
     }
 
-    fun getStartTime(player: ServerPlayerEntity) = player.getSkillData(skill)?.getLong("startTime")
+    fun getStartTime(player: ServerPlayerEntity) = player.getSkillData(asSkill())?.getLong("startTime")
 }

@@ -2,8 +2,11 @@ package com.imoonday.trigger
 
 import com.imoonday.component.*
 import com.imoonday.init.ModComponents
+import com.imoonday.network.SendPlayerDataC2SPacket
 import com.imoonday.skill.Skill
+import com.imoonday.trigger.SendPlayerDataTrigger.SendTime.*
 import com.imoonday.util.SkillSlot
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.block.BlockState
 import net.minecraft.client.gui.hud.InGameHud.HeartType
 import net.minecraft.client.network.ClientPlayerEntity
@@ -13,6 +16,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.fluid.Fluid
 import net.minecraft.fluid.FluidState
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.BlockPos
@@ -47,12 +51,14 @@ object SkillTriggerHandler {
     }
 
     fun tick(player: ServerPlayerEntity) = player.run {
-        cooldownTick(this)
+        val skills = this.getComponent(ModComponents.SKILLS).skills
+        skills.filterValues { it > 0 }.forEach { skills[it.key] = it.value - 1 }
+        ModComponents.SKILLS.sync(this)
         updateSkillUsedTime()
         equippedSkills.filter { it is AutoStartTrigger }
             .filterNot { it in usingSkills }
             .forEach { onStart(player, it) }
-        equippedSkills.filterNot { it in usingSkills }
+        equippedSkills
             .filterIsInstance<AutoTrigger>()
             .forEach { it.tick(this) }
         equippedSkills.filter { it is TickTrigger }
@@ -91,12 +97,6 @@ object SkillTriggerHandler {
             .filterIsInstance<ClimbingTrigger>()
             .map { it.isClimbing(player) }
             .any { it }
-
-    fun syncVelocity(player: ClientPlayerEntity) {
-        player.equippedSkills
-            .filterIsInstance<VelocitySyncTrigger>()
-            .forEach { it.syncVelocity(player) }
-    }
 
     fun onEquipped(player: ServerPlayerEntity, slot: SkillSlot, skill: Skill) =
         (skill as? EquipTrigger)?.onEquipped(player, slot) ?: true
@@ -144,9 +144,47 @@ object SkillTriggerHandler {
             .any { it }
     }
 
-    private fun cooldownTick(player: ServerPlayerEntity) {
-        val skills = player.getComponent(ModComponents.SKILLS).skills
-        skills.filterValues { it > 0 }.forEach { skills[it.key] = it.value - 1 }
-        ModComponents.SKILLS.sync(player)
+    fun canBreatheInWater(player: PlayerEntity): Boolean {
+        return player.equippedSkills
+            .filterIsInstance<BreatheInWaterTrigger>()
+            .map { it.canBreatheInWater(player) }
+            .any { it }
+    }
+
+    fun isInvisible(player: PlayerEntity): Boolean {
+        return player.equippedSkills
+            .filterIsInstance<InvisibilityTrigger>()
+            .map { it.isInvisible(player) }
+            .any { it }
+    }
+
+    fun isInvisibleTo(player: PlayerEntity, otherPlayer: PlayerEntity): Boolean {
+        return player.equippedSkills
+            .filterIsInstance<InvisibilityTrigger>()
+            .map { it.isInvisibleTo(player, otherPlayer) }
+            .any { it }
+    }
+
+    fun sendPlayerData(player: ClientPlayerEntity) {
+        player.learnedSkills
+            .filter { it is SendPlayerDataTrigger && it.getSendTime() != USE }
+            .forEach {
+                it as SendPlayerDataTrigger
+                val send = when (it.getSendTime()) {
+                    ALWAYS -> true
+                    USING -> player.isUsingSkill(it)
+                    EQUIPPED -> it in player.equippedSkills
+                    else -> false
+                }
+                if (send) ClientPlayNetworking.send(SendPlayerDataC2SPacket(it, it.write(player, NbtCompound())))
+            }
+    }
+
+    fun getItemMaxUseTimeMultiplier(player: PlayerEntity, stack: ItemStack): Float {
+        var multiplier = 1.0f
+        player.equippedSkills
+            .filterIsInstance<ItemMaxUseTimeTrigger>()
+            .forEach { multiplier += it.getItemMaxUseTimeMultiplier(player, stack) }
+        return multiplier.coerceAtLeast(0f)
     }
 }

@@ -1,9 +1,8 @@
 package com.imoonday.skill
 
 import com.imoonday.component.isCooling
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.startCooling
 import com.imoonday.trigger.*
+import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import net.minecraft.entity.LivingEntity
@@ -20,7 +19,7 @@ class LastDitchEffortSkill : Skill(
     cooldown = 180,
     rarity = Rarity.SUPERB,
 ), DamageTrigger, AutoStopTrigger, AttackTrigger, AttributeTrigger, AutoTrigger, DeathTrigger {
-    override val attribute: Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             MOVEMENT_SPEED_UUID,
             "Last Ditch Effort",
@@ -29,9 +28,12 @@ class LastDitchEffortSkill : Skill(
         )
     )
 
-    override val persistTime: Int = 20 * 15
-    override val skill: Skill
-        get() = this
+    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
+        super<AutoStopTrigger>.postUnequipped(player, slot)
+        super<AttributeTrigger>.postUnequipped(player, slot)
+    }
+
+    override fun getPersistTime(): Int = 20 * 15
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
 
@@ -40,12 +42,12 @@ class LastDitchEffortSkill : Skill(
         source: DamageSource,
         player: ServerPlayerEntity,
         target: LivingEntity,
-    ): Float = if (!player.isUsingSkill(this)) amount else amount + 1
+    ): Float = if (!player.isUsing()) amount else amount + 1
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean {
         return if (!player.isCooling(this) && (player.health / player.maxHealth) < 0.3f) {
             player.health = player.maxHealth * 0.5f
-            addAttributes(player)
+            player.addAttributes()
             true
         } else false
     }
@@ -55,16 +57,16 @@ class LastDitchEffortSkill : Skill(
         source: DamageSource,
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
-    ): Float = if (!player.isUsingSkill(this)) amount else amount + 1
+    ): Float = if (!player.isUsing()) amount else amount + 1
 
     override fun onStop(player: ServerPlayerEntity) {
-        player.startCooling(this)
-        removeAttributes(player)
+        player.startCooling()
+        player.removeAttributes()
         super.onStop(player)
     }
 
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean {
-        player.startCooling(this)
+        player.startCooling()
         return true
     }
 

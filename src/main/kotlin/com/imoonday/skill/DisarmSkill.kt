@@ -35,7 +35,7 @@ class DisarmSkill : Skill(
         player: ServerPlayerEntity,
         target: LivingEntity,
     ): Float {
-        if (!player.isUsingSkill(this)) return amount
+        if (!player.isUsing()) return amount
         if (Random.nextFloat() <= 0.45f) {
             target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM, 20 * 5, 0))
             player.sendMessage(translate("skill", "disarm.success"), true)
@@ -54,12 +54,12 @@ class DisarmSkill : Skill(
             player.sendMessage(translate("skill", "disarm.failed"), true)
         }
 
-        player.stopUsingSkill(this)
-        player.startCooling(this)
+        player.stopUsing()
+        player.startCooling()
         return amount
     }
 
     override fun afterRespawn(oldPlayer: ServerPlayerEntity, newPlayer: ServerPlayerEntity, alive: Boolean) {
-        if (oldPlayer.isUsingSkill(this)) newPlayer.startCooling(this)
+        if (oldPlayer.isUsing()) newPlayer.startCooling()
     }
 }

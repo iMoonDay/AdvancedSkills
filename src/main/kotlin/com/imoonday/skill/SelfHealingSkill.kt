@@ -1,8 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.startUsingSkill
-import com.imoonday.component.stopUsingSkill
 import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.trigger.AutoTrigger
 import com.imoonday.trigger.DamageTrigger
@@ -19,10 +16,7 @@ class SelfHealingSkill : Skill(
 ), AutoTrigger, AutoStopTrigger, DamageTrigger {
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
 
-    override val persistTime: Int = 20 * 10
-
-    override val skill: Skill
-        get() = this
+    override fun getPersistTime(): Int = 20 * 10
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = player.health < player.maxHealth
 
@@ -37,10 +31,10 @@ class SelfHealingSkill : Skill(
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
     ): Float {
-        if (!player.isUsingSkill(this)) return amount
-        player.stopUsingSkill(skill)
+        if (!player.isUsing()) return amount
+        player.stopUsing()
         if (shouldStart(player)) {
-            player.startUsingSkill(skill)
+            player.startUsing()
         }
         return amount
     }

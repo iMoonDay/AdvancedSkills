@@ -6,8 +6,8 @@ object ModChannels {
     fun registerServer() {
         UseSkillC2SRequest.register()
         EquipSkillC2SRequest.register()
-        UpdateVelocityC2SPacket.register()
         SyncConfigS2CPacket.register()
+        SendPlayerDataC2SPacket.register()
     }
 
     fun registerClient() {

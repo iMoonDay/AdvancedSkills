@@ -1,9 +1,7 @@
 package com.imoonday.skill
 
 import com.imoonday.component.getSkillData
-import com.imoonday.component.isUsingSkill
 import com.imoonday.component.startUsingSkill
-import com.imoonday.component.stopUsingSkill
 import com.imoonday.init.ModSounds
 import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.util.SkillType
@@ -29,21 +27,19 @@ class PiercingSkill : Skill(
         val noGravity = user.hasNoGravity()
         user.setNoGravity(true)
         user.send(EntityVelocityUpdateS2CPacket(user))
-        return UseResult.of(user.startUsingSkill(skill, NbtCompound().apply {
+        return UseResult.of(user.startUsingSkill(asSkill(), NbtCompound().apply {
             putDouble("x", user.velocity.x)
             putDouble("z", user.velocity.z)
             putBoolean("noGravity", noGravity)
         }))
     }
 
-    override val persistTime: Int = 8
-    override val skill: Skill
-        get() = this
+    override fun getPersistTime(): Int = 8
 
     override fun onStop(player: ServerPlayerEntity) {
         player.velocityDirty = true
         player.velocity = Vec3d.ZERO
-        player.getSkillData(skill)?.let {
+        player.getSkillData(asSkill())?.let {
             player.setNoGravity(it.getBoolean("noGravity"))
         }
         player.send(EntityVelocityUpdateS2CPacket(player))
@@ -51,13 +47,13 @@ class PiercingSkill : Skill(
     }
 
     override fun tick(player: ServerPlayerEntity, usedTime: Int) {
-        if (!player.isUsingSkill(this)) return
+        if (!player.isUsing()) return
         if (player.horizontalCollision) {
             onStop(player)
-            player.stopUsingSkill(skill)
+            player.stopUsing()
             return
         }
-        player.getSkillData(skill)?.let {
+        player.getSkillData(asSkill())?.let {
             if (it.contains("x") && it.contains("z")) {
                 player.velocityDirty = true
                 player.velocity = Vec3d(it.getDouble("x"), 0.0, it.getDouble("z"))

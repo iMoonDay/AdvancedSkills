@@ -209,6 +209,18 @@ advancedSkills:
     automatic_uphill:
       name: Automatic Uphill
       description: You can step up blocks smoothly
+    water_breathing:
+      name: Water Breathing
+      description: You can breathe in water
+    static_invisibility:
+      name: Static Invisibility
+      description: Be invisible when stationary
+    faster_eating:
+      name: Faster Eating
+      description: Increase the speed of eating
+    danger_perception:
+      name: Danger Perception
+      description: Gain temporary speed when in danger
   skillType:
     attack: Attack
     defense: Defense

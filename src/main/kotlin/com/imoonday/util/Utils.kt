@@ -10,6 +10,8 @@ import net.minecraft.network.packet.Packet
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvent
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
@@ -60,8 +62,10 @@ fun PlayerEntity.spawnParticles(
         ?: world.addParticle(type, x, y, z, deltaX, deltaY, deltaZ)
 }
 
+fun ServerPlayerEntity.playSound(sound: SoundEvent) {
+    world.playSound(null, blockPos, sound, SoundCategory.PLAYERS)
+}
+
 fun id(name: String): Identifier = Identifier(MOD_ID, name)
 
 fun itemId(name: String): Identifier = id("textures/item/$name.png")
-
-fun Box.volume() = xLength * yLength * zLength

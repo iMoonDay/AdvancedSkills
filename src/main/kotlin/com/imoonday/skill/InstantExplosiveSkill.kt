@@ -2,7 +2,7 @@ package com.imoonday.skill
 
 import com.imoonday.entity.UnstableTntEntity
 import com.imoonday.init.ModSounds
-import com.imoonday.trigger.VelocitySyncTrigger
+import com.imoonday.trigger.SendPlayerVelocityTrigger
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import net.minecraft.server.network.ServerPlayerEntity
@@ -13,7 +13,7 @@ class InstantExplosiveSkill : Skill(
     cooldown = 20,
     rarity = Rarity.EPIC,
     sound = ModSounds.FIRE,
-), VelocitySyncTrigger {
+), SendPlayerVelocityTrigger {
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             val rotation = user.velocity.add(rotationVector.normalize().multiply(1.5))

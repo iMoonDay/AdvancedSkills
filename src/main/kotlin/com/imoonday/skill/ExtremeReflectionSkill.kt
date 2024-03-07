@@ -1,8 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.stopCooling
-import com.imoonday.component.stopUsingSkill
 import com.imoonday.trigger.DamageTrigger
 import com.imoonday.trigger.ReflectionTrigger
 import com.imoonday.util.SkillType
@@ -20,9 +17,7 @@ class ExtremeReflectionSkill : Skill(
 ), DamageTrigger, ReflectionTrigger {
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
 
-    override val persistTime: Int = 5
-    override val skill: Skill
-        get() = this
+    override fun getPersistTime(): Int = 5
 
     override fun onDamaged(
         amount: Float,
@@ -30,9 +25,9 @@ class ExtremeReflectionSkill : Skill(
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
     ): Float {
-        if (!player.isUsingSkill(this)) return amount
-        player.stopUsingSkill(skill)
-        player.stopCooling(skill)
+        if (!player.isUsing()) return amount
+        player.stopUsing()
+        player.stopCooling()
         return if (Random.nextFloat() <= 0.75f) {
             reflect(player, attacker, amount)
             0.0f

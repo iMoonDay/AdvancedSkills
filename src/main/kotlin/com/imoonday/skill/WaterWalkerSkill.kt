@@ -1,8 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.startCooling
-import com.imoonday.component.toggleUsingSkill
 import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.trigger.FluidMovementTrigger
 import com.imoonday.trigger.WalkOnFluidTrigger
@@ -25,13 +22,11 @@ class WaterWalkerSkill : Skill(
     rarity = Rarity.SUPERB,
     sound = SoundEvents.BLOCK_WATER_AMBIENT
 ), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger {
-    override val persistTime: Int = 20 * 15
-    override val skill: Skill
-        get() = this
+    override fun getPersistTime(): Int = 20 * 15
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val active = user.toggleUsingSkill(this)
-        if (!active) user.startCooling(this)
+        val active = user.toggleUsing()
+        if (!active) user.startCooling()
         return UseResult.consume(
             translateSkill(
                 "wall_climbing", if (active) "active" else "inactive",
@@ -41,16 +36,16 @@ class WaterWalkerSkill : Skill(
     }
 
     override fun canWalkOnFluid(player: PlayerEntity, state: FluidState): Boolean =
-        player.isUsingSkill(this) && state.isOf(Fluids.WATER) && !player.isSubmergedInWater
+        player.isUsing() && state.isOf(Fluids.WATER) && !player.isSubmergedInWater
 
     override fun onStop(player: ServerPlayerEntity) {
+        player.startCooling()
         super.onStop(player)
-        player.startCooling(this)
     }
 
     override fun ignoreFluid(player: PlayerEntity, tag: TagKey<Fluid>): Boolean =
-        player.isUsingSkill(this) && tag == FluidTags.WATER && !player.isSubmergedInWater
+        player.isUsing() && tag == FluidTags.WATER && !player.isSubmergedInWater
 
     override fun getMovementInFluid(player: PlayerEntity, tag: TagKey<Fluid>, speed: Double): Double =
-        if (!player.isUsingSkill(this) || tag != FluidTags.WATER) speed else 0.0
+        if (!player.isUsing() || tag != FluidTags.WATER) speed else 0.0
 }

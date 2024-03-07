@@ -13,6 +13,6 @@ public class ClientPlayerEntityMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     private void advanced_skills$tick(CallbackInfo ci) {
         ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
-        SkillTriggerHandler.INSTANCE.syncVelocity(player);
+        SkillTriggerHandler.INSTANCE.sendPlayerData(player);
     }
 }

@@ -1,6 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.toggleUsingSkill
 import com.imoonday.trigger.AttributeTrigger
 import com.imoonday.trigger.EquipTrigger
 import com.imoonday.trigger.RespawnTrigger
@@ -24,17 +23,14 @@ abstract class PassiveSkill(
     override fun use(user: ServerPlayerEntity): UseResult = if (toggleable) {
         UseResult.consume(
             translateSkill(
-                "wall_climbing", if (user.toggleUsingSkill(this)) "active" else "inactive",
+                "wall_climbing", if (user.toggleUsing()) "active" else "inactive",
                 name.string
             )
         )
     } else UseResult.passive(name.string)
 
-    override fun postEquipped(player: ServerPlayerEntity, slot: SkillSlot) {
-        addAttributes(player)
-    }
+    override fun postEquipped(player: ServerPlayerEntity, slot: SkillSlot) = player.addAttributes()
 
-    override fun afterRespawn(oldPlayer: ServerPlayerEntity, newPlayer: ServerPlayerEntity, alive: Boolean) {
-        addAttributes(newPlayer)
-    }
+    override fun afterRespawn(oldPlayer: ServerPlayerEntity, newPlayer: ServerPlayerEntity, alive: Boolean) =
+        newPlayer.addAttributes()
 }

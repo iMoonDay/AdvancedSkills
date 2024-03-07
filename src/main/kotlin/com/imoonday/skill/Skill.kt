@@ -1,11 +1,16 @@
 package com.imoonday.skill
 
-import com.imoonday.component.*
+import com.imoonday.component.getCooldown
+import com.imoonday.component.getSkillUsedTime
+import com.imoonday.component.isCooling
+import com.imoonday.component.startCooling
 import com.imoonday.config.Config
+import com.imoonday.init.ModSkills
 import com.imoonday.init.isSilenced
 import com.imoonday.item.SkillItem
 import com.imoonday.network.UseSkillC2SRequest
 import com.imoonday.trigger.LongPressTrigger
+import com.imoonday.trigger.SkillTrigger
 import com.imoonday.trigger.SynchronousCoolingTrigger
 import com.imoonday.util.*
 import net.minecraft.client.MinecraftClient
@@ -27,12 +32,12 @@ abstract class Skill(
     val name: Text,
     val description: Text,
     val icon: Identifier = id("unknown.png"),
-    vararg val types: SkillType,
+    vararg val types: SkillType = emptyArray(),
     cooldown: Int = 0,
     rarity: Rarity,
     val sound: SoundEvent? = null,
     invalid: Boolean = false,
-) {
+) : SkillTrigger {
 
     constructor(
         id: String,
@@ -126,7 +131,7 @@ abstract class Skill(
         attacker: LivingEntity?,
         amount: Float,
     ) {
-        player.world.playSound(null, player.blockPos, SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS)
+        player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
         attacker?.damage(player.damageSources.thorns(player), amount)?.let {
             player.sendMessage(
                 translateSkill("extreme_reflection", if (it) "success" else "failed"),
@@ -140,7 +145,7 @@ abstract class Skill(
         keyState: UseSkillC2SRequest.KeyState,
     ) {
         if (invalid) return
-        if ((this !is LongPressTrigger || !player.isUsingSkill(this)) && keyState == UseSkillC2SRequest.KeyState.RELEASE) return
+        if ((this !is LongPressTrigger || !player.isUsing()) && keyState == UseSkillC2SRequest.KeyState.RELEASE) return
         if (player.isSilenced) {
             player.sendMessage(translate("useSkill", "silenced"), true)
             return
@@ -176,10 +181,12 @@ abstract class Skill(
                 serverPlayerEntity.sendMessage(message, true)
         }
         if (result.cooling) {
-            serverPlayerEntity.startCooling(this)
-            (this as? SynchronousCoolingTrigger)?.otherSkills?.forEach { serverPlayerEntity.startCooling(it) }
+            serverPlayerEntity.startCooling()
+            (this as? SynchronousCoolingTrigger)?.getOtherSkills()?.forEach { serverPlayerEntity.startCooling(it) }
         }
     }
+
+    override fun asSkill(): Skill = this
 
     enum class Rarity(
         val level: Int,
@@ -198,5 +205,10 @@ abstract class Skill(
 
         val displayName: Text
             get() = translate("skillRarity", id)
+    }
+
+    companion object {
+        fun fromId(id: Identifier) = ModSkills.get(id)
+        fun fromIdOrNull(id: Identifier) = ModSkills.getOrNull(id)
     }
 }

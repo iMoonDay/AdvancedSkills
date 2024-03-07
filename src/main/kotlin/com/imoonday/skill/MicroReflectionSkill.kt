@@ -1,7 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.stopUsingSkill
 import com.imoonday.trigger.DamageTrigger
 import com.imoonday.trigger.ReflectionTrigger
 import com.imoonday.util.SkillType
@@ -19,9 +17,7 @@ class MicroReflectionSkill : Skill(
 ), DamageTrigger, ReflectionTrigger {
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
 
-    override val persistTime: Int = 20
-    override val skill: Skill
-        get() = this
+    override fun getPersistTime(): Int = 20
 
     override fun onDamaged(
         amount: Float,
@@ -29,8 +25,8 @@ class MicroReflectionSkill : Skill(
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
     ): Float {
-        if (!player.isUsingSkill(this)) return amount
-        player.stopUsingSkill(skill)
+        if (!player.isUsing()) return amount
+        player.stopUsing()
         if (Random.nextFloat() <= 0.25f) {
             reflect(player, attacker, amount / 2)
         } else {

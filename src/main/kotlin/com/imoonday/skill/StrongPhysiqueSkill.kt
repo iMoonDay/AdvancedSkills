@@ -12,7 +12,7 @@ class StrongPhysiqueSkill : PassiveSkill(
     rarity = Rarity.SUPERB
 ) {
 
-    override val attribute: Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MAX_HEALTH to EntityAttributeModifier(
             MAX_HEALTH_UUID,
             "Strong Physique",

@@ -2,7 +2,7 @@ package com.imoonday.trigger
 
 import net.minecraft.server.network.ServerPlayerEntity
 
-interface AutoStartTrigger {
+interface AutoStartTrigger : SkillTrigger {
 
-    fun onStart(player: ServerPlayerEntity){}
+    fun onStart(player: ServerPlayerEntity) = Unit
 }

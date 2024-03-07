@@ -82,4 +82,22 @@ public class EntityMixin {
         }
         return speed;
     }
+
+    @Inject(method = "isInvisible", at = @At("HEAD"), cancellable = true)
+    private void advanced_skills$isInvisible(CallbackInfoReturnable<Boolean> cir) {
+        if ((Entity) (Object) this instanceof PlayerEntity player) {
+            if (SkillTriggerHandler.INSTANCE.isInvisible(player)) {
+                cir.setReturnValue(true);
+            }
+        }
+    }
+
+    @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
+    private void advanced_skills$isInvisibleTo(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
+        if ((Entity) (Object) this instanceof PlayerEntity entity) {
+            if (!SkillTriggerHandler.INSTANCE.isInvisibleTo(entity, player)) {
+                cir.setReturnValue(false);
+            }
+        }
+    }
 }

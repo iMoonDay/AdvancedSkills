@@ -1,6 +1,6 @@
 package com.imoonday.trigger
 
-interface InitTrigger {
+interface InitTrigger : SkillTrigger {
 
-    fun init()
+    fun init() = Unit
 }

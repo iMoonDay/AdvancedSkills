@@ -1,8 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.startUsingSkill
-import com.imoonday.component.stopUsingSkill
 import com.imoonday.trigger.FallTrigger
 import com.imoonday.trigger.LandingTrigger
 import com.imoonday.trigger.PersistentTrigger
@@ -10,7 +7,6 @@ import com.imoonday.util.*
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.Vec3d
 import kotlin.math.absoluteValue
@@ -27,13 +23,13 @@ class GroundWhackSkill : Skill(
         user.run {
             velocity = Vec3d(0.0, min(velocity.y, -1.0), 0.0)
             send(EntityVelocityUpdateS2CPacket(this))
-            startUsingSkill(this@GroundWhackSkill)
+            startUsing()
         }
         return UseResult.success()
     }
 
     override fun onLanding(player: ServerPlayerEntity, height: Float) {
-        if (!player.isUsingSkill(this)) return
+        if (!player.isUsing()) return
         if (height > 0) {
             player.world.getOtherEntities(
                 player,
@@ -54,13 +50,13 @@ class GroundWhackSkill : Skill(
                 0.0,
                 0.0
             )
-            player.world.playSound(null, player.blockPos, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS)
+            player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
         }
-        player.stopUsingSkill(this)
+        player.stopUsing()
     }
 
     override fun onFall(amount: Int, player: ServerPlayerEntity, fallDistance: Float, damageMultiplier: Float): Int {
-        if (!player.isUsingSkill(this)) return amount
+        if (!player.isUsing()) return amount
         return if (fallDistance < 10) 0 else amount / 2
     }
 }

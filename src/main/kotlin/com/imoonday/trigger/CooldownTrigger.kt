@@ -1,6 +1,6 @@
 package com.imoonday.trigger
 
-interface CooldownTrigger {
+interface CooldownTrigger : SkillTrigger {
 
-    fun getCooldown(original: Int): Int
+    fun getCooldown(original: Int): Int = original
 }

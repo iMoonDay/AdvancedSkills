@@ -1,14 +1,12 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
 import com.imoonday.entity.Servant
 import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.trigger.DamageTrigger
 import com.imoonday.trigger.FeatureRendererTrigger
+import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.TexturedRenderLayers
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.feature.FeatureRendererContext
@@ -17,9 +15,7 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.math.RotationAxis
 
 class TauntSkill : Skill(
     id = "taunt",
@@ -28,9 +24,7 @@ class TauntSkill : Skill(
     rarity = Rarity.SUPERB,
 ), DamageTrigger, AutoStopTrigger, FeatureRendererTrigger {
 
-    override val persistTime: Int = 20 * 15
-    override val skill: Skill
-        get() = this
+    override fun getPersistTime(): Int = 20 * 15
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
     override fun onDamaged(
@@ -38,7 +32,7 @@ class TauntSkill : Skill(
         source: DamageSource,
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
-    ): Float = if (!player.isUsingSkill(this) || attacker !is Servant) amount else amount * 0.75f
+    ): Float = if (!player.isUsing() || attacker !is Servant) amount else amount * 0.75f
 
     override fun <T : PlayerEntity, M : EntityModel<T>> render(
         matrices: MatrixStack,
@@ -53,21 +47,7 @@ class TauntSkill : Skill(
         headPitch: Float,
         renderer: FeatureRendererContext<T, M>,
         context: EntityRendererFactory.Context,
-    ) {
-        matrices.push()
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180f))
-        matrices.translate(-0.5, 0.65, -0.5)
-        val model = context.modelManager.getModel(modelIdentifier)
-        context.itemRenderer.renderBakedItemQuads(
-            matrices,
-            provider.getBuffer(TexturedRenderLayers.getEntityTranslucentCull()),
-            model.getQuads(null, null, player.random),
-            ItemStack.EMPTY,
-            0xF000F0,
-            OverlayTexture.DEFAULT_UV
-        )
-        matrices.pop()
-    }
+    ) = renderSkillAboveHead(matrices, context, provider, player)
 
-    override fun shouldRender(player: PlayerEntity): Boolean = player.isUsingSkill(this)
+    override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean = !player.isUsing()
 }

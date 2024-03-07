@@ -152,6 +152,18 @@ object ModSkills {
     @JvmField
     val AUTOMATIC_UPHILL = AutomaticUphillSkill().register()
 
+    @JvmField
+    val WATER_BREATHING = WaterBreathingSkill().register()
+
+    @JvmField
+    val STATIC_INVISIBILITY = StaticInvisibilitySkill().register()
+
+    @JvmField
+    val FASTER_EATING = FasterEatingSkill().register()
+
+    @JvmField
+    val DANGER_PERCEPTION = DangerPerceptionSkill().register()
+
     fun init() {
         SKILLS.filterIsInstance<InitTrigger>().forEach { it.init() }
     }

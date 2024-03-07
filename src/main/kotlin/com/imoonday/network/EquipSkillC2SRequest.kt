@@ -5,10 +5,12 @@ import com.imoonday.init.ModSkills
 import com.imoonday.skill.Skill
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.id
+import com.imoonday.util.playSound
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
 import net.fabricmc.fabric.api.networking.v1.PacketType
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.sound.SoundEvents
 
 class EquipSkillC2SRequest(
     val slot: SkillSlot,
@@ -22,7 +24,10 @@ class EquipSkillC2SRequest(
 
         fun register() {
             ServerPlayNetworking.registerGlobalReceiver(pType) { packet, player, sender ->
-                player.equipSkill(packet.skill, packet.slot)
+                val skill = packet.skill
+                if (player.equipSkill(skill, packet.slot) && !skill.invalid) {
+                    player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC)
+                }
             }
         }
     }

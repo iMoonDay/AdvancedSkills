@@ -95,6 +95,10 @@ fun PlayerEntity.isUsingSkill(skill: Skill) = skill in usingSkills
 fun PlayerEntity.getSkillUsedTime(skill: Skill): Int =
     getComponent(ModComponents.USING_SKILLS).skills[skill]?.getInt("time") ?: 0
 
+fun PlayerEntity.resetSkillUsedTime(skill: Skill) {
+    getComponent(ModComponents.USING_SKILLS).skills[skill]?.putInt("time", 0)
+}
+
 fun PlayerEntity.updateSkillUsedTime() {
     val skills = getComponent(ModComponents.USING_SKILLS).skills
     skills.forEach { skills[it.key] = it.value.apply { putInt("time", it.value.getInt("time") + 1) } }

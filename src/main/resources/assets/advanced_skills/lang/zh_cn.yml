@@ -209,6 +209,18 @@ advancedSkills:
     automatic_uphill:
       name: 自动上坡
       description: 可以自动爬上方块
+    water_breathing:
+      name: 水下呼吸
+      description: 你可以在水中呼吸
+    static_invisibility:
+      name: 静态隐身
+      description: 静止不动时隐身
+    faster_eating:
+      name: 快速进食
+      description: 加快进食速度
+    danger_perception:
+      name: 危险感知
+      description: 遇到危险时临时获得加速
   skillType:
     attack: 攻击
     defense: 防御

@@ -4,7 +4,8 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.server.network.ServerPlayerEntity
 
-interface DamageTrigger {
+interface DamageTrigger : SkillTrigger {
 
-    fun onDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?): Float
+    fun onDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?): Float =
+        amount
 }

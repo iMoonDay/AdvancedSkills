@@ -8,20 +8,19 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 interface LongPressTrigger : TickTrigger, AutoStopTrigger {
 
-    val maxPressTime: Int
-    override val persistTime: Int
-        get() = maxPressTime
+    fun getMaxPressTime(): Int
+    override fun getPersistTime(): Int = getMaxPressTime()
 
     fun onPress(player: ServerPlayerEntity): UseResult {
-        player.startUsingSkill(skill)
-        return UseResult.fail(translateSkill("charged_sweep", "charging", skill.name.string))
+        player.startUsingSkill(asSkill())
+        return UseResult.fail(translateSkill("charged_sweep", "charging", asSkill().name.string))
     }
 
     fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult
 
     override fun onStop(player: ServerPlayerEntity) {
-        val result = onRelease(player, maxPressTime)
-        skill.handleResult(player, result)
+        val result = onRelease(player, getMaxPressTime())
+        asSkill().handleResult(player, result)
         super.onStop(player)
     }
 

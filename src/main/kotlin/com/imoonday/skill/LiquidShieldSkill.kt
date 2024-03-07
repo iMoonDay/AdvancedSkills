@@ -1,8 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.startCooling
-import com.imoonday.component.toggleUsingSkill
 import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.trigger.FluidMovementTrigger
 import com.imoonday.trigger.TickTrigger
@@ -24,13 +21,11 @@ class LiquidShieldSkill : Skill(
     rarity = Rarity.SUPERB,
     sound = SoundEvents.BLOCK_WATER_AMBIENT
 ), TickTrigger, AutoStopTrigger, FluidMovementTrigger {
-    override val persistTime: Int = 20 * 15
-    override val skill: Skill
-        get() = this
+    override fun getPersistTime(): Int = 20 * 15
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val active = user.toggleUsingSkill(this)
-        if (!active) user.startCooling(this)
+        val active = user.toggleUsing()
+        if (!active) user.startCooling()
         return UseResult.consume(
             translateSkill(
                 "wall_climbing", if (active) "active" else "inactive",
@@ -40,7 +35,7 @@ class LiquidShieldSkill : Skill(
     }
 
     override fun tick(player: ServerPlayerEntity, usedTime: Int) {
-        if (!player.isUsingSkill(this)) return
+        if (!player.isUsing()) return
         val world = player.world
         val blockPos = player.blockPos
         player.boundingBox.expand(4.0)
@@ -48,16 +43,11 @@ class LiquidShieldSkill : Skill(
             .filter { it.isWithinDistance(blockPos, 4.0) && !world.getFluidState(it).isEmpty }
             .sortedByDescending { it.getSquaredDistance(blockPos) }
             .forEach { world.setBlockState(it, Blocks.AIR.defaultState) }
-        super.tick(player, usedTime)
+        super<AutoStopTrigger>.tick(player, usedTime)
     }
 
-    override fun onStop(player: ServerPlayerEntity) {
-        super.onStop(player)
-        player.startCooling(this)
-    }
-
-    override fun ignoreFluid(player: PlayerEntity, tag: TagKey<Fluid>): Boolean = player.isUsingSkill(this)
+    override fun ignoreFluid(player: PlayerEntity, tag: TagKey<Fluid>): Boolean = player.isUsing()
 
     override fun getMovementInFluid(player: PlayerEntity, tag: TagKey<Fluid>, speed: Double): Double =
-        if (!player.isUsingSkill(this)) speed else 0.0
+        if (!player.isUsing()) speed else 0.0
 }

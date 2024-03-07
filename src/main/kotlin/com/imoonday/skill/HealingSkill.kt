@@ -21,6 +21,6 @@ abstract class HealingSkill(
         return UseResult.success()
     }
 
-    override val otherSkills: Set<Skill>
-        get() = ModSkills.SKILLS.filter { !it.invalid && it is HealingSkill && it != this }.toSet()
+    override fun getOtherSkills(): Set<Skill> =
+        ModSkills.SKILLS.filter { !it.invalid && it is HealingSkill && it != this }.toSet()
 }

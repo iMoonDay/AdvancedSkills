@@ -1,18 +1,19 @@
 package com.imoonday.trigger
 
-import com.imoonday.skill.Skill
-import com.imoonday.component.startUsingSkill
 import net.minecraft.server.network.ServerPlayerEntity
 
-interface AutoTrigger {
-
-    val skill: Skill
+interface AutoTrigger : SkillTrigger {
 
     fun shouldStart(player: ServerPlayerEntity): Boolean
 
+    fun shouldStop(player: ServerPlayerEntity): Boolean = false
+
     fun tick(player: ServerPlayerEntity) {
-        if (shouldStart(player)) {
-            player.startUsingSkill(skill)
+        if (shouldStart(player) && !player.isUsing() && !shouldStop(player)) {
+            player.startUsing()
+        }
+        if (player.isUsing() && shouldStop(player)) {
+            player.stopUsing()
         }
     }
 }

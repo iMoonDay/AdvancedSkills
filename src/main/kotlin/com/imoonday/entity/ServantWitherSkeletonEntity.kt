@@ -16,6 +16,7 @@ import net.minecraft.entity.ai.pathing.PathNodeType
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
+import net.minecraft.entity.damage.DamageTypes
 import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.entity.mob.WitherSkeletonEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -113,6 +114,7 @@ class ServantWitherSkeletonEntity(
     }
 
     override fun isInvulnerableTo(damageSource: DamageSource): Boolean {
+        if (damageSource.isOf(DamageTypes.FALL)) return true
         val attacker = damageSource.attacker
         val source = damageSource.source
         if (attacker == null && source == null) return false

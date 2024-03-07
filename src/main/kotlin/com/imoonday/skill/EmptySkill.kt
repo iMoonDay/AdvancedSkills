@@ -11,7 +11,6 @@ class EmptySkill : Skill(
     id = id("empty"),
     name = translateSkill("empty", "name"),
     description = Text.empty(),
-    types = arrayOf(),
     rarity = Rarity.USELESS,
     invalid = true
 ) {

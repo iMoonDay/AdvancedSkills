@@ -14,8 +14,5 @@ abstract class LongPressSkill(
     sound: SoundEvent? = null,
 ) : Skill(id, types = types, cooldown, rarity, sound), LongPressTrigger {
 
-    override val skill: Skill
-        get() = this
-
     override fun use(user: ServerPlayerEntity): UseResult = onRelease(user, 1)
 }

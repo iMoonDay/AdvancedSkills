@@ -15,8 +15,10 @@ import io.wispforest.owo.ui.container.ScrollContainer
 import io.wispforest.owo.ui.core.*
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.sound.PositionedSoundInstance
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
@@ -70,9 +72,8 @@ class SkillInventoryScreen(
 
     private fun setupInventory(rootComponent: FlowLayout) {
         rootComponent.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-            gap(0)
             val halfSize = SkillType.entries.size / 2
-            child(Containers.grid(Sizing.fixed(9 * slotSize + 10), Sizing.content(), 1, 5).apply {
+            child(Containers.grid(Sizing.fixed(9 * slotSize + 15), Sizing.content(), 1, 5).apply {
                 horizontalAlignment(HorizontalAlignment.CENTER)
                 SkillType.entries.take(halfSize).forEachIndexed { index, skillType ->
                     child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
@@ -144,7 +145,7 @@ class SkillInventoryScreen(
                     })
                 })
             })
-            child(Containers.grid(Sizing.fixed(9 * slotSize + 10), Sizing.content(), 1, 5).apply {
+            child(Containers.grid(Sizing.fixed(9 * slotSize + 15), Sizing.content(), 1, 5).apply {
                 horizontalAlignment(HorizontalAlignment.CENTER)
                 SkillType.entries.drop(halfSize).forEachIndexed { index, skillType ->
                     child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
@@ -319,6 +320,7 @@ class SkillInventoryScreen(
             mouseDown().subscribe { _, _, button ->
                 if (button != 0) return@subscribe false
                 selectedTab = if (selectedTab != this) this else null
+                client!!.soundManager.play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f))
                 true
             }
             child(

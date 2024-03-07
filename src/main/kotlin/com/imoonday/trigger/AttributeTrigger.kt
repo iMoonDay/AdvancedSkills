@@ -7,11 +7,11 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 interface AttributeTrigger : UnequipTrigger {
 
-    val attribute: Map<EntityAttribute, EntityAttributeModifier>
+    fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = emptyMap()
 
-    fun addAttributes(player: ServerPlayerEntity) {
-        attribute.forEach {
-            player.attributes.getCustomInstance(it.key)?.run {
+    fun ServerPlayerEntity.addAttributes() {
+        this@AttributeTrigger.getAttributes().forEach {
+            attributes.getCustomInstance(it.key)?.run {
                 if (hasModifier(it.value)) {
                     removeModifier(it.value)
                 }
@@ -20,9 +20,9 @@ interface AttributeTrigger : UnequipTrigger {
         }
     }
 
-    fun removeAttributes(player: ServerPlayerEntity) {
-        attribute.forEach {
-            player.attributes.getCustomInstance(it.key)?.run {
+    fun ServerPlayerEntity.removeAttributes() {
+        this@AttributeTrigger.getAttributes().forEach {
+            attributes.getCustomInstance(it.key)?.run {
                 if (hasModifier(it.value)) {
                     removeModifier(it.value)
                 }
@@ -31,6 +31,6 @@ interface AttributeTrigger : UnequipTrigger {
     }
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
-        removeAttributes(player)
+        player.removeAttributes()
     }
 }

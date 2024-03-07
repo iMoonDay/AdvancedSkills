@@ -1,10 +1,16 @@
 package com.imoonday.skill
 
-import com.imoonday.component.startCooling
-import com.imoonday.component.stopUsingSkill
 import com.imoonday.trigger.AttributeTrigger
+import com.imoonday.trigger.FeatureRendererTrigger
+import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
+import com.imoonday.util.playSound
+import net.minecraft.client.render.VertexConsumerProvider
+import net.minecraft.client.render.entity.EntityRendererFactory
+import net.minecraft.client.render.entity.feature.FeatureRendererContext
+import net.minecraft.client.render.entity.model.EntityModel
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
@@ -13,7 +19,6 @@ import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Hand
 import java.util.*
@@ -27,9 +32,9 @@ class ChargedSweepSkill : LongPressSkill(
     types = arrayOf(SkillType.ATTACK),
     cooldown = 9,
     rarity = Rarity.RARE,
-), AttributeTrigger {
-    override val maxPressTime: Int = 20 * 3
-    override val attribute: Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+), AttributeTrigger, FeatureRendererTrigger {
+    override fun getMaxPressTime(): Int = 20 * 3
+    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             MOVEMENT_SPEED_UUID,
             "Charged Sweep Charging",
@@ -38,14 +43,19 @@ class ChargedSweepSkill : LongPressSkill(
         )
     )
 
+    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
+        super<LongPressSkill>.postUnequipped(player, slot)
+        super<AttributeTrigger>.postUnequipped(player, slot)
+    }
+
     override fun onPress(player: ServerPlayerEntity): UseResult {
-        addAttributes(player)
+        player.addAttributes()
         return super.onPress(player)
     }
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
-        removeAttributes(player)
-        player.stopUsingSkill(this)
+        player.removeAttributes()
+        player.stopUsing()
         player.world.getOtherEntities(player, player.boundingBox.expand(5.0)) { it.isLiving && it.isAlive }
             .map { it as LivingEntity }
             .filter {
@@ -59,12 +69,12 @@ class ChargedSweepSkill : LongPressSkill(
                         + EnchantmentHelper.getAttackDamage(
                     player.mainHandStack,
                     it.group
-                )) * (pressedTime.toFloat() / maxPressTime * 2)
+                )) * (pressedTime.toFloat() / getMaxPressTime() * 2)
                 it.damage(player.damageSources.playerAttack(player), amount)
             }
         player.swingHand(Hand.MAIN_HAND, true)
-        player.world.playSound(null, player.blockPos, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS)
-        player.startCooling(this, pressedTime * 3)
+        player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
+        player.startCooling(pressedTime * 3)
         player.mainHandStack.damage(1, player) { it.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND) }
         return UseResult.consume()
     }
@@ -77,6 +87,21 @@ class ChargedSweepSkill : LongPressSkill(
         val product = vectorX * vector.x + vectorZ * vector.z
         return acos(product / magnitude)
     }
+
+    override fun <T : PlayerEntity, M : EntityModel<T>> render(
+        matrices: MatrixStack,
+        provider: VertexConsumerProvider,
+        light: Int,
+        player: T,
+        limbAngle: Float,
+        limbDistance: Float,
+        tickDelta: Float,
+        animationProgress: Float,
+        headYaw: Float,
+        headPitch: Float,
+        renderer: FeatureRendererContext<T, M>,
+        context: EntityRendererFactory.Context,
+    ) = renderSkillAboveHead(matrices, context, provider, player)
 
     companion object {
         val MOVEMENT_SPEED_UUID: UUID = UUID.fromString("D4B7E033-3EAC-4A14-86E1-12D4D2D86B5A")

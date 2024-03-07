@@ -20,7 +20,7 @@ object SkillSlotRenderer {
 
     val progressStrings: MutableList<ScrollingStringRenderer?> = mutableListOf(null, null, null, null)
 
-    fun render(client: MinecraftClient, context: DrawContext, delta: Float) {
+    fun render(client: MinecraftClient, context: DrawContext) {
         if (client.player?.isSpectator == false) {
             client.player?.equippedSkills?.forEachIndexed { index, skill ->
                 val player = client.player!!
@@ -123,10 +123,10 @@ object SkillSlotRenderer {
         startY: Int,
     ) {
         if (skill is AutoStopTrigger && skill !is LongPressSkill) {
-            val leftUseTime = skill.persistTime - player.getSkillUsedTime(skill)
-            if (skill.persistTime > 20 * 5 && leftUseTime <= skill.persistTime / 5) {
+            val leftUseTime = skill.getPersistTime() - player.getSkillUsedTime(skill)
+            if (skill.getPersistTime() > 20 * 5 && leftUseTime <= skill.getPersistTime() / 5) {
                 val alpha =
-                    (0.5 * sin((2 * PI / 20) * (leftUseTime - skill.persistTime / 5)) + 0.5).toFloat()
+                    (0.5 * sin((2 * PI / 20) * (leftUseTime - skill.getPersistTime() / 5)) + 0.5).toFloat()
                 RenderSystem.enableBlend()
                 context.setShaderColor(1.0f, 1.0f, 1.0f, alpha)
             }

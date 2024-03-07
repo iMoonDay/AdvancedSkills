@@ -15,6 +15,7 @@ import net.minecraft.entity.ai.goal.WanderAroundFarGoal
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
+import net.minecraft.entity.damage.DamageTypes
 import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -108,6 +109,7 @@ class ServantSkeletonEntity(
     }
 
     override fun isInvulnerableTo(damageSource: DamageSource): Boolean {
+        if (damageSource.isOf(DamageTypes.FALL)) return true
         val attacker = damageSource.attacker
         val source = damageSource.source
         if (attacker == null && source == null) return false

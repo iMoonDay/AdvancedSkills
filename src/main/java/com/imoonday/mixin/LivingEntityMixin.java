@@ -12,8 +12,10 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,10 +27,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Optional;
 
 @Mixin(LivingEntity.class)
-public class LivingEntityMixin {
+public abstract class LivingEntityMixin {
 
     @Shadow
     private Optional<BlockPos> climbingPos;
+
+    @Shadow
+    protected int itemUseTimeLeft;
+
+    @Shadow
+    public abstract ItemStack getStackInHand(Hand hand);
 
     @ModifyReturnValue(method = "modifyAppliedDamage", at = @At("RETURN"))
     private float advanced_skills$modifyAppliedDamage(float original, DamageSource source, float amount) {
@@ -97,6 +105,22 @@ public class LivingEntityMixin {
     public void advanced_skills$canWalkOnFluid(FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
         if ((LivingEntity) (Object) this instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.allowWalkOnFluid(player, fluidState)) {
             cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "canBreatheInWater", at = @At("HEAD"), cancellable = true)
+    public void advanced_skills$canBreatheInWater(CallbackInfoReturnable<Boolean> cir) {
+        if ((LivingEntity) (Object) this instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.canBreatheInWater(player)) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "setCurrentHand", at = @At("TAIL"))
+    public void advanced_skills$setCurrentHand(Hand hand, CallbackInfo ci) {
+        if ((LivingEntity) (Object) this instanceof PlayerEntity player) {
+            ItemStack itemStack = this.getStackInHand(hand);
+            float multiplier = SkillTriggerHandler.INSTANCE.getItemMaxUseTimeMultiplier(player, itemStack);
+            this.itemUseTimeLeft = (int) (this.itemUseTimeLeft * multiplier);
         }
     }
 }

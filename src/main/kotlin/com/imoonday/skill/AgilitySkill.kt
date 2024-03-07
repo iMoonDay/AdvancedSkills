@@ -10,7 +10,7 @@ class AgilitySkill : PassiveSkill(
     rarity = Rarity.RARE,
 ) {
 
-    override val attribute: Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             MOVEMENT_SPEED_UUID,
             "Agility",

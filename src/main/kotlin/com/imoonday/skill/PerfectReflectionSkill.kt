@@ -1,17 +1,14 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.stopCooling
-import com.imoonday.component.stopUsingSkill
 import com.imoonday.trigger.DamageTrigger
 import com.imoonday.trigger.ReflectionTrigger
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
+import com.imoonday.util.playSound
 import com.imoonday.util.translateSkill
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Util
 
@@ -24,9 +21,7 @@ class PerfectReflectionSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
 
-    override val persistTime: Int = 2
-    override val skill: Skill
-        get() = this
+    override fun getPersistTime(): Int = 2
 
     override fun onDamaged(
         amount: Float,
@@ -34,13 +29,13 @@ class PerfectReflectionSkill : Skill(
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
     ): Float {
-        if (!player.isUsingSkill(this)) return amount
+        if (!player.isUsing()) return amount
         val time = getStartTime(player)?.let {
             Util.getMeasuringTimeMs() - it
         }
-        player.stopUsingSkill(skill)
-        player.stopCooling(skill)
-        player.world.playSound(null, player.blockPos, SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS)
+        player.stopUsing()
+        player.stopCooling()
+        player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
         player.heal(amount / 10)
         player.sendMessage(
             translateSkill(
