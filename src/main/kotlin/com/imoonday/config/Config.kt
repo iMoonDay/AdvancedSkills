@@ -46,7 +46,6 @@ class Config {
         cooldownModifier.clear()
         rarityModifier.clear()
         skillBlackList.clear()
-
         val cooldownModifierTag = tag.getCompound("cooldownModifier")
         for (namespace in cooldownModifierTag.keys) {
             val mapTag = cooldownModifierTag.getCompound(namespace)
@@ -56,7 +55,6 @@ class Config {
             }
             cooldownModifier[namespace] = map
         }
-
         val rarityModifierTag = tag.getCompound("rarityModifier")
         for (namespace in rarityModifierTag.keys) {
             val mapTag = rarityModifierTag.getCompound(namespace)
@@ -70,7 +68,6 @@ class Config {
             }
             rarityModifier[namespace] = map
         }
-
         val skillBlackListTag = tag.getCompound("skillBlackList")
         for (namespace in skillBlackListTag.keys) {
             val listTag = skillBlackListTag.getList(namespace, NbtElement.STRING_TYPE.toInt())
@@ -112,6 +109,7 @@ class Config {
     }
 
     companion object {
+
         private val GSON = GsonBuilder().setPrettyPrinting().create()
         private var file: File? = null
             get() {

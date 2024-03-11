@@ -10,10 +10,12 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.server.network.ServerPlayerEntity
 
 interface LongComponent : Component {
+
     var value: Long
 }
 
 class SkillExpComponent(private val provider: PlayerEntity) : LongComponent, AutoSyncedComponent {
+
     override var value: Long = 0
         set(value) {
             field = value
@@ -51,14 +53,12 @@ var PlayerEntity.skillExp: Long
                 }
         }
     }
-
 val levelExpCache = IntArray(101) { -1 }
 
 fun getNextLevelExp(level: Int): Int {
     if (levelExpCache[level] != -1) {
         return levelExpCache[level]
     }
-
     val exp = when {
         level >= 30 -> 112 + (level - 30) * 9
         level >= 15 -> 37 + (level - 15) * 5
@@ -74,7 +74,6 @@ val PlayerEntity.skillLevel: Int
         var level = 0
         var reset = 0
         var needed = getNextLevelExp(level)
-
         var experience = skillExp
         while (experience >= needed) {
             experience -= needed

@@ -24,6 +24,7 @@ interface SkillListComponent : Component {
 }
 
 class EquippedSkillComponent(private val provider: PlayerEntity) : SkillListComponent, AutoSyncedComponent {
+
     override var skills: DefaultedList<Skill> = DefaultedList.ofSize(4, ModSkills.EMPTY)
         get() {
             field.indices
@@ -40,12 +41,12 @@ class EquippedSkillComponent(private val provider: PlayerEntity) : SkillListComp
         }
 
     override fun readFromNbt(tag: NbtCompound) {
-        skills = DefaultedList.ofSize<Skill>(4, ModSkills.EMPTY).apply {
+        skills = DefaultedList.ofSize(4, ModSkills.EMPTY).apply {
             tag.getList("skills", NbtElement.COMPOUND_TYPE.toInt()).forEach { skillTag ->
                 (skillTag as NbtCompound).run {
                     val index = getInt("index")
                     if (index in 0 until 4) {
-                        this@apply[index] = ModSkills.get(Identifier(getString("id")))
+                        this@apply[index] = Skill.fromId(Identifier(getString("id")))
                     }
                 }
             }
@@ -83,7 +84,6 @@ fun PlayerEntity.equipSkill(skill: Skill, slot: SkillSlot): Boolean {
             ModComponents.EQUIPPED_SKILLS.sync(this)
             return false
         }
-
         val oldSkill = skills[slot.ordinal - 1]
         var move = false
         if (!skill.invalid) {

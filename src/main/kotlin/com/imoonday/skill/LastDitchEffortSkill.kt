@@ -11,7 +11,6 @@ import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.server.network.ServerPlayerEntity
-import java.util.*
 
 class LastDitchEffortSkill : Skill(
     id = "last_ditch_effort",
@@ -19,9 +18,10 @@ class LastDitchEffortSkill : Skill(
     cooldown = 180,
     rarity = Rarity.SUPERB,
 ), DamageTrigger, AutoStopTrigger, AttackTrigger, AttributeTrigger, AutoTrigger, DeathTrigger {
+
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
-            MOVEMENT_SPEED_UUID,
+            createUuid("Last Ditch Effort"),
             "Last Ditch Effort",
             0.4,
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
@@ -68,10 +68,5 @@ class LastDitchEffortSkill : Skill(
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean {
         player.startCooling()
         return true
-    }
-
-    companion object {
-        @JvmField
-        val MOVEMENT_SPEED_UUID: UUID = UUID.fromString("2B39D07A-41B8-4E8E-8536-2E754CF3D5E2")
     }
 }

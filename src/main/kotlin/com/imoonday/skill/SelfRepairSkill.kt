@@ -12,6 +12,7 @@ class SelfRepairSkill : Skill(
     rarity = Rarity.SUPERB,
     cooldown = 10,
 ), AutoTrigger, AutoStopTrigger {
+
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
 
     override fun getPersistTime(): Int = 20 * 10

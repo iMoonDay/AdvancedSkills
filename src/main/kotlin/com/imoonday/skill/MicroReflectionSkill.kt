@@ -15,6 +15,7 @@ class MicroReflectionSkill : Skill(
     cooldown = 6,
     rarity = Rarity.RARE
 ), DamageTrigger, ReflectionTrigger {
+
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
 
     override fun getPersistTime(): Int = 20

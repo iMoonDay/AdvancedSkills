@@ -1,6 +1,5 @@
 package com.imoonday.mixin;
 
-import com.imoonday.component.EntityStatusComponentKt;
 import com.imoonday.component.UsingSkillComponentKt;
 import com.imoonday.init.ModEffectsKt;
 import com.imoonday.init.ModSkills;
@@ -9,6 +8,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
@@ -41,14 +41,21 @@ public abstract class LivingEntityMixin {
     @ModifyReturnValue(method = "modifyAppliedDamage", at = @At("RETURN"))
     private float advanced_skills$modifyAppliedDamage(float original, DamageSource source, float amount) {
         if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || original <= 0.0f) return original;
-        LivingEntity attacker = source.getSource() instanceof LivingEntity entity ? entity : source.getAttacker() instanceof LivingEntity entity1 ? entity1 : null;
+        LivingEntity attacker = null;
+        if (source.getAttacker() instanceof LivingEntity entity) {
+            attacker = entity;
+        } else if (source.getSource() instanceof LivingEntity entity) {
+            attacker = entity;
+        }
+        float newAmount = original;
         LivingEntity target = (LivingEntity) (Object) this;
         if (target instanceof ServerPlayerEntity player) {
-            return SkillTriggerHandler.INSTANCE.onDamaged(original, source, player, attacker);
-        } else if (attacker instanceof ServerPlayerEntity player) {
-            return SkillTriggerHandler.INSTANCE.onAttack(original, source, player, target);
+            newAmount = SkillTriggerHandler.INSTANCE.onDamaged(newAmount, source, player, attacker);
         }
-        return original;
+        if (attacker instanceof ServerPlayerEntity player) {
+            newAmount = SkillTriggerHandler.INSTANCE.onAttack(newAmount, source, player, target);
+        }
+        return newAmount;
     }
 
     @ModifyReturnValue(method = "computeFallDamage", at = @At("RETURN"))
@@ -90,11 +97,6 @@ public abstract class LivingEntityMixin {
         }
     }
 
-    @Inject(method = "tick", at = @At("TAIL"))
-    public void advanced_skills$tick(CallbackInfo ci) {
-        EntityStatusComponentKt.syncStatus((LivingEntity) (Object) this);
-    }
-
     @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
     public boolean advanced_skills$hasStatusEffect(boolean original, StatusEffect effect) {
         if (effect != StatusEffects.NIGHT_VISION) return original;
@@ -121,6 +123,13 @@ public abstract class LivingEntityMixin {
             ItemStack itemStack = this.getStackInHand(hand);
             float multiplier = SkillTriggerHandler.INSTANCE.getItemMaxUseTimeMultiplier(player, itemStack);
             this.itemUseTimeLeft = (int) (this.itemUseTimeLeft * multiplier);
+        }
+    }
+
+    @Inject(method = "canHaveStatusEffect", at = @At("HEAD"), cancellable = true)
+    public void advanced_skills$canHaveStatusEffect(StatusEffectInstance effect, CallbackInfoReturnable<Boolean> cir) {
+        if ((LivingEntity) (Object) this instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.cannotHaveStatusEffect(player, effect)) {
+            cir.setReturnValue(false);
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.imoonday.trigger
 
 import com.imoonday.component.*
-import com.imoonday.init.ModComponents
 import com.imoonday.network.SendPlayerDataC2SPacket
 import com.imoonday.skill.Skill
 import com.imoonday.trigger.SendPlayerDataTrigger.SendTime.*
@@ -10,8 +9,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.block.BlockState
 import net.minecraft.client.gui.hud.InGameHud.HeartType
 import net.minecraft.client.network.ClientPlayerEntity
+import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
+import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.fluid.Fluid
 import net.minecraft.fluid.FluidState
@@ -42,6 +43,16 @@ object SkillTriggerHandler {
         return newAmount
     }
 
+    fun ignoreDamage(
+        amount: Float,
+        source: DamageSource,
+        player: ServerPlayerEntity,
+        attacker: Entity?,
+    ): Boolean = player.equippedSkills
+        .filterIsInstance<DamageTrigger>()
+        .map { it.ignoreDamage(amount, source, player, attacker) }
+        .any { it }
+
     fun onAttack(amount: Float, source: DamageSource, player: ServerPlayerEntity, target: LivingEntity): Float {
         var newAmount = amount
         player.equippedSkills
@@ -51,10 +62,6 @@ object SkillTriggerHandler {
     }
 
     fun tick(player: ServerPlayerEntity) = player.run {
-        val skills = this.getComponent(ModComponents.SKILLS).skills
-        skills.filterValues { it > 0 }.forEach { skills[it.key] = it.value - 1 }
-        ModComponents.SKILLS.sync(this)
-        updateSkillUsedTime()
         equippedSkills.filter { it is AutoStartTrigger }
             .filterNot { it in usingSkills }
             .forEach { onStart(player, it) }
@@ -187,4 +194,10 @@ object SkillTriggerHandler {
             .forEach { multiplier += it.getItemMaxUseTimeMultiplier(player, stack) }
         return multiplier.coerceAtLeast(0f)
     }
+
+    fun cannotHaveStatusEffect(player: PlayerEntity, effect: StatusEffectInstance): Boolean =
+        player.equippedSkills
+            .filterIsInstance<StatusEffectTrigger>()
+            .map { it.cannotHaveStatusEffect(player, effect) }
+            .any { it }
 }

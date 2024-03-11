@@ -6,7 +6,7 @@ import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.playSound
 import com.imoonday.util.translateSkill
-import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.Entity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents
@@ -23,13 +23,13 @@ class PerfectReflectionSkill : Skill(
 
     override fun getPersistTime(): Int = 2
 
-    override fun onDamaged(
+    override fun ignoreDamage(
         amount: Float,
         source: DamageSource,
         player: ServerPlayerEntity,
-        attacker: LivingEntity?,
-    ): Float {
-        if (!player.isUsing()) return amount
+        attacker: Entity?,
+    ): Boolean {
+        if (!player.isUsing()) return false
         val time = getStartTime(player)?.let {
             Util.getMeasuringTimeMs() - it
         }
@@ -46,6 +46,6 @@ class PerfectReflectionSkill : Skill(
             velocityDirty = true
             velocity = pos.subtract(player.pos).normalize().multiply(1.5, 0.0, 1.5).add(0.0, 0.5, 0.0)
         }
-        return 0.0f
+        return true
     }
 }

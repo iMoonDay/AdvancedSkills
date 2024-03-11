@@ -22,7 +22,8 @@ public abstract class MeleeAttackGoalMixin {
     @Shadow
     public abstract void stop();
 
-    @Shadow protected abstract void resetCooldown();
+    @Shadow
+    protected abstract void resetCooldown();
 
     @ModifyReturnValue(method = "canStart", at = @At("RETURN"))
     public boolean advanced_skills$canStart(boolean original) {

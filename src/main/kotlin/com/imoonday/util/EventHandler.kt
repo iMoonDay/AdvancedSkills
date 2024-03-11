@@ -9,10 +9,10 @@ import com.imoonday.entity.render.feature.IceLayer
 import com.imoonday.entity.render.feature.SkillLayer
 import com.imoonday.entity.render.feature.StatusEffectLayer
 import com.imoonday.init.ModItems
-import com.imoonday.init.ModSkills
 import com.imoonday.init.isDisarmed
 import com.imoonday.network.SyncConfigS2CPacket
 import com.imoonday.render.SkillSlotRenderer
+import com.imoonday.skill.Skill
 import com.imoonday.trigger.DeathTrigger
 import com.imoonday.trigger.FeatureRendererTrigger
 import com.imoonday.trigger.RespawnTrigger
@@ -112,7 +112,7 @@ object EventHandler {
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register { _, renderer, helper, context ->
             helper.register(StatusEffectLayer(renderer, context))
             helper.register(IceLayer(renderer, context))
-            if (renderer is PlayerEntityRenderer) ModSkills.SKILLS.filterIsInstance<FeatureRendererTrigger>()
+            if (renderer is PlayerEntityRenderer) Skill.getSkills().filterIsInstance<FeatureRendererTrigger>()
                 .forEach { helper.register(SkillLayer(renderer, context, it)) }
         }
     }

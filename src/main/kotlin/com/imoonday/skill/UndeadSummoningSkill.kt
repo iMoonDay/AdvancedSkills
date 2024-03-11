@@ -15,6 +15,7 @@ class UndeadSummoningSkill : Skill(
     rarity = Rarity.EPIC,
     sound = SoundEvents.ENTITY_WITHER_SPAWN
 ) {
+
     override fun use(user: ServerPlayerEntity): UseResult {
         val count = (1..3).random()
         repeat(count) {

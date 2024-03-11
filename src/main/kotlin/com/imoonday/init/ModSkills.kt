@@ -1,15 +1,9 @@
 package com.imoonday.init
 
-import com.imoonday.item.SkillItem
 import com.imoonday.skill.*
 import com.imoonday.trigger.InitTrigger
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.util.Identifier
 
 object ModSkills {
-    @JvmField
-    val SKILLS = mutableSetOf<Skill>()
 
     @JvmField
     val EMPTY = EmptySkill().register()
@@ -164,18 +158,31 @@ object ModSkills {
     @JvmField
     val DANGER_PERCEPTION = DangerPerceptionSkill().register()
 
+    @JvmField
+    val RISING_SHOCK = RisingShockSkill().register()
+
+    @JvmField
+    val CATAPULT_GLIDING = CatapultGlidingSkill().register()
+
+    @JvmField
+    val CHARGED_DASH = ChargedDashSkill().register()
+
+    @JvmField
+    val LASER_EYE = LaserEyeSkill().register()
+
+    @JvmField
+    val METEOR_SHOWER = MeteorShowerSkill().register()
+
+    @JvmField
+    val NEGATIVE_RESISTANCE = NegativeResistanceSkill().register()
+
+    @JvmField
+    val INSIGHTFUL_EYE = InsightfulEyeSkill().register()
+
+    @JvmField
+    val ITEM_ATTRACTION = ItemAttractionSkill().register()
+
     fun init() {
-        SKILLS.filterIsInstance<InitTrigger>().forEach { it.init() }
+        Skill.getSkills().filterIsInstance<InitTrigger>().forEach { it.init() }
     }
-
-    fun <T : Skill> T.register(): T {
-        if (!invalid) Registry.register(Registries.ITEM, id, SkillItem(this))
-        SKILLS.add(this)
-        return this
-    }
-
-    fun get(id: Identifier): Skill = SKILLS.find { it.id == id } ?: EMPTY
-
-    fun getOrNull(id: Identifier): Skill? = SKILLS.find { it.id == id }
 }
-

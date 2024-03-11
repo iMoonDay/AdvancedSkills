@@ -1,0 +1,9 @@
+package com.imoonday.trigger
+
+import net.minecraft.entity.effect.StatusEffectInstance
+import net.minecraft.entity.player.PlayerEntity
+
+interface StatusEffectTrigger {
+
+    fun cannotHaveStatusEffect(player: PlayerEntity, effect: StatusEffectInstance): Boolean = false
+}

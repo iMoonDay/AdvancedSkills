@@ -15,10 +15,10 @@ class RapidReflectionSkill : Skill(
     cooldown = 4,
     rarity = Rarity.RARE
 ), DamageTrigger, ReflectionTrigger {
+
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
 
     override fun getPersistTime(): Int = 10
-    override fun asSkill(): Skill = this
 
     override fun onDamaged(
         amount: Float,

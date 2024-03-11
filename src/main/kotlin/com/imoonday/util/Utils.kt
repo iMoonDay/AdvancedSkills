@@ -15,6 +15,7 @@ import net.minecraft.sound.SoundEvent
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
+import net.minecraft.util.math.Vec3d
 import java.awt.Color
 import kotlin.math.floor
 
@@ -69,3 +70,8 @@ fun ServerPlayerEntity.playSound(sound: SoundEvent) {
 fun id(name: String): Identifier = Identifier(MOD_ID, name)
 
 fun itemId(name: String): Identifier = id("textures/item/$name.png")
+
+val Box.volume: Double
+    get() = this.xLength * this.yLength * this.zLength
+
+fun Vec3d.toBlockPos(): BlockPos = BlockPos.ofFloored(this)

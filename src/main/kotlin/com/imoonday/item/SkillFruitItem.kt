@@ -14,6 +14,7 @@ import net.minecraft.util.Formatting
 import net.minecraft.world.World
 
 class SkillFruitItem(val rarity: Skill.Rarity, settings: Settings) : Item(settings) {
+
     private val translationKey = "item.advanced_skills.skill_fruit"
 
     constructor(rarity: Skill.Rarity) : this(

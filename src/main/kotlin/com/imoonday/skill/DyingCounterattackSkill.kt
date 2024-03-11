@@ -19,6 +19,7 @@ class DyingCounterattackSkill : Skill(
     cooldown = 180,
     rarity = Rarity.EPIC,
 ), DeathTrigger, PersistentTrigger, AttackTrigger, TickTrigger, UnequipTrigger, HeartTypeTrigger {
+
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
 
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean {

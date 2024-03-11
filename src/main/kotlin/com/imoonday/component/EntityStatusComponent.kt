@@ -4,15 +4,18 @@ import com.imoonday.init.ModComponents
 import com.imoonday.init.ModEffects
 import dev.onyxstudios.cca.api.v3.component.Component
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
+import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffect
 import net.minecraft.nbt.NbtCompound
 
 interface StatusComponent : Component {
+
     var status: NbtCompound
 }
 
-class EntityStatusComponent(private val entity: LivingEntity) : StatusComponent, AutoSyncedComponent {
+class EntityStatusComponent(private val entity: Entity) : StatusComponent, AutoSyncedComponent {
+
     override var status: NbtCompound = NbtCompound()
         set(value) {
             field = value
@@ -28,14 +31,13 @@ class EntityStatusComponent(private val entity: LivingEntity) : StatusComponent,
     }
 }
 
-fun LivingEntity.syncStatus() {
+fun Entity.syncStatus() {
     if (world.isClient) return
-    ModEffects.SYNC_CLIENT_EFFECTS
-        .forEach {
-            status.putBoolean(it.syncId, hasStatusEffect(it as StatusEffect))
-        }
+    if (this is LivingEntity) ModEffects.SYNC_CLIENT_EFFECTS.forEach {
+        status.putBoolean(it.syncId, hasStatusEffect(it as StatusEffect))
+    }
     ModComponents.STATUS.sync(this)
 }
 
-val LivingEntity.status: NbtCompound
+val Entity.status: NbtCompound
     get() = getComponent(ModComponents.STATUS).status

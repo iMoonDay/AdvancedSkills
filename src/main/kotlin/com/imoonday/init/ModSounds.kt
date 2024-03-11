@@ -28,6 +28,9 @@ object ModSounds {
     @JvmStatic
     val FIRE = register("fire")
 
+    @JvmStatic
+    val LASER = register("laser")
+
     fun init() = Unit
 
     fun register(name: String): SoundEvent {

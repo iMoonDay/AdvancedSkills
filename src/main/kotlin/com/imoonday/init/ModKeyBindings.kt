@@ -16,6 +16,7 @@ import net.minecraft.nbt.NbtCompound
 import org.lwjgl.glfw.GLFW
 
 object ModKeyBindings {
+
     @JvmField
     val OPEN_LIST_SCREEN = register("openListScreen", GLFW.GLFW_KEY_K) { client ->
         client.setScreen(SkillListScreen(client.player!!))
@@ -93,5 +94,4 @@ object ModKeyBindings {
         }
         return key
     }
-
 }

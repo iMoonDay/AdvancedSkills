@@ -25,6 +25,7 @@ import java.awt.Color
 class SkillListScreen(
     val player: PlayerEntity,
 ) : BaseOwoScreen<FlowLayout>(), AutoSyncedScreen {
+
     var selectedSkill: Skill? = null
     var selectedSlot: SkillSlot? = null
     private val selectedSlotSkill: Skill?
@@ -113,6 +114,7 @@ class SkillListScreen(
     inner class SkillLine(
         private val skill: Skill,
     ) : FlowLayout(Sizing.fill(98), Sizing.content(5), Algorithm.HORIZONTAL) {
+
         private val content: FlowLayout = Containers.horizontalFlow(Sizing.content(), Sizing.content())
         private val equipButton = Components.texture(com.imoonday.util.id("equip.png"), 0, 0, 16, 16, 16, 16).apply {
             mouseDown().subscribe { x, y, button ->
@@ -152,7 +154,7 @@ class SkillListScreen(
                 child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
                     gap(5)
                     child(Components.label(skill.formattedName))
-                    child(Components.label(Text.literal("(${skill.cooldown / 20.0}s)")))
+                    child(Components.label(Text.literal("(${skill.getCooldown(client?.world) / 20.0}s)")))
                 })
                 child(
                     ShiftScrollContainer.horizontalScroll(
@@ -215,6 +217,7 @@ class SkillListScreen(
         private val slot: SkillSlot,
         var skill: Skill,
     ) : FlowLayout(Sizing.fill(100), Sizing.fill(24), Algorithm.HORIZONTAL) {
+
         private val content: FlowLayout = Containers.horizontalFlow(Sizing.content(), Sizing.content())
         private var lastClickTime: Long = 0
 
@@ -259,7 +262,7 @@ class SkillListScreen(
                     child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
                         gap(5)
                         child(Components.label(this@SlotLine.skill.formattedName))
-                        child(Components.label(Text.literal("(${this@SlotLine.skill.cooldown / 20.0}s)")))
+                        child(Components.label(Text.literal("(${this@SlotLine.skill.getCooldown(client?.world) / 20.0}s)")))
                     })
                     child(
                         ShiftScrollContainer.horizontalScroll(

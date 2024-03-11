@@ -11,5 +11,6 @@ class AutomaticUphillSkill : PassiveSkill(
     rarity = Rarity.RARE,
     toggleable = true
 ), StepHeightTrigger, PersistentTrigger {
+
     override fun getStepHeight(player: PlayerEntity): Float? = if (!player.isUsing()) null else 1.0f
 }

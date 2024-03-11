@@ -2,8 +2,10 @@ package com.imoonday.screen
 
 import com.imoonday.component.equipSkill
 import com.imoonday.component.equippedSkills
+import com.imoonday.component.getSkill
 import com.imoonday.component.learnedSkills
 import com.imoonday.init.ModSkills
+import com.imoonday.render.SkillSlotRenderer
 import com.imoonday.skill.Skill
 import com.imoonday.util.*
 import io.wispforest.owo.ui.base.BaseOwoScreen
@@ -19,9 +21,9 @@ import net.minecraft.client.sound.PositionedSoundInstance
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
+import org.lwjgl.glfw.GLFW
 import java.awt.Color
 
 class SkillInventoryScreen(
@@ -40,22 +42,29 @@ class SkillInventoryScreen(
             scrollContainer.onMouseScroll(0.0, 0.0, 100.0)
             update(NbtCompound())
         }
-    val tabs: MutableList<Tab> = mutableListOf()
+    var selectingSlot: Slot? = null
+    private val tabs: MutableList<Tab> = mutableListOf()
     private val equippedSlots: MutableList<Slot> = mutableListOf()
     private lateinit var inventory: GridLayout
     private lateinit var scrollContainer: ScrollContainer<*>
-    private val slotSize = 18
-    private val rows: Int
-        get() = ModSkills.SKILLS.size / 9 + if (ModSkills.SKILLS.size % 9 == 0) 0 else 1
+    private val slotSize = 24
     private val tabTexture = Identifier("textures/gui/container/creative_inventory/tabs.png")
     private val titleComponent = Components.label(
         translate(
             "screen",
             "inventory.title",
             player.learnedSkills.size,
-            ModSkills.SKILLS.filterNot { it.invalid }.size
+            Skill.getValidSkills().size
         ).formatted(Formatting.BLACK)
     )
+    private val rows: Int
+        get() = Skill.getValidSkills().size / 9 + if (Skill.getValidSkills().size % 9 == 0) 0 else 1
+    private val displaySkills
+        get() = player.learnedSkills
+            .filterNot { it in player.equippedSkills }
+            .filter { skill ->
+                (selectedTab?.type ?: return@filter true) in skill.types
+            }
 
     override fun createAdapter(): OwoUIAdapter<FlowLayout> = OwoUIAdapter.create(this, Containers::verticalFlow)!!
     override fun build(rootComponent: FlowLayout) {
@@ -73,99 +82,105 @@ class SkillInventoryScreen(
     private fun setupInventory(rootComponent: FlowLayout) {
         rootComponent.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
             val halfSize = SkillType.entries.size / 2
-            child(Containers.grid(Sizing.fixed(9 * slotSize + 15), Sizing.content(), 1, 5).apply {
-                horizontalAlignment(HorizontalAlignment.CENTER)
-                SkillType.entries.take(halfSize).forEachIndexed { index, skillType ->
-                    child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                        val tab = Tab(skillType, index)
-                        child(tab, 0, index)
-                        tabs.add(tab)
-                    })
+            val width = 9 * (slotSize + 4) + 15
+            addTopTabs(width, halfSize)
+            addSkills(width)
+            addBottomTabs(width, halfSize)
+        })
+    }
+
+    private fun FlowLayout.addBottomTabs(width: Int, halfSize: Int) {
+        child(Containers.grid(Sizing.fixed(width), Sizing.content(), 1, 5).apply {
+            horizontalAlignment(HorizontalAlignment.CENTER)
+            SkillType.entries.drop(halfSize).forEachIndexed { index, skillType ->
+                child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
+                    val tab = Tab(skillType, halfSize + index)
+                    child(tab)
+                    tabs.add(tab)
+                }, 0, index)
+            }
+        })
+    }
+
+    private fun FlowLayout.addSkills(width: Int) {
+        child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
+            surface(Surface.PANEL.and { context, component ->
+                selectedTab?.run {
+                    context.drawTexture(
+                        tabTexture,
+                        x(),
+                        if (reverse) component.y() + component.height() - 4 else component.y(),
+                        26,
+                        v + if (reverse) 0 else 28,
+                        26,
+                        4
+                    )
                 }
             })
+            padding(Insets.vertical(7))
+            horizontalAlignment(HorizontalAlignment.CENTER)
+            gap(3)
+            child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
+                alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
+                child(titleComponent)
+            })
+            val skills = displaySkills
+            val rows = rows
             child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                surface(Surface.PANEL.and { context, component ->
-                    selectedTab?.run {
-                        context.drawTexture(
-                            tabTexture,
-                            x(),
-                            if (reverse) component.y() + component.height() - 4 else component.y(),
-                            26,
-                            v + if (reverse) 0 else 28,
-                            26,
-                            4
-                        )
+                gap(3)
+                child(Containers.verticalScroll(
+                    Sizing.content(),
+                    Sizing.fixed(slotSize * 5),
+                    Containers.grid(Sizing.content(), Sizing.content(), rows, 9).apply {
+                        padding(Insets.right(5))
+                        alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
+                        for (index in (0 until rows * 9)) {
+                            child(
+                                Slot(SkillSlot.INVALID, skills.getOrElse(index) { ModSkills.EMPTY }),
+                                index / 9,
+                                index % 9
+                            )
+                        }
+                    }.also { inventory = it }
+                ).apply {
+                    scrollbar(ScrollContainer.Scrollbar.vanilla())
+                    padding(Insets.horizontal(5))
+                }.also { scrollContainer = it })
+                child(Containers.grid(Sizing.fixed(width), Sizing.content(), 1, 4).apply {
+                    padding(Insets.left(5))
+                    alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
+                    player.equippedSkills.forEachIndexed { index, skill ->
+                        child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
+                            padding(Insets.of(1))
+                            alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
+                            gap(3)
+                            child(Components.texture(SkillSlotRenderer.indexTexture, index * 9, 0, 9, 9))
+                            val slot = Slot(SkillSlot.fromIndex(index + 1), skill)
+                            child(slot)
+                            equippedSlots.add(slot)
+                        }, 0, index)
                     }
                 })
-                padding(Insets.vertical(7))
-                horizontalAlignment(HorizontalAlignment.CENTER)
-                gap(3)
-                child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                    alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                    child(titleComponent)
-                })
-                val skills = player.learnedSkills.filterNot { it in player.equippedSkills }.toList()
-                val rows = rows
+            })
+        })
+    }
+
+    private fun FlowLayout.addTopTabs(width: Int, halfSize: Int) {
+        child(Containers.grid(Sizing.fixed(width), Sizing.content(), 1, 5).apply {
+            horizontalAlignment(HorizontalAlignment.CENTER)
+            SkillType.entries.take(halfSize).forEachIndexed { index, skillType ->
                 child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                    gap(3)
-                    zIndex(-1)
-                    child(Containers.verticalScroll(
-                        Sizing.content(),
-                        Sizing.fixed(slotSize * 5),
-                        Containers.grid(Sizing.content(), Sizing.content(), rows, 9).apply {
-                            padding(Insets.right(5))
-                            alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-                            for (index in (0 until rows * 9)) {
-                                child(
-                                    Slot(SkillSlot.INVALID, skills.getOrElse(index) { ModSkills.EMPTY }),
-                                    index / 9,
-                                    index % 9
-                                )
-                            }
-                        }.also { inventory = it }
-                    ).apply {
-                        scrollbar(ScrollContainer.Scrollbar.vanilla())
-                        scrollStep(slotSize)
-                        padding(Insets.horizontal(5))
-                    }.also { scrollContainer = it })
-                    child(Containers.grid(Sizing.fixed(9 * slotSize + 5), Sizing.content(), 1, 4).apply {
-                        padding(Insets.left(5))
-                        alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                        player.equippedSkills.forEachIndexed { index, skill ->
-                            child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                                padding(Insets.of(1))
-                                alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                                gap(3)
-                                child(Components.label(Text.literal("${index + 1}").formatted(Formatting.BLACK)))
-                                val slot = Slot(SkillSlot.fromIndex(index + 1), skill)
-                                child(slot)
-                                equippedSlots.add(slot)
-                            }, 0, index)
-                        }
-                    })
+                    val tab = Tab(skillType, index)
+                    child(tab, 0, index)
+                    tabs.add(tab)
                 })
-            })
-            child(Containers.grid(Sizing.fixed(9 * slotSize + 15), Sizing.content(), 1, 5).apply {
-                horizontalAlignment(HorizontalAlignment.CENTER)
-                SkillType.entries.drop(halfSize).forEachIndexed { index, skillType ->
-                    child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                        val tab = Tab(skillType, halfSize + index)
-                        child(tab)
-                        tabs.add(tab)
-                    }, 0, index)
-                }
-            })
+            }
         })
     }
 
     override fun update(data: NbtCompound) {
         val size = inventory.children().size
-        val skills =
-            player.learnedSkills.filterNot { it in player.equippedSkills || it == selectedSlot?.skill }.filter {
-                it.types.any {
-                    it == (selectedTab?.type ?: return@filter true)
-                }
-            }
+        val skills = displaySkills
         inventory.run {
             for (index in 0 until size) {
                 child(
@@ -183,7 +198,7 @@ class SkillInventoryScreen(
                 "screen",
                 "inventory.title",
                 player.learnedSkills.size,
-                ModSkills.SKILLS.filterNot { it.invalid }.size
+                Skill.getValidSkills().size
             ) else selectedTab!!.type.displayName).copy().formatted(Formatting.BLACK)
         )
     }
@@ -195,11 +210,54 @@ class SkillInventoryScreen(
         }
     }
 
-    override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean =
+    override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
         if (client!!.options.inventoryKey.matchesKey(keyCode, scanCode)) {
             close()
-            true
+            return true
+        }
+        return if (selectingSlot != null && !selectingSlot!!.skill.invalid && selectingSlot != selectedSlot) {
+            val slot = selectingSlot!!
+            when (keyCode) {
+                GLFW.GLFW_KEY_1 -> {
+                    val original = player.getSkill(SkillSlot.SLOT_1)
+                    player.equipSkill(slot.skill, SkillSlot.SLOT_1)
+                    if (slot.slot.valid && !original.invalid) {
+                        player.equipSkill(original, slot.slot)
+                    }
+                    true
+                }
+
+                GLFW.GLFW_KEY_2 -> {
+                    val original = player.getSkill(SkillSlot.SLOT_2)
+                    player.equipSkill(slot.skill, SkillSlot.SLOT_2)
+                    if (slot.slot.valid && !original.invalid) {
+                        player.equipSkill(original, slot.slot)
+                    }
+                    true
+                }
+
+                GLFW.GLFW_KEY_3 -> {
+                    val original = player.getSkill(SkillSlot.SLOT_3)
+                    player.equipSkill(slot.skill, SkillSlot.SLOT_3)
+                    if (slot.slot.valid && !original.invalid) {
+                        player.equipSkill(original, slot.slot)
+                    }
+                    true
+                }
+
+                GLFW.GLFW_KEY_4 -> {
+                    val original = player.getSkill(SkillSlot.SLOT_4)
+                    player.equipSkill(slot.skill, SkillSlot.SLOT_4)
+                    if (slot.slot.valid && !original.invalid) {
+                        player.equipSkill(original, slot.slot)
+                    }
+                    true
+                }
+
+                else -> super.keyPressed(keyCode, scanCode, modifiers)
+            }
         } else super.keyPressed(keyCode, scanCode, modifiers)
+    }
 
     override fun close() = client!!.setScreen(parent)
     override fun init() {
@@ -214,10 +272,32 @@ class SkillInventoryScreen(
         var skill: Skill,
     ) : FlowLayout(Sizing.fixed(slotSize), Sizing.fixed(slotSize), Algorithm.VERTICAL) {
 
+        private val slotTexture = com.imoonday.util.id("slot.png")
+
         init {
             padding(Insets.of(1))
-            surface(Surface.tiled(com.imoonday.util.id("slot.png"), slotSize, slotSize))
+            surface { context, component ->
+                context.drawTexture(
+                    slotTexture,
+                    component.x(),
+                    component.y(),
+                    skill.rarity.level * 24f,
+                    0f,
+                    component.width(),
+                    component.height(),
+                    256,
+                    256
+                )
+                context.fill(
+                    component.x() + component.width() - 3,
+                    component.y() + 1,
+                    component.x() + component.width() - 1,
+                    component.y() + 3,
+                    skill.rarity.formatting.colorValue ?: 0
+                )
+            }
             alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
+            margins(Insets.of(2))
             updateSkill(skill)
             mouseDown().subscribe { _, _, button ->
                 if (button != 0) return@subscribe false
@@ -258,25 +338,24 @@ class SkillInventoryScreen(
         fun updateSkill(skill: Skill) {
             this.skill = skill
             clearChildren()
-            skill.takeUnless { it.invalid || slot.valid && this == selectedSlot }?.run {
+            skill.takeUnless { it.invalid || this == selectedSlot }?.run {
                 child(Components.texture(icon, 0, 0, 16, 16, 16, 16))
             }
             tooltip(skill.name)
         }
 
         override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) {
-            if (hasShiftDown()) {
-                tooltip(skill.getItemTooltips(client!!, true))
-            } else {
-                tooltip(skill.name)
-            }
+            if (hovered) selectingSlot = if (!skill.invalid) this else null
+            else if (selectingSlot == this) selectingSlot = null
+            if (hasShiftDown()) tooltip(skill.getItemTooltips(client!!, true)) else tooltip(skill.name)
             super.draw(context, mouseX, mouseY, partialTicks, delta)
             if (hovered) {
+                val edge = 4
                 context.fill(
-                    x + 1,
-                    y + 1,
-                    x + width - 1,
-                    y + height - 1,
+                    x + edge,
+                    y + edge,
+                    x + width - edge,
+                    y + height - edge,
                     Color.WHITE.alpha(0.4).rgb
                 )
             }
@@ -284,6 +363,13 @@ class SkillInventoryScreen(
 
         override fun shouldDrawTooltip(mouseX: Double, mouseY: Double): Boolean =
             super.shouldDrawTooltip(mouseX, mouseY) && selectedSlot == null && !skill.invalid
+
+        override fun equals(other: Any?): Boolean = other is Slot && other.skill == skill
+        override fun hashCode(): Int {
+            var result = slot.hashCode()
+            result = 31 * result + skill.hashCode()
+            return result
+        }
     }
 
     inner class Tab(
@@ -331,15 +417,16 @@ class SkillInventoryScreen(
                         padding(Insets.bottom(2))
                     }
                     alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                    child(Components.texture(
-                        ModSkills.SKILLS.filterNot { it.invalid }.first { type in it.types }.icon,
-                        0,
-                        0,
-                        16,
-                        16,
-                        16,
-                        16
-                    )
+                    child(
+                        Components.texture(
+                            Skill.getValidSkills().first { type in it.types }.icon,
+                            0,
+                            0,
+                            16,
+                            16,
+                            16,
+                            16
+                        )
                     )
                 }
             )

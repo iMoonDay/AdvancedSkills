@@ -15,7 +15,9 @@ class UseSkillC2SRequest(
     val keyState: KeyState,
     val data: NbtCompound,
 ) : FabricPacket {
+
     companion object {
+
         val id = id("use_skill_c2s")
         val pType = PacketType.create(id) {
             UseSkillC2SRequest(

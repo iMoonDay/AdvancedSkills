@@ -7,7 +7,7 @@ import com.imoonday.trigger.SendPlayerVelocityTrigger
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.send
-import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.Entity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.particle.ParticleTypes
@@ -45,10 +45,10 @@ class ExtremeEvasionSkill : Skill(
         return UseResult.startUsing(user, this)
     }
 
-    override fun onDamaged(
+    override fun ignoreDamage(
         amount: Float,
         source: DamageSource,
         player: ServerPlayerEntity,
-        attacker: LivingEntity?,
-    ): Float = if (!player.isUsing()) amount else 0.0f
+        attacker: Entity?,
+    ): Boolean = player.isUsing()
 }

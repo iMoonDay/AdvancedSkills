@@ -8,5 +8,6 @@ class DisarmEffect : StatusEffect(
     StatusEffectCategory.HARMFUL,
     Color.RED.rgb
 ), SyncClientEffect {
+
     override val syncId: String = "disarm"
 }

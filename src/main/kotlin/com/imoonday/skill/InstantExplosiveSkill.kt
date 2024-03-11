@@ -14,6 +14,7 @@ class InstantExplosiveSkill : Skill(
     rarity = Rarity.EPIC,
     sound = ModSounds.FIRE,
 ), SendPlayerVelocityTrigger {
+
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             val rotation = user.velocity.add(rotationVector.normalize().multiply(1.5))

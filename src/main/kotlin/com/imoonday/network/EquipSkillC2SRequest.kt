@@ -1,7 +1,6 @@
 package com.imoonday.network
 
 import com.imoonday.component.equipSkill
-import com.imoonday.init.ModSkills
 import com.imoonday.skill.Skill
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.id
@@ -16,10 +15,12 @@ class EquipSkillC2SRequest(
     val slot: SkillSlot,
     val skill: Skill,
 ) : FabricPacket {
+
     companion object {
+
         val id = id("equip_skill_c2s")
         val pType = PacketType.create(id) {
-            EquipSkillC2SRequest(SkillSlot.fromIndex(it.readInt()), ModSkills.get(it.readIdentifier()))
+            EquipSkillC2SRequest(SkillSlot.fromIndex(it.readInt()), Skill.fromId(it.readIdentifier()))
         }!!
 
         fun register() {

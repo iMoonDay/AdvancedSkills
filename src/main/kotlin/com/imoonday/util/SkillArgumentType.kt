@@ -1,6 +1,6 @@
 package com.imoonday.util
 
-import com.imoonday.init.ModSkills
+import com.imoonday.MOD_ID
 import com.imoonday.skill.Skill
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.arguments.ArgumentType
@@ -16,11 +16,15 @@ import net.minecraft.util.InvalidIdentifierException
 import java.util.concurrent.CompletableFuture
 
 class SkillArgumentType : ArgumentType<Skill> {
+
     override fun <S : Any?> listSuggestions(
         context: CommandContext<S>,
         builder: SuggestionsBuilder,
     ): CompletableFuture<Suggestions> =
-        CommandSource.suggestIdentifiers(ModSkills.SKILLS.filterNot { it.invalid }.map { it.id }, builder)
+        CommandSource.suggestMatching(mutableListOf<String>().apply {
+            addAll(Skill.getValidSkills().map { it.id.toString() })
+            addAll(Skill.getSkills().filter { it.id.namespace == MOD_ID }.map { it.id.path })
+        }, builder)
 
     override fun parse(reader: StringReader): Skill {
         val i = reader.cursor
@@ -28,11 +32,10 @@ class SkillArgumentType : ArgumentType<Skill> {
         while (reader.canRead() && Identifier.isCharValid(reader.peek())) {
             reader.skip()
         }
-
         val string = reader.string.substring(i, reader.cursor)
         try {
-            val id = Identifier(string)
-            val skill = ModSkills.getOrNull(id) ?: throw UNKNOWN.create()
+            val id = if (":" in string) Identifier(string) else id(string)
+            val skill = Skill.fromIdNullable(id) ?: throw UNKNOWN.create()
             if (skill.invalid) throw INVALID.create()
             return skill
         } catch (e: InvalidIdentifierException) {
@@ -42,6 +45,7 @@ class SkillArgumentType : ArgumentType<Skill> {
     }
 
     companion object {
+
         val INVALID = SimpleCommandExceptionType(translate("command", "invalid"))
         val UNKNOWN = SimpleCommandExceptionType(translate("command", "unknown"))
         fun register() = ArgumentTypeRegistry.registerArgumentType(

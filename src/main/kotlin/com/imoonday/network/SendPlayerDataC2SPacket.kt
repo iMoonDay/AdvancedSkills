@@ -17,7 +17,9 @@ class SendPlayerDataC2SPacket(
     val skill: Skill,
     val data: NbtCompound,
 ) : FabricPacket {
+
     companion object {
+
         val id = id("send_player_data_c2s")
         val pType = PacketType.create(id) {
             SendPlayerDataC2SPacket(Skill.fromId(it.readIdentifier()), it.readNbt()!!)

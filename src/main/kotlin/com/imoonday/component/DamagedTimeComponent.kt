@@ -8,11 +8,13 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Util
 
 interface PairLongComponent : Component {
+
     var first: Long
     var second: Long
 }
 
 class DamagedTimeComponent : PairLongComponent {
+
     override var first: Long = 0
     override var second: Long = 0
 

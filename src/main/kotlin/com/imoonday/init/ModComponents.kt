@@ -7,10 +7,10 @@ import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy
-import net.minecraft.entity.LivingEntity
-
+import net.minecraft.entity.Entity
 
 object ModComponents : EntityComponentInitializer {
+
     @JvmField
     val EXP: ComponentKey<LongComponent> =
         ComponentRegistry.getOrCreate(id("exp"), LongComponent::class.java)
@@ -41,6 +41,6 @@ object ModComponents : EntityComponentInitializer {
         registry.registerForPlayers(EQUIPPED_SKILLS, ::EquippedSkillComponent, RespawnCopyStrategy.CHARACTER)
         registry.registerForPlayers(USING_SKILLS, ::UsingSkillComponent, RespawnCopyStrategy.NEVER_COPY)
         registry.registerForPlayers(DAMAGED_TIME, { DamagedTimeComponent() }, RespawnCopyStrategy.NEVER_COPY)
-        registry.registerFor(LivingEntity::class.java, STATUS, ::EntityStatusComponent)
+        registry.registerFor(Entity::class.java, STATUS, ::EntityStatusComponent)
     }
 }

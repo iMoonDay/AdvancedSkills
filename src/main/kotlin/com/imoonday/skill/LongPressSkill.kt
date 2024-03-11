@@ -1,6 +1,7 @@
 package com.imoonday.skill
 
 import com.imoonday.trigger.LongPressTrigger
+import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import net.minecraft.server.network.ServerPlayerEntity
@@ -15,4 +16,6 @@ abstract class LongPressSkill(
 ) : Skill(id, types = types, cooldown, rarity, sound), LongPressTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = onRelease(user, 1)
+
+    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) = Unit
 }

@@ -12,6 +12,7 @@ import java.io.FileWriter
 
 @Config(name = "ui-config", wrapperName = "UIConfig")
 class UIConfigModel {
+
     var uiOffsetX: Int = 0
         set(value) {
             field = value
@@ -27,6 +28,7 @@ class UIConfigModel {
     fun toJson(): String = GSON.toJson(this)
 
     companion object {
+
         private val GSON = GsonBuilder().setPrettyPrinting().create()
         private var file: File? = null
             get() {

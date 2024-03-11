@@ -21,6 +21,7 @@
     "PlayerEntityMixin",
     "ProjectileAttackGoalMixin",
     "ServerPlayerEntityMixin",
+    "ServerWorldMixin",
     "ShulkerEntity$ShootBulletGoalMixin",
     "StatusEffectInstanceAccessor",
     "WardenEntityMixin"
@@ -30,6 +31,7 @@
   },
   "client": [
     "ClientPlayerEntityMixin",
+    "ClientWorldMixin",
     "GameRendererMixin",
     "HandledScreenMixin",
     "HeartTypeMixin",

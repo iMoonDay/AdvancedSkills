@@ -11,7 +11,9 @@ import net.minecraft.network.PacketByteBuf
 class SyncConfigS2CPacket(
     val tag: NbtCompound,
 ) : FabricPacket {
+
     companion object {
+
         val id = id("sync_config_s2c")
         val pType = PacketType.create(id) {
             SyncConfigS2CPacket(it.readNbt()!!)

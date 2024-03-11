@@ -1,13 +1,11 @@
 package com.imoonday.skill
 
 import com.imoonday.component.getSkillData
-import com.imoonday.component.startUsingSkill
 import com.imoonday.init.ModSounds
 import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.send
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Direction
@@ -20,6 +18,7 @@ class PiercingSkill : Skill(
     rarity = Rarity.SUPERB,
     sound = ModSounds.PIERCING
 ), AutoStopTrigger {
+
     override fun use(user: ServerPlayerEntity): UseResult {
         user.stopFallFlying()
         user.velocityDirty = true
@@ -27,11 +26,11 @@ class PiercingSkill : Skill(
         val noGravity = user.hasNoGravity()
         user.setNoGravity(true)
         user.send(EntityVelocityUpdateS2CPacket(user))
-        return UseResult.of(user.startUsingSkill(asSkill(), NbtCompound().apply {
-            putDouble("x", user.velocity.x)
-            putDouble("z", user.velocity.z)
-            putBoolean("noGravity", noGravity)
-        }))
+        return UseResult.of(user.startUsing {
+            it.putDouble("x", user.velocity.x)
+            it.putDouble("z", user.velocity.z)
+            it.putBoolean("noGravity", noGravity)
+        })
     }
 
     override fun getPersistTime(): Int = 8
@@ -39,7 +38,7 @@ class PiercingSkill : Skill(
     override fun onStop(player: ServerPlayerEntity) {
         player.velocityDirty = true
         player.velocity = Vec3d.ZERO
-        player.getSkillData(asSkill())?.let {
+        player.getSkillData(this)?.let {
             player.setNoGravity(it.getBoolean("noGravity"))
         }
         player.send(EntityVelocityUpdateS2CPacket(player))
@@ -53,7 +52,7 @@ class PiercingSkill : Skill(
             player.stopUsing()
             return
         }
-        player.getSkillData(asSkill())?.let {
+        player.getSkillData(this)?.let {
             if (it.contains("x") && it.contains("z")) {
                 player.velocityDirty = true
                 player.velocity = Vec3d(it.getDouble("x"), 0.0, it.getDouble("z"))
@@ -62,8 +61,11 @@ class PiercingSkill : Skill(
         }
         player.world.getOtherEntities(player, player.boundingBox) { it.isLiving && it.isAlive }.forEach {
             it.damage(player.damageSources.playerAttack(player), 6.0f)
+            it.velocityDirty = true
             it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(1.5).withAxis(Direction.Axis.Y, 1.0))
         }
         super.tick(player, usedTime)
     }
+
+    override fun isDangerousTo(player: ServerPlayerEntity): Boolean = player.isUsing()
 }

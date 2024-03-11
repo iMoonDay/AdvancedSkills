@@ -24,8 +24,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.ServerConfigHandler
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
 import net.minecraft.world.World
 import java.util.*
 
@@ -73,16 +71,7 @@ class ServantWitherSkeletonEntity(
 
     override fun canFreeze(): Boolean = false
 
-    override fun getAmbientSound(): SoundEvent = SoundEvents.ENTITY_WITHER_SKELETON_AMBIENT
-
-    override fun getHurtSound(source: DamageSource?): SoundEvent = SoundEvents.ENTITY_WITHER_SKELETON_HURT
-
-    override fun getDeathSound(): SoundEvent = SoundEvents.ENTITY_WITHER_SKELETON_DEATH
-
-    fun getStepSound(): SoundEvent = SoundEvents.ENTITY_WITHER_SKELETON_STEP
-
     override fun drop(source: DamageSource) {
-
     }
 
     override fun getOwner(): Entity? = world.getPlayerByUuid(ownerUuid)
@@ -122,6 +111,7 @@ class ServantWitherSkeletonEntity(
     }
 
     companion object {
+
         fun createAttributes(): DefaultAttributeContainer.Builder {
             return createHostileAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5)
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 1.0)

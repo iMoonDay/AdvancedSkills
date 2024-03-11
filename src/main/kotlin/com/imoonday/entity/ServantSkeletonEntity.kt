@@ -74,10 +74,9 @@ class ServantSkeletonEntity(
 
     override fun getDeathSound(): SoundEvent = SoundEvents.ENTITY_SKELETON_DEATH
 
-    fun getStepSound(): SoundEvent = SoundEvents.ENTITY_SKELETON_STEP
+    override fun getStepSound(): SoundEvent = SoundEvents.ENTITY_SKELETON_STEP
 
     override fun drop(source: DamageSource) {
-
     }
 
     override fun getOwner(): Entity? = world.getPlayerByUuid(ownerUuid)
@@ -117,6 +116,7 @@ class ServantSkeletonEntity(
     }
 
     companion object {
+
         fun createAttributes(): DefaultAttributeContainer.Builder {
             return createHostileAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.5)
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 1.0)

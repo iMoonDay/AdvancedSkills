@@ -16,6 +16,7 @@ import org.joml.Matrix4f
 
 abstract class EffectEnergyBallEntityRenderer<T : EffectEnergyBallEntity>(context: EntityRendererFactory.Context) :
     EntityRenderer<T>(context) {
+
     abstract val texture: Identifier
     val layer: RenderLayer
         get() = RenderLayer.getEntityCutoutNoCull(texture)

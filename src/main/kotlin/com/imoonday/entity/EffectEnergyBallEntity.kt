@@ -58,24 +58,41 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
                 .filterIsInstance<LivingEntity>()
                 .forEach {
                     for (entry in effects) {
-                        if (random.nextFloat() < entry.value) it.addStatusEffect(entry.key, effectCause)
+                        if (random.nextFloat() < entry.value || canApply(
+                                entry.key,
+                                entry.value,
+                                it
+                            )
+                        ) it.addStatusEffect(
+                            entry.key,
+                            effectCause
+                        )
                     }
                 }
-            (world as ServerWorld).spawnParticles(
-                ParticleTypes.EXPLOSION,
-                x,
-                y,
-                z,
-                10,
-                0.0,
-                0.0,
-                0.0,
-                0.0
-            )
-            world.playSound(null, blockPos, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.VOICE)
+            spawnParticles()
+            playSound()
         }
         discard()
     }
+
+    protected open fun playSound() =
+        world.playSound(null, blockPos, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.VOICE)
+
+    protected open fun spawnParticles() {
+        (world as? ServerWorld)?.spawnParticles(
+            ParticleTypes.EFFECT,
+            x,
+            y,
+            z,
+            (range * range * 100).toInt(),
+            range - 1,
+            range - 1,
+            range - 1,
+            0.0
+        )
+    }
+
+    open fun canApply(effect: StatusEffectInstance, chance: Float, target: LivingEntity): Boolean = false
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)

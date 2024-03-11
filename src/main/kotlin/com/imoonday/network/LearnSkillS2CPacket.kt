@@ -1,10 +1,9 @@
 package com.imoonday.network
 
-import com.imoonday.util.id
 import com.imoonday.init.ModSounds
 import com.imoonday.screen.component.SkillToast
-import com.imoonday.init.ModSkills
 import com.imoonday.skill.Skill
+import com.imoonday.util.id
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
 import net.fabricmc.fabric.api.networking.v1.PacketType
@@ -15,10 +14,12 @@ import net.minecraft.network.PacketByteBuf
 class LearnSkillS2CPacket(
     val skill: Skill,
 ) : FabricPacket {
+
     companion object {
+
         val id = id("learn_skill_s2c")
         val pType = PacketType.create(id) {
-            LearnSkillS2CPacket(ModSkills.get(it.readIdentifier()))
+            LearnSkillS2CPacket(Skill.fromId(it.readIdentifier()))
         }!!
 
         fun register() {

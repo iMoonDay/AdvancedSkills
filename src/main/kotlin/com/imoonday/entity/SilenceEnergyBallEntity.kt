@@ -19,7 +19,6 @@ class SilenceEnergyBallEntity(entityType: EntityType<out SilenceEnergyBallEntity
         StatusEffectInstance(ModEffects.SILENCE, 20 * 5, 0, false, false, true) to 0.5f,
         StatusEffectInstance(StatusEffects.SLOWNESS, 30, 2, false, false, true) to 1f
     )
-
     override var range: Double = 2.0
 
     constructor(
@@ -46,6 +45,7 @@ class SilenceEnergyBallEntity(entityType: EntityType<out SilenceEnergyBallEntity
 
     class Renderer(context: EntityRendererFactory.Context) :
         EffectEnergyBallEntityRenderer<SilenceEnergyBallEntity>(context) {
+
         override val texture: Identifier = id("textures/entity/silence_energy_ball.png")
     }
 }

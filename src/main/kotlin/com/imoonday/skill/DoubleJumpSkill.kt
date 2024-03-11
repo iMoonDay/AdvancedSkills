@@ -1,6 +1,9 @@
 package com.imoonday.skill
 
-import com.imoonday.util.*
+import com.imoonday.util.SkillType
+import com.imoonday.util.UseResult
+import com.imoonday.util.send
+import com.imoonday.util.spawnParticles
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.ServerPlayerEntity
@@ -11,6 +14,7 @@ class DoubleJumpSkill : Skill(
     cooldown = 3,
     rarity = Rarity.UNCOMMON
 ) {
+
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             stopFallFlying()
@@ -23,11 +27,11 @@ class DoubleJumpSkill : Skill(
                 x,
                 y,
                 z,
-                30,
+                10,
+                0.5,
                 0.0,
-                -velocity.y,
-                0.0,
-                0.0
+                0.5,
+                0.1
             )
         }
         return UseResult.success()

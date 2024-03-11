@@ -2,6 +2,7 @@ package com.imoonday.init
 
 import com.imoonday.entity.*
 import com.imoonday.util.id
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
@@ -9,12 +10,12 @@ import net.minecraft.client.render.entity.HorseEntityRenderer
 import net.minecraft.client.render.entity.SkeletonEntityRenderer
 import net.minecraft.client.render.entity.TntEntityRenderer
 import net.minecraft.client.render.entity.WitherSkeletonEntityRenderer
+import net.minecraft.client.render.entity.model.EntityModelLayer
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.passive.AbstractHorseEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
-
 
 object ModEntities {
 
@@ -80,6 +81,19 @@ object ModEntities {
             .build()
             .register("servant_wither_skeleton", ServantWitherSkeletonEntity.createAttributes().build())
 
+    @JvmField
+    val METEORITE: EntityType<MeteoriteEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.MISC, ::MeteoriteEntity)
+            .dimensions(EntityDimensions.changing(1f, 1f))
+            .trackRangeChunks(8)
+            .trackedUpdateRate(1)
+            .forceTrackedVelocityUpdates(true)
+            .build()
+            .register("meteorite")
+
+    @JvmField
+    val METEORITE_MODEL_LAYER: EntityModelLayer = registerModelLayer("meteorite")
+
     fun <T : Entity> EntityType<T>.register(name: String): EntityType<T> =
         Registry.register(Registries.ENTITY_TYPE, id(name), this)
 
@@ -92,6 +106,8 @@ object ModEntities {
         return this
     }
 
+    fun registerModelLayer(id: String): EntityModelLayer = EntityModelLayer(id(id), "main")
+
     fun init() = Unit
 
     fun initClient() {
@@ -102,5 +118,8 @@ object ModEntities {
         EntityRendererRegistry.register(SPECIAL_TAME_HORSE, ::HorseEntityRenderer)
         EntityRendererRegistry.register(SERVANT_SKELETON, ::SkeletonEntityRenderer)
         EntityRendererRegistry.register(SERVANT_WITHER_SKELETON, ::WitherSkeletonEntityRenderer)
+        EntityRendererRegistry.register(METEORITE, MeteoriteEntity::Renderer)
+
+        EntityModelLayerRegistry.registerModelLayer(METEORITE_MODEL_LAYER, MeteoriteEntity.Renderer::texturedModelData)
     }
 }

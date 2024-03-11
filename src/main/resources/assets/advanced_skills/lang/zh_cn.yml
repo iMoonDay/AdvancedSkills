@@ -14,6 +14,8 @@ advancedSkills:
     silenced: 沉默中，无法使用技能
     passive: '%s 是被动技能'
     active: '%s 已激活'
+    inactive: '%s 已关闭'
+    charging: '%s 开始蓄力'
   learnSkill:
     toast: 学到了一项新技能！
     message: '学习了 %s'
@@ -27,6 +29,9 @@ advancedSkills:
   equipSkill:
     success: '%s 已装备 %s 至插槽 %d'
     failed: '%s 已经装备了 %s 在插槽 %d 上'
+  unequipSkill:
+    success: '%s 已将 %s 从插槽 %d 卸下'
+    failed: '%s 未装备技能在插槽 %d 上'
   resetCooldown: '%s 重置了所有技能的冷却时间'
   skillExp:
     give:
@@ -92,8 +97,6 @@ advancedSkills:
     wall_climbing:
       name: 爬墙
       description: 允许爬墙
-      active: '%s 已激活'
-      inactive: '%s 已关闭'
     piercing:
       name: 突刺
       description: 向前冲刺一段距离，并对接触的生物造成伤害并击退
@@ -158,7 +161,6 @@ advancedSkills:
     charged_sweep:
       name: 蓄力横扫
       description: 蓄力后对前方扇形范围内实体造成伤害
-      charging: '%s 开始蓄力'
     active_defense:
       name: 主动防御
       description: 长按使用时减伤20%
@@ -221,6 +223,33 @@ advancedSkills:
     danger_perception:
       name: 危险感知
       description: 遇到危险时临时获得加速
+    rising_shock:
+      name: 上升冲击
+      description: 向上升起一段距离，同时将身边的生物一起带飞
+    catapult_gliding:
+      name: 弹射滑翔
+      description: 蓄力然后弹出去并使用鞘翅滑翔
+      failed: 你没有鞘翅或者已损坏
+      fallFlying: 无法在滑翔时使用
+    charged_dash:
+      name: 蓄力冲刺
+      description: 蓄力然后弹出去，可用于滑翔
+    laser_eye:
+      name: 激光眼
+      description: 发射一束激光，对路径上的所有生物造成伤害
+    meteor_shower:
+      name: 流星雨
+      description: 召唤一场陨石雨
+      failed: 蓄力中断
+    negative_resistance:
+      name: 负面抵抗
+      description: 短时间内抵挡一次负面效果
+    insightful_eye:
+      name: 洞察之眼
+      description: 可以看到其他玩家的技能
+    item_attraction:
+      name: 物品吸引
+      description: 吸引周围物品
   skillType:
     attack: 攻击
     defense: 防御
@@ -263,7 +292,7 @@ advancedSkills:
     slot:
       title: 左键拖动移动，右键重置
     inventory:
-      title: '技能背包 | %d/%d'
+      title: '技能背包 %d/%d'
 item:
   advanced_skills:
     skill_fruit: 技能果实
@@ -280,6 +309,7 @@ entity:
     special_tame_horse: 特驯马
     servant_skeleton: 奴仆骷髅
     servant_wither_skeleton: 奴仆凋零骷髅
+    meteorite: 陨石
 subtitles:
   advanced_skills:
     heal: 治愈
@@ -289,3 +319,7 @@ subtitles:
     disarm: 缴械
     piercing: 突刺
     fire: 发射
+    laser: 激光
+gamerule:
+  skillCooldownMultiplier: 技能冷却乘数
+  skillCooldownMultiplier.description: 所有技能冷却时间按此倍率调整

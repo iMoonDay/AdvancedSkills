@@ -3,6 +3,7 @@ package com.imoonday.init
 import com.imoonday.network.*
 
 object ModChannels {
+
     fun registerServer() {
         UseSkillC2SRequest.register()
         EquipSkillC2SRequest.register()

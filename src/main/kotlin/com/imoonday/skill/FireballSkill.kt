@@ -13,6 +13,7 @@ class FireballSkill : Skill(
     rarity = Rarity.SUPERB,
     sound = SoundEvents.ENTITY_ENDER_DRAGON_SHOOT
 ) {
+
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             val rotation = rotationVector.normalize().multiply(1.5)
@@ -31,5 +32,4 @@ class FireballSkill : Skill(
         }
         return UseResult.success()
     }
-
 }

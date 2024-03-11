@@ -11,6 +11,7 @@ import com.imoonday.util.translate
 import com.imoonday.util.updateScreen
 import dev.onyxstudios.cca.api.v3.component.Component
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
+import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Items
@@ -25,12 +26,15 @@ import net.minecraft.util.Identifier
 import kotlin.math.min
 
 interface Skill2IntMapComponent : Component {
+
     var skills: MutableMap<Skill, Int>
 }
 
 class LearnedSkillComponent(private val provider: PlayerEntity) :
     Skill2IntMapComponent,
-    AutoSyncedComponent {
+    AutoSyncedComponent,
+    CommonTickingComponent {
+
     override var skills: MutableMap<Skill, Int> = mutableMapOf()
         get() {
             field.keys.removeIf { it.invalid }
@@ -46,7 +50,7 @@ class LearnedSkillComponent(private val provider: PlayerEntity) :
     override fun readFromNbt(tag: NbtCompound) {
         skills = tag.getList("skills", NbtElement.COMPOUND_TYPE.toInt())
             .map { it as NbtCompound }
-            .associate { ModSkills.get(Identifier(it.getString("id"))) to it.getInt("cooldown") }
+            .associate { Skill.fromId(Identifier(it.getString("id"))) to it.getInt("cooldown") }
             .toMutableMap()
     }
 
@@ -59,6 +63,20 @@ class LearnedSkillComponent(private val provider: PlayerEntity) :
             }
         })
         tag.put("skills", list)
+    }
+
+    override fun tick() {
+        var anyFinished = false
+        skills.filterValues { it > 0 }.forEach {
+            val next = it.value - 1
+            skills[it.key] = next
+            if (!anyFinished && next <= 0) {
+                anyFinished = true
+            }
+        }
+        if (anyFinished && !provider.world.isClient) {
+            ModComponents.SKILLS.sync(provider)
+        }
     }
 
     override fun applySyncPacket(buf: PacketByteBuf) {
@@ -77,7 +95,7 @@ fun PlayerEntity.isCooling(skill: Skill): Boolean = getCooldown(skill) > 0
 fun PlayerEntity.startCooling(skill: Skill, cooldown: Int? = null) {
     if (isCooling(skill)) return
     modifySkills {
-        var time = cooldown ?: skill.cooldown
+        var time = cooldown ?: skill.getCooldown(world)
         equippedSkills.filterIsInstance<CooldownTrigger>()
             .forEach { time = it.getCooldown(time) }
         it[skill] = if (isCreative) min(20, time) else time
@@ -129,13 +147,10 @@ fun PlayerEntity.learnSkill(skill: Skill): Boolean =
                     )
                 )
             })
-            if (it.keys.toSet() == ModSkills.SKILLS.filterNot { it.invalid }
-                    .toSet()) sendMessage(
-                translate("learnSkill", "all")
-            )
+            if (it.keys.toSet() == Skill.getValidSkills().toSet())
+                sendMessage(translate("learnSkill", "all"))
             true
         } else false
-
     }
 
 fun PlayerEntity.forgetSkill(skill: Skill): Boolean =
@@ -165,8 +180,8 @@ fun PlayerEntity.forgetSkill(skill: Skill): Boolean =
     }
 
 fun PlayerEntity.learnRandomSkill(predicate: (Skill) -> Boolean = { true }): Boolean =
-    ModSkills.SKILLS
-        .filterNot { it.invalid || it in learnedSkills }
+    Skill.getValidSkills()
+        .filterNot { it in learnedSkills }
         .filter(predicate)
         .takeUnless { it.isEmpty() }
         ?.let { learnSkill(it.random()) } ?: false

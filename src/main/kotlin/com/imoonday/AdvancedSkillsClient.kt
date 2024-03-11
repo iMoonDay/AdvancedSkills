@@ -8,6 +8,7 @@ import com.imoonday.util.EventHandler
 import net.fabricmc.api.ClientModInitializer
 
 object AdvancedSkillsClient : ClientModInitializer {
+
     override fun onInitializeClient() {
         UIConfigModel.load()
         ModKeyBindings.init()

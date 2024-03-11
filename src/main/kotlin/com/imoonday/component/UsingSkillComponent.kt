@@ -1,11 +1,11 @@
 package com.imoonday.component
 
 import com.imoonday.init.ModComponents
-import com.imoonday.init.ModSkills
 import com.imoonday.skill.Skill
 import com.imoonday.trigger.ClientUseTrigger
 import dev.onyxstudios.cca.api.v3.component.Component
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
+import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent
 import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
@@ -16,10 +16,15 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.util.Identifier
 
 interface Skill2NbtComponent : Component {
+
     var skills: MutableMap<Skill, NbtCompound>
 }
 
-class UsingSkillComponent(private val provider: PlayerEntity) : Skill2NbtComponent, AutoSyncedComponent {
+class UsingSkillComponent(private val provider: PlayerEntity) :
+    Skill2NbtComponent,
+    AutoSyncedComponent,
+    CommonTickingComponent {
+
     override var skills: MutableMap<Skill, NbtCompound> = mutableMapOf()
         get() {
             field.keys.removeIf { it.invalid }
@@ -35,7 +40,7 @@ class UsingSkillComponent(private val provider: PlayerEntity) : Skill2NbtCompone
     override fun readFromNbt(tag: NbtCompound) {
         skills = tag.getList("skills", NbtElement.COMPOUND_TYPE.toInt())
             .map { it as NbtCompound }
-            .associate { ModSkills.get(Identifier(it.getString("id"))) to it.getCompound("data") }
+            .associate { Skill.fromId(Identifier(it.getString("id"))) to it.getCompound("data") }
             .toMutableMap()
     }
 
@@ -48,6 +53,10 @@ class UsingSkillComponent(private val provider: PlayerEntity) : Skill2NbtCompone
             }
         })
         tag.put("skills", list)
+    }
+
+    override fun tick() {
+        skills.forEach { skills[it.key] = it.value.apply { putInt("time", getInt("time") + 1) } }
     }
 
     override fun applySyncPacket(buf: PacketByteBuf?) {
@@ -97,12 +106,6 @@ fun PlayerEntity.getSkillUsedTime(skill: Skill): Int =
 
 fun PlayerEntity.resetSkillUsedTime(skill: Skill) {
     getComponent(ModComponents.USING_SKILLS).skills[skill]?.putInt("time", 0)
-}
-
-fun PlayerEntity.updateSkillUsedTime() {
-    val skills = getComponent(ModComponents.USING_SKILLS).skills
-    skills.forEach { skills[it.key] = it.value.apply { putInt("time", it.value.getInt("time") + 1) } }
-    ModComponents.USING_SKILLS.sync(this)
 }
 
 fun PlayerEntity.getSkillData(skill: Skill): NbtCompound? =

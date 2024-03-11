@@ -5,12 +5,13 @@ import com.imoonday.init.*
 import com.imoonday.util.EventHandler
 import com.imoonday.util.SkillArgumentType
 import net.fabricmc.api.ModInitializer
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 const val MOD_ID = "advanced_skills"
+val LOGGER: Logger = LoggerFactory.getLogger(MOD_ID)
 
 object AdvancedSkills : ModInitializer {
-    private val logger = LoggerFactory.getLogger(MOD_ID)
 
     override fun onInitialize() {
         Config.load()
@@ -23,6 +24,7 @@ object AdvancedSkills : ModInitializer {
         ModEffects.init()
         ModSounds.init()
         ModEntities.init()
+        ModGameRules.init()
         EventHandler.register()
     }
 }

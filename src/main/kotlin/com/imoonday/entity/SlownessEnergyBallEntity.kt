@@ -17,7 +17,6 @@ class SlownessEnergyBallEntity(entityType: EntityType<out SlownessEnergyBallEnti
     override var effects = mutableMapOf(
         StatusEffectInstance(StatusEffects.SLOWNESS, 20 * 8, 1) to 0.5f,
     )
-
     override var range: Double = 5.0
 
     constructor(
@@ -44,6 +43,7 @@ class SlownessEnergyBallEntity(entityType: EntityType<out SlownessEnergyBallEnti
 
     class Renderer(context: EntityRendererFactory.Context) :
         EffectEnergyBallEntityRenderer<SlownessEnergyBallEntity>(context) {
+
         override val texture: Identifier = id("textures/entity/freeze_energy_ball.png")
         override var scale = 1f
     }

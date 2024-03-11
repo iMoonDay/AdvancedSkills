@@ -7,9 +7,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.util.*
 
 interface Servant : Ownable {
+
     var ownerUuid: UUID?
 
     companion object {
+
         fun invulnerableToServant(
             damageSource: DamageSource,
             cir: CallbackInfoReturnable<Boolean?>,

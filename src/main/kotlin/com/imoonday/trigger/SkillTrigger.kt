@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 
 interface SkillTrigger {
+
     fun asSkill(): Skill
     fun PlayerEntity.isUsing(): Boolean = isUsingSkill(asSkill())
     fun PlayerEntity.isCooling(): Boolean = isCooling(asSkill())

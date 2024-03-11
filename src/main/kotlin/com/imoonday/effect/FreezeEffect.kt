@@ -8,5 +8,6 @@ class FreezeEffect : StatusEffect(
     StatusEffectCategory.HARMFUL,
     Color.CYAN.rgb
 ), SyncClientEffect {
+
     override val syncId: String = "frozen"
 }

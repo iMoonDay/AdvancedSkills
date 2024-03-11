@@ -18,7 +18,8 @@ public abstract class CreeperIgniteGoalMixin {
     @Final
     private CreeperEntity creeper;
 
-    @Shadow public abstract void stop();
+    @Shadow
+    public abstract void stop();
 
     @ModifyReturnValue(method = "canStart", at = @At("RETURN"))
     public boolean advanced_skills$canStart(boolean original) {

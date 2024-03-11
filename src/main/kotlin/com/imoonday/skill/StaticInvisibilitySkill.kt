@@ -9,6 +9,7 @@ class StaticInvisibilitySkill : PassiveSkill(
     types = arrayOf(SkillType.PASSIVE),
     rarity = Rarity.EPIC,
 ), AutoTrigger, PersistentTrigger, SendPlayerVelocityTrigger, InvisibilityTrigger {
+
     override fun shouldStart(player: ServerPlayerEntity): Boolean =
         player.velocity.length() < 0.079 && (player.isOnGround || player.abilities.flying)
 

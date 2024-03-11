@@ -26,6 +26,7 @@ import net.minecraft.world.World
 import kotlin.math.abs
 
 class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: World) : HorseEntity(entityType, world) {
+
     private val summonSkill
         get() = ModSkills.EXCLUSIVE_MOUNT
 
@@ -81,7 +82,6 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
     }
 
     override fun drop(source: DamageSource) {
-
     }
 
     fun tryTeleport() {

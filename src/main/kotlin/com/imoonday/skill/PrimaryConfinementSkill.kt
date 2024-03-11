@@ -1,18 +1,12 @@
 package com.imoonday.skill
 
 import com.imoonday.init.ModEffects
-import com.imoonday.trigger.FeatureRendererTrigger
+import com.imoonday.trigger.UsingRenderTrigger
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.translateSkill
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ProjectileUtil
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents
@@ -26,7 +20,8 @@ class PrimaryConfinementSkill : LongPressSkill(
     cooldown = 12,
     rarity = Rarity.SUPERB,
     sound = SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE
-), FeatureRendererTrigger {
+), UsingRenderTrigger {
+
     override fun getMaxPressTime(): Int = 5 * 20
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
@@ -59,19 +54,4 @@ class PrimaryConfinementSkill : LongPressSkill(
         }
         return UseResult.pass(translateSkill("primary_confinement", "empty"))
     }
-
-    override fun <T : PlayerEntity, M : EntityModel<T>> render(
-        matrices: MatrixStack,
-        provider: VertexConsumerProvider,
-        light: Int,
-        player: T,
-        limbAngle: Float,
-        limbDistance: Float,
-        tickDelta: Float,
-        animationProgress: Float,
-        headYaw: Float,
-        headPitch: Float,
-        renderer: FeatureRendererContext<T, M>,
-        context: EntityRendererFactory.Context,
-    ) = renderSkillAboveHead(matrices, context, provider, player)
 }

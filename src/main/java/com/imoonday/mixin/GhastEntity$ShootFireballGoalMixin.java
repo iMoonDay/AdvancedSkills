@@ -13,9 +13,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "net.minecraft.entity.mob.GhastEntity$ShootFireballGoal")
 public abstract class GhastEntity$ShootFireballGoalMixin {
 
-    @Shadow @Final private GhastEntity ghast;
+    @Shadow
+    @Final
+    private GhastEntity ghast;
 
-    @Shadow public abstract void stop();
+    @Shadow
+    public abstract void stop();
 
     @ModifyReturnValue(method = "canStart", at = @At("RETURN"))
     public boolean advanced_skills$canStart(boolean original) {

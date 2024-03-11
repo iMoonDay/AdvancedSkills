@@ -1,8 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.startCooling
-import com.imoonday.component.stopUsingSkill
 import com.imoonday.init.ModEffects
 import com.imoonday.init.ModSounds
 import com.imoonday.trigger.AttackTrigger
@@ -27,6 +24,7 @@ class DisarmSkill : Skill(
     cooldown = 15,
     rarity = Rarity.SUPERB,
 ), AttackTrigger, PersistentTrigger, RespawnTrigger {
+
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(false)
 
     override fun onAttack(

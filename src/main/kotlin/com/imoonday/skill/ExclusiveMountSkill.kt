@@ -17,6 +17,7 @@ class ExclusiveMountSkill : Skill(
     rarity = Rarity.EPIC,
     sound = SoundEvents.ENTITY_HORSE_SADDLE
 ) {
+
     override fun use(user: ServerPlayerEntity): UseResult {
         if (!user.isOnGround && !user.isTouchingWater || user.hasVehicle()) return UseResult.fail(
             translateSkill(

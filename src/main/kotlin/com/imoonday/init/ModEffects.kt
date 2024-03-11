@@ -35,13 +35,10 @@ object ModEffects {
 
 val LivingEntity.isDisarmed: Boolean
     get() = hasStatusEffect(this, ModEffects.DISARM)
-
 val LivingEntity.isSilenced: Boolean
     get() = hasStatusEffect(this, ModEffects.SILENCE)
-
 val LivingEntity.isForceFrozen: Boolean
     get() = hasStatusEffect(this, ModEffects.FREEZE)
-
 val LivingEntity.isConfined: Boolean
     get() = hasStatusEffect(this, ModEffects.CONFINEMENT)
 

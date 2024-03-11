@@ -14,6 +14,7 @@ class SelfHealingSkill : Skill(
     types = arrayOf(SkillType.PASSIVE, SkillType.HEALING),
     rarity = Rarity.RARE
 ), AutoTrigger, AutoStopTrigger, DamageTrigger {
+
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
 
     override fun getPersistTime(): Int = 20 * 10

@@ -15,6 +15,7 @@ class PrimaryPurificationSkill : Skill(
     rarity = Rarity.SUPERB,
     sound = ModSounds.PURIFY
 ) {
+
     override fun use(user: ServerPlayerEntity): UseResult = user.statusEffects
         .filter { it.effectType.category == StatusEffectCategory.HARMFUL }
         .randomOrNull()

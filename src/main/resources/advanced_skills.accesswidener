@@ -11,3 +11,5 @@ accessible field net/minecraft/entity/TntEntity causingEntity Lnet/minecraft/ent
 extendable method net/minecraft/entity/TntEntity explode ()V
 
 accessible method net/minecraft/client/render/item/ItemRenderer renderBakedItemQuads (Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Ljava/util/List;Lnet/minecraft/item/ItemStack;II)V
+
+accessible method net/minecraft/entity/mob/AbstractSkeletonEntity getStepSound ()Lnet/minecraft/sound/SoundEvent;

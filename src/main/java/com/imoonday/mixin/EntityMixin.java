@@ -1,5 +1,6 @@
 package com.imoonday.mixin;
 
+import com.imoonday.component.EntityStatusComponentKt;
 import com.imoonday.init.ModEffectsKt;
 import com.imoonday.trigger.SkillTriggerHandler;
 import net.minecraft.entity.Entity;
@@ -75,6 +76,15 @@ public class EntityMixin {
         }
     }
 
+    @Inject(method = "isSubmergedIn", at = @At("HEAD"), cancellable = true)
+    private void advanced_skills$isSubmergedIn(TagKey<Fluid> tag, CallbackInfoReturnable<Boolean> cir) {
+        if ((Entity) (Object) this instanceof PlayerEntity player) {
+            if (SkillTriggerHandler.INSTANCE.ignoreFluid(player, tag)) {
+                cir.setReturnValue(false);
+            }
+        }
+    }
+
     @ModifyVariable(method = "updateMovementInFluid", at = @At("HEAD"), argsOnly = true, index = 2)
     private double advanced_skills$modifySpeed(double value, TagKey<Fluid> tag, double speed) {
         if ((Entity) (Object) this instanceof PlayerEntity player) {
@@ -99,5 +109,10 @@ public class EntityMixin {
                 cir.setReturnValue(false);
             }
         }
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    public void advanced_skills$tick(CallbackInfo ci) {
+        EntityStatusComponentKt.syncStatus((Entity) (Object) this);
     }
 }

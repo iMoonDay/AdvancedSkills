@@ -1,6 +1,5 @@
 package com.imoonday.screen
 
-import com.imoonday.init.ModSkills
 import com.imoonday.skill.Skill
 import com.imoonday.util.alpha
 import com.imoonday.util.translate
@@ -18,6 +17,7 @@ import java.awt.Color
 
 class SkillGalleryScreen(private val parent: Screen? = null, private val positioning: Skill? = null) :
     BaseOwoScreen<FlowLayout>() {
+
     var selectedSkill: Skill? = null
         set(value) {
             field = value
@@ -29,7 +29,7 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
             Sizing.content()
         ).apply {
             padding(Insets.right(1))
-            ModSkills.SKILLS.filterNot { it.invalid }.forEachIndexed { i: Int, skill: Skill ->
+            Skill.getValidSkills().forEachIndexed { i: Int, skill: Skill ->
                 child(SkillLine(i + 1, skill))
             }
         }).apply {
@@ -89,15 +89,20 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
                     child(Components.texture(it.icon, 0, 0, 16, 16, 16, 16))
                 })
                 child(Components.label(translate("screen", "gallery.info.name", it.name.string)).trim())
-                child(Components.label(
-                    translate(
-                        "screen",
-                        "gallery.info.type",
-                        it.types.joinToString(" ") { type -> type.displayName.string }
-                    )
-                ).trim())
+                child(
+                    Components.label(translate("screen", "gallery.info.type", it.types.joinToString(" ") { type -> type.displayName.string }))
+                        .trim()
+                )
                 child(Components.label(translate("screen", "gallery.info.description", it.description.string)).trim())
-                child(Components.label(translate("screen", "gallery.info.cooldown", "${it.cooldown / 20.0}s")).trim())
+                child(
+                    Components.label(
+                        translate(
+                            "screen",
+                            "gallery.info.cooldown",
+                            "${it.getCooldown(client?.world) / 20.0}s"
+                        )
+                    ).trim()
+                )
                 child(Components.label(translate("screen", "gallery.info.rarity", it.rarity.displayName.string)).trim())
             }
         }
@@ -115,11 +120,11 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
         }
     }
 
-
     inner class SkillLine(
         index: Int,
         val skill: Skill,
     ) : FlowLayout(Sizing.fill(98), Sizing.content(2), Algorithm.HORIZONTAL) {
+
         private val content: FlowLayout = Containers.horizontalFlow(Sizing.fill(95), Sizing.content())
 
         init {
@@ -156,13 +161,7 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
         override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) {
             super.draw(context, mouseX, mouseY, partialTicks, delta)
             if (selectedSkill == skill || hovered) {
-                context.fill(
-                    x,
-                    y,
-                    x + width,
-                    y + height,
-                    Color.WHITE.alpha(if (selectedSkill == skill) 0.4 else 0.2).rgb
-                )
+                context.fill(x, y, x + width, y + height, Color.WHITE.alpha(if (selectedSkill == skill) 0.4 else 0.2).rgb)
             }
         }
     }

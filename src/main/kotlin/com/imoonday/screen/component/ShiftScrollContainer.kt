@@ -22,7 +22,6 @@ class ShiftScrollContainer<C : Component>(
         set(value) {
             super.scrollOffset = value
         }
-
     var currentScrollPosition: Double
         get() = super.currentScrollPosition
         set(value) {
@@ -34,6 +33,7 @@ class ShiftScrollContainer<C : Component>(
     }
 
     companion object {
+
         fun <C : Component> verticalScroll(
             horizontalSizing: Sizing?,
             verticalSizing: Sizing?,

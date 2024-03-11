@@ -14,6 +14,7 @@ advancedSkills:
     silenced: You are silenced and cannot use skills
     passive: '%s is passive skill'
     active: '%s is active'
+    charging: '%s start charging'
   learnSkill:
     toast: Learned a new skill!
     message: 'Learned %s'
@@ -27,6 +28,9 @@ advancedSkills:
   equipSkill:
     success: '%s equipped %s to Slot %d'
     failed: '%s already equipped %s on Slot %d'
+  unequipSkill:
+    success: '%s has removed %s from slot %d'
+    failed: '%s has no equipped skill on slot %d'
   resetCooldown: '%s reset all skills cooldown'
   skillExp:
     give:
@@ -92,8 +96,6 @@ advancedSkills:
     wall_climbing:
       name: Wall Climbing
       description: Allow to climb the wall
-      active: '%s Active'
-      inactive: '%s Inactive'
     piercing:
       name: Piercing
       description: Dash forward for a distance, dealing damage and knocking back creatures on contact
@@ -158,7 +160,6 @@ advancedSkills:
     charged_sweep:
       name: Charged Sweep
       description: After charging, it will cause damage to entities within the fan-shaped range in front
-      charging: '%s start charging'
     active_defense:
       name: Active Defense
       description: Reduce damage by 20% when long pressed
@@ -221,6 +222,33 @@ advancedSkills:
     danger_perception:
       name: Danger Perception
       description: Gain temporary speed when in danger
+    rising_shock:
+      name: Rising Shock
+      description: Rise up a certain distance and take the creatures around you with it
+    catapult_gliding:
+      name: Catapult Gliding
+      description: Charge up, then pop out and use elytra to glide
+      failed: You have no elytra or your elytra is broken
+      fallFlying: Cannot be used while gliding
+    charged_dash:
+      name: Charged Dash
+      description: Charge up and pop out, which can be used to glide
+    laser_eye:
+      name: Laser Eye
+      description: Fires a laser beam, damaging all creatures in its path
+    meteor_shower:
+      name: Meteor Shower
+      description: Summon a meteor shower
+      failed: Charge interrupted
+    negative_resistance:
+      name: Negative Resistance
+      description: Resist a negative effect once for a short period of time
+    insightful_eye:
+      name: Insightful Eye
+      description: Can see the skills of other players
+    item_attraction:
+      name: Item Attraction
+      description: Attract surrounding items
   skillType:
     attack: Attack
     defense: Defense
@@ -263,7 +291,7 @@ advancedSkills:
     slot:
       title: Left drag to move, right click to reset
     inventory:
-      title: 'Skill Inventory | %d/%d'
+      title: 'Skill Inventory %d/%d'
 item:
   advanced_skills:
     skill_fruit: Skill Fruit
@@ -280,6 +308,7 @@ entity:
     special_tame_horse: Special Tame Horse
     servant_skeleton: Servant Skeleton
     servant_wither_skeleton: Servant Wither Skeleton
+    meteorite: Meteorite
 subtitles:
   advanced_skills:
     heal: Heal
@@ -289,3 +318,7 @@ subtitles:
     disarm: Disarm
     piercing: Piercing
     fire: Fire
+    laser: Laser
+gamerule:
+  skillCooldownMultiplier: Skill Cooldown Multiplier
+  skillCooldownMultiplier.description: The cooldown time of all skills is adjusted according to this multiplier

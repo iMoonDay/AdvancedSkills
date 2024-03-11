@@ -17,7 +17,8 @@ public abstract class BlazeEntity$ShootFireballGoalMixin {
     @Final
     private BlazeEntity blaze;
 
-    @Shadow public abstract void stop();
+    @Shadow
+    public abstract void stop();
 
     @ModifyReturnValue(method = "canStart", at = @At("RETURN"))
     public boolean advanced_skills$canStart(boolean original) {

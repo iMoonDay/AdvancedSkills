@@ -20,7 +20,6 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
-import java.util.*
 
 class ActiveDefenseSkill : LongPressSkill(
     id = "active_defense",
@@ -28,20 +27,19 @@ class ActiveDefenseSkill : LongPressSkill(
     cooldown = 10,
     rarity = Rarity.SUPERB,
 ), DamageTrigger, AttributeTrigger, FeatureRendererTrigger {
+
     override fun getMaxPressTime(): Int = 10 * 10
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
-            MOVEMENT_SPEED_UUID,
+            createUuid("Active Defense"),
             "Active Defense",
             -0.5,
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
 
-    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
-        super<LongPressSkill>.postUnequipped(player, slot)
+    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) =
         super<AttributeTrigger>.postUnequipped(player, slot)
-    }
 
     override fun onPress(player: ServerPlayerEntity): UseResult {
         player.addAttributes()
@@ -63,14 +61,7 @@ class ActiveDefenseSkill : LongPressSkill(
         source: DamageSource,
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
-    ): Float {
-        if (!player.isUsing()) return amount
-        return amount * 0.8f
-    }
-
-    companion object {
-        val MOVEMENT_SPEED_UUID: UUID = UUID.fromString("A0F548ED-6E81-45D3-83CD-4C2A2FE0A1DC")
-    }
+    ): Float = if (!player.isUsing()) amount else amount * 0.8f
 
     override fun <T : PlayerEntity, M : EntityModel<T>> render(
         matrices: MatrixStack,

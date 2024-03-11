@@ -1,5 +1,6 @@
 package com.imoonday.init
 
+import com.imoonday.skill.Skill
 import com.imoonday.util.id
 import com.imoonday.util.translate
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
@@ -11,13 +12,14 @@ import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 
 object ModItemGroups {
+
     val ITEM_GROUP_KEY = register("advanced_skills")
     val GROUP: ItemGroup = FabricItemGroup.builder()
         .icon { ModItems.UNIQUE_SKILL_FRUIT.defaultStack ?: Items.BARRIER.defaultStack }
         .displayName(translate("key", "category"))
         .entries { _, entries ->
             ModItems.FRUITS.forEach { entries.add(it) }
-            ModSkills.SKILLS.filterNot { it.invalid }.mapNotNull { it.item }.forEach { entries.add(it) }
+            Skill.getValidSkills().mapNotNull { it.item }.forEach { entries.add(it) }
         }
         .build()!!
 

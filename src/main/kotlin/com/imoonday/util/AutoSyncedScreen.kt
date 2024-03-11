@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 
 interface AutoSyncedScreen {
+
     fun update(data: NbtCompound)
 }
 

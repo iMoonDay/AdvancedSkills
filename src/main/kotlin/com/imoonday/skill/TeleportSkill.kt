@@ -14,6 +14,7 @@ class TeleportSkill : Skill(
     cooldown = 2,
     rarity = Rarity.UNCOMMON
 ) {
+
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             val offset = rotationVector.withAxis(Direction.Axis.Y, 0.0).normalize().multiply(2.0)
@@ -39,13 +40,13 @@ class TeleportSkill : Skill(
             user.spawnParticles(
                 ParticleTypes.LARGE_SMOKE,
                 prevPos.x,
-                prevPos.y + 0.5,
+                prevPos.y + height / 2.0,
                 prevPos.z,
                 10,
-                0.0,
-                0.0,
-                0.0,
-                0.0
+                width / 2.0,
+                height / 2.0,
+                width / 2.0,
+                0.1
             )
         }
         return UseResult.success()

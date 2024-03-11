@@ -18,7 +18,8 @@ public abstract class ProjectileAttackGoalMixin {
     @Final
     private MobEntity mob;
 
-    @Shadow public abstract void stop();
+    @Shadow
+    public abstract void stop();
 
     @ModifyReturnValue(method = "canStart", at = @At("RETURN"))
     public boolean advanced_skills$canStart(boolean original) {

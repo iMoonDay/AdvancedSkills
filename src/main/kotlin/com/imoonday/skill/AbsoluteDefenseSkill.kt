@@ -11,7 +11,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.entity.feature.FeatureRendererContext
 import net.minecraft.client.render.entity.model.EntityModel
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.Entity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
@@ -27,16 +27,17 @@ class AbsoluteDefenseSkill : Skill(
     override fun getPersistTime() = 20 * 30
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
-    override fun onDamaged(
+
+    override fun ignoreDamage(
         amount: Float,
         source: DamageSource,
         player: ServerPlayerEntity,
-        attacker: LivingEntity?,
-    ): Float {
-        if (!player.isUsing() || amount <= 0) return amount
+        attacker: Entity?,
+    ): Boolean {
+        if (!player.isUsing() || amount <= 0) return false
         player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
         player.stopUsing()
-        return 0.0f
+        return true
     }
 
     override fun <T : PlayerEntity, M : EntityModel<T>> render(

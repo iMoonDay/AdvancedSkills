@@ -27,6 +27,7 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
     renderer: FeatureRendererContext<T, M>,
     private val context: EntityRendererFactory.Context,
 ) : FeatureRenderer<T, M>(renderer) {
+
     override fun render(
         matrices: MatrixStack,
         vertexConsumers: VertexConsumerProvider,
@@ -73,7 +74,6 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
             stack.push()
 
             stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotateAngleY * (180f / Math.PI.toFloat()) + (c * (360f / count))))
-
             val scale = (entity.width * 1.2f).coerceAtMost(1.0f)
 
             stack.translate(-0.5, (entity.height - scale) * 0.5, -0.5)
@@ -81,7 +81,6 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
             stack.translate(0f, 0f, (entity.width).coerceAtLeast(0.75f) + horizonOffset)
 
             stack.scale(scale, scale, scale)
-
             val model = context.modelManager.getModel(modelIdentifier)
             for (dir in Direction.entries) {
                 context.itemRenderer.renderBakedItemQuads(
@@ -101,6 +100,7 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
     }
 
     companion object {
+
         val silenceModelId = ModelIdentifier(Registries.ITEM.getId(ModSkills.PRIMARY_SILENCE.item), "inventory")
         val disarmModelId = ModelIdentifier(Registries.ITEM.getId(ModSkills.DISARM.item), "inventory")
         val confinementModelId = ModelIdentifier(Registries.ITEM.getId(Items.BARRIER), "inventory")

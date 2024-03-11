@@ -40,5 +40,11 @@
     "sounds": [
       "advanced_skills:fire"
     ]
+  },
+  "laser": {
+    "subtitle": "subtitles.advanced_skills.laser",
+    "sounds": [
+      "advanced_skills:laser"
+    ]
   }
 }

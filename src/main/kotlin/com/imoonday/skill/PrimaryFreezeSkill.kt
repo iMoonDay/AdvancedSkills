@@ -13,6 +13,7 @@ class PrimaryFreezeSkill : Skill(
     rarity = Rarity.SUPERB,
     sound = ModSounds.FIRE
 ) {
+
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             val rotation = rotationVector.normalize().multiply(1.5)
