@@ -1,13 +1,14 @@
 package com.imoonday.mixin;
 
-import com.imoonday.component.EntityStatusComponentKt;
 import com.imoonday.init.ModEffectsKt;
 import com.imoonday.trigger.SkillTriggerHandler;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,10 +18,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public class EntityMixin {
+public abstract class EntityMixin {
 
     @Shadow
     private float stepHeight;
+
+    @Shadow
+    protected abstract BlockPos getPosWithYOffset(float offset);
 
     @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
     public void advanced_skills$changeLookDirection(double cursorDeltaX, double cursorDeltaY, CallbackInfo ci) {
@@ -111,8 +115,16 @@ public class EntityMixin {
         }
     }
 
-    @Inject(method = "tick", at = @At("TAIL"))
-    public void advanced_skills$tick(CallbackInfo ci) {
-        EntityStatusComponentKt.syncStatus((Entity) (Object) this);
+    @Inject(method = "isGlowing", at = @At("HEAD"), cancellable = true)
+    private void advanced_skills$isGlowing(CallbackInfoReturnable<Boolean> cir) {
+        Entity entity = (Entity) (Object) this;
+        if (entity.getWorld().isClient) {
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client != null && client.player != null) {
+                if (SkillTriggerHandler.INSTANCE.isGlowing(client.player, entity)) {
+                    cir.setReturnValue(true);
+                }
+            }
+        }
     }
 }

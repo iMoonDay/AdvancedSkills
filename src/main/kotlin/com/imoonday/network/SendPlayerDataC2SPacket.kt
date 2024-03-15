@@ -1,12 +1,12 @@
 package com.imoonday.network
 
-import com.imoonday.component.equippedSkills
-import com.imoonday.component.isUsingSkill
-import com.imoonday.component.learnedSkills
 import com.imoonday.skill.Skill
 import com.imoonday.trigger.SendPlayerDataTrigger
-import com.imoonday.trigger.SendPlayerDataTrigger.SendTime.*
+import com.imoonday.trigger.SendTime.*
+import com.imoonday.util.hasEquipped
+import com.imoonday.util.hasLearned
 import com.imoonday.util.id
+import com.imoonday.util.isUsing
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
 import net.fabricmc.fabric.api.networking.v1.PacketType
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -29,11 +29,11 @@ class SendPlayerDataC2SPacket(
             ServerPlayNetworking.registerGlobalReceiver(pType) { packet, player, _ ->
                 val skill = packet.skill
                 val data = packet.data
-                if (!skill.invalid && skill is SendPlayerDataTrigger && skill in player.learnedSkills) {
+                if (!skill.invalid && skill is SendPlayerDataTrigger && player.hasLearned(skill)) {
                     when (skill.getSendTime()) {
                         ALWAYS -> skill.apply(player, data)
-                        USING -> if (player.isUsingSkill(skill)) skill.apply(player, data)
-                        EQUIPPED -> if (skill in player.equippedSkills) skill.apply(player, data)
+                        USING -> if (player.isUsing(skill)) skill.apply(player, data)
+                        EQUIPPED -> if (player.hasEquipped(skill)) skill.apply(player, data)
                         else -> {}
                     }
                 }

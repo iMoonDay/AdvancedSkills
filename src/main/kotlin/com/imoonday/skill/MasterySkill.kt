@@ -7,7 +7,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class MasterySkill : Skill(
     id = "mastery",
-    types = arrayOf(SkillType.PASSIVE),
+    types = listOf(SkillType.PASSIVE),
     rarity = Rarity.LEGENDARY
 ), CooldownTrigger {
 

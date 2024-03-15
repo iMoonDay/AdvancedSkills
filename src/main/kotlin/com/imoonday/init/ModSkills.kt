@@ -1,5 +1,6 @@
 package com.imoonday.init
 
+import com.imoonday.custom.CustomSkillHandler
 import com.imoonday.skill.*
 import com.imoonday.trigger.InitTrigger
 
@@ -182,7 +183,17 @@ object ModSkills {
     @JvmField
     val ITEM_ATTRACTION = ItemAttractionSkill().register()
 
+    @JvmField
+    val DOPING = DopingSkill().register()
+
+    @JvmField
+    val GRAPPLING_HOOK = GrapplingHookSkill().register()
+
+    @JvmField
+    val REVERSE_GRAVITY = ReverseGravitySkill().register()
+
     fun init() {
-        Skill.getSkills().filterIsInstance<InitTrigger>().forEach { it.init() }
+        CustomSkillHandler.load()
+        Skill.getTriggers<InitTrigger>().forEach { it.init() }
     }
 }

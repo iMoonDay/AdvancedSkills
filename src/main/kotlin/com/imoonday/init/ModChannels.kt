@@ -4,14 +4,15 @@ import com.imoonday.network.*
 
 object ModChannels {
 
-    fun registerServer() {
+    fun register() {
         UseSkillC2SRequest.register()
         EquipSkillC2SRequest.register()
-        SyncConfigS2CPacket.register()
         SendPlayerDataC2SPacket.register()
     }
 
     fun registerClient() {
+        SyncConfigS2CPacket.register()
         LearnSkillS2CPacket.register()
+        SyncCustomSkillS2CPacket.register()
     }
 }

@@ -14,7 +14,7 @@ import net.minecraft.util.Util
 
 class PerfectReflectionSkill : Skill(
     id = "perfect_reflection",
-    types = arrayOf(SkillType.DEFENSE),
+    types = listOf(SkillType.DEFENSE),
     cooldown = 5,
     rarity = Rarity.EPIC
 ), DamageTrigger, ReflectionTrigger {

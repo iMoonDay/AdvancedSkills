@@ -8,7 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class PrimarySlownessSkill : Skill(
     id = "primary_slowness",
-    types = arrayOf(SkillType.CONTROL),
+    types = listOf(SkillType.CONTROL),
     cooldown = 6,
     rarity = Rarity.RARE,
     sound = ModSounds.FIRE

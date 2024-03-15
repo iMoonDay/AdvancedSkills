@@ -4,15 +4,15 @@ import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.trigger.BreatheInWaterTrigger
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import com.imoonday.util.spawnParticles
 import com.imoonday.util.toBlockPos
+import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.fluid.Fluids
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.ServerPlayerEntity
 
 class WaterBreathingSkill : Skill(
     id = "water_breathing",
-    types = arrayOf(SkillType.ENHANCEMENT),
+    types = listOf(SkillType.ENHANCEMENT),
     cooldown = 10,
     rarity = Rarity.RARE,
 ), AutoStopTrigger, BreatheInWaterTrigger {
@@ -26,21 +26,22 @@ class WaterBreathingSkill : Skill(
         super.onStop(player)
     }
 
-    override fun tick(player: ServerPlayerEntity, usedTime: Int) {
+    override fun clientTick(player: ClientPlayerEntity, usedTime: Int) {
         if (player.isUsing()
             && usedTime % 4 == 0
             && player.world.getFluidState(player.eyePos.toBlockPos()).isOf(Fluids.WATER)
-        ) player.spawnParticles(
-            ParticleTypes.BUBBLE,
-            player.x,
-            player.eyeY,
-            player.z,
-            0,
-            0.0,
-            1.0,
-            0.0,
-            1.0
-        )
-        super.tick(player, usedTime)
+        ) {
+            val rotation = player.rotationVector.normalize().multiply(player.width / 2.0)
+            player.world.addParticle(
+                ParticleTypes.BUBBLE,
+                player.x + rotation.x,
+                player.eyeY + rotation.y,
+                player.z + rotation.z,
+                0.0,
+                1.0,
+                0.0,
+            )
+        }
+        super.clientTick(player, usedTime)
     }
 }

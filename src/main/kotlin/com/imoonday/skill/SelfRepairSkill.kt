@@ -8,7 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class SelfRepairSkill : Skill(
     id = "self_repair",
-    types = arrayOf(SkillType.PASSIVE),
+    types = listOf(SkillType.PASSIVE),
     rarity = Rarity.SUPERB,
     cooldown = 10,
 ), AutoTrigger, AutoStopTrigger {

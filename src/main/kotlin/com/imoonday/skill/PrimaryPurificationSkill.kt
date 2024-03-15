@@ -10,7 +10,7 @@ import kotlin.math.min
 
 class PrimaryPurificationSkill : Skill(
     id = "primary_purification",
-    types = arrayOf(SkillType.RESTORATION),
+    types = listOf(SkillType.RESTORATION),
     cooldown = 30,
     rarity = Rarity.SUPERB,
     sound = ModSounds.PURIFY

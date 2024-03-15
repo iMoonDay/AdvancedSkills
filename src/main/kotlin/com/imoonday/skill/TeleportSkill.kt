@@ -10,7 +10,7 @@ import net.minecraft.util.math.Direction
 
 class TeleportSkill : Skill(
     id = "teleport",
-    types = arrayOf(SkillType.MOVEMENT),
+    types = listOf(SkillType.MOVEMENT),
     cooldown = 2,
     rarity = Rarity.UNCOMMON
 ) {

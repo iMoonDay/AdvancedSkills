@@ -8,7 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class PrimaryFreezeSkill : Skill(
     id = "primary_freeze",
-    types = arrayOf(SkillType.CONTROL),
+    types = listOf(SkillType.CONTROL),
     cooldown = 8,
     rarity = Rarity.SUPERB,
     sound = ModSounds.FIRE

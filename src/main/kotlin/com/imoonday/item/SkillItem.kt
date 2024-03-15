@@ -1,10 +1,10 @@
 package com.imoonday.item
 
-import com.imoonday.component.learnSkill
 import com.imoonday.skill.Skill
+import com.imoonday.util.client
+import com.imoonday.util.learn
 import com.imoonday.util.translate
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
@@ -30,7 +30,7 @@ class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
         tooltip: MutableList<Text>,
         context: TooltipContext,
     ) {
-        if (world?.isClient == true) tooltip.addAll(skill.getItemTooltips(MinecraftClient.getInstance()))
+        if (world?.isClient == true) tooltip.addAll(skill.getItemTooltips(client!!))
         super.appendTooltip(stack, world, tooltip, context)
     }
 
@@ -41,7 +41,7 @@ class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
             user.sendMessage(translate("learnSkill", "invalid", skill.name.string))
             return TypedActionResult.fail(stack)
         }
-        if (user.learnSkill(skill)) {
+        if (user.learn(skill)) {
             stack.decrement(1)
             return TypedActionResult.success(stack)
         }

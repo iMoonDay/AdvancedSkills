@@ -1,10 +1,7 @@
 package com.imoonday.init
 
-import com.imoonday.component.*
 import com.imoonday.skill.Skill
-import com.imoonday.util.SkillArgumentType
-import com.imoonday.util.SkillSlot
-import com.imoonday.util.translate
+import com.imoonday.util.*
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.LongArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -164,7 +161,7 @@ object ModCommands {
             val slot = IntegerArgumentType.getInteger(it, "slot")
             val skillSlot = SkillSlot.fromIndex(slot)
             val original = target.getSkill(skillSlot)
-            if (target.equipSkill(ModSkills.EMPTY, skillSlot)) {
+            if (target.equip(ModSkills.EMPTY, skillSlot)) {
                 it.source.sendFeedback(
                     {
                         translate(
@@ -203,7 +200,7 @@ object ModCommands {
                     val target = EntityArgumentType.getPlayer(it, "target")
                     val slot = IntegerArgumentType.getInteger(it, "slot")
                     val skill = SkillArgumentType.getSkill(it)
-                    if (target.equipSkill(skill, SkillSlot.fromIndex(slot))) {
+                    if (target.equip(skill, SkillSlot.fromIndex(slot))) {
                         it.source.sendFeedback(
                             {
                                 translate(
@@ -234,11 +231,11 @@ object ModCommands {
         )
 
     private fun executeForgetAll(): LiteralArgumentBuilder<ServerCommandSource> =
-        literal("forget-all").executes {
-            val target = EntityArgumentType.getPlayer(it, "target")
+        literal("forget-all").executes { context ->
+            val target = EntityArgumentType.getPlayer(context, "target")
             target.run {
-                learnedSkills.toList().forEach { skill ->
-                    forgetSkill(skill)
+                learnedSkills.forEach {
+                    forget(it)
                 }
             }
             1
@@ -250,7 +247,7 @@ object ModCommands {
                 .executes {
                     val target = EntityArgumentType.getPlayer(it, "target")
                     val skill = SkillArgumentType.getSkill(it)
-                    if (!target.forgetSkill(skill)) {
+                    if (!target.forget(skill)) {
                         it.source.sendFeedback(
                             {
                                 translate(
@@ -270,7 +267,7 @@ object ModCommands {
         literal("learn-all").executes { context ->
             val target = EntityArgumentType.getPlayer(context, "target")
             Skill.getValidSkills().forEach { skill ->
-                target.learnSkill(skill)
+                target.learn(skill)
             }
             1
         }
@@ -281,7 +278,7 @@ object ModCommands {
                 .executes {
                     val target = EntityArgumentType.getPlayer(it, "target")
                     val skill = SkillArgumentType.getSkill(it)
-                    if (!target.learnSkill(skill)) {
+                    if (!target.learn(skill)) {
                         it.source.sendFeedback(
                             {
                                 translate(

@@ -13,7 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class TauntSkill : Skill(
     id = "taunt",
-    types = arrayOf(SkillType.ENHANCEMENT),
+    types = listOf(SkillType.ENHANCEMENT),
     cooldown = 30,
     rarity = Rarity.SUPERB,
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {

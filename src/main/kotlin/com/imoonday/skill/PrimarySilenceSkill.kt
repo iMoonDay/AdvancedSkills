@@ -8,7 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class PrimarySilenceSkill : Skill(
     id = "primary_silence",
-    types = arrayOf(SkillType.CONTROL),
+    types = listOf(SkillType.CONTROL),
     cooldown = 20,
     rarity = Rarity.SUPERB,
     sound = ModSounds.FIRE

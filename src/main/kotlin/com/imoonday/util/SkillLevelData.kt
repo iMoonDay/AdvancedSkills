@@ -3,9 +3,9 @@ package com.imoonday.util
 import net.minecraft.nbt.NbtCompound
 
 data class SkillLevelData(
-    var experience: Long,
-    var level: Int,
-    var cycle: Int,
+    var experience: Long = 0,
+    var level: Int = 0,
+    var cycle: Int = 0,
 ) {
 
     fun toNbt(): NbtCompound = NbtCompound().apply {

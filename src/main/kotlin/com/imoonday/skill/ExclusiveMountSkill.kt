@@ -12,7 +12,7 @@ import net.minecraft.sound.SoundEvents
 
 class ExclusiveMountSkill : Skill(
     id = "exclusive_mount",
-    types = arrayOf(SkillType.SUMMON),
+    types = listOf(SkillType.SUMMON),
     cooldown = 60,
     rarity = Rarity.EPIC,
     sound = SoundEvents.ENTITY_HORSE_SADDLE

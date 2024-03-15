@@ -1,10 +1,12 @@
 package com.imoonday.util
 
-import com.imoonday.component.startUsingSkill
 import com.imoonday.skill.Skill
+import kotlinx.serialization.Serializable
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
 
+@Serializable
 class UseResult(
     val success: Boolean,
     val cooling: Boolean,
@@ -28,9 +30,19 @@ class UseResult(
             if (success) success(successMessage) else fail(failMessage)
 
         fun passive(name: String) = fail(translate("useSkill", "passive", name))
-        fun startUsing(user: PlayerEntity, skill: Skill, failedMessage: Text? = null) = of(
-            user.startUsingSkill(skill), null,
+        fun startUsing(user: PlayerEntity, skill: Skill, data: NbtCompound? = null, failedMessage: Text? = null) = of(
+            user.startUsing(skill, data), null,
             failedMessage ?: translateActive(true, skill.name.string)
         )
+
+        fun toggleUsing(
+            user: PlayerEntity,
+            skill: Skill,
+            data: NbtCompound? = null,
+        ): UseResult {
+            val active = user.toggleUsing(skill, data)
+            if (!active) user.startCooling(skill)
+            return consume(translateActive(active, skill.name.string))
+        }
     }
 }

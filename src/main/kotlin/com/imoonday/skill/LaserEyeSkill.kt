@@ -3,21 +3,19 @@ package com.imoonday.skill
 import com.imoonday.init.ModSounds
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
+import com.imoonday.util.raycastVisualBlock
 import com.imoonday.util.spawnParticles
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.projectile.ProjectileUtil
 import net.minecraft.particle.DustParticleEffect
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Box
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.RaycastContext
 import org.joml.Vector3f
 
 class LaserEyeSkill : Skill(
     id = "laser_eye",
-    types = arrayOf(SkillType.ATTACK),
+    types = listOf(SkillType.ATTACK),
     cooldown = 15,
     rarity = Rarity.EPIC,
     sound = ModSounds.LASER
@@ -27,7 +25,7 @@ class LaserEyeSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val cameraPos = user.getCameraPosVec(0f)
-        val maxDistance = user.raycast(10.0).let {
+        val maxDistance = user.raycastVisualBlock(10.0).let {
             if (it.type == HitResult.Type.MISS) 10.0 else it.pos.distanceTo(cameraPos)
         }
         var offset = 0.1
@@ -60,20 +58,5 @@ class LaserEyeSkill : Skill(
         }
         entities.forEach { it.damage(user.damageSources.magic(), 4f) }
         return UseResult.success()
-    }
-
-    private fun PlayerEntity.raycast(maxDistance: Double): HitResult {
-        val vec3d: Vec3d = getCameraPosVec(0f)
-        val vec3d2: Vec3d = getRotationVec(0f)
-        val vec3d3 = vec3d.add(vec3d2.x * maxDistance, vec3d2.y * maxDistance, vec3d2.z * maxDistance)
-        return world.raycast(
-            RaycastContext(
-                vec3d,
-                vec3d3,
-                RaycastContext.ShapeType.VISUAL,
-                RaycastContext.FluidHandling.NONE,
-                this
-            )
-        )
     }
 }

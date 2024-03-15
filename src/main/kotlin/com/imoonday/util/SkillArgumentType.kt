@@ -23,7 +23,7 @@ class SkillArgumentType : ArgumentType<Skill> {
     ): CompletableFuture<Suggestions> =
         CommandSource.suggestMatching(mutableListOf<String>().apply {
             addAll(Skill.getValidSkills().map { it.id.toString() })
-            addAll(Skill.getSkills().filter { it.id.namespace == MOD_ID }.map { it.id.path })
+            addAll(Skill.getValidSkills().filter { it.id.namespace == MOD_ID }.map { it.id.path })
         }, builder)
 
     override fun parse(reader: StringReader): Skill {

@@ -1,12 +1,13 @@
 package com.imoonday.init
 
-import com.imoonday.component.equippedSkills
 import com.imoonday.network.UseSkillC2SRequest
 import com.imoonday.screen.SkillGalleryScreen
 import com.imoonday.screen.SkillListScreen
 import com.imoonday.screen.SkillSlotScreen
 import com.imoonday.trigger.SendPlayerDataTrigger
+import com.imoonday.trigger.SendTime
 import com.imoonday.util.SkillSlot
+import com.imoonday.util.getSkill
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
@@ -35,19 +36,17 @@ object ModKeyBindings {
     }
 
     fun init() {
-        (1..4).forEach { i ->
-            registerSkill(GLFW.GLFW_KEY_KP_0 + i) { client, keyState ->
-                if (client.player?.isSpectator == false) ClientPlayNetworking.send(
+        for (i in 1..4) registerSkill(GLFW.GLFW_KEY_KP_0 + i) { client, keyState ->
+            if (client.player?.isSpectator == false) {
+                val slot = SkillSlot.fromIndex(i)
+                ClientPlayNetworking.send(
                     UseSkillC2SRequest(
-                        SkillSlot.fromIndex(i),
+                        slot,
                         keyState,
                         NbtCompound().apply {
-                            (client.player!!.equippedSkills[i - 1] as? SendPlayerDataTrigger)
-                                ?.takeIf { it.getSendTime() == SendPlayerDataTrigger.SendTime.USE }
-                                ?.write(
-                                    client.player!!,
-                                    this
-                                )
+                            (client.player!!.getSkill(slot) as? SendPlayerDataTrigger)
+                                ?.takeIf { it.getSendTime() == SendTime.USE }
+                                ?.write(client.player!!, this)
                         }
                     )
                 )

@@ -9,7 +9,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class InstantExplosiveSkill : Skill(
     id = "instant_explosive",
-    types = arrayOf(SkillType.DESTRUCTION),
+    types = listOf(SkillType.DESTRUCTION),
     cooldown = 20,
     rarity = Rarity.EPIC,
     sound = ModSounds.FIRE,

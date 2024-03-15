@@ -12,7 +12,7 @@ import kotlin.random.Random
 
 class ExtremeReflectionSkill : Skill(
     id = "extreme_reflection",
-    types = arrayOf(SkillType.DEFENSE),
+    types = listOf(SkillType.DEFENSE),
     cooldown = 3,
     rarity = Rarity.RARE
 ), DamageTrigger, ReflectionTrigger {

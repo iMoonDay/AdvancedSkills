@@ -10,7 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class AbsoluteDomainSkill : Skill(
     id = "absolute_domain",
-    types = arrayOf(SkillType.DESTRUCTION),
+    types = listOf(SkillType.DESTRUCTION),
     cooldown = 10,
     rarity = Rarity.RARE,
 ) {

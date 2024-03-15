@@ -9,7 +9,7 @@ import net.minecraft.text.Text
 
 class AdvancedPurificationSkill : Skill(
     id = "advanced_purification",
-    types = arrayOf(SkillType.RESTORATION),
+    types = listOf(SkillType.RESTORATION),
     cooldown = 30,
     rarity = Rarity.SUPERB,
     sound = ModSounds.PURIFY

@@ -16,7 +16,7 @@ import net.minecraft.server.world.ServerWorld
 
 class ExtremeEvasionSkill : Skill(
     id = "extreme_evasion",
-    types = arrayOf(SkillType.MOVEMENT),
+    types = listOf(SkillType.MOVEMENT),
     cooldown = 10,
     rarity = Rarity.EPIC,
     sound = ModSounds.DASH

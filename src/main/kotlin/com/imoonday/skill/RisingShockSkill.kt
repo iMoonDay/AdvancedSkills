@@ -1,6 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.getSkillData
 import com.imoonday.init.ModSounds
 import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.util.SkillType
@@ -16,7 +15,7 @@ import kotlin.math.max
 
 class RisingShockSkill : Skill(
     id = "rising_shock",
-    types = arrayOf(SkillType.MOVEMENT),
+    types = listOf(SkillType.MOVEMENT),
     cooldown = 10,
     rarity = Rarity.RARE,
     sound = ModSounds.DASH
@@ -37,13 +36,13 @@ class RisingShockSkill : Skill(
     override fun getPersistTime(): Int = 8
 
     override fun onStop(player: ServerPlayerEntity) {
-        player.getSkillData(asSkill())?.let {
+        player.getUsingData()?.let {
             player.setNoGravity(it.getBoolean("noGravity"))
         }
         super.onStop(player)
     }
 
-    override fun tick(player: ServerPlayerEntity, usedTime: Int) {
+    override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return
         player.velocityDirty = true
         player.velocity = Vec3d(0.0, max(player.velocity.y, 0.5), 0.0)
@@ -53,6 +52,6 @@ class RisingShockSkill : Skill(
             it.velocityDirty = true
             it.velocity = it.velocity.withAxis(Direction.Axis.Y, max(it.velocity.y, 0.5))
         }
-        super.tick(player, usedTime)
+        super.serverTick(player, usedTime)
     }
 }

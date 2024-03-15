@@ -1,6 +1,6 @@
 package com.imoonday.entity
 
-import com.imoonday.component.isUsingSkill
+import com.imoonday.util.isUsing
 import com.imoonday.init.ModEntities
 import com.imoonday.init.ModSkills
 import com.imoonday.util.translateSkill
@@ -55,7 +55,7 @@ class ServantWitherSkeletonEntity(
                 this,
                 PlayerEntity::class.java,
                 true
-            ) { it.uuid != ownerUuid && (it as PlayerEntity).isUsingSkill(ModSkills.TAUNT) })
+            ) { it.uuid != ownerUuid && (it as PlayerEntity).isUsing(ModSkills.TAUNT) })
         targetSelector.add(
             1,
             ActiveTargetGoal(this, LivingEntity::class.java, true) { it is Servant && it.ownerUuid != this.ownerUuid })

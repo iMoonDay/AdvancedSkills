@@ -43,7 +43,7 @@ interface FeatureRendererTrigger : SkillTrigger {
         matrices.push()
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180f))
         matrices.translate(-0.5, 0.65, -0.5)
-        val model = context.modelManager.getModel(asSkill().modelId)
+        val model = context.modelManager.getModel(getAsSkill().modelId)
         context.itemRenderer.renderBakedItemQuads(
             matrices,
             provider.getBuffer(TexturedRenderLayers.getEntityTranslucentCull()),
@@ -76,7 +76,7 @@ interface FeatureRendererTrigger : SkillTrigger {
             matrices.translate(-0.5, -0.65, -0.5)
 
             matrices.translate(0f, 0f, -0.75f)
-            val model: BakedModel = context.modelManager.getModel(asSkill().modelId)
+            val model: BakedModel = context.modelManager.getModel(getAsSkill().modelId)
             for (dir in Direction.entries) {
                 context.itemRenderer.renderBakedItemQuads(
                     matrices,

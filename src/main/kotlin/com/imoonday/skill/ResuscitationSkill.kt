@@ -16,7 +16,7 @@ import net.minecraft.sound.SoundEvents
 
 class ResuscitationSkill : Skill(
     id = "resuscitation",
-    types = arrayOf(SkillType.PASSIVE, SkillType.DEFENSE),
+    types = listOf(SkillType.PASSIVE, SkillType.DEFENSE),
     cooldown = 300,
     rarity = Rarity.LEGENDARY
 ), DeathTrigger, AutoStopTrigger, DamageTrigger {

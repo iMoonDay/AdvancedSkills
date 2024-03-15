@@ -1,6 +1,6 @@
 package com.imoonday.mixin;
 
-import com.imoonday.component.DamagedTimeComponentKt;
+import com.imoonday.util.PlayerUtilsKt;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTracker;
@@ -22,7 +22,7 @@ public class DamageTrackerMixin {
     @Inject(method = "onDamage", at = @At("HEAD"))
     public void advanced_skills$onDamage(DamageSource source, float amount, CallbackInfo ci) {
         if (this.entity instanceof ServerPlayerEntity player) {
-            DamagedTimeComponentKt.onDamage(player);
+            PlayerUtilsKt.onDamage(player);
         }
     }
 }

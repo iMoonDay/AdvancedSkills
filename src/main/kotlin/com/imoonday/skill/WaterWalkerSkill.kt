@@ -6,7 +6,6 @@ import com.imoonday.trigger.WalkOnFluidTrigger
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.toBlockPos
-import com.imoonday.util.translateActive
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.fluid.Fluid
 import net.minecraft.fluid.FluidState
@@ -18,7 +17,7 @@ import net.minecraft.sound.SoundEvents
 
 class WaterWalkerSkill : Skill(
     id = "water_walker",
-    types = arrayOf(SkillType.ENHANCEMENT),
+    types = listOf(SkillType.ENHANCEMENT),
     cooldown = 15,
     rarity = Rarity.SUPERB,
     sound = SoundEvents.BLOCK_WATER_AMBIENT
@@ -26,11 +25,7 @@ class WaterWalkerSkill : Skill(
 
     override fun getPersistTime(): Int = 20 * 15
 
-    override fun use(user: ServerPlayerEntity): UseResult {
-        val active = user.toggleUsing()
-        if (!active) user.startCooling()
-        return UseResult.consume(translateActive(active, name.string))
-    }
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 
     override fun canWalkOnFluid(player: PlayerEntity, state: FluidState): Boolean =
         player.isUsing() && state.isOf(Fluids.WATER) && player.getFluidHeight(FluidTags.WATER) < 0.02

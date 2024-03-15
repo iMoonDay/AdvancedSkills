@@ -23,7 +23,7 @@ import kotlin.math.sqrt
 
 class ChargedSweepSkill : LongPressSkill(
     id = "charged_sweep",
-    types = arrayOf(SkillType.ATTACK),
+    types = listOf(SkillType.ATTACK),
     cooldown = 9,
     rarity = Rarity.RARE,
 ), AttributeTrigger, UsingRenderTrigger {

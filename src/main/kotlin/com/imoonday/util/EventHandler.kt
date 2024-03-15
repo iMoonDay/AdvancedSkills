@@ -1,24 +1,21 @@
 package com.imoonday.util
 
 import com.imoonday.api.SkillChangeEvents
-import com.imoonday.component.equippedSkills
-import com.imoonday.component.isCooling
-import com.imoonday.component.stopUsingSkill
 import com.imoonday.config.Config
+import com.imoonday.custom.CustomSkill
 import com.imoonday.entity.render.feature.IceLayer
 import com.imoonday.entity.render.feature.SkillLayer
 import com.imoonday.entity.render.feature.StatusEffectLayer
 import com.imoonday.init.ModItems
 import com.imoonday.init.isDisarmed
 import com.imoonday.network.SyncConfigS2CPacket
+import com.imoonday.network.SyncCustomSkillS2CPacket
 import com.imoonday.render.SkillSlotRenderer
 import com.imoonday.skill.Skill
-import com.imoonday.trigger.DeathTrigger
-import com.imoonday.trigger.FeatureRendererTrigger
-import com.imoonday.trigger.RespawnTrigger
-import com.imoonday.trigger.SkillTriggerHandler
+import com.imoonday.trigger.*
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback
@@ -26,7 +23,6 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.block.Blocks
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.entity.PlayerEntityRenderer
 import net.minecraft.loot.LootPool
 import net.minecraft.loot.LootTables
@@ -52,18 +48,17 @@ object EventHandler {
         }
         SkillChangeEvents.POST_UNEQUIPPED.register { player, slot, skill ->
             SkillTriggerHandler.postUnequipped(player, slot, skill)
-            player.stopUsingSkill(skill)
+            player.stopUsing(skill)
         }
         ServerPlayerEvents.AFTER_RESPAWN.register { oldPlayer, newPlayer, alive ->
-            newPlayer.equippedSkills
-                .filterIsInstance<RespawnTrigger>()
+            newPlayer.usingSkills.forEach { newPlayer.stopUsing(it) }
+            newPlayer.getTriggers<RespawnTrigger>()
                 .forEach { it.afterRespawn(oldPlayer, newPlayer, alive) }
         }
         ServerLivingEntityEvents.ALLOW_DEATH.register { entity, source, amount ->
             (entity as? ServerPlayerEntity)?.run {
-                equippedSkills
-                    .filterNot { isCooling(it) }
-                    .filterIsInstance<DeathTrigger>()
+                getTriggers<DeathTrigger>()
+                    .filterNot { isCooling(it.getAsSkill()) }
                     .all { it.allowDeath(this, source, amount) }
             } ?: true
         }
@@ -99,21 +94,33 @@ object EventHandler {
                 builder.pool(pool.build())
             }
         }
-        ServerPlayConnectionEvents.JOIN.register { handler, sender, server ->
+        ServerPlayConnectionEvents.JOIN.register { _, sender, _ ->
             sender.sendPacket(SyncConfigS2CPacket(Config.instance.toTag(NbtCompound())))
+            Skill.getValidSkills().filterIsInstance<CustomSkill>().forEach {
+                sender.sendPacket(SyncCustomSkillS2CPacket(it.toJson().toString()))
+            }
         }
     }
 
     fun registerClient() {
         HudRenderCallback.EVENT.register { context, _ ->
-            val client = MinecraftClient.getInstance()
-            SkillSlotRenderer.render(client, context)
+            SkillSlotRenderer.render(client!!, context)
+            Skill.getTriggers<HudRenderTrigger>().forEach { it.render(context) }
+            Skill.getTriggers<CrosshairTrigger> { it.shouldRender() && it.getPriority() < 0 }
+                .minByOrNull { it.getPriority() }
+                ?.render(context)
+            Skill.getTriggers<CrosshairTrigger> { it.shouldRender() && it.getPriority() >= 0 }
+                .maxByOrNull { it.getPriority() }
+                ?.render(context)
         }
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register { _, renderer, helper, context ->
             helper.register(StatusEffectLayer(renderer, context))
             helper.register(IceLayer(renderer, context))
-            if (renderer is PlayerEntityRenderer) Skill.getSkills().filterIsInstance<FeatureRendererTrigger>()
+            if (renderer is PlayerEntityRenderer) Skill.getTriggers<FeatureRendererTrigger>()
                 .forEach { helper.register(SkillLayer(renderer, context, it)) }
+        }
+        WorldRenderEvents.AFTER_ENTITIES.register { context ->
+            Skill.getTriggers<WorldRendererTrigger>().forEach { it.render(context) }
         }
     }
 }

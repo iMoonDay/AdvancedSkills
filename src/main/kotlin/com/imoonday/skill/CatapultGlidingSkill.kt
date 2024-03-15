@@ -13,7 +13,7 @@ import net.minecraft.util.math.Direction
 
 class CatapultGlidingSkill : LongPressSkill(
     id = "catapult_gliding",
-    types = arrayOf(SkillType.MOVEMENT),
+    types = listOf(SkillType.MOVEMENT),
     cooldown = 30,
     rarity = Rarity.RARE,
     sound = ModSounds.DASH
@@ -32,7 +32,7 @@ class CatapultGlidingSkill : LongPressSkill(
         if (player.isFallFlying) return fallFlyingResult()
         player.stopUsing()
         player.startCooling()
-        playSound(player)
+        playSoundFrom(player)
         player.setOnGround(false)
         player.startFallFlying()
         player.velocityDirty = true
@@ -44,9 +44,9 @@ class CatapultGlidingSkill : LongPressSkill(
         return UseResult.success()
     }
 
-    override fun tick(player: ServerPlayerEntity, usedTime: Int) {
+    override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (player.isUsing() && !canUse(player)) player.stopUsing()
-        super.tick(player, usedTime)
+        super.serverTick(player, usedTime)
     }
 
     private fun failedResult() = UseResult.fail(translateSkill(id.path, "failed"))

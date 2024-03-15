@@ -3,10 +3,10 @@ package com.imoonday.util
 import net.minecraft.nbt.NbtCompound
 
 data class SkillData(
-    var cooldown: Int,
-    var using: Boolean,
-    var usedTime: Int,
-    var data: NbtCompound,
+    var cooldown: Int = 0,
+    var using: Boolean = false,
+    var usedTime: Int = 0,
+    var data: NbtCompound = NbtCompound(),
 ) {
 
     fun toNbt(): NbtCompound = NbtCompound().apply {

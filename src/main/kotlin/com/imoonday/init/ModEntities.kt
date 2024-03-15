@@ -106,7 +106,7 @@ object ModEntities {
         return this
     }
 
-    fun registerModelLayer(id: String): EntityModelLayer = EntityModelLayer(id(id), "main")
+    private fun registerModelLayer(id: String): EntityModelLayer = EntityModelLayer(id(id), "main")
 
     fun init() = Unit
 

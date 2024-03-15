@@ -12,7 +12,7 @@ import net.minecraft.util.math.Direction
 
 class HorizontalDashSkill : Skill(
     id = "horizontal_dash",
-    types = arrayOf(SkillType.MOVEMENT),
+    types = listOf(SkillType.MOVEMENT),
     cooldown = 1,
     rarity = Rarity.COMMON,
     sound = ModSounds.DASH

@@ -15,7 +15,7 @@ import net.minecraft.util.math.Vec3d
 
 class MeteorShowerSkill : LongPressSkill(
     id = "meteor_shower",
-    types = arrayOf(SkillType.ATTACK, SkillType.DESTRUCTION),
+    types = listOf(SkillType.ATTACK, SkillType.DESTRUCTION),
     cooldown = 120,
     rarity = Rarity.MYTHIC,
 ), AttributeTrigger, UsingRenderTrigger {

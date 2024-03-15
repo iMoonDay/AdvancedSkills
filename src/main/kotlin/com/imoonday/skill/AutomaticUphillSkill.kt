@@ -7,7 +7,7 @@ import net.minecraft.entity.player.PlayerEntity
 
 class AutomaticUphillSkill : PassiveSkill(
     id = "automatic_uphill",
-    types = arrayOf(SkillType.PASSIVE),
+    types = listOf(SkillType.PASSIVE),
     rarity = Rarity.RARE,
     toggleable = true
 ), StepHeightTrigger, PersistentTrigger {

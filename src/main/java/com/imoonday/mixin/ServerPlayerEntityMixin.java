@@ -21,12 +21,6 @@ public class ServerPlayerEntityMixin {
         }
     }
 
-    @Inject(method = "tick", at = @At("TAIL"))
-    private void advanced_skills$tick(CallbackInfo ci) {
-        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        SkillTriggerHandler.INSTANCE.tick(player);
-    }
-
     @Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"), cancellable = true)
     private void advanced_skills$damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;

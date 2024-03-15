@@ -6,7 +6,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class StaticInvisibilitySkill : PassiveSkill(
     id = "static_invisibility",
-    types = arrayOf(SkillType.PASSIVE),
+    types = listOf(SkillType.PASSIVE),
     rarity = Rarity.EPIC,
 ), AutoTrigger, PersistentTrigger, SendPlayerVelocityTrigger, InvisibilityTrigger {
 
@@ -15,5 +15,5 @@ class StaticInvisibilitySkill : PassiveSkill(
 
     override fun shouldStop(player: ServerPlayerEntity): Boolean = !shouldStart(player)
 
-    override fun getSendTime(): SendPlayerDataTrigger.SendTime = SendPlayerDataTrigger.SendTime.EQUIPPED
+    override fun getSendTime(): SendTime = SendTime.EQUIPPED
 }

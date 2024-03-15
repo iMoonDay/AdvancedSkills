@@ -1,8 +1,8 @@
 package com.imoonday.entity
 
-import com.imoonday.component.startCooling
+import com.imoonday.util.startCooling
 import com.imoonday.component.status
-import com.imoonday.component.stopCooling
+import com.imoonday.util.stopCooling
 import com.imoonday.init.ModComponents
 import com.imoonday.init.ModEntities
 import com.imoonday.init.ModSkills

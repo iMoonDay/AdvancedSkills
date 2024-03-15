@@ -1,6 +1,5 @@
 package com.imoonday.trigger
 
-import com.imoonday.component.getSkillUsedTime
 import com.imoonday.util.SkillSlot
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
@@ -9,7 +8,8 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
 
     fun getPersistTime(): Int
 
-    override fun tick(player: ServerPlayerEntity, usedTime: Int) {
+    override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
+        super.serverTick(player, usedTime)
         if (usedTime >= getPersistTime()) {
             onStop(player)
             player.stopUsing()
@@ -19,7 +19,7 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
     fun onStop(player: ServerPlayerEntity) = Unit
 
     override fun getProgress(player: PlayerEntity): Double =
-        (getPersistTime() - player.getSkillUsedTime(asSkill())) / getPersistTime().toDouble()
+        (getPersistTime() - player.getUsedTime()) / getPersistTime().toDouble()
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
         onStop(player)

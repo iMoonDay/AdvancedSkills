@@ -12,7 +12,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class NegativeResistanceSkill : Skill(
     id = "negative_resistance",
-    types = arrayOf(SkillType.ENHANCEMENT),
+    types = listOf(SkillType.ENHANCEMENT),
     cooldown = 30,
     rarity = Rarity.SUPERB,
 ), AutoStopTrigger, StatusEffectTrigger {

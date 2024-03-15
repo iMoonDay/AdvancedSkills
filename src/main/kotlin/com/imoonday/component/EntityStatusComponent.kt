@@ -4,6 +4,7 @@ import com.imoonday.init.ModComponents
 import com.imoonday.init.ModEffects
 import dev.onyxstudios.cca.api.v3.component.Component
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffect
@@ -14,7 +15,10 @@ interface StatusComponent : Component {
     var status: NbtCompound
 }
 
-class EntityStatusComponent(private val entity: Entity) : StatusComponent, AutoSyncedComponent {
+class EntityStatusComponent(private val entity: Entity) :
+    StatusComponent,
+    AutoSyncedComponent,
+    ServerTickingComponent {
 
     override var status: NbtCompound = NbtCompound()
         set(value) {
@@ -28,6 +32,10 @@ class EntityStatusComponent(private val entity: Entity) : StatusComponent, AutoS
 
     override fun writeToNbt(tag: NbtCompound) {
         tag.put("status", status)
+    }
+
+    override fun serverTick() {
+        entity.syncStatus()
     }
 }
 

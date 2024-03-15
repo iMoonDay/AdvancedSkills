@@ -1,9 +1,9 @@
 package com.imoonday.mixin;
 
-import com.imoonday.component.UsingSkillComponentKt;
 import com.imoonday.init.ModEffectsKt;
 import com.imoonday.init.ModSkills;
 import com.imoonday.trigger.SkillTriggerHandler;
+import com.imoonday.util.PlayerUtilsKt;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -100,7 +100,7 @@ public abstract class LivingEntityMixin {
     @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
     public boolean advanced_skills$hasStatusEffect(boolean original, StatusEffect effect) {
         if (effect != StatusEffects.NIGHT_VISION) return original;
-        return (LivingEntity) (Object) this instanceof PlayerEntity player && UsingSkillComponentKt.isUsingSkill(player, ModSkills.NIGHT_VISION) || original;
+        return (LivingEntity) (Object) this instanceof PlayerEntity player && PlayerUtilsKt.isUsing(player, ModSkills.NIGHT_VISION) || original;
     }
 
     @Inject(method = "canWalkOnFluid", at = @At("HEAD"), cancellable = true)
@@ -131,5 +131,13 @@ public abstract class LivingEntityMixin {
         if ((LivingEntity) (Object) this instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.cannotHaveStatusEffect(player, effect)) {
             cir.setReturnValue(false);
         }
+    }
+
+    @ModifyReturnValue(method = "getJumpVelocity", at = @At("RETURN"))
+    private float advanced_skills$getJumpVelocity(float original) {
+        if ((LivingEntity) (Object) this instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.shouldInvertJump(player)) {
+            return -original;
+        }
+        return original;
     }
 }

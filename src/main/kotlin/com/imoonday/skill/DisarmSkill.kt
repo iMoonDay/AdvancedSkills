@@ -20,7 +20,7 @@ import kotlin.random.Random
 
 class DisarmSkill : Skill(
     id = "disarm",
-    types = arrayOf(SkillType.ENHANCEMENT),
+    types = listOf(SkillType.ENHANCEMENT),
     cooldown = 15,
     rarity = Rarity.SUPERB,
 ), AttackTrigger, PersistentTrigger, RespawnTrigger {

@@ -1,6 +1,5 @@
 package com.imoonday.render
 
-import com.imoonday.component.*
 import com.imoonday.config.UIConfigModel
 import com.imoonday.init.ModSkills
 import com.imoonday.init.isSilenced
@@ -8,7 +7,7 @@ import com.imoonday.skill.LongPressSkill
 import com.imoonday.skill.Skill
 import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.trigger.UsingProgressTrigger
-import com.imoonday.util.id
+import com.imoonday.util.*
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -68,7 +67,7 @@ object SkillSlotRenderer {
         if (skill.invalid) return
         val lineEndX = startX - 2
         val lineStartX = startX - 20 - 14
-        if (player.isUsingSkill(skill) && skill is UsingProgressTrigger && skill.shouldDisplay(player)) {
+        if (player.isUsing(skill) && skill is UsingProgressTrigger && skill.shouldDisplay(player)) {
             val progress = skill.getProgress(player)
             val centerX = lineStartX + (32 * progress).toInt()
             context.fill(lineStartX, endY - 2, centerX, endY - 1, Color.GREEN.rgb)
@@ -110,7 +109,7 @@ object SkillSlotRenderer {
     ) {
         if (skill is AutoStopTrigger && skill !is LongPressSkill) {
             val persistTime = skill.getPersistTime()
-            val leftUseTime = persistTime - player.getSkillUsedTime(skill)
+            val leftUseTime = persistTime - player.getUsedTime(skill)
             if (persistTime > 20 * 5 && leftUseTime <= persistTime / 5) {
                 val alpha = 0.5 * sin(2 * PI / 20 * (leftUseTime - persistTime / 5)) + 0.5
                 RenderSystem.enableBlend()

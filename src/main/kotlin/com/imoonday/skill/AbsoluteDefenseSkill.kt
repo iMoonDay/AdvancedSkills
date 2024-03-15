@@ -19,7 +19,7 @@ import net.minecraft.sound.SoundEvents
 
 class AbsoluteDefenseSkill : Skill(
     id = "absolute_defense",
-    types = arrayOf(SkillType.DEFENSE),
+    types = listOf(SkillType.DEFENSE),
     cooldown = 30,
     rarity = Rarity.SUPERB
 ), DamageTrigger, AutoStopTrigger, FeatureRendererTrigger {

@@ -11,7 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class SelfHealingSkill : Skill(
     id = "self_healing",
-    types = arrayOf(SkillType.PASSIVE, SkillType.HEALING),
+    types = listOf(SkillType.PASSIVE, SkillType.HEALING),
     rarity = Rarity.RARE
 ), AutoTrigger, AutoStopTrigger, DamageTrigger {
 
@@ -19,7 +19,7 @@ class SelfHealingSkill : Skill(
 
     override fun getPersistTime(): Int = 20 * 10
 
-    override fun shouldStart(player: ServerPlayerEntity): Boolean = player.health < player.maxHealth
+    override fun shouldStart(player: ServerPlayerEntity): Boolean = !player.isDead && player.health < player.maxHealth
 
     override fun onStop(player: ServerPlayerEntity) {
         player.heal(2.0f)

@@ -1,9 +1,6 @@
 package com.imoonday.skill
 
 import com.imoonday.LOGGER
-import com.imoonday.component.getCooldown
-import com.imoonday.component.isCooling
-import com.imoonday.component.startCooling
 import com.imoonday.config.Config
 import com.imoonday.init.ModGameRules
 import com.imoonday.init.ModSkills.EMPTY
@@ -36,8 +33,8 @@ abstract class Skill(
     val name: Text,
     val description: Text,
     val icon: Identifier = id("unknown.png"),
-    vararg val types: SkillType = emptyArray(),
-    private val defaultCooldown: Int = 0,
+    val types: List<SkillType> = emptyList(),
+    val defaultCooldown: Int = 0,
     rarity: Rarity,
     val sound: SoundEvent? = null,
     invalid: Boolean = false,
@@ -56,7 +53,7 @@ abstract class Skill(
 
     constructor(
         id: String,
-        vararg types: SkillType,
+        types: List<SkillType>,
         cooldown: Int = 0,
         rarity: Rarity,
         sound: SoundEvent? = null,
@@ -65,7 +62,7 @@ abstract class Skill(
         translateSkill(id, "name"),
         translateSkill(id, "description"),
         itemId(id),
-        types = types,
+        types,
         20 * cooldown,
         rarity,
         sound,
@@ -109,11 +106,11 @@ abstract class Skill(
     }
 
     abstract fun use(user: ServerPlayerEntity): UseResult
-    open fun playSound(user: PlayerEntity) {
+    open fun playSoundFrom(player: PlayerEntity) {
         sound?.let {
-            user.world.playSound(
+            player.world.playSound(
                 null,
-                user.blockPos,
+                player.blockPos,
                 it,
                 SoundCategory.PLAYERS,
             )
@@ -175,7 +172,7 @@ abstract class Skill(
         result: UseResult,
     ) {
         if (result.success) {
-            playSound(serverPlayerEntity)
+            playSoundFrom(serverPlayerEntity)
             serverPlayerEntity.sendMessage(result.message ?: this.name, true)
         } else {
             val message =
@@ -189,7 +186,7 @@ abstract class Skill(
         }
     }
 
-    override fun asSkill(): Skill = this
+    override fun getAsSkill(): Skill = this
 
     open fun isDangerousTo(player: ServerPlayerEntity): Boolean = false
 
@@ -228,7 +225,9 @@ abstract class Skill(
         private val skills = mutableSetOf<Skill>()
         fun getSkills() = skills.toList()
         fun getValidSkills() = skills.filterNot { it.invalid }
-        fun fromId(id: Identifier) = skills.find { it.id == id } ?: EMPTY
-        fun fromIdNullable(id: Identifier) = skills.find { it.id == id }
+        fun fromId(id: Identifier?) = skills.find { it.id == id } ?: EMPTY
+        fun fromIdNullable(id: Identifier?) = skills.find { it.id == id }
+        inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> =
+            getSkills().filterIsInstance<T>().filter(predicate)
     }
 }

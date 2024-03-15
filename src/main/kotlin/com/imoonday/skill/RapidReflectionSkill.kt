@@ -11,7 +11,7 @@ import kotlin.random.Random
 
 class RapidReflectionSkill : Skill(
     id = "rapid_reflection",
-    types = arrayOf(SkillType.DEFENSE),
+    types = listOf(SkillType.DEFENSE),
     cooldown = 4,
     rarity = Rarity.RARE
 ), DamageTrigger, ReflectionTrigger {

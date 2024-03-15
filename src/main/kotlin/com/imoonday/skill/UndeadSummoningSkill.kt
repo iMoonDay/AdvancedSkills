@@ -10,7 +10,7 @@ import kotlin.math.min
 
 class UndeadSummoningSkill : Skill(
     id = "undead_summoning",
-    types = arrayOf(SkillType.SUMMON),
+    types = listOf(SkillType.SUMMON),
     cooldown = 30,
     rarity = Rarity.EPIC,
     sound = SoundEvents.ENTITY_WITHER_SPAWN

@@ -1,6 +1,6 @@
 package com.imoonday.skill
 
-import com.imoonday.component.isCooling
+import com.imoonday.init.ModSounds
 import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
@@ -14,9 +14,10 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class LastDitchEffortSkill : Skill(
     id = "last_ditch_effort",
-    types = arrayOf(SkillType.PASSIVE),
+    types = listOf(SkillType.PASSIVE),
     cooldown = 180,
     rarity = Rarity.SUPERB,
+    sound = ModSounds.HEAL
 ), DamageTrigger, AutoStopTrigger, AttackTrigger, AttributeTrigger, AutoTrigger, DeathTrigger {
 
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
@@ -44,13 +45,13 @@ class LastDitchEffortSkill : Skill(
         target: LivingEntity,
     ): Float = if (!player.isUsing()) amount else amount + 1
 
-    override fun shouldStart(player: ServerPlayerEntity): Boolean {
-        return if (!player.isCooling(this) && (player.health / player.maxHealth) < 0.3f) {
+    override fun shouldStart(player: ServerPlayerEntity): Boolean =
+        if (!player.isCooling() && !player.isUsing() && !player.isDead && (player.health / player.maxHealth) < 0.3f) {
             player.health = player.maxHealth * 0.5f
+            playSoundFrom(player)
             player.addAttributes()
             true
         } else false
-    }
 
     override fun onDamaged(
         amount: Float,

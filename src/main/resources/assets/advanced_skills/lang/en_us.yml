@@ -249,6 +249,16 @@ advancedSkills:
     item_attraction:
       name: Item Attraction
       description: Attract surrounding items
+    doping:
+      name: Doping
+      description: Gain a lot of speed at the cost of a little health
+    grappling_hook:
+      name: Grappling Hook
+      description: Grab a block and move towards it
+      failed: No blocks to grab
+    reverse_gravity:
+      name: Reverse Gravity
+      description: Reverse gravity
   skillType:
     attack: Attack
     defense: Defense

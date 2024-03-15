@@ -11,7 +11,7 @@ import kotlin.random.Random
 
 class MicroReflectionSkill : Skill(
     id = "micro_reflection",
-    types = arrayOf(SkillType.DEFENSE),
+    types = listOf(SkillType.DEFENSE),
     cooldown = 6,
     rarity = Rarity.RARE
 ), DamageTrigger, ReflectionTrigger {

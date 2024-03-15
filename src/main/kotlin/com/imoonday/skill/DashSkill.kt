@@ -11,7 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class DashSkill : Skill(
     id = "dash",
-    types = arrayOf(SkillType.MOVEMENT),
+    types = listOf(SkillType.MOVEMENT),
     cooldown = 2,
     rarity = Rarity.UNCOMMON,
     sound = ModSounds.DASH

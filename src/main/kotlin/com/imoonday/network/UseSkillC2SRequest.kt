@@ -1,7 +1,8 @@
 package com.imoonday.network
 
-import com.imoonday.component.getSkill
+import com.imoonday.util.getSkill
 import com.imoonday.trigger.SendPlayerDataTrigger
+import com.imoonday.trigger.SendTime
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.id
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
@@ -35,7 +36,7 @@ class UseSkillC2SRequest(
                 if (slot.valid && !player.isSpectator) {
                     val skill = player.getSkill(slot)
                     (skill as? SendPlayerDataTrigger)
-                        ?.takeIf { it.getSendTime() == SendPlayerDataTrigger.SendTime.USE }
+                        ?.takeIf { it.getSendTime() == SendTime.USE }
                         ?.apply(player, data)
                     skill.tryUse(player, keyState)
                 }

@@ -12,12 +12,12 @@ import net.minecraft.sound.SoundEvent
 
 abstract class PassiveSkill(
     id: String,
-    types: Array<SkillType> = arrayOf(SkillType.PASSIVE),
+    types: List<SkillType> = listOf(SkillType.PASSIVE),
     cooldown: Int = 0,
     rarity: Rarity,
     sound: SoundEvent? = null,
     val toggleable: Boolean = false,
-) : Skill(id, types = types, cooldown, rarity, sound),
+) : Skill(id, types, cooldown, rarity, sound),
     EquipTrigger, AttributeTrigger, RespawnTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = if (toggleable)

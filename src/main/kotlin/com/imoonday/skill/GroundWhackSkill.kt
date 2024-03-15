@@ -14,7 +14,7 @@ import kotlin.math.min
 
 class GroundWhackSkill : Skill(
     id = "ground_whack",
-    types = arrayOf(SkillType.ATTACK, SkillType.MOVEMENT),
+    types = listOf(SkillType.ATTACK, SkillType.MOVEMENT),
     cooldown = 8,
     rarity = Rarity.RARE
 ), LandingTrigger, PersistentTrigger, FallTrigger {

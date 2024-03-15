@@ -8,7 +8,7 @@ import net.minecraft.sound.SoundEvents
 
 class FireballSkill : Skill(
     id = "fireball",
-    types = arrayOf(SkillType.DESTRUCTION),
+    types = listOf(SkillType.DESTRUCTION),
     cooldown = 5,
     rarity = Rarity.SUPERB,
     sound = SoundEvents.ENTITY_ENDER_DRAGON_SHOOT

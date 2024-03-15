@@ -1,7 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.component.equippedSkills
-import com.imoonday.component.resetSkillUsedTime
 import com.imoonday.entity.Servant
 import com.imoonday.init.ModSounds
 import com.imoonday.trigger.AttributeTrigger
@@ -10,7 +8,9 @@ import com.imoonday.trigger.DamageTrigger
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
+import com.imoonday.util.equippedSkills
 import com.imoonday.util.playSound
+import com.imoonday.util.resetUsedTime
 import net.minecraft.entity.Entity
 import net.minecraft.entity.FallingBlockEntity
 import net.minecraft.entity.LivingEntity
@@ -29,7 +29,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class DangerPerceptionSkill : Skill(
     id = "danger_perception",
-    types = arrayOf(SkillType.PASSIVE),
+    types = listOf(SkillType.PASSIVE),
     cooldown = 12,
     rarity = Rarity.SUPERB,
 ), AutoStopTrigger, AttributeTrigger, DamageTrigger {
@@ -51,16 +51,16 @@ class DangerPerceptionSkill : Skill(
         super<AutoStopTrigger>.postUnequipped(player, slot)
     }
 
-    override fun tick(player: ServerPlayerEntity, usedTime: Int) {
+    override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isCreative && !player.isSpectator && (player.isUsing() || !player.isCooling())) {
             val hasDanger = player.world
                 .getOtherEntities(player, player.boundingBox.expand(3.0)) { dangerTest(player, it) }
                 .isNotEmpty()
             if (hasDanger) {
-                if (player.isUsing()) player.resetSkillUsedTime(this) else start(player)
+                if (player.isUsing()) player.resetUsedTime(this) else start(player)
             }
         }
-        super.tick(player, usedTime)
+        super.serverTick(player, usedTime)
     }
 
     override fun onStop(player: ServerPlayerEntity) {

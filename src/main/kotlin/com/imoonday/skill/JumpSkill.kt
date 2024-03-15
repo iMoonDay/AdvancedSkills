@@ -10,7 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class JumpSkill : Skill(
     id = "jump",
-    types = arrayOf(SkillType.MOVEMENT),
+    types = listOf(SkillType.MOVEMENT),
     cooldown = 1,
     rarity = Rarity.COMMON
 ) {

@@ -1,9 +1,8 @@
 package com.imoonday.trigger
 
-import com.imoonday.component.getSkillData
-import com.imoonday.component.lastDamagedTime
-import com.imoonday.component.lastReflectedTime
 import com.imoonday.util.UseResult
+import com.imoonday.util.lastDamagedTime
+import com.imoonday.util.lastReflectedTime
 import com.imoonday.util.translateSkill
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
@@ -34,5 +33,5 @@ interface ReflectionTrigger : AutoStopTrigger {
         super.onStop(player)
     }
 
-    fun getStartTime(player: ServerPlayerEntity) = player.getSkillData(asSkill())?.getLong("startTime")
+    fun getStartTime(player: ServerPlayerEntity) = player.getUsingData()?.getLong("startTime")
 }

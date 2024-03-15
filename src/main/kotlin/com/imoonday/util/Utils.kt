@@ -2,6 +2,7 @@ package com.imoonday.util
 
 import com.imoonday.MOD_ID
 import com.imoonday.mixin.StatusEffectInstanceAccessor
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.entity.player.PlayerEntity
@@ -75,3 +76,8 @@ val Box.volume: Double
     get() = this.xLength * this.yLength * this.zLength
 
 fun Vec3d.toBlockPos(): BlockPos = BlockPos.ofFloored(this)
+
+val client: MinecraftClient?
+    get() = MinecraftClient.getInstance()
+val clientPlayer: ClientPlayerEntity?
+    get() = client?.player

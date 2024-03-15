@@ -1,13 +1,9 @@
 package com.imoonday.screen
 
-import com.imoonday.component.*
 import com.imoonday.init.ModSkills
 import com.imoonday.screen.component.ShiftScrollContainer
 import com.imoonday.skill.Skill
-import com.imoonday.util.AutoSyncedScreen
-import com.imoonday.util.SkillSlot
-import com.imoonday.util.alpha
-import com.imoonday.util.translate
+import com.imoonday.util.*
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
@@ -68,8 +64,7 @@ class SkillListScreen(
                         Sizing.fill(100),
                         Sizing.content()
                     ).apply {
-                        player.learnedSkills.filterNot { it.invalid }
-                            .forEach { child(SkillLine(it)) }
+                        player.learnedSkills.forEach { child(SkillLine(it)) }
                     }).apply {
                         scrollbar(ScrollContainer.Scrollbar.vanilla())
                         padding(Insets.of(5))
@@ -121,7 +116,7 @@ class SkillListScreen(
                 if (button == 0) {
                     val slot = getValidSlot()
                     return@subscribe if (slot != SkillSlot.INVALID) {
-                        player.equipSkill(skill, slot)
+                        player.equip(skill, slot)
                         selectedSlot = null
                         true
                     } else false
@@ -240,7 +235,7 @@ class SkillListScreen(
         private fun onMouseDown(button: Int): Boolean {
             if (button != 0) return false
             if (!skill.invalid && Util.getMeasuringTimeMs() - lastClickTime < 250L) {
-                player.equipSkill(ModSkills.EMPTY, slot)
+                player.equip(ModSkills.EMPTY, slot)
             }
             lastClickTime = Util.getMeasuringTimeMs()
             selectedSlot = if (selectedSlot != slot) slot else null

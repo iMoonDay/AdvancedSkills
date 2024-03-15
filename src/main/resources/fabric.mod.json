@@ -9,7 +9,8 @@
   ],
   "contact": {
     "homepage": "https://github.com/iMoonDay/AdvancedSkills",
-    "sources": "https://github.com/iMoonDay/AdvancedSkills"
+    "sources": "https://github.com/iMoonDay/AdvancedSkills",
+    "issues": "https://github.com/iMoonDay/AdvancedSkills/issues"
   },
   "license": "MIT",
   "icon": "assets/advanced_skills/icon.png",
@@ -46,11 +47,7 @@
   },
   "custom": {
     "cardinal-components": [
-      "advanced_skills:exp",
-      "advanced_skills:skills",
-      "advanced_skills:equipped_skills",
-      "advanced_skills:using_skills",
-      "advanced_skills:damaged_time",
+      "advanced_skills:data",
       "advanced_skills:status"
     ]
   },

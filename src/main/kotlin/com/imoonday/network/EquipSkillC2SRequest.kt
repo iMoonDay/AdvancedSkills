@@ -1,6 +1,6 @@
 package com.imoonday.network
 
-import com.imoonday.component.equipSkill
+import com.imoonday.util.equip
 import com.imoonday.skill.Skill
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.id
@@ -26,7 +26,7 @@ class EquipSkillC2SRequest(
         fun register() {
             ServerPlayNetworking.registerGlobalReceiver(pType) { packet, player, sender ->
                 val skill = packet.skill
-                if (player.equipSkill(skill, packet.slot) && !skill.invalid) {
+                if (player.equip(skill, packet.slot) && !skill.invalid) {
                     player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC)
                 }
             }

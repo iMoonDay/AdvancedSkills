@@ -11,7 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class ChargedDashSkill : LongPressSkill(
     id = "charged_dash",
-    types = arrayOf(SkillType.MOVEMENT),
+    types = listOf(SkillType.MOVEMENT),
     cooldown = 15,
     rarity = Rarity.SUPERB,
 ), AttributeTrigger {

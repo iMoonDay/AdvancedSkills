@@ -15,7 +15,7 @@ import net.minecraft.sound.SoundEvents
 
 class DyingCounterattackSkill : Skill(
     id = "dying_counterattack",
-    types = arrayOf(SkillType.PASSIVE),
+    types = listOf(SkillType.PASSIVE),
     cooldown = 180,
     rarity = Rarity.EPIC,
 ), DeathTrigger, PersistentTrigger, AttackTrigger, TickTrigger, UnequipTrigger, HeartTypeTrigger {
@@ -41,7 +41,7 @@ class DyingCounterattackSkill : Skill(
         return amount
     }
 
-    override fun tick(player: ServerPlayerEntity, usedTime: Int) {
+    override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return
         if (usedTime % 20 == 0) player.damage(
             player.damageSources.wither(),

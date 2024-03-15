@@ -1,8 +1,8 @@
 package com.imoonday.skill
 
-import com.imoonday.component.equippedSkills
 import com.imoonday.trigger.FeatureRendererTrigger
-import net.minecraft.client.MinecraftClient
+import com.imoonday.util.clientPlayer
+import com.imoonday.util.equippedSkills
 import net.minecraft.client.network.OtherClientPlayerEntity
 import net.minecraft.client.render.OverlayTexture
 import net.minecraft.client.render.RenderLayer
@@ -39,7 +39,7 @@ class InsightfulEyeSkill : PassiveSkill(
         if (player !is OtherClientPlayerEntity) return
         val cameraPos = context.renderDispatcher.camera.pos
         if (!player.shouldRender(cameraPos.x, cameraPos.y, cameraPos.z)) return
-        if (player.isInvisibleTo(MinecraftClient.getInstance().player)) return
+        if (player.isInvisibleTo(clientPlayer)) return
         player.equippedSkills.forEachIndexed { index, skill ->
             matrices.push()
             matrices.scale(0.5f, 0.5f, 0.5f)
@@ -84,5 +84,5 @@ class InsightfulEyeSkill : PassiveSkill(
     }
 
     override fun shouldRender(player: PlayerEntity): Boolean =
-        MinecraftClient.getInstance()?.player?.equippedSkills?.contains(this) == true && player is OtherClientPlayerEntity
+        clientPlayer?.hasEquipped() == true && player is OtherClientPlayerEntity
 }

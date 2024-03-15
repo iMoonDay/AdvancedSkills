@@ -1,6 +1,5 @@
 package com.imoonday.trigger
 
-import com.imoonday.component.getSkillUsedTime
 import com.imoonday.network.UseSkillC2SRequest
 import com.imoonday.util.UseResult
 import com.imoonday.util.translate
@@ -14,18 +13,18 @@ interface LongPressTrigger : TickTrigger, AutoStopTrigger {
 
     fun use(player: ServerPlayerEntity, keyState: UseSkillC2SRequest.KeyState): UseResult =
         if (keyState == UseSkillC2SRequest.KeyState.PRESS) onPress(player)
-        else onRelease(player, player.getSkillUsedTime(asSkill()))
+        else onRelease(player, player.getUsedTime())
 
     fun onPress(player: ServerPlayerEntity): UseResult {
         player.startUsing()
-        return UseResult.fail(translate("useSkill", "charging", asSkill().name.string))
+        return UseResult.fail(translate("useSkill", "charging", getAsSkill().name.string))
     }
 
     fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult
 
     override fun onStop(player: ServerPlayerEntity) {
         val result = onRelease(player, getMaxPressTime())
-        asSkill().handleResult(player, result)
+        getAsSkill().handleResult(player, result)
         super.onStop(player)
     }
 

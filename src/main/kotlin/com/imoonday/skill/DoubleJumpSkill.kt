@@ -10,7 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class DoubleJumpSkill : Skill(
     id = "double_jump",
-    types = arrayOf(SkillType.MOVEMENT),
+    types = listOf(SkillType.MOVEMENT),
     cooldown = 3,
     rarity = Rarity.UNCOMMON
 ) {

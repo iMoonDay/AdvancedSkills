@@ -250,6 +250,16 @@ advancedSkills:
     item_attraction:
       name: 物品吸引
       description: 吸引周围物品
+    doping:
+      name: 兴奋剂
+      description: 以少量血量为代价，获得大量速度
+    grappling_hook:
+      name: 抓钩
+      description: 抓住一个方块并向方块移动
+      failed: 无可抓方块
+    reverse_gravity:
+      name: 反重力
+      description: 颠倒重力
   skillType:
     attack: 攻击
     defense: 防御
@@ -323,3 +333,8 @@ subtitles:
 gamerule:
   skillCooldownMultiplier: 技能冷却乘数
   skillCooldownMultiplier.description: 所有技能冷却时间按此倍率调整
+modmenu:
+  nameTranslation:
+    advanced_skills: 进阶技能
+  descriptionTranslation:
+    advanced_skills: 大量技能让你更畅快地体验战斗

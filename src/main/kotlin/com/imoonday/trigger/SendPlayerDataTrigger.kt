@@ -11,8 +11,8 @@ interface SendPlayerDataTrigger : SkillTrigger {
     fun apply(player: ServerPlayerEntity, data: NbtCompound) = Unit
 
     fun getSendTime(): SendTime = SendTime.USE
+}
 
-    enum class SendTime {
-        USE, ALWAYS, USING, EQUIPPED
-    }
+enum class SendTime {
+    USE, ALWAYS, USING, EQUIPPED
 }

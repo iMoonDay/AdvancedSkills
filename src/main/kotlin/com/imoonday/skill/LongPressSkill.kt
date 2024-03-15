@@ -9,11 +9,11 @@ import net.minecraft.sound.SoundEvent
 
 abstract class LongPressSkill(
     id: String,
-    vararg types: SkillType,
+    types: List<SkillType>,
     cooldown: Int,
     rarity: Rarity,
     sound: SoundEvent? = null,
-) : Skill(id, types = types, cooldown, rarity, sound), LongPressTrigger {
+) : Skill(id, types, cooldown, rarity, sound), LongPressTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = onRelease(user, 1)
 

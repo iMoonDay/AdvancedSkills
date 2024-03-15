@@ -1,9 +1,5 @@
 package com.imoonday.screen
 
-import com.imoonday.component.equipSkill
-import com.imoonday.component.equippedSkills
-import com.imoonday.component.getSkill
-import com.imoonday.component.learnedSkills
 import com.imoonday.init.ModSkills
 import com.imoonday.render.SkillSlotRenderer
 import com.imoonday.skill.Skill
@@ -34,13 +30,13 @@ class SkillInventoryScreen(
     var selectedSlot: Slot? = null
         set(value) {
             field = value
-            update(NbtCompound())
+            update()
         }
     var selectedTab: Tab? = null
         set(value) {
             field = value
             scrollContainer.onMouseScroll(0.0, 0.0, 100.0)
-            update(NbtCompound())
+            update()
         }
     var selectingSlot: Slot? = null
     private val tabs: MutableList<Tab> = mutableListOf()
@@ -61,7 +57,7 @@ class SkillInventoryScreen(
         get() = Skill.getValidSkills().size / 9 + if (Skill.getValidSkills().size % 9 == 0) 0 else 1
     private val displaySkills
         get() = player.learnedSkills
-            .filterNot { it in player.equippedSkills }
+            .filterNot { player.hasEquipped(it) }
             .filter { skill ->
                 (selectedTab?.type ?: return@filter true) in skill.types
             }
@@ -220,36 +216,36 @@ class SkillInventoryScreen(
             when (keyCode) {
                 GLFW.GLFW_KEY_1 -> {
                     val original = player.getSkill(SkillSlot.SLOT_1)
-                    player.equipSkill(slot.skill, SkillSlot.SLOT_1)
+                    player.equip(slot.skill, SkillSlot.SLOT_1)
                     if (slot.slot.valid && !original.invalid) {
-                        player.equipSkill(original, slot.slot)
+                        player.equip(original, slot.slot)
                     }
                     true
                 }
 
                 GLFW.GLFW_KEY_2 -> {
                     val original = player.getSkill(SkillSlot.SLOT_2)
-                    player.equipSkill(slot.skill, SkillSlot.SLOT_2)
+                    player.equip(slot.skill, SkillSlot.SLOT_2)
                     if (slot.slot.valid && !original.invalid) {
-                        player.equipSkill(original, slot.slot)
+                        player.equip(original, slot.slot)
                     }
                     true
                 }
 
                 GLFW.GLFW_KEY_3 -> {
                     val original = player.getSkill(SkillSlot.SLOT_3)
-                    player.equipSkill(slot.skill, SkillSlot.SLOT_3)
+                    player.equip(slot.skill, SkillSlot.SLOT_3)
                     if (slot.slot.valid && !original.invalid) {
-                        player.equipSkill(original, slot.slot)
+                        player.equip(original, slot.slot)
                     }
                     true
                 }
 
                 GLFW.GLFW_KEY_4 -> {
                     val original = player.getSkill(SkillSlot.SLOT_4)
-                    player.equipSkill(slot.skill, SkillSlot.SLOT_4)
+                    player.equip(slot.skill, SkillSlot.SLOT_4)
                     if (slot.slot.valid && !original.invalid) {
-                        player.equipSkill(original, slot.slot)
+                        player.equip(original, slot.slot)
                     }
                     true
                 }
@@ -304,29 +300,29 @@ class SkillInventoryScreen(
                 if (!slot.valid) {
                     if (hasShiftDown()) {
                         if (equippedSlots.any { it.skill.invalid }) {
-                            player.equipSkill(
+                            player.equip(
                                 skill,
                                 SkillSlot.fromIndex(player.equippedSkills.indexOfFirst { it.invalid } + 1)
                             )
                         }
                     } else {
                         if (selectedSlot != null && selectedSlot!!.slot.valid) {
-                            player.equipSkill(ModSkills.EMPTY, selectedSlot!!.slot)
+                            player.equip(ModSkills.EMPTY, selectedSlot!!.slot)
                             selectedSlot = null
                         } else {
                             selectedSlot = if (selectedSlot == null && !skill.invalid) this else null
                         }
                     }
                 } else if (selectedSlot != null && selectedSlot != this) {
-                    player.equipSkill(selectedSlot!!.skill, slot)
-                    if (selectedSlot!!.slot.valid && !selectedSlot!!.skill.invalid) player.equipSkill(
+                    player.equip(selectedSlot!!.skill, slot)
+                    if (selectedSlot!!.slot.valid && !selectedSlot!!.skill.invalid) player.equip(
                         skill,
                         selectedSlot!!.slot
                     )
                     selectedSlot = null
                 } else if (!skill.invalid) {
                     if (hasShiftDown()) {
-                        player.equipSkill(ModSkills.EMPTY, slot)
+                        player.equip(ModSkills.EMPTY, slot)
                     } else {
                         selectedSlot = if (selectedSlot != this) this else null
                     }

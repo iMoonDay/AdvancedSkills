@@ -1,6 +1,6 @@
 package com.imoonday.item
 
-import com.imoonday.component.learnRandomSkill
+import com.imoonday.util.learnRandomly
 import com.imoonday.skill.Skill
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings
 import net.minecraft.client.item.TooltipContext
@@ -23,7 +23,7 @@ class SkillFruitItem(val rarity: Skill.Rarity, settings: Settings) : Item(settin
     )
 
     override fun finishUsing(stack: ItemStack, world: World, user: LivingEntity): ItemStack {
-        (user as? ServerPlayerEntity)?.learnRandomSkill { it.rarity.level <= rarity.level }
+        (user as? ServerPlayerEntity)?.learnRandomly { it.rarity.level <= rarity.level }
         stack.decrement(1)
         return stack
     }
