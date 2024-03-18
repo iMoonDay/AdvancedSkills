@@ -1,10 +1,11 @@
 package com.imoonday.init
 
-import com.imoonday.component.status
+import com.imoonday.component.properties
 import com.imoonday.effect.*
 import com.imoonday.util.id
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffect
+import net.minecraft.nbt.NbtElement
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 
@@ -43,4 +44,7 @@ val LivingEntity.isConfined: Boolean
     get() = hasStatusEffect(this, ModEffects.CONFINEMENT)
 
 private fun hasStatusEffect(entity: LivingEntity, effect: StatusEffect): Boolean =
-    if (effect is SyncClientEffect) entity.status.getBoolean(effect.syncId) else entity.hasStatusEffect(effect)
+    if (effect is SyncClientEffect) effect.syncId in entity.properties.getList(
+        "syncEffects",
+        NbtElement.STRING_TYPE.toInt()
+    ).map { it.asString() } else entity.hasStatusEffect(effect)

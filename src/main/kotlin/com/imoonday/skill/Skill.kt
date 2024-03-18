@@ -200,6 +200,10 @@ abstract class Skill(
         return this
     }
 
+    fun failedMessage() = translateSkill(id.path, "failed")
+
+    fun message(key: String) = translateSkill(id.path, key)
+
     enum class Rarity(
         val level: Int,
         val id: String,

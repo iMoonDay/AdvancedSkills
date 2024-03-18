@@ -41,7 +41,7 @@ class MeteorShowerSkill : LongPressSkill(
         player.stopUsing()
         if (pressedTime < getMaxPressTime()) {
             player.startCooling(10)
-            return UseResult.fail(translateSkill(id.path, "failed"))
+            return UseResult.fail(failedMessage())
         }
         val targetPos = player.raycast(512.0, 0f, false).pos
         val random = player.random

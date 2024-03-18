@@ -2,8 +2,7 @@ package com.imoonday.trigger
 
 import net.minecraft.entity.player.PlayerEntity
 
-interface UsingProgressTrigger : SkillTrigger {
+interface UsingProgressTrigger : ProgressTrigger {
 
-    fun shouldDisplay(player: PlayerEntity): Boolean = true
-    fun getProgress(player: PlayerEntity): Double
+    override fun shouldDisplay(player: PlayerEntity): Boolean = true
 }

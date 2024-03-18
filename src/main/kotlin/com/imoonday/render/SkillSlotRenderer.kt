@@ -6,6 +6,7 @@ import com.imoonday.init.isSilenced
 import com.imoonday.skill.LongPressSkill
 import com.imoonday.skill.Skill
 import com.imoonday.trigger.AutoStopTrigger
+import com.imoonday.trigger.ProgressTrigger
 import com.imoonday.trigger.UsingProgressTrigger
 import com.imoonday.util.*
 import com.mojang.blaze3d.systems.RenderSystem
@@ -27,9 +28,9 @@ object SkillSlotRenderer {
     fun render(client: MinecraftClient, context: DrawContext) {
         val player = client.player ?: return
         if (player.isSpectator) return
+        val startX = context.scaledWindowWidth - 20 - UIConfigModel.instance.uiOffsetX
+        val endX = startX + 16
         player.equippedSkills.forEachIndexed { index, skill ->
-            val startX = context.scaledWindowWidth - 20 - UIConfigModel.instance.uiOffsetX
-            val endX = startX + 16
             val startY = context.scaledWindowHeight / 2 + (index - 2) * 18 + UIConfigModel.instance.uiOffsetY
             val endY = startY + 16
             renderIcon(context, startX, startY, player, skill)
@@ -51,7 +52,15 @@ object SkillSlotRenderer {
         stack.scale(scale, scale, scale)
         RenderSystem.enableBlend()
         RenderSystem.setShaderColor(1f, 1f, 1f, 0.75f)
-        context.drawTexture(indexTexture, ((endX - 3) / scale).toInt(), ((startY - 3) / scale).toInt(), index * 9, 0, 9, 9)
+        context.drawTexture(
+            indexTexture,
+            ((endX - 3) / scale).toInt(),
+            ((startY - 3) / scale).toInt(),
+            index * 9,
+            0,
+            9,
+            9
+        )
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
         RenderSystem.disableBlend()
         stack.pop()
@@ -67,7 +76,9 @@ object SkillSlotRenderer {
         if (skill.invalid) return
         val lineEndX = startX - 2
         val lineStartX = startX - 20 - 14
-        if (player.isUsing(skill) && skill is UsingProgressTrigger && skill.shouldDisplay(player)) {
+        if (skill is ProgressTrigger && skill.shouldDisplay(player)
+            && (player.isUsing(skill) || skill !is UsingProgressTrigger)
+        ) {
             val progress = skill.getProgress(player)
             val centerX = lineStartX + (32 * progress).toInt()
             context.fill(lineStartX, endY - 2, centerX, endY - 1, Color.GREEN.rgb)
@@ -116,7 +127,17 @@ object SkillSlotRenderer {
                 context.setShaderColor(1.0f, 1.0f, 1.0f, alpha.toFloat())
             }
         }
-        context.drawTexture(if (player.isSilenced) ModSkills.EMPTY.icon else skill.icon, startX, startY, 0f, 0f, 16, 16, 16, 16)
+        context.drawTexture(
+            if (player.isSilenced) ModSkills.EMPTY.icon else skill.icon,
+            startX,
+            startY,
+            0f,
+            0f,
+            16,
+            16,
+            16,
+            16
+        )
         if (skill is AutoStopTrigger && skill !is LongPressSkill) {
             context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
             RenderSystem.disableBlend()

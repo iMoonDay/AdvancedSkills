@@ -1,7 +1,7 @@
 package com.imoonday.entity
 
 import com.imoonday.util.startCooling
-import com.imoonday.component.status
+import com.imoonday.component.properties
 import com.imoonday.util.stopCooling
 import com.imoonday.init.ModComponents
 import com.imoonday.init.ModEntities
@@ -136,10 +136,10 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
     override fun tick() {
         if (!world.isClient) {
             owner?.let {
-                if (!it.status.containsUuid("horseUuid")) {
-                    it.status.putUuid("horseUuid", uuid)
-                    ModComponents.STATUS.sync(it)
-                } else if (it.status.getUuid("horseUuid") != uuid) {
+                if (!it.properties.containsUuid("horseUuid")) {
+                    it.properties.putUuid("horseUuid", uuid)
+                    ModComponents.PROPERTY.sync(it)
+                } else if (it.properties.getUuid("horseUuid") != uuid) {
                     discard()
                     return
                 }

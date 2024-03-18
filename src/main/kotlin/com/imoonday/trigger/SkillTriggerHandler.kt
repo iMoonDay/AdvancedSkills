@@ -237,4 +237,9 @@ object SkillTriggerHandler {
             ?.forEach { movement = it.getDelta(movement) }
         return movement
     }
+
+    fun postDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
+        player.getTriggers<PostDamagedTrigger>()
+            .forEach { it.postDamaged(amount, source, player, attacker) }
+    }
 }

@@ -259,6 +259,26 @@ advancedSkills:
     reverse_gravity:
       name: Reverse Gravity
       description: Reverse gravity
+    ore_perception:
+      name: Ore Perception
+      description: Can see through surrounding ores
+    invisible_trap:
+      name: Invisible Trap
+      description: Place a invisible trap
+      failed: No empty place
+    frost_trap:
+      name: Frost Trap
+      description: Place a snow trap
+      failed: No empty place
+    temporary_shield:
+      name: Temporary Shield
+      description: Slowly increase the absorption amount, the upper limit is 10
+    pain_feedback:
+      name: Pain Feedback
+      description: When the same creature continuously causes a certain amount of damage to you, all the damage previously caused by the creature to you will be immediately reflected
+    thunder_fury:
+      name: Thunder Fury
+      description: Summon a lightning bolt
   skillType:
     attack: Attack
     defense: Defense
@@ -319,6 +339,10 @@ entity:
     servant_skeleton: Servant Skeleton
     servant_wither_skeleton: Servant Wither Skeleton
     meteorite: Meteorite
+block:
+  advanced_skills:
+    invisible_trap: Invisible Trap
+    frost_trap: Frost Trap
 subtitles:
   advanced_skills:
     heal: Heal

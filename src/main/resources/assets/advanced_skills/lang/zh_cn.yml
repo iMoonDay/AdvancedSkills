@@ -260,6 +260,26 @@ advancedSkills:
     reverse_gravity:
       name: 反重力
       description: 颠倒重力
+    ore_perception:
+      name: 矿物感知
+      description: 可以透视周围矿石
+    invisible_trap:
+      name: 隐形陷阱
+      description: 放置一个隐形陷阱
+      failed: 没有空位
+    frost_trap:
+      name: 冰霜陷阱
+      description: 放置一个雪陷阱
+      failed: 没有空位
+    temporary_shield:
+      name: 临时护盾
+      description: 缓慢增加额外血量上限,上限10
+    pain_feedback:
+      name: 痛苦反馈
+      description: 当同一个生物连续对自己造成一定量的伤害时，立即反弹之前该生物对自己造成的所有伤害
+    thunder_fury:
+      name: 雷霆之怒
+      description: 召唤一道闪电
   skillType:
     attack: 攻击
     defense: 防御
@@ -320,6 +340,10 @@ entity:
     servant_skeleton: 奴仆骷髅
     servant_wither_skeleton: 奴仆凋零骷髅
     meteorite: 陨石
+block:
+  advanced_skills:
+    invisible_trap: 隐形陷阱
+    frost_trap: 冰霜陷阱
 subtitles:
   advanced_skills:
     heal: 治愈

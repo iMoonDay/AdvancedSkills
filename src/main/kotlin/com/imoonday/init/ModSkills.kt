@@ -1,6 +1,5 @@
 package com.imoonday.init
 
-import com.imoonday.custom.CustomSkillHandler
 import com.imoonday.skill.*
 import com.imoonday.trigger.InitTrigger
 
@@ -192,8 +191,25 @@ object ModSkills {
     @JvmField
     val REVERSE_GRAVITY = ReverseGravitySkill().register()
 
+    @JvmField
+    val ORE_PERCEPTION = OrePerceptionSkill().register()
+
+    @JvmField
+    val INVISIBLE_TRAP = InvisibleTrapSkill().register()
+
+    @JvmField
+    val FROST_TRAP = FrostTrapSkill().register()
+
+    @JvmField
+    val TEMPORARY_SHIELD = TemporaryShieldSkill().register()
+
+    @JvmField
+    val PAIN_FEEDBACK = PainFeedbackSkill().register()
+
+    @JvmField
+    val THUNDER_FURY = ThunderFurySkill().register()
+
     fun init() {
-        CustomSkillHandler.load()
         Skill.getTriggers<InitTrigger>().forEach { it.init() }
     }
 }

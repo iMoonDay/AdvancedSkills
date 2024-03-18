@@ -1,6 +1,6 @@
 package com.imoonday.skill
 
-import com.imoonday.component.status
+import com.imoonday.component.properties
 import com.imoonday.entity.SpecialTameHorseEntity
 import com.imoonday.init.ModComponents
 import com.imoonday.util.SkillType
@@ -33,11 +33,11 @@ class ExclusiveMountSkill : Skill(
             headYaw = user.headYaw
         }
         if (user.world.isSpaceEmpty(newHorse, newHorse.boundingBox.offset(user.pos.subtract(newHorse.pos)))) {
-            if (user.status.containsUuid("horseUuid")) {
-                (user.world as ServerWorld).getEntity(user.status.getUuid("horseUuid"))?.discard()
+            if (user.properties.containsUuid("horseUuid")) {
+                (user.world as ServerWorld).getEntity(user.properties.getUuid("horseUuid"))?.discard()
             }
-            user.status.putUuid("horseUuid", newHorse.uuid)
-            ModComponents.STATUS.sync(user)
+            user.properties.putUuid("horseUuid", newHorse.uuid)
+            ModComponents.PROPERTY.sync(user)
             newHorse.requestTeleport(user.x, user.y, user.z)
             user.world.spawnEntity(newHorse)
             newHorse.putPlayerOnBack(user)

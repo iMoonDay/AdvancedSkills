@@ -3,14 +3,12 @@ package com.imoonday.config
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.imoonday.MOD_ID
-import io.wispforest.owo.config.annotation.Config
 import net.fabricmc.loader.api.FabricLoader
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 
-@Config(name = "ui-config", wrapperName = "UIConfig")
 class UIConfigModel {
 
     var uiOffsetX: Int = 0

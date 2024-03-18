@@ -1,9 +1,9 @@
 package com.imoonday.init
 
 import com.imoonday.component.DataComponent
-import com.imoonday.component.EntityStatusComponent
+import com.imoonday.component.EntityPropertyComponent
 import com.imoonday.component.PlayerDataComponent
-import com.imoonday.component.StatusComponent
+import com.imoonday.component.PropertyComponent
 import com.imoonday.util.id
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
@@ -19,11 +19,11 @@ object ModComponents : EntityComponentInitializer {
         ComponentRegistry.getOrCreate(id("data"), DataComponent::class.java)
 
     @JvmField
-    val STATUS: ComponentKey<StatusComponent> =
-        ComponentRegistry.getOrCreate(id("status"), StatusComponent::class.java)
+    val PROPERTY: ComponentKey<PropertyComponent> =
+        ComponentRegistry.getOrCreate(id("property"), PropertyComponent::class.java)
 
     override fun registerEntityComponentFactories(registry: EntityComponentFactoryRegistry) {
         registry.registerForPlayers(DATA, ::PlayerDataComponent, RespawnCopyStrategy.CHARACTER)
-        registry.registerFor(Entity::class.java, STATUS, ::EntityStatusComponent)
+        registry.registerFor(Entity::class.java, PROPERTY, ::EntityPropertyComponent)
     }
 }

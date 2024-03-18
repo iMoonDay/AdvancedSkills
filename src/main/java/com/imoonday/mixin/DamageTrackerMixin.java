@@ -1,5 +1,6 @@
 package com.imoonday.mixin;
 
+import com.imoonday.trigger.SkillTriggerHandler;
 import com.imoonday.util.PlayerUtilsKt;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -22,6 +23,13 @@ public class DamageTrackerMixin {
     @Inject(method = "onDamage", at = @At("HEAD"))
     public void advanced_skills$onDamage(DamageSource source, float amount, CallbackInfo ci) {
         if (this.entity instanceof ServerPlayerEntity player) {
+            LivingEntity attacker = null;
+            if (source.getAttacker() instanceof LivingEntity entity) {
+                attacker = entity;
+            } else if (source.getSource() instanceof LivingEntity entity) {
+                attacker = entity;
+            }
+            SkillTriggerHandler.INSTANCE.postDamaged(amount, source, player, attacker);
             PlayerUtilsKt.onDamage(player);
         }
     }

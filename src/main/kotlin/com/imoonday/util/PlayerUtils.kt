@@ -2,6 +2,7 @@ package com.imoonday.util
 
 import com.imoonday.api.SkillChangeEvents
 import com.imoonday.component.DataComponent
+import com.imoonday.component.properties
 import com.imoonday.init.ModComponents
 import com.imoonday.init.ModSkills
 import com.imoonday.network.EquipSkillC2SRequest
@@ -298,11 +299,11 @@ fun PlayerEntity.getUsingData(skill: Skill): NbtCompound? = getData(skill)?.data
 fun PlayerEntity.getData(skill: Skill): SkillData? = data.learned[skill]
 
 var ServerPlayerEntity.lastDamagedTime: Long
-    get() = data.extraData.getLong("lastDamagedTime")
-    set(value) = data.extraData.putLong("lastDamagedTime", value)
+    get() = properties.getLong("lastDamagedTime")
+    set(value) = properties.putLong("lastDamagedTime", value)
 var ServerPlayerEntity.lastReflectedTime: Long
-    get() = data.extraData.getLong("lastReflectedTime")
-    set(value) = data.extraData.putLong("lastReflectedTime", value)
+    get() = properties.getLong("lastReflectedTime")
+    set(value) = properties.putLong("lastReflectedTime", value)
 
 fun ServerPlayerEntity.onDamage() {
     lastDamagedTime = Util.getMeasuringTimeMs()

@@ -7,6 +7,8 @@ import com.imoonday.util.UseResult
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.ItemEntity
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.ServerPlayerEntity
 
 class ItemAttractionSkill : LongPressSkill(
@@ -23,18 +25,30 @@ class ItemAttractionSkill : LongPressSkill(
         return UseResult.success()
     }
 
-    override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
+    override fun tick(player: PlayerEntity, usedTime: Int) {
         if (player.isUsing())
             player.world.getOtherEntities(
                 player,
                 player.boundingBox.expand(15.0)
             ) { it is ItemEntity && !it.cannotPickup() }
                 .forEach {
-                    it.velocityDirty = true
-                    it.velocity = player.eyePos.subtract(it.pos).normalize().multiply(0.25)
-                    if (it.horizontalCollision) it.addVelocity(0.0, 0.25, 0.0)
+                    if (player.world.isClient) {
+                        it.world.addParticle(
+                            ParticleTypes.ENCHANT,
+                            it.x,
+                            it.boundingBox.maxY,
+                            it.z,
+                            0.0,
+                            0.25,
+                            0.0
+                        )
+                    } else {
+                        it.velocityDirty = true
+                        it.velocity = player.eyePos.subtract(it.pos).normalize().multiply(0.25)
+                        if (it.horizontalCollision) it.addVelocity(0.0, 0.25, 0.0)
+                    }
                 }
-        super.serverTick(player, usedTime)
+        super.tick(player, usedTime)
     }
 
     override fun isGlowing(player: ClientPlayerEntity, entity: Entity): Boolean =

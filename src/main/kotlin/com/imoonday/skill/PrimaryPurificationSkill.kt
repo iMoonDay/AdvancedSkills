@@ -31,5 +31,5 @@ class PrimaryPurificationSkill : Skill(
                     amount
                 )
             )
-        } ?: UseResult.fail(translateSkill(id.path, "failed"))
+        } ?: UseResult.fail(failedMessage())
 }

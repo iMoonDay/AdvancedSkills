@@ -2,14 +2,12 @@ package com.imoonday.util
 
 import com.imoonday.api.SkillChangeEvents
 import com.imoonday.config.Config
-import com.imoonday.custom.CustomSkill
 import com.imoonday.entity.render.feature.IceLayer
 import com.imoonday.entity.render.feature.SkillLayer
 import com.imoonday.entity.render.feature.StatusEffectLayer
 import com.imoonday.init.ModItems
 import com.imoonday.init.isDisarmed
 import com.imoonday.network.SyncConfigS2CPacket
-import com.imoonday.network.SyncCustomSkillS2CPacket
 import com.imoonday.render.SkillSlotRenderer
 import com.imoonday.skill.Skill
 import com.imoonday.trigger.*
@@ -96,9 +94,6 @@ object EventHandler {
         }
         ServerPlayConnectionEvents.JOIN.register { _, sender, _ ->
             sender.sendPacket(SyncConfigS2CPacket(Config.instance.toTag(NbtCompound())))
-            Skill.getValidSkills().filterIsInstance<CustomSkill>().forEach {
-                sender.sendPacket(SyncCustomSkillS2CPacket(it.toJson().toString()))
-            }
         }
     }
 
@@ -120,7 +115,10 @@ object EventHandler {
                 .forEach { helper.register(SkillLayer(renderer, context, it)) }
         }
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
-            Skill.getTriggers<WorldRendererTrigger>().forEach { it.render(context) }
+            Skill.getTriggers<WorldRendererTrigger>().forEach { it.renderAfterEntities(context) }
+        }
+        WorldRenderEvents.LAST.register { context ->
+            Skill.getTriggers<WorldRendererTrigger>().forEach { it.renderLast(context) }
         }
     }
 }

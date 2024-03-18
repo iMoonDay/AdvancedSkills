@@ -12,6 +12,9 @@ enum class SkillSlot {
 
     companion object {
 
+        /**
+         * @param index 1~4
+         */
         fun fromIndex(index: Int): SkillSlot = if (index in 0..<entries.size) entries[index] else INVALID
     }
 }

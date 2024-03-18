@@ -13,6 +13,5 @@ object ModChannels {
     fun registerClient() {
         SyncConfigS2CPacket.register()
         LearnSkillS2CPacket.register()
-        SyncCustomSkillS2CPacket.register()
     }
 }

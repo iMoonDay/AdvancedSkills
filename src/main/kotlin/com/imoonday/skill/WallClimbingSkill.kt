@@ -1,6 +1,6 @@
 package com.imoonday.skill
 
-import com.imoonday.component.status
+import com.imoonday.component.properties
 import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
@@ -35,7 +35,7 @@ class WallClimbingSkill : PassiveSkill(
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
-        if (player.isUsing() && !player.horizontalCollision && !player.status.getBoolean(HORIZONTAL_COLLISION_KEY)) {
+        if (player.isUsing() && !player.horizontalCollision && !player.properties.getBoolean(HORIZONTAL_COLLISION_KEY)) {
             player.modifyUsedTime { it - 2 }
             if (player.getUsedTime() <= 0) {
                 player.stopUsing()
@@ -47,12 +47,12 @@ class WallClimbingSkill : PassiveSkill(
         data.apply { putBoolean(HORIZONTAL_COLLISION_KEY, player.horizontalCollision) }
 
     override fun apply(player: ServerPlayerEntity, data: NbtCompound) {
-        player.status.putBoolean(HORIZONTAL_COLLISION_KEY, data.getBoolean(HORIZONTAL_COLLISION_KEY))
+        player.properties.putBoolean(HORIZONTAL_COLLISION_KEY, data.getBoolean(HORIZONTAL_COLLISION_KEY))
     }
 
     override fun getSendTime(): SendTime = SendTime.ALWAYS
     private fun PlayerEntity.shouldClimb(): Boolean =
-        (horizontalCollision || status.getBoolean(HORIZONTAL_COLLISION_KEY)) && !abilities.flying
+        (horizontalCollision || properties.getBoolean(HORIZONTAL_COLLISION_KEY)) && !abilities.flying
 
     companion object {
 

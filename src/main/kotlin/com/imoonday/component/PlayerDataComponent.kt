@@ -22,7 +22,6 @@ interface DataComponent : Component {
     val learned: MutableMap<Skill, SkillData>
     val equipped: MutableMap<SkillSlot, Skill>
     val level: SkillLevelData
-    val extraData: NbtCompound
 }
 
 class PlayerDataComponent(private val player: PlayerEntity) :
@@ -36,7 +35,6 @@ class PlayerDataComponent(private val player: PlayerEntity) :
             .associateWith { ModSkills.EMPTY }
             .toMutableMap()
     override val level: SkillLevelData = SkillLevelData()
-    override val extraData: NbtCompound = NbtCompound()
 
     override fun readFromNbt(tag: NbtCompound) {
         learned.clear()
@@ -56,7 +54,6 @@ class PlayerDataComponent(private val player: PlayerEntity) :
                 if (slot.valid) equipped[slot] = skill
             }
         level.copyFrom(SkillLevelData.fromNbt(tag.getCompound("level")))
-        extraData.copyFrom(tag.getCompound("extraData"))
     }
 
     override fun writeToNbt(tag: NbtCompound) {
@@ -79,7 +76,6 @@ class PlayerDataComponent(private val player: PlayerEntity) :
             })
             put("level", level.toNbt())
         }
-        tag.put("extraData", extraData)
     }
 
     override fun tick() {

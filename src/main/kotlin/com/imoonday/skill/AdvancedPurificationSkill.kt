@@ -42,5 +42,5 @@ class AdvancedPurificationSkill : Skill(
                 )
             )
         }
-    ?: UseResult.fail(translateSkill(id.path, "failed"))
+    ?: UseResult.fail(failedMessage())
 }

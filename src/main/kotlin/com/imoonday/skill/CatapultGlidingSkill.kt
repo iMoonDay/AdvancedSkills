@@ -4,7 +4,6 @@ import com.imoonday.init.ModSounds
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.send
-import com.imoonday.util.translateSkill
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.item.ElytraItem
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
@@ -49,9 +48,9 @@ class CatapultGlidingSkill : LongPressSkill(
         super.serverTick(player, usedTime)
     }
 
-    private fun failedResult() = UseResult.fail(translateSkill(id.path, "failed"))
+    private fun failedResult() = UseResult.fail(failedMessage())
 
-    private fun fallFlyingResult() = UseResult.fail(translateSkill(id.path, "fallFlying"))
+    private fun fallFlyingResult() = UseResult.fail(message("fallFlying"))
 
     private fun canUse(player: ServerPlayerEntity): Boolean {
         val stack = player.getEquippedStack(EquipmentSlot.CHEST)

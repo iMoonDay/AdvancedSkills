@@ -20,7 +20,7 @@ class GroundWhackSkill : Skill(
 ), LandingTrigger, PersistentTrigger, FallTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        if (user.isOnGround) return UseResult.fail(translateSkill(id.path, "failed"))
+        if (user.isOnGround) return UseResult.fail(failedMessage())
         user.run {
             velocity = Vec3d(0.0, min(velocity.y, -1.0), 0.0)
             send(EntityVelocityUpdateS2CPacket(this))

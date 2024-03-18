@@ -46,7 +46,7 @@ class GrapplingHookSkill : LongPressSkill(
                 NBTUtils.writeVec3dToTag(raycast.pos, NbtCompound())
             ).withCooling(false)
         } else {
-            UseResult.fail(translateSkill(id.path, "failed"))
+            UseResult.fail(failedMessage())
         }
     }
 
@@ -217,8 +217,8 @@ class GrapplingHookSkill : LongPressSkill(
         vertexConsumer.vertex(positionMatrix, u + k, v + i - j, w - l).color(r, s, t, 1.0f).light(p).next()
     }
 
-    override fun render(context: WorldRenderContext) {
-        super<WorldRendererTrigger>.render(context)
+    override fun renderAfterEntities(context: WorldRenderContext) {
+        super<WorldRendererTrigger>.renderAfterEntities(context)
         if (context.camera().isThirdPerson || context.camera().focusedEntity != context.gameRenderer().client.player) return
         context.gameRenderer().client.player?.let {
             context.consumers()?.let { provider ->
