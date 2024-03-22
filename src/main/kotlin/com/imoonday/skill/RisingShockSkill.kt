@@ -47,7 +47,15 @@ class RisingShockSkill : Skill(
         player.velocityDirty = true
         player.velocity = Vec3d(0.0, max(player.velocity.y, 0.5), 0.0)
         player.send(EntityVelocityUpdateS2CPacket(player))
-        player.spawnParticles(ParticleTypes.CLOUD, player.x, player.boundingBox.minY, player.z, 10, 0.5, 0.5, 0.5, 0.1)
+        player.spawnParticles(
+            ParticleTypes.CLOUD,
+            Vec3d(player.x, player.boundingBox.minY, player.z),
+            10,
+            0.5,
+            0.5,
+            0.5,
+            0.1
+        )
         player.world.getOtherEntities(player, player.boundingBox.expand(1.0)) { it.isLiving && it.isAlive }.forEach {
             it.velocityDirty = true
             it.velocity = it.velocity.withAxis(Direction.Axis.Y, max(it.velocity.y, 0.5))

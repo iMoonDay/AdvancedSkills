@@ -1,7 +1,6 @@
 package com.imoonday.skill
 
 import com.imoonday.util.isUsing
-import com.imoonday.init.ModSkills
 import com.imoonday.trigger.AttributeTrigger
 import com.imoonday.trigger.DamageTrigger
 import com.imoonday.trigger.FeatureRendererTrigger
@@ -79,5 +78,5 @@ class ActiveDefenseSkill : LongPressSkill(
     ) = renderSkillAround(player, tickDelta, matrices, context, provider)
 
     override fun shouldRender(player: PlayerEntity): Boolean =
-        player.isUsing() && !player.isUsing(ModSkills.ABSOLUTE_DEFENSE)
+        player.isUsing() && !player.isUsing(Skills.ABSOLUTE_DEFENSE)
 }

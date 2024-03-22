@@ -2,14 +2,17 @@ package com.imoonday.init
 
 import com.imoonday.skill.Skill
 import com.imoonday.util.*
+import com.imoonday.util.SkillContainer.Companion.MAX_SLOT_SIZE
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.LongArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.context.CommandContext
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.argument.EntityArgumentType
 import net.minecraft.server.command.CommandManager.argument
 import net.minecraft.server.command.CommandManager.literal
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 
 object ModCommands {
@@ -28,6 +31,7 @@ object ModCommands {
                             .then(executeUnequip())
                             .then(executeResetCooldown())
                             .then(executeList())
+                            .then(executeSlot())
                     )
             )
 
@@ -40,11 +44,58 @@ object ModCommands {
         }
     }
 
+    private fun executeSlot(): LiteralArgumentBuilder<ServerCommandSource> =
+        literal("slot")
+            .then(
+                literal("add").then(
+                    literal("active").executes { context ->
+                        val target = getTarget(context)
+                        val index =
+                            (target.skillContainer.getLastSlot { it is SkillSlot.Active }?.index ?: 0) + 1
+                        target.skillContainer.addSlot(SkillSlot.Active(index))
+                            .also { target.syncData() } ?: 0
+                    }
+                ).then(
+                    literal("generic").executes { context ->
+                        val target = getTarget(context)
+                        val index = (target.skillContainer.getLastSlot { it is SkillSlot.Generic }?.index
+                            ?: target.skillContainer.getLastSlot { it is SkillSlot.Active }?.index
+                            ?: 0) + 1
+                        target.skillContainer.addSlot(SkillSlot.Generic(index))
+                            .also { target.syncData() } ?: 0
+                    }
+                ).then(
+                    literal("passive").executes { context ->
+                        val target = getTarget(context)
+                        val index = (target.skillContainer.getLastSlot { it is SkillSlot.Passive }?.index
+                            ?: target.skillContainer.getLastSlot { it is SkillSlot.Generic }?.index
+                            ?: target.skillContainer.getLastSlot { it is SkillSlot.Active }?.index
+                            ?: 0) + 1
+                        target.skillContainer.addSlot(SkillSlot.Passive(index))
+                            .also { target.syncData() } ?: 0
+                    }
+                )
+            ).then(
+                literal("remove").then(
+                    argument("index", IntegerArgumentType.integer(1, 10)).executes {
+                        val target = getTarget(it)
+                        val index = IntegerArgumentType.getInteger(it, "index")
+                        target.skillContainer.removeSlot(index)?.let { 1 }.also { target.syncData() } ?: 0
+                    }
+                )
+            ).then(
+                literal("reset").executes {
+                    val target = getTarget(it)
+                    target.skillContainer.resetSlots().also { target.syncData() }
+                    1
+                }
+            )
+
     private fun executeQuery(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("query")
             .then(
                 argument("target", EntityArgumentType.player()).executes {
-                    val target = EntityArgumentType.getPlayer(it, "target")
+                    val target = getTarget(it)
                     val exp = target.skillExp
 
                     it.source.sendFeedback(
@@ -125,7 +176,7 @@ object ModCommands {
 
     private fun executeList(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("list").executes {
-            val target = EntityArgumentType.getPlayer(it, "target")
+            val target = getTarget(it)
             val skills = target.learnedSkills
 
             it.source.sendMessage(
@@ -137,7 +188,7 @@ object ModCommands {
     private fun executeResetCooldown(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("reset-cooldown")
             .executes {
-                val target = EntityArgumentType.getPlayer(it, "target")
+                val target = getTarget(it)
                 target.learnedSkills.forEach { target.stopCooling(it) }
                 it.source.sendFeedback(
                     {
@@ -155,13 +206,12 @@ object ModCommands {
     private fun executeUnequip(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("unequip").then(argument(
             "slot",
-            IntegerArgumentType.integer(1, 4)
+            IntegerArgumentType.integer(1, MAX_SLOT_SIZE)
         ).executes {
-            val target = EntityArgumentType.getPlayer(it, "target")
+            val target = getTarget(it)
             val slot = IntegerArgumentType.getInteger(it, "slot")
-            val skillSlot = SkillSlot.fromIndex(slot)
-            val original = target.getSkill(skillSlot)
-            if (target.equip(ModSkills.EMPTY, skillSlot)) {
+            val original = target.getSkill(slot)
+            if (target.equip(Skill.EMPTY, slot)) {
                 it.source.sendFeedback(
                     {
                         translate(
@@ -194,13 +244,13 @@ object ModCommands {
         literal("equip").then(
             argument("skill", SkillArgumentType.skill()).then(argument(
                 "slot",
-                IntegerArgumentType.integer(1, 4)
+                IntegerArgumentType.integer(1, MAX_SLOT_SIZE)
             )
                 .executes {
-                    val target = EntityArgumentType.getPlayer(it, "target")
+                    val target = getTarget(it)
                     val slot = IntegerArgumentType.getInteger(it, "slot")
                     val skill = SkillArgumentType.getSkill(it)
-                    if (target.equip(skill, SkillSlot.fromIndex(slot))) {
+                    if (target.equip(skill, slot)) {
                         it.source.sendFeedback(
                             {
                                 translate(
@@ -245,7 +295,7 @@ object ModCommands {
         literal("forget")
             .then(argument("skill", SkillArgumentType.skill())
                 .executes {
-                    val target = EntityArgumentType.getPlayer(it, "target")
+                    val target = getTarget(it)
                     val skill = SkillArgumentType.getSkill(it)
                     if (!target.forget(skill)) {
                         it.source.sendFeedback(
@@ -276,7 +326,7 @@ object ModCommands {
         literal("learn")
             .then(argument("skill", SkillArgumentType.skill())
                 .executes {
-                    val target = EntityArgumentType.getPlayer(it, "target")
+                    val target = getTarget(it)
                     val skill = SkillArgumentType.getSkill(it)
                     if (!target.learn(skill)) {
                         it.source.sendFeedback(
@@ -292,4 +342,7 @@ object ModCommands {
                     }
                     1
                 })
+
+    private fun getTarget(it: CommandContext<ServerCommandSource>): ServerPlayerEntity =
+        EntityArgumentType.getPlayer(it, "target")
 }

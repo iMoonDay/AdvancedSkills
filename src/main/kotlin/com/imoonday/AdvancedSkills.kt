@@ -2,6 +2,8 @@ package com.imoonday
 
 import com.imoonday.config.Config
 import com.imoonday.init.*
+import com.imoonday.network.Channels
+import com.imoonday.skill.Skills
 import com.imoonday.util.EventHandler
 import com.imoonday.util.SkillArgumentType
 import net.fabricmc.api.ModInitializer
@@ -15,8 +17,8 @@ object AdvancedSkills : ModInitializer {
 
     override fun onInitialize() {
         Config.load()
-        ModSkills.init()
-        ModChannels.register()
+        Skills.init()
+        Channels.register()
         ModCommands.init()
         SkillArgumentType.register()
         ModItemGroups.init()

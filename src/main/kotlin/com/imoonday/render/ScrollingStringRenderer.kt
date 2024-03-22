@@ -1,6 +1,6 @@
 package com.imoonday.render
 
-import com.imoonday.config.UIConfigModel
+import com.imoonday.config.UIConfig
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.text.Text
@@ -25,7 +25,7 @@ class ScrollingStringRenderer(
 
     private val updateInterval: Double
         get() {
-            val rate = UIConfigModel.instance.nameScrollRate
+            val rate = UIConfig.instance.nameScrollRate
             if (rate <= 0.0) return Double.MAX_VALUE
             return 100 / rate
         }

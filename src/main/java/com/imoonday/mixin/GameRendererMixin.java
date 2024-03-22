@@ -1,6 +1,6 @@
 package com.imoonday.mixin;
 
-import com.imoonday.init.ModSkills;
+import com.imoonday.skill.Skills;
 import com.imoonday.trigger.SkillTriggerHandler;
 import com.imoonday.util.PlayerUtilsKt;
 import net.minecraft.client.MinecraftClient;
@@ -25,7 +25,7 @@ public class GameRendererMixin {
 
     @Inject(method = "getNightVisionStrength", at = @At("HEAD"), cancellable = true)
     private static void advanced_skills$getNightVisionStrength(LivingEntity entity, float tickDelta, CallbackInfoReturnable<Float> cir) {
-        if (entity instanceof PlayerEntity player && PlayerUtilsKt.isUsing(player, ModSkills.NIGHT_VISION)) {
+        if (entity instanceof PlayerEntity player && PlayerUtilsKt.isUsing(player, Skills.NIGHT_VISION)) {
             cir.setReturnValue(1.0f);
         }
     }

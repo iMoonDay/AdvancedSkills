@@ -1,10 +1,7 @@
 package com.imoonday.skill
 
 import com.imoonday.init.ModSounds
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
-import com.imoonday.util.raycastVisualBlock
-import com.imoonday.util.spawnParticles
+import com.imoonday.util.*
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.projectile.ProjectileUtil
 import net.minecraft.particle.DustParticleEffect
@@ -32,9 +29,7 @@ class LaserEyeSkill : Skill(
         while (offset <= maxDistance) {
             user.spawnParticles(
                 DustParticleEffect(particleColor, 1f),
-                user.eyePos.x + user.rotationVector.x * offset,
-                user.eyePos.y + user.rotationVector.y * offset,
-                user.eyePos.z + user.rotationVector.z * offset,
+                user.eyePos + user.rotationVector * offset,
                 1,
                 0.0,
                 0.0,

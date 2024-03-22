@@ -1,12 +1,8 @@
-package com.imoonday.init
+package com.imoonday.skill
 
-import com.imoonday.skill.*
 import com.imoonday.trigger.InitTrigger
 
-object ModSkills {
-
-    @JvmField
-    val EMPTY = EmptySkill().register()
+object Skills {
 
     @JvmField
     val FIREBALL = FireballSkill().register()
@@ -208,6 +204,12 @@ object ModSkills {
 
     @JvmField
     val THUNDER_FURY = ThunderFurySkill().register()
+
+    @JvmField
+    val COUNTERBLAST = CounterblastSkill().register()
+
+    @JvmField
+    val TIME_REWIND = TimeRewindSkill().register()
 
     fun init() {
         Skill.getTriggers<InitTrigger>().forEach { it.init() }

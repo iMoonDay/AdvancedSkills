@@ -1,9 +1,8 @@
 package com.imoonday.screen
 
-import com.imoonday.init.ModSkills
-import com.imoonday.render.SkillSlotRenderer
 import com.imoonday.skill.Skill
 import com.imoonday.util.*
+import com.imoonday.util.SkillSlot.Companion.indexTexture
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
@@ -77,6 +76,7 @@ class SkillInventoryScreen(
 
     private fun setupInventory(rootComponent: FlowLayout) {
         rootComponent.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
+            horizontalAlignment(HorizontalAlignment.CENTER)
             val halfSize = SkillType.entries.size / 2
             val width = 9 * (slotSize + 4) + 15
             addTopTabs(width, halfSize)
@@ -123,6 +123,7 @@ class SkillInventoryScreen(
             val skills = displaySkills
             val rows = rows
             child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
+                alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
                 gap(3)
                 child(Containers.verticalScroll(
                     Sizing.content(),
@@ -132,7 +133,7 @@ class SkillInventoryScreen(
                         alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
                         for (index in (0 until rows * 9)) {
                             child(
-                                Slot(SkillSlot.INVALID, skills.getOrElse(index) { ModSkills.EMPTY }),
+                                Slot(null, skills.getOrElse(index) { Skill.EMPTY }),
                                 index / 9,
                                 index % 9
                             )
@@ -142,21 +143,31 @@ class SkillInventoryScreen(
                     scrollbar(ScrollContainer.Scrollbar.vanilla())
                     padding(Insets.horizontal(5))
                 }.also { scrollContainer = it })
-                child(Containers.grid(Sizing.fixed(width), Sizing.content(), 1, 4).apply {
-                    padding(Insets.left(5))
-                    alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                    player.equippedSkills.forEachIndexed { index, skill ->
-                        child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                            padding(Insets.of(1))
+                val slots = player.skillContainer.getAllSlots()
+                child(
+                    Containers.horizontalScroll(
+                        Sizing.fixed(width - 15),
+                        Sizing.content(),
+                        Containers.grid(Sizing.content(), Sizing.content(), 1, slots.size).apply {
                             alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                            gap(3)
-                            child(Components.texture(SkillSlotRenderer.indexTexture, index * 9, 0, 9, 9))
-                            val slot = Slot(SkillSlot.fromIndex(index + 1), skill)
-                            child(slot)
-                            equippedSlots.add(slot)
-                        }, 0, index)
+                            slots.forEach {
+                                child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
+                                    padding(Insets.of(1))
+                                    alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
+                                    gap(3)
+                                    child(Components.texture(indexTexture, it.u, it.v, 9, 9).apply {
+                                        tooltip(it.tooltip)
+                                    })
+                                    val slot = Slot(it, it.skill)
+                                    child(slot)
+                                    equippedSlots.add(slot)
+                                }, 0, it.index - 1)
+                            }
+                        }).apply {
+                        scrollbarThiccness(0)
+                        scrollStep(42)
                     }
-                })
+                )
             })
         })
     }
@@ -180,7 +191,7 @@ class SkillInventoryScreen(
         inventory.run {
             for (index in 0 until size) {
                 child(
-                    Slot(SkillSlot.INVALID, skills.getOrElse(index) { ModSkills.EMPTY }),
+                    Slot(null, skills.getOrElse(index) { Skill.EMPTY }),
                     index / 9,
                     index % 9
                 )
@@ -214,48 +225,32 @@ class SkillInventoryScreen(
         return if (selectingSlot != null && !selectingSlot!!.skill.invalid && selectingSlot != selectedSlot) {
             val slot = selectingSlot!!
             when (keyCode) {
-                GLFW.GLFW_KEY_1 -> {
-                    val original = player.getSkill(SkillSlot.SLOT_1)
-                    player.equip(slot.skill, SkillSlot.SLOT_1)
-                    if (slot.slot.valid && !original.invalid) {
-                        player.equip(original, slot.slot)
-                    }
-                    true
-                }
-
-                GLFW.GLFW_KEY_2 -> {
-                    val original = player.getSkill(SkillSlot.SLOT_2)
-                    player.equip(slot.skill, SkillSlot.SLOT_2)
-                    if (slot.slot.valid && !original.invalid) {
-                        player.equip(original, slot.slot)
-                    }
-                    true
-                }
-
-                GLFW.GLFW_KEY_3 -> {
-                    val original = player.getSkill(SkillSlot.SLOT_3)
-                    player.equip(slot.skill, SkillSlot.SLOT_3)
-                    if (slot.slot.valid && !original.invalid) {
-                        player.equip(original, slot.slot)
-                    }
-                    true
-                }
-
-                GLFW.GLFW_KEY_4 -> {
-                    val original = player.getSkill(SkillSlot.SLOT_4)
-                    player.equip(slot.skill, SkillSlot.SLOT_4)
-                    if (slot.slot.valid && !original.invalid) {
-                        player.equip(original, slot.slot)
-                    }
-                    true
-                }
-
+                GLFW.GLFW_KEY_1 -> swap(slot, 1)
+                GLFW.GLFW_KEY_2 -> swap(slot, 2)
+                GLFW.GLFW_KEY_3 -> swap(slot, 3)
+                GLFW.GLFW_KEY_4 -> swap(slot, 4)
+                GLFW.GLFW_KEY_5 -> swap(slot, 5)
+                GLFW.GLFW_KEY_6 -> swap(slot, 6)
+                GLFW.GLFW_KEY_7 -> swap(slot, 7)
+                GLFW.GLFW_KEY_8 -> swap(slot, 8)
+                GLFW.GLFW_KEY_9 -> swap(slot, 9)
+                GLFW.GLFW_KEY_0 -> swap(slot, 10)
                 else -> super.keyPressed(keyCode, scanCode, modifiers)
             }
         } else super.keyPressed(keyCode, scanCode, modifiers)
     }
 
+    private fun swap(slot: Slot, index: Int): Boolean {
+        val original = player.getSkill(index)
+        val result = player.equip(slot.skill, index)
+        if (slot.slot != null && !original.invalid) {
+            player.equip(original, slot.slot)
+        }
+        return result
+    }
+
     override fun close() = client!!.setScreen(parent)
+
     override fun init() {
         super.init()
         tabs.forEach {
@@ -263,8 +258,10 @@ class SkillInventoryScreen(
         }
     }
 
+    override fun shouldPause(): Boolean = false
+
     inner class Slot(
-        val slot: SkillSlot,
+        val slot: SkillSlot?,
         var skill: Skill,
     ) : FlowLayout(Sizing.fixed(slotSize), Sizing.fixed(slotSize), Algorithm.VERTICAL) {
 
@@ -297,32 +294,28 @@ class SkillInventoryScreen(
             updateSkill(skill)
             mouseDown().subscribe { _, _, button ->
                 if (button != 0) return@subscribe false
-                if (!slot.valid) {
+                if (slot == null) {
                     if (hasShiftDown()) {
-                        if (equippedSlots.any { it.skill.invalid }) {
-                            player.equip(
-                                skill,
-                                SkillSlot.fromIndex(player.equippedSkills.indexOfFirst { it.invalid } + 1)
-                            )
-                        }
+                        player.equip(skill)
                     } else {
-                        if (selectedSlot != null && selectedSlot!!.slot.valid) {
-                            player.equip(ModSkills.EMPTY, selectedSlot!!.slot)
+                        if (selectedSlot != null && selectedSlot!!.slot != null) {
+                            player.equip(Skill.EMPTY, selectedSlot!!.slot!!)
                             selectedSlot = null
                         } else {
                             selectedSlot = if (selectedSlot == null && !skill.invalid) this else null
                         }
                     }
                 } else if (selectedSlot != null && selectedSlot != this) {
+                    if (!slot.canEquip(selectedSlot!!.skill)) return@subscribe false
                     player.equip(selectedSlot!!.skill, slot)
-                    if (selectedSlot!!.slot.valid && !selectedSlot!!.skill.invalid) player.equip(
+                    if (selectedSlot!!.slot != null && !selectedSlot!!.skill.invalid) player.equip(
                         skill,
-                        selectedSlot!!.slot
+                        selectedSlot!!.slot!!
                     )
                     selectedSlot = null
                 } else if (!skill.invalid) {
                     if (hasShiftDown()) {
-                        player.equip(ModSkills.EMPTY, slot)
+                        player.equip(Skill.EMPTY, slot)
                     } else {
                         selectedSlot = if (selectedSlot != this) this else null
                     }

@@ -60,7 +60,6 @@ dependencies {
         exclude group: "xml-apis", module: "xml-apis"
         exclude group: "commons-io", module: "commons-io"
     }
-//    modApi "com.terraformersmc:modmenu:7.2.2"
 }
 
 processResources {

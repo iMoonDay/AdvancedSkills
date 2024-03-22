@@ -3,9 +3,9 @@ package com.imoonday.entity
 import com.imoonday.util.startCooling
 import com.imoonday.component.properties
 import com.imoonday.util.stopCooling
-import com.imoonday.init.ModComponents
+import com.imoonday.component.Components
 import com.imoonday.init.ModEntities
-import com.imoonday.init.ModSkills
+import com.imoonday.skill.Skills
 import com.imoonday.util.translateSkill
 import net.minecraft.block.LeavesBlock
 import net.minecraft.entity.EntityType
@@ -28,7 +28,7 @@ import kotlin.math.abs
 class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: World) : HorseEntity(entityType, world) {
 
     private val summonSkill
-        get() = ModSkills.EXCLUSIVE_MOUNT
+        get() = Skills.EXCLUSIVE_MOUNT
 
     constructor(world: World, owner: PlayerEntity) : this(ModEntities.SPECIAL_TAME_HORSE, world) {
         bondWithPlayer(owner)
@@ -138,7 +138,7 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
             owner?.let {
                 if (!it.properties.containsUuid("horseUuid")) {
                     it.properties.putUuid("horseUuid", uuid)
-                    ModComponents.PROPERTY.sync(it)
+                    Components.PROPERTY.sync(it)
                 } else if (it.properties.getUuid("horseUuid") != uuid) {
                     discard()
                     return

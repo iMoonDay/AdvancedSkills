@@ -1,7 +1,7 @@
 package com.imoonday.mixin;
 
 import com.imoonday.init.ModEffectsKt;
-import com.imoonday.init.ModSkills;
+import com.imoonday.skill.Skills;
 import com.imoonday.trigger.SkillTriggerHandler;
 import com.imoonday.util.PlayerUtilsKt;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
@@ -100,7 +100,7 @@ public abstract class LivingEntityMixin {
     @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
     public boolean advanced_skills$hasStatusEffect(boolean original, StatusEffect effect) {
         if (effect != StatusEffects.NIGHT_VISION) return original;
-        return (LivingEntity) (Object) this instanceof PlayerEntity player && PlayerUtilsKt.isUsing(player, ModSkills.NIGHT_VISION) || original;
+        return (LivingEntity) (Object) this instanceof PlayerEntity player && PlayerUtilsKt.isUsing(player, Skills.NIGHT_VISION) || original;
     }
 
     @Inject(method = "canWalkOnFluid", at = @At("HEAD"), cancellable = true)

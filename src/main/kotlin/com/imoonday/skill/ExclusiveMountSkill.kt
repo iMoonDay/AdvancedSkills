@@ -2,7 +2,7 @@ package com.imoonday.skill
 
 import com.imoonday.component.properties
 import com.imoonday.entity.SpecialTameHorseEntity
-import com.imoonday.init.ModComponents
+import com.imoonday.component.Components
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.translateSkill
@@ -37,7 +37,7 @@ class ExclusiveMountSkill : Skill(
                 (user.world as ServerWorld).getEntity(user.properties.getUuid("horseUuid"))?.discard()
             }
             user.properties.putUuid("horseUuid", newHorse.uuid)
-            ModComponents.PROPERTY.sync(user)
+            Components.PROPERTY.sync(user)
             newHorse.requestTeleport(user.x, user.y, user.z)
             user.world.spawnEntity(newHorse)
             newHorse.putPlayerOnBack(user)

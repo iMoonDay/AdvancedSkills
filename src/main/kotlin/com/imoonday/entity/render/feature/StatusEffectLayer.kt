@@ -1,6 +1,6 @@
 package com.imoonday.entity.render.feature
 
-import com.imoonday.init.ModSkills
+import com.imoonday.skill.Skills
 import com.imoonday.init.isConfined
 import com.imoonday.init.isDisarmed
 import com.imoonday.init.isSilenced
@@ -101,8 +101,8 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
 
     companion object {
 
-        val silenceModelId = ModelIdentifier(Registries.ITEM.getId(ModSkills.PRIMARY_SILENCE.item), "inventory")
-        val disarmModelId = ModelIdentifier(Registries.ITEM.getId(ModSkills.DISARM.item), "inventory")
+        val silenceModelId = ModelIdentifier(Registries.ITEM.getId(Skills.PRIMARY_SILENCE.item), "inventory")
+        val disarmModelId = ModelIdentifier(Registries.ITEM.getId(Skills.DISARM.item), "inventory")
         val confinementModelId = ModelIdentifier(Registries.ITEM.getId(Items.BARRIER), "inventory")
     }
 }

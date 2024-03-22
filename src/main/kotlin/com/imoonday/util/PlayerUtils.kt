@@ -1,27 +1,32 @@
 package com.imoonday.util
 
 import com.imoonday.api.SkillChangeEvents
+import com.imoonday.component.Components
 import com.imoonday.component.DataComponent
 import com.imoonday.component.properties
-import com.imoonday.init.ModComponents
-import com.imoonday.init.ModSkills
 import com.imoonday.network.EquipSkillC2SRequest
 import com.imoonday.network.LearnSkillS2CPacket
+import com.imoonday.network.UseSkillC2SRequest
 import com.imoonday.skill.Skill
-import com.imoonday.trigger.CooldownTrigger
-import com.imoonday.trigger.SkillTrigger
-import com.imoonday.trigger.SkillTriggerHandler
-import com.imoonday.trigger.UnequipTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.PlayerUtils.getNextLevelExp
 import com.imoonday.util.PlayerUtils.shouldLearnSkill
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.entity.projectile.ProjectileUtil
 import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.network.listener.PacketListener
+import net.minecraft.network.packet.Packet
+import net.minecraft.particle.ParticleEffect
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.sound.SoundCategory
+import net.minecraft.sound.SoundEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.util.Util
+import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.RaycastContext
@@ -49,62 +54,62 @@ object PlayerUtils {
 }
 
 private val PlayerEntity.data: DataComponent
-    get() = getComponent(ModComponents.DATA)
+    get() = getComponent(Components.DATA)
+val PlayerEntity.skillContainer: SkillContainer
+    get() = data.container
 val PlayerEntity.learnedSkills: Set<Skill>
-    get() = data.learned.keys.filterNot { it.invalid }.toSet()
+    get() = skillContainer.getAllSkills()
 
 fun PlayerEntity.syncData() {
-    if (!world.isClient) ModComponents.DATA.sync(this)
+    if (!world.isClient) Components.DATA.sync(this)
 }
+
+fun PlayerEntity.getSlot(index: Int): SkillSlot? = skillContainer.getSlot(index)
+
+fun PlayerEntity.getSlot(slot: SkillSlot): SkillSlot? = skillContainer.getSlot(slot.index)
 
 fun PlayerEntity.hasLearned(skill: Skill): Boolean = skill in learnedSkills
 
-fun PlayerEntity.getCooldown(skill: Skill): Int = data.learned[skill]?.cooldown ?: 0
+fun PlayerEntity.getCooldown(skill: Skill): Int = skillContainer.getData(skill)?.cooldown ?: 0
 fun PlayerEntity.isCooling(skill: Skill): Boolean = getCooldown(skill) > 0
 fun PlayerEntity.startCooling(skill: Skill, cooldown: Int? = null) {
     if (isCooling(skill)) return
-    modifySkills {
+    modifySkillData(skill) {
         var time = cooldown ?: skill.getCooldown(world)
         getTriggers<CooldownTrigger>().forEach { trigger -> time = trigger.getCooldown(time) }
-        it[skill]?.cooldown = if (isCreative) min(20, time) else time
+        it.cooldown = if (isCreative) min(20, time) else time
         true
     }
 }
 
 fun PlayerEntity.stopCooling(skill: Skill) {
     if (!isCooling(skill)) return
-    modifySkills {
-        it[skill]?.cooldown = 0
+    modifySkillData(skill) {
+        it.cooldown = 0
         true
     }
 }
 
 fun PlayerEntity.modifyCooldown(skill: Skill, operation: (Int) -> Int) {
-    modifySkills {
-        it[skill]?.cooldown = operation.invoke(getCooldown(skill))
+    modifySkillData(skill) {
+        it.cooldown = operation.invoke(getCooldown(skill))
         true
     }
 }
 
-fun PlayerEntity.modifySkills(operation: (MutableMap<Skill, SkillData>) -> Boolean): Boolean {
-    val modified = operation(data.learned)
-    syncData()
-    return modified
-}
+fun PlayerEntity.modifySkillData(skill: Skill, operation: (SkillData) -> Boolean): Boolean =
+    skillContainer.getData(skill)?.run {
+        val modified = operation(this)
+        syncData()
+        return modified
+    } ?: false
 
 fun PlayerEntity.learn(skill: Skill): Boolean =
-    modifySkills { map ->
-        if (!map.contains(skill)) {
-            map[skill] = SkillData()
-            val skills = data.equipped
-            skills.filterValues { it.invalid }.keys
-                .firstOrNull()
-                ?.let { skills[it] = skill }
-            (this as? ServerPlayerEntity)?.let { player ->
-                ServerPlayNetworking.send(
-                    player,
-                    LearnSkillS2CPacket(skill)
-                )
+    skillContainer.learn(skill) { result ->
+        if (result) {
+            skillContainer.getEmptySlot(skill)?.equip(skill)
+            (this as? ServerPlayerEntity)?.let {
+                ServerPlayNetworking.send(it, LearnSkillS2CPacket(skill))
             }
             sendMessage(translate("learnSkill", "message", skill.name.string).styled {
                 it.withHoverEvent(
@@ -114,25 +119,15 @@ fun PlayerEntity.learn(skill: Skill): Boolean =
                     )
                 )
             })
-            if (map.keys.toSet() == Skill.getValidSkills().toSet())
+            if (skillContainer.skillSize == Skill.getValidSkills().size)
                 sendMessage(translate("learnSkill", "all"))
-            true
-        } else false
+        }
+        syncData()
     }
 
 fun PlayerEntity.forget(skill: Skill): Boolean =
-    modifySkills { map ->
-        if (map.containsKey(skill)) {
-            val skills = data.equipped
-            skills.filterValues { it == skill }.forEach {
-                val slot = it.key
-                skills[slot] = ModSkills.EMPTY
-                (this as? ServerPlayerEntity)?.run {
-                    (skill as? UnequipTrigger)?.postUnequipped(this, slot)
-                }
-                stopUsing(skill)
-            }
-            map.remove(skill)
+    skillContainer.forget(skill, { result ->
+        if (result) {
             sendMessage(translate("forgetSkill", "message", skill.name.string).styled {
                 it.withHoverEvent(
                     HoverEvent(
@@ -141,120 +136,142 @@ fun PlayerEntity.forget(skill: Skill): Boolean =
                     )
                 )
             })
-            true
-        } else false
+        }
+        syncData()
+    }) { slot, result ->
+        if (result && this is ServerPlayerEntity && slot is UnequipTrigger) {
+            slot.postUnequipped(this, slot)
+            stopUsing(skill)
+        }
     }
 
-fun PlayerEntity.learnRandomly(predicate: (Skill) -> Boolean = { true }): Boolean =
+fun PlayerEntity.learnRandomly(filter: (Skill) -> Boolean = { true }): Boolean =
     Skill.getValidSkills()
         .filterNot { hasLearned(it) }
-        .filter(predicate)
+        .filter(filter)
         .takeUnless { it.isEmpty() }
         ?.let { learn(it.random()) } ?: false
 
 val PlayerEntity.equippedSkills: List<Skill>
-    get() = data.equipped.values.toList()
+    get() = skillContainer.getAllSlots().map { it.skill }
 
 fun PlayerEntity.hasEquipped(skill: Skill): Boolean = skill in equippedSkills
 
-fun PlayerEntity.equip(skill: Skill, slot: SkillSlot): Boolean {
+fun PlayerEntity.equip(skill: Skill): Boolean =
+    skillContainer.getEmptySlot(skill)?.let { equip(skill, it.index) } ?: false
+
+fun PlayerEntity.equip(skill: Skill, slot: SkillSlot): Boolean = equip(skill, slot.index)
+
+fun PlayerEntity.equip(skill: Skill, index: Int): Boolean {
     if (world.isClient) {
-        ClientPlayNetworking.send(EquipSkillC2SRequest(slot, skill))
-    } else {
+        ClientPlayNetworking.send(EquipSkillC2SRequest(index, skill))
+        return true
+    } else if (this is ServerPlayerEntity) {
+        if (skill.invalid && !skill.isEmpty()) return false
         if (!skill.invalid && !hasLearned(skill)) return false
-        val player = this as ServerPlayerEntity
-        val skills = data.equipped
-        if (skills[slot] == skill) {
-            syncData()
-            return false
-        }
-        val oldSkill = skills[slot]
+        val slot = skillContainer.getSlot(index) ?: return false
+        if (slot.skill == skill || !slot.canEquip(skill)) return false
+        val original = slot.skill
         var move = false
-        if (!skill.invalid) {
-            skills.forEach {
-                if (it.value == skill) {
-                    skills[it.key] = ModSkills.EMPTY
-                    move = true
-                }
-            }
-        }
+        if (!skill.invalid) skillContainer.getSlot(skill)?.let { it.unequip { move = true } }
         if (!move) {
             if (skill.invalid) {
-                if (!SkillChangeEvents.UNEQUIPPED.invoker().onUnequipped(player, slot, oldSkill)) {
+                if (!SkillChangeEvents.UNEQUIPPED.invoker().onUnequipped(this, slot, original)) {
                     syncData()
                     return false
                 }
-            } else if (!SkillChangeEvents.UNEQUIPPED.invoker()
-                    .onUnequipped(player, slot, oldSkill) || !SkillChangeEvents.EQUIPPED.invoker()
-                    .onEquipped(player, slot, skill)
+            } else if (!SkillChangeEvents.UNEQUIPPED.invoker().onUnequipped(this, slot, original)
+                || !SkillChangeEvents.EQUIPPED.invoker().onEquipped(this, slot, skill)
             ) {
                 syncData()
                 return false
             }
         }
-        skills[slot] = skill
+        slot.equip(skill) { syncData() }
         if (!move) {
             if (skill.invalid) {
-                SkillChangeEvents.POST_UNEQUIPPED.invoker().postUnequipped(player, slot, oldSkill)
+                SkillChangeEvents.POST_UNEQUIPPED.invoker().postUnequipped(this, slot, original)
             } else {
-                SkillChangeEvents.POST_EQUIPPED.invoker().postEquipped(player, slot, skill)
-                if (!oldSkill!!.invalid) SkillChangeEvents.POST_UNEQUIPPED.invoker()
-                    .postUnequipped(player, slot, oldSkill)
+                SkillChangeEvents.POST_EQUIPPED.invoker().postEquipped(this, slot, skill)
+                if (!original.invalid) SkillChangeEvents.POST_UNEQUIPPED.invoker()
+                    .postUnequipped(this, slot, original)
             }
         }
         syncData()
+        return true
     }
-    return true
+    return false
 }
 
-fun PlayerEntity.getSkill(slot: SkillSlot) = data.equipped[slot] ?: ModSkills.EMPTY
+fun PlayerEntity.getSkill(slot: Int) = skillContainer.getSlot(slot)?.skill ?: Skill.EMPTY
+
+fun PlayerEntity.getSkill(slot: SkillSlot) = skillContainer.getSlot(slot.index)?.skill ?: Skill.EMPTY
+
+fun ClientPlayerEntity.requestUse(
+    index: Int,
+    keyState: UseSkillC2SRequest.KeyState,
+) {
+    ClientPlayNetworking.send(
+        UseSkillC2SRequest(
+            index,
+            keyState,
+            NbtCompound().apply {
+                (getSkill(index) as? SendPlayerDataTrigger)
+                    ?.takeIf { it.getSendTime() == SendTime.USE }
+                    ?.write(this@requestUse, this)
+            }
+        )
+    )
+}
 
 var PlayerEntity.skillExp: Long
     get() {
         updateLevel()
-        return data.level.experience
+        return levelData.experience
     }
     set(value) {
-        data.level.experience = value
+        levelData.experience = value
         updateLevel()
         syncData()
     }
 var PlayerEntity.skillLevel: Int
     get() {
         updateCycle()
-        return data.level.level
+        return levelData.level
     }
     set(value) {
-        data.level.level = value
+        levelData.level = value
         updateCycle()
         syncData()
     }
+val PlayerEntity.levelData: SkillLevelData
+    get() = data.level
 
 private fun PlayerEntity.updateLevel() {
     updateCycle()
     var needed: Int
-    while (data.level.experience >= getNextLevelExp(data.level.level).also { needed = it }) {
-        data.level.experience -= needed
-        data.level.level++
+    while (levelData.experience >= getNextLevelExp(levelData.level).also { needed = it }) {
+        levelData.experience -= needed
+        levelData.level++
         updateCycle()
-        if (shouldLearnSkill(data.level.level)) learnRandomly()
+        if (shouldLearnSkill(levelData.level)) learnRandomly()
     }
 }
 
 private fun PlayerEntity.updateCycle() {
-    while (data.level.level > 100) {
-        data.level.level -= 101
-        data.level.cycle++
+    while (levelData.level > 100) {
+        levelData.level -= 101
+        levelData.cycle++
     }
 }
 
 val PlayerEntity.usingSkills: Set<Skill>
-    get() = data.learned.filterValues { it.using }.keys.toSet()
+    get() = skillContainer.getAllSkills { _, data -> data.using }
 
 fun PlayerEntity.startUsing(skill: Skill, data: NbtCompound? = null): Boolean {
     if (skill in usingSkills) return false
     if (skill.invalid) return false
-    this.data.learned[skill]?.apply {
+    getData(skill)?.apply {
         using = true
         usedTime = 0
         data?.let { this.data.copyFrom(it) }
@@ -265,7 +282,7 @@ fun PlayerEntity.startUsing(skill: Skill, data: NbtCompound? = null): Boolean {
 
 fun PlayerEntity.stopUsing(skill: Skill): Boolean {
     if (skill !in usingSkills) return false
-    this.data.learned[skill]?.apply {
+    getData(skill)?.apply {
         using = false
         data = NbtCompound()
         SkillTriggerHandler.postStop(this@stopUsing)
@@ -274,12 +291,11 @@ fun PlayerEntity.stopUsing(skill: Skill): Boolean {
     return true
 }
 
-fun PlayerEntity.toggleUsing(skill: Skill, data: NbtCompound? = null): Boolean {
-    return if (skill in usingSkills) {
+fun PlayerEntity.toggleUsing(skill: Skill, data: NbtCompound? = null): Boolean =
+    if (skill in usingSkills) {
         stopUsing(skill)
         false
     } else startUsing(skill, data)
-}
 
 fun PlayerEntity.isUsing(skill: Skill) = skill in usingSkills
 fun PlayerEntity.getUsedTime(skill: Skill): Int = getData(skill)?.usedTime ?: 0
@@ -296,7 +312,7 @@ fun PlayerEntity.resetUsedTime(skill: Skill) {
 
 fun PlayerEntity.getUsingData(skill: Skill): NbtCompound? = getData(skill)?.data
 
-fun PlayerEntity.getData(skill: Skill): SkillData? = data.learned[skill]
+fun PlayerEntity.getData(skill: Skill): SkillData? = skillContainer.getData(skill)
 
 var ServerPlayerEntity.lastDamagedTime: Long
     get() = properties.getLong("lastDamagedTime")
@@ -306,6 +322,7 @@ var ServerPlayerEntity.lastReflectedTime: Long
     set(value) = properties.putLong("lastReflectedTime", value)
 
 fun ServerPlayerEntity.onDamage() {
+    if (equippedSkills.none { it is ReflectionTrigger }) return
     lastDamagedTime = Util.getMeasuringTimeMs()
     val l = lastDamagedTime - lastReflectedTime
     if (l < 1000) {
@@ -349,9 +366,52 @@ fun PlayerEntity.calculateAngle(pos: Vec3d): Double {
     return adjustedAngle
 }
 
+fun PlayerEntity.raycastLivingEntity(distance: Double): EntityHitResult? {
+    val cameraPos = getCameraPosVec(0f)
+    return ProjectileUtil.raycast(
+        this,
+        cameraPos,
+        cameraPos.add(rotationVector.multiply(distance)),
+        boundingBox.stretch(rotationVector.multiply(distance)).expand(1.0),
+        { !it.isSpectator && it.isAlive && it.isLiving },
+        distance * distance
+    )
+}
+
 val PlayerEntity.skillInitialized: Boolean
     get() = try {
-        ModComponents.DATA.maybeGet(this).isPresent
+        Components.DATA.maybeGet(this).isPresent
     } catch (e: Exception) {
         false
     }
+
+fun PlayerEntity.updateScreen(data: NbtCompound = NbtCompound()) {
+    if (world.isClient) {
+        (client!!.currentScreen as? AutoSyncedScreen)?.update(data)
+    }
+}
+
+fun PlayerEntity.send(packet: Packet<out PacketListener>) {
+    if (this is ServerPlayerEntity) {
+        networkHandler.sendPacket(packet)
+    } else if (this is ClientPlayerEntity) {
+        networkHandler.sendPacket(packet)
+    }
+}
+
+fun ServerPlayerEntity.spawnParticles(
+    type: ParticleEffect,
+    pos: Vec3d,
+    count: Int,
+    deltaX: Double,
+    deltaY: Double,
+    deltaZ: Double,
+    speed: Double,
+) {
+    serverWorld.spawnParticles(type, pos.x, pos.y, pos.z, count, deltaX, deltaY, deltaZ, speed)
+}
+
+fun ServerPlayerEntity.playSound(sound: SoundEvent) = world.playSound(null, blockPos, sound, SoundCategory.PLAYERS)
+
+val clientPlayer: ClientPlayerEntity?
+    get() = client?.player

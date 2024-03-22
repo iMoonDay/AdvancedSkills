@@ -1,9 +1,9 @@
 package com.imoonday.screen
 
-import com.imoonday.init.ModSkills
 import com.imoonday.screen.component.ShiftScrollContainer
 import com.imoonday.skill.Skill
 import com.imoonday.util.*
+import com.imoonday.util.SkillSlot.Companion.indexTexture
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
 import io.wispforest.owo.ui.container.Containers
@@ -23,18 +23,29 @@ class SkillListScreen(
 ) : BaseOwoScreen<FlowLayout>(), AutoSyncedScreen {
 
     var selectedSkill: Skill? = null
-    var selectedSlot: SkillSlot? = null
+    var selectedSlot: Int? = null
     private val selectedSlotSkill: Skill?
-        get() = selectedSlot?.let { player.equippedSkills[it.ordinal - 1] }
+        get() = selectedSlot?.let { player.getSkill(it) }
     private val slotLines = mutableListOf<SlotLine>()
-    private var slotGrid: GridLayout = Containers.grid(Sizing.fill(50), Sizing.fill(100), 4, 1).apply {
-        player.equippedSkills.forEachIndexed { i, skill ->
-            val slotLine = SlotLine(SkillSlot.fromIndex(i + 1), skill)
-            child(slotLine, 0, i)
-            slotLines.add(slotLine)
+    private val container
+        get() = player.skillContainer
+    private var slotGrid: GridLayout =
+        Containers.grid(
+            Sizing.fill(50),
+            Sizing.fill(100),
+            (container.slotSize / 2 + if (container.slotSize % 2 == 0) 0 else 1).coerceAtLeast(1),
+            if (container.slotSize > 1) 2 else 1
+        ).apply {
+            alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
+            container.getAllSlots().forEach {
+                val slotLine = SlotLine(it.index)
+                val column = if ((it.index - 1) % 2 == 0) 0 else 1
+                val row = (it.index - 1) / 2
+                child(slotLine, row, column)
+                slotLines.add(slotLine)
+            }
+            padding(Insets.horizontal(5))
         }
-        padding(Insets.horizontal(5))
-    }
 
     override fun createAdapter(): OwoUIAdapter<FlowLayout> = OwoUIAdapter.create(this, Containers::verticalFlow)!!
 
@@ -71,7 +82,9 @@ class SkillListScreen(
                         surface(Surface.PANEL)
                     })
                 }, 0, 0)
-                child(slotGrid, 0, 1)
+                child(Containers.verticalScroll(Sizing.content(), Sizing.fill(100), slotGrid).apply {
+                    scrollbarThiccness(0)
+                }, 0, 1)
             })
             if (player.isCreative && player.hasPermissionLevel(4)) {
                 child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
@@ -101,10 +114,12 @@ class SkillListScreen(
     }
 
     fun updateScreen() {
-        player.equippedSkills.forEachIndexed { i, skill ->
-            slotLines[i].updateSkill(skill)
+        player.equippedSkills.forEachIndexed { i, _ ->
+            slotLines[i].updateSkill()
         }
     }
+
+    override fun shouldPause(): Boolean = false
 
     inner class SkillLine(
         private val skill: Skill,
@@ -112,23 +127,26 @@ class SkillListScreen(
 
         private val content: FlowLayout = Containers.horizontalFlow(Sizing.content(), Sizing.content())
         private val equipButton = Components.texture(com.imoonday.util.id("equip.png"), 0, 0, 16, 16, 16, 16).apply {
-            mouseDown().subscribe { x, y, button ->
+            mouseDown().subscribe { _, _, button ->
                 if (button == 0) {
-                    val slot = getValidSlot()
-                    return@subscribe if (slot != SkillSlot.INVALID) {
-                        player.equip(skill, slot)
+                    return@subscribe getValidSlot()?.run {
+                        player.equip(skill, this)
                         selectedSlot = null
                         true
-                    } else false
+                    } ?: false
                 }
                 false
             }
         }
 
-        private fun getValidSlot(): SkillSlot {
-            val skills = player.equippedSkills
-            return if (selectedSlotSkill != null && selectedSlotSkill != skill || skills.any { it.invalid } && skills.none { it == skill }) selectedSlot
-                ?: SkillSlot.fromIndex(skills.indexOfFirst { it.invalid } + 1) else SkillSlot.INVALID
+        private fun getValidSlot(): Int? {
+            val emptyIndex = container.getEmptySlot(skill)?.index
+
+            return when {
+                selectedSlotSkill != null && player.getSlot(selectedSlot!!)?.canEquip(skill) == true -> selectedSlot
+                emptyIndex != null && container.getAllSlots { it.skill == skill }.none() -> emptyIndex
+                else -> null
+            }
         }
 
         private var lastClickTime: Long = 0
@@ -190,7 +208,7 @@ class SkillListScreen(
         }
 
         override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) {
-            if (hovered && getValidSlot() != SkillSlot.INVALID) {
+            if (hovered && getValidSlot() != null) {
                 equipButton.sizing(Sizing.content())
             } else {
                 equipButton.sizing(Sizing.fill(0))
@@ -209,33 +227,55 @@ class SkillListScreen(
     }
 
     inner class SlotLine(
-        private val slot: SkillSlot,
-        var skill: Skill,
-    ) : FlowLayout(Sizing.fill(100), Sizing.fill(24), Algorithm.HORIZONTAL) {
+        private val slot: Int,
+    ) : FlowLayout(
+        Sizing.fill(47),
+        Sizing.fill(17),
+        Algorithm.HORIZONTAL
+    ) {
 
+        var skill: Skill
+            get() = player.getSkill(slot)
+            set(value) {
+                player.equip(value, slot)
+            }
         private val content: FlowLayout = Containers.horizontalFlow(Sizing.content(), Sizing.content())
         private var lastClickTime: Long = 0
 
         init {
             gap(5)
-            surface(Surface.TOOLTIP)
+            surface(Surface.TOOLTIP.and { context, component ->
+                context.drawTexture(
+                    indexTexture,
+                    component.x() + component.width() - 13,
+                    component.y() + 4,
+                    player.getSlot(slot)?.u ?: 0,
+                    player.getSlot(slot)?.v ?: 0,
+                    9,
+                    9
+                )
+            })
             content.gap(5)
-                .alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-                .padding(Insets.of(3, 2, 8, 0))
+                .alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
 
-            verticalAlignment(VerticalAlignment.CENTER)
+            padding(Insets.left(8))
+            alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
 
             updateSkill()
 
             mouseDown().subscribe { _, _, button ->
                 onMouseDown(button)
             }
+
+            player.getSlot(slot)?.let {
+                tooltip(it.tooltip)
+            }
         }
 
         private fun onMouseDown(button: Int): Boolean {
             if (button != 0) return false
             if (!skill.invalid && Util.getMeasuringTimeMs() - lastClickTime < 250L) {
-                player.equip(ModSkills.EMPTY, slot)
+                player.equip(Skill.EMPTY, slot)
             }
             lastClickTime = Util.getMeasuringTimeMs()
             selectedSlot = if (selectedSlot != slot) slot else null
@@ -243,32 +283,14 @@ class SkillListScreen(
             return true
         }
 
-        fun updateSkill(skill: Skill? = null) {
-            if (this.skill == skill) return
-            this.skill = skill ?: this.skill
+        fun updateSkill() {
             clearChildren()
             if (!this.skill.invalid) {
                 content.clearChildren()
                 child(content)
 
                 content.child(Components.texture(this.skill.icon, 0, 0, 16, 16, 16, 16))
-                content.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                    gap(3)
-                    child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                        gap(5)
-                        child(Components.label(this@SlotLine.skill.formattedName))
-                        child(Components.label(Text.literal("(${this@SlotLine.skill.getCooldown(client?.world) / 20.0}s)")))
-                    })
-                    child(
-                        ShiftScrollContainer.horizontalScroll(
-                            Sizing.fill(85),
-                            Sizing.content(),
-                            Components.label(this@SlotLine.skill.description)
-                        ).apply {
-                            scrollbarThiccness(0)
-                        }
-                    )
-                })
+                content.child(Components.label(this@SlotLine.skill.formattedName))
             }
         }
 
@@ -284,5 +306,8 @@ class SkillListScreen(
                 )
             }
         }
+
+        override fun shouldDrawTooltip(mouseX: Double, mouseY: Double): Boolean =
+            this.tooltip() != null && mouseX >= x + width - 13 && mouseX <= x + width - 4 && mouseY >= y + 4 && mouseY <= y + 13
     }
 }

@@ -1,8 +1,7 @@
 package com.imoonday.network
 
-import com.imoonday.util.equip
 import com.imoonday.skill.Skill
-import com.imoonday.util.SkillSlot
+import com.imoonday.util.equip
 import com.imoonday.util.id
 import com.imoonday.util.playSound
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
@@ -12,7 +11,7 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.sound.SoundEvents
 
 class EquipSkillC2SRequest(
-    val slot: SkillSlot,
+    val slot: Int,
     val skill: Skill,
 ) : FabricPacket {
 
@@ -20,7 +19,7 @@ class EquipSkillC2SRequest(
 
         val id = id("equip_skill_c2s")
         val pType = PacketType.create(id) {
-            EquipSkillC2SRequest(SkillSlot.fromIndex(it.readInt()), Skill.fromId(it.readIdentifier()))
+            EquipSkillC2SRequest(it.readInt(), Skill.fromId(it.readIdentifier()))
         }!!
 
         fun register() {
@@ -34,7 +33,7 @@ class EquipSkillC2SRequest(
     }
 
     override fun write(buf: PacketByteBuf) {
-        buf.writeInt(slot.ordinal)
+        buf.writeInt(slot)
         buf.writeIdentifier(skill.id)
     }
 

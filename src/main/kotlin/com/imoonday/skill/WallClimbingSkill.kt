@@ -4,6 +4,8 @@ import com.imoonday.component.properties
 import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
+import com.imoonday.util.getData
+import com.imoonday.util.syncData
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
@@ -29,17 +31,17 @@ class WallClimbingSkill : PassiveSkill(
         super<AutoStopTrigger>.postUnequipped(player, slot)
     }
 
-    override fun shouldStart(player: ServerPlayerEntity): Boolean {
-        return player.isReady() && player.shouldClimb()
-    }
+    override fun shouldStart(player: ServerPlayerEntity): Boolean = player.isReady() && player.shouldClimb()
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (player.isUsing() && !player.horizontalCollision && !player.properties.getBoolean(HORIZONTAL_COLLISION_KEY)) {
-            player.modifyUsedTime { it - 2 }
+            player.getData(this)?.usingSpeed = -1
             if (player.getUsedTime() <= 0) {
+                player.getData(this)?.usingSpeed = 1
                 player.stopUsing()
             }
+            player.syncData()
         }
     }
 

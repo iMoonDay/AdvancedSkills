@@ -1,9 +1,9 @@
 package com.imoonday.network
 
-import com.imoonday.util.getSkill
 import com.imoonday.trigger.SendPlayerDataTrigger
 import com.imoonday.trigger.SendTime
 import com.imoonday.util.SkillSlot
+import com.imoonday.util.getSkill
 import com.imoonday.util.id
 import net.fabricmc.fabric.api.networking.v1.FabricPacket
 import net.fabricmc.fabric.api.networking.v1.PacketType
@@ -12,7 +12,7 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.PacketByteBuf
 
 class UseSkillC2SRequest(
-    val slot: SkillSlot,
+    val slot: Int,
     val keyState: KeyState,
     val data: NbtCompound,
 ) : FabricPacket {
@@ -22,7 +22,7 @@ class UseSkillC2SRequest(
         val id = id("use_skill_c2s")
         val pType = PacketType.create(id) {
             UseSkillC2SRequest(
-                SkillSlot.fromIndex(it.readInt()),
+                it.readInt(),
                 it.readEnumConstant(KeyState::class.java),
                 it.readNbt()!!
             )
@@ -33,7 +33,7 @@ class UseSkillC2SRequest(
                 val slot = packet.slot
                 val keyState = packet.keyState
                 val data = packet.data
-                if (slot.valid && !player.isSpectator) {
+                if (SkillSlot.isValidIndex(player, slot) && !player.isSpectator) {
                     val skill = player.getSkill(slot)
                     (skill as? SendPlayerDataTrigger)
                         ?.takeIf { it.getSendTime() == SendTime.USE }
@@ -45,7 +45,7 @@ class UseSkillC2SRequest(
     }
 
     override fun write(buf: PacketByteBuf) {
-        buf.writeInt(slot.ordinal)
+        buf.writeInt(slot)
         buf.writeEnumConstant(keyState)
         buf.writeNbt(data)
     }

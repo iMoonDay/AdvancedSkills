@@ -41,9 +41,7 @@ class ChargedDashSkill : LongPressSkill(
             send(EntityVelocityUpdateS2CPacket(this))
             spawnParticles(
                 ParticleTypes.CLOUD,
-                x,
-                y,
-                z,
+                pos,
                 10,
                 0.5,
                 0.0,

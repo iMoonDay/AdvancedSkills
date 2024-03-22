@@ -3,7 +3,6 @@ package com.imoonday.skill
 import com.imoonday.LOGGER
 import com.imoonday.config.Config
 import com.imoonday.init.ModGameRules
-import com.imoonday.init.ModSkills.EMPTY
 import com.imoonday.init.isSilenced
 import com.imoonday.item.SkillItem
 import com.imoonday.network.UseSkillC2SRequest
@@ -43,7 +42,11 @@ abstract class Skill(
     val invalid = invalid
         get() = Config.instance.skillBlackList[id.namespace]?.contains(id.path) == true || field
     val rarity = rarity
-        get() = Config.instance.rarityModifier[id.namespace]?.get(id.path) ?: field
+        get() = Config.instance.skillModifier[id.namespace]
+            ?.get(id.path)
+            ?.get("rarity")
+            ?.let { Rarity.parse(it) }
+            ?: field
     val formattedName: Text
         get() = name.copy().formatted(rarity.formatting)
     val item: SkillItem?
@@ -69,8 +72,14 @@ abstract class Skill(
         false
     )
 
+    fun isEmpty(): Boolean = this == EMPTY
+
     fun getCooldown(world: World?): Int =
-        ((Config.instance.cooldownModifier[id.namespace]?.get(id.path) ?: defaultCooldown) *
+        ((Config.instance.skillModifier[id.namespace]
+            ?.get(id.path)
+            ?.get("cooldown")
+            ?.toIntOrNull()
+            ?: defaultCooldown) *
             (world?.gameRules?.get(ModGameRules.COOLDOWN_MULTIPLIER)?.get() ?: 1.0)).toInt()
 
     fun createUuid(content: String): UUID = UUID.nameUUIDFromBytes("$id-$content".toByteArray())
@@ -222,15 +231,33 @@ abstract class Skill(
 
         val displayName: Text
             get() = translate("skillRarity", id)
+
+        companion object {
+
+            fun fromLevel(level: Int): Rarity? = entries.find { it.level == level }
+
+            fun fromId(id: String): Rarity? = entries.find { it.id == id }
+
+            fun parse(string: String): Rarity? = try {
+                valueOf(string)
+            } catch (e: Exception) {
+                fromId(string) ?: string.toIntOrNull()?.let { fromLevel(it) }
+            }
+        }
     }
 
     companion object {
 
         private val skills = mutableSetOf<Skill>()
+
+        @JvmField
+        val EMPTY = EmptySkill().register()
         fun getSkills() = skills.toList()
         fun getValidSkills() = skills.filterNot { it.invalid }
         fun fromId(id: Identifier?) = skills.find { it.id == id } ?: EMPTY
+        fun fromId(id: String?) = skills.find { it.id == Identifier.tryParse(id) } ?: EMPTY
         fun fromIdNullable(id: Identifier?) = skills.find { it.id == id }
+        fun fromIdNullable(id: String?) = skills.find { it.id == Identifier.tryParse(id) }
         inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> =
             getSkills().filterIsInstance<T>().filter(predicate)
     }

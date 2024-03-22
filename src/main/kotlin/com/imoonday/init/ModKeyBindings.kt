@@ -4,59 +4,64 @@ import com.imoonday.network.UseSkillC2SRequest
 import com.imoonday.screen.SkillGalleryScreen
 import com.imoonday.screen.SkillListScreen
 import com.imoonday.screen.SkillSlotScreen
-import com.imoonday.trigger.SendPlayerDataTrigger
-import com.imoonday.trigger.SendTime
-import com.imoonday.util.SkillSlot
-import com.imoonday.util.getSkill
+import com.imoonday.screen.SkillWheelScreen
+import com.imoonday.skill.Skills
+import com.imoonday.util.SkillContainer.Companion.MAX_SLOT_SIZE
+import com.imoonday.util.requestUse
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.KeyBinding
-import net.minecraft.nbt.NbtCompound
 import org.lwjgl.glfw.GLFW
 
 object ModKeyBindings {
 
     @JvmField
-    val OPEN_LIST_SCREEN = register("openListScreen", GLFW.GLFW_KEY_K) { client ->
+    val OPEN_LIST_SCREEN = register("openListScreen", GLFW.GLFW_KEY_K, { client, _ ->
         client.setScreen(SkillListScreen(client.player!!))
-    }
+    })
 
     @JvmField
-    val OPEN_GALLERY_SCREEN = register("openGalleryScreen", GLFW.GLFW_KEY_G) {
-        it.setScreen(SkillGalleryScreen().apply {
-            selectedSkill = ModSkills.FIREBALL
+    val OPEN_GALLERY_SCREEN = register("openGalleryScreen", GLFW.GLFW_KEY_G, { client, _ ->
+        client.setScreen(SkillGalleryScreen().apply {
+            selectedSkill = Skills.FIREBALL
         })
-    }
+    })
 
     @JvmField
-    val OPEN_SLOT_SCREEN = register("openSlotScreen", GLFW.GLFW_KEY_N) {
-        it.setScreen(SkillSlotScreen())
+    val OPEN_SLOT_SCREEN = register("openSlotScreen", GLFW.GLFW_KEY_N, { client, _ ->
+        client.setScreen(SkillSlotScreen())
+    })
+
+    @JvmField
+    val QUICK_CAST = register("quickCast", GLFW.GLFW_KEY_R, { client, key ->
+        if (pressStates[key] != true) {
+            pressStates[key] = true
+            client.setScreen(SkillWheelScreen())
+        }
+    }) { client, key ->
+        if (pressStates[key] == true && client.currentScreen == null) {
+            pressStates.remove(key)
+        }
     }
 
     fun init() {
-        for (i in 1..4) registerSkill(GLFW.GLFW_KEY_KP_0 + i) { client, keyState ->
+        for (index in 1..MAX_SLOT_SIZE) registerSkill(if (index <= 6) (GLFW.GLFW_KEY_KP_0 + index) else GLFW.GLFW_KEY_UNKNOWN) { client, keyState ->
             if (client.player?.isSpectator == false) {
-                val slot = SkillSlot.fromIndex(i)
-                ClientPlayNetworking.send(
-                    UseSkillC2SRequest(
-                        slot,
-                        keyState,
-                        NbtCompound().apply {
-                            (client.player!!.getSkill(slot) as? SendPlayerDataTrigger)
-                                ?.takeIf { it.getSendTime() == SendTime.USE }
-                                ?.write(client.player!!, this)
-                        }
-                    )
-                )
+                client.player?.requestUse(index, keyState)
             }
         }
     }
 
-    val pressStates = mutableMapOf<KeyBinding, Boolean>()
+    private val pressStates = mutableMapOf<KeyBinding, Boolean>()
+    private var usingQuickCast = false
 
-    private fun register(name: String, code: Int, callbacks: (MinecraftClient) -> Unit): KeyBinding {
+    private fun register(
+        name: String,
+        code: Int,
+        callback: (MinecraftClient, KeyBinding) -> Unit,
+        releaseCallback: (MinecraftClient, KeyBinding) -> Unit = { _, _ -> },
+    ): KeyBinding {
         val key = KeyBindingHelper.registerKeyBinding(
             KeyBinding(
                 "advancedSkills.key.$name",
@@ -65,7 +70,11 @@ object ModKeyBindings {
             )
         )
         ClientTickEvents.END_CLIENT_TICK.register {
-            if (key.wasPressed()) callbacks.invoke(it)
+            if (key.wasPressed()) {
+                callback.invoke(it, key)
+            } else if (!key.isPressed) {
+                releaseCallback.invoke(it, key)
+            }
         }
         return key
     }

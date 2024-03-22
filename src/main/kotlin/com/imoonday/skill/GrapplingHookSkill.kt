@@ -63,16 +63,23 @@ class GrapplingHookSkill : LongPressSkill(
                 NBTUtils.readVec3d(it)?.run {
                     val pos = player.pos
                     val distance = distanceTo(pos)
-                    if (player.steppingPos == toBlockPos() || player.calculateAngle(this) > PI / 4.5) {
+                    if (player.blockPos.down() == toBlockPos()
+                        || player.calculateAngle(this) > PI / 4.5
+                    ) {
                         if (!player.world.isClient) {
                             player.stopUsing()
                             player.startCooling()
                         }
                         return@let
                     }
-                    player.velocityDirty = true
-                    val newVelocity = add(0.0, player.height / 2.0, 0.0).subtract(pos).normalize()
+                    val rotation = player.rotationVector
+                    val newVelocity = add(
+                        rotation.x,
+                        player.height.toDouble() / 2.0 + rotation.y,
+                        rotation.z
+                    ).subtract(pos).normalize()
                         .multiply((distance / maxDistance) + 1)
+                    player.velocityDirty = true
                     player.addVelocity((newVelocity - player.velocity).multiply(0.5))
                 }
             }
@@ -92,7 +99,7 @@ class GrapplingHookSkill : LongPressSkill(
         headYaw: Float,
         headPitch: Float,
         renderer: FeatureRendererContext<T, M>,
-        context: EntityRendererFactory.Context,
+        context: EntityRendererFactory.Context
     ) = renderHook(player, matrices, tickDelta, provider)
 
     private fun renderHook(
@@ -153,8 +160,7 @@ class GrapplingHookSkill : LongPressSkill(
                 leashThickness,
                 offsetX,
                 offsetZ,
-                leashSegment,
-                false
+                leashSegment
             )
             ++leashSegment
         }
@@ -175,8 +181,7 @@ class GrapplingHookSkill : LongPressSkill(
                 0.0f,
                 offsetX,
                 offsetZ,
-                leashSegment,
-                true
+                leashSegment
             )
             --leashSegment
         }
@@ -200,13 +205,11 @@ class GrapplingHookSkill : LongPressSkill(
         k: Float,
         l: Float,
         pieceIndex: Int,
-        isLeashKnot: Boolean,
     ) {
         val m = pieceIndex.toFloat() / 24.0f
         val n = MathHelper.lerp(m, leashedEntityBlockLight.toFloat(), holdingEntityBlockLight.toFloat()).toInt()
         val o = MathHelper.lerp(m, leashedEntitySkyLight.toFloat(), holdingEntitySkyLight.toFloat()).toInt()
         val p = LightmapTextureManager.pack(n, o)
-//        val q = if (pieceIndex % 2 == (if (isLeashKnot) 1 else 0)) 0.7f else 1.0f
         val r = 0.75f * 0.7f
         val s = 0.75f * 0.7f
         val t = 0.75f * 0.7f
@@ -218,7 +221,7 @@ class GrapplingHookSkill : LongPressSkill(
     }
 
     override fun renderAfterEntities(context: WorldRenderContext) {
-        super<WorldRendererTrigger>.renderAfterEntities(context)
+        super.renderAfterEntities(context)
         if (context.camera().isThirdPerson || context.camera().focusedEntity != context.gameRenderer().client.player) return
         context.gameRenderer().client.player?.let {
             context.consumers()?.let { provider ->

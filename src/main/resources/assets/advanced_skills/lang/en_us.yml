@@ -4,10 +4,17 @@ advancedSkills:
     openGalleryScreen: View the Skill Atlas
     openListScreen: View the list of skills
     openSlotScreen: Adjust the position of the skill bar
+    quickCast: Quick Cast
     useSkill1: Use Skill 1
     useSkill2: Use Skill 2
     useSkill3: Use Skill 3
     useSkill4: Use Skill 4
+    useSkill5: Use Skill 5
+    useSkill6: Use Skill 6
+    useSkill7: Use Skill 7
+    useSkill8: Use Skill 8
+    useSkill9: Use Skill 9
+    useSkill10: Use Skill 10
   useSkill:
     cooling: '%s is cooling: %s'
     failed: Use %s failed
@@ -31,6 +38,7 @@ advancedSkills:
   unequipSkill:
     success: '%s has removed %s from slot %d'
     failed: '%s has no equipped skill on slot %d'
+    banned: '%s was banned from server'
   resetCooldown: '%s reset all skills cooldown'
   skillExp:
     give:
@@ -279,6 +287,12 @@ advancedSkills:
     thunder_fury:
       name: Thunder Fury
       description: Summon a lightning bolt
+    counterblast:
+      name: Counterblast
+      description: After being attacked a certain number of times, repel surrounding creatures
+    time_rewind:
+      name: Time Rewind
+      description: Backtracking coordinates
   skillType:
     attack: Attack
     defense: Defense
@@ -320,8 +334,13 @@ advancedSkills:
         inventory: Inventory
     slot:
       title: Left drag to move, right click to reset
+      simplify: Simplify the skill display
     inventory:
       title: 'Skill Inventory %d/%d'
+  skillSlot:
+    generic: 'Generic Skill Slot %d'
+    active: 'Active Skill Slot %d'
+    passive: 'Passive Skill Slot %d'
 item:
   advanced_skills:
     skill_fruit: Skill Fruit

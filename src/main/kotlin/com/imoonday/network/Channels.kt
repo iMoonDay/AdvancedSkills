@@ -1,8 +1,6 @@
-package com.imoonday.init
+package com.imoonday.network
 
-import com.imoonday.network.*
-
-object ModChannels {
+object Channels {
 
     fun register() {
         UseSkillC2SRequest.register()

@@ -30,7 +30,7 @@
     ],
     "cardinal-components": [
       {
-        "value": "com.imoonday.init.ModComponents",
+        "value": "com.imoonday.component.Components",
         "adapter": "kotlin"
       }
     ]

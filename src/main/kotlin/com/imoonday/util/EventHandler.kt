@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRe
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback
 import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents
@@ -78,8 +79,8 @@ object EventHandler {
             LootTables.END_CITY_TREASURE_CHEST
         )
         val pool = LootPool.builder()
-            .with(ItemEntry.builder(ModItems.COMMON_SKILL_FRUIT).weight(128))
-            .with(ItemEntry.builder(ModItems.UNCOMMON_SKILL_FRUIT).weight(64))
+            .with(ItemEntry.builder(ModItems.COMMON_SKILL_FRUIT).weight(256))
+            .with(ItemEntry.builder(ModItems.UNCOMMON_SKILL_FRUIT).weight(128))
             .with(ItemEntry.builder(ModItems.RARE_SKILL_FRUIT).weight(32))
             .with(ItemEntry.builder(ModItems.SUPERB_SKILL_FRUIT).weight(16))
             .with(ItemEntry.builder(ModItems.EPIC_SKILL_FRUIT).weight(8))
@@ -94,6 +95,9 @@ object EventHandler {
         }
         ServerPlayConnectionEvents.JOIN.register { _, sender, _ ->
             sender.sendPacket(SyncConfigS2CPacket(Config.instance.toTag(NbtCompound())))
+        }
+        ServerLifecycleEvents.SERVER_STARTED.register {
+            Config.initWatchService(it)
         }
     }
 

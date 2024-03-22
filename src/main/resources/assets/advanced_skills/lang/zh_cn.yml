@@ -4,10 +4,17 @@ advancedSkills:
     openGalleryScreen: 查看技能图鉴
     openListScreen: 查看技能列表
     openSlotScreen: 调整技能栏位置
+    quickCast: 快捷施法
     useSkill1: 使用技能 1
     useSkill2: 使用技能 2
     useSkill3: 使用技能 3
     useSkill4: 使用技能 4
+    useSkill5: 使用技能 5
+    useSkill6: 使用技能 6
+    useSkill7: 使用技能 7
+    useSkill8: 使用技能 8
+    useSkill9: 使用技能 9
+    useSkill10: 使用技能 10
   useSkill:
     cooling: '%s 正在冷却：%s'
     failed: 使用 %s 失败
@@ -32,6 +39,7 @@ advancedSkills:
   unequipSkill:
     success: '%s 已将 %s 从插槽 %d 卸下'
     failed: '%s 未装备技能在插槽 %d 上'
+    banned: '%s 被服务器禁用'
   resetCooldown: '%s 重置了所有技能的冷却时间'
   skillExp:
     give:
@@ -280,6 +288,12 @@ advancedSkills:
     thunder_fury:
       name: 雷霆之怒
       description: 召唤一道闪电
+    counterblast:
+      name: 蓄势爆发
+      description: 被攻击一定次数后，击退周围生物
+    time_rewind:
+      name: 时间倒流
+      description: 回溯坐标
   skillType:
     attack: 攻击
     defense: 防御
@@ -321,8 +335,13 @@ advancedSkills:
         inventory: 背包
     slot:
       title: 左键拖动移动，右键重置
+      simplify: 简化技能显示
     inventory:
       title: '技能背包 %d/%d'
+  skillSlot:
+    generic: '通用技能栏 %d'
+    active: '主动技能栏 %d'
+    passive: '被动技能栏 %d'
 item:
   advanced_skills:
     skill_fruit: 技能果实

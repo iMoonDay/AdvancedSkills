@@ -6,6 +6,7 @@ data class SkillData(
     var cooldown: Int = 0,
     var using: Boolean = false,
     var usedTime: Int = 0,
+    var usingSpeed: Int = 1,
     var data: NbtCompound = NbtCompound(),
 ) {
 
@@ -13,6 +14,7 @@ data class SkillData(
         putInt("cooldown", cooldown)
         putBoolean("using", using)
         putInt("usedTime", usedTime)
+        putInt("usingSpeed", usingSpeed)
         put("data", data)
     }
 
@@ -20,6 +22,7 @@ data class SkillData(
         this.cooldown = data.cooldown
         this.using = data.using
         this.usedTime = data.usedTime
+        this.usingSpeed = data.usingSpeed
         this.data = data.data.copy()
     }
 
@@ -28,7 +31,7 @@ data class SkillData(
             cooldown--
         }
         if (using) {
-            usedTime++
+            usedTime += usingSpeed
         } else if (usedTime != 0) {
             usedTime = 0
         }
@@ -40,6 +43,7 @@ data class SkillData(
             nbt.getInt("cooldown"),
             nbt.getBoolean("using"),
             nbt.getInt("usedTime"),
+            if (nbt.contains("usingSpeed")) nbt.getInt("usingSpeed") else 1,
             nbt.getCompound("data")
         )
     }

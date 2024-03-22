@@ -32,6 +32,10 @@ interface Crosshair {
     val height: Int
     val textureWidth: Int
     val textureHeight: Int
+
+    /**
+     * The one with the largest absolute value takes precedence, regardless of positive or negative, and negative numbers take precedence.
+     * */
     val priority: Int
 
     fun draw(context: DrawContext) {

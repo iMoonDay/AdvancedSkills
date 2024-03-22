@@ -1,7 +1,9 @@
 package com.imoonday.screen
 
-import com.imoonday.config.UIConfigModel
+import com.imoonday.config.UIConfig
 import com.imoonday.render.SkillSlotRenderer
+import com.imoonday.util.clientPlayer
+import com.imoonday.util.skillContainer
 import com.imoonday.util.translate
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
@@ -28,22 +30,41 @@ class SkillSlotScreen : BaseOwoScreen<FlowLayout>() {
             )
         )
 
-        if (!SkillSlotRenderer.progressStrings.filterNotNull().all { it.fixed }) {
+        if (!UIConfig.instance.simplify && !SkillSlotRenderer.progressStrings.values.all { it.fixed }) {
             rootComponent.child(Components.slimSlider(SlimSliderComponent.Axis.HORIZONTAL).apply {
                 horizontalSizing(Sizing.fill(25))
                 min(0.25)
                 max(5.0)
-                value(UIConfigModel.instance.nameScrollRate)
+                value(UIConfig.instance.nameScrollRate)
                 onChanged().subscribe {
-                    UIConfigModel.instance.nameScrollRate = it
+                    UIConfig.instance.nameScrollRate = it
                 }
             })
         }
 
-        rootComponent.mouseDrag().subscribe { mouseX, mouseY, deltaX, deltaY, button ->
+        rootComponent.child(Components.smallCheckbox(translate("screen", "slot.simplify")).apply {
+            checked(UIConfig.instance.simplify)
+            onChanged().subscribe {
+                UIConfig.instance.uiOffsetX = 0
+                UIConfig.instance.uiOffsetY = 0
+                UIConfig.instance.simplify = it
+            }
+            positioning(Positioning.relative(1, 1))
+        })
+
+        rootComponent.mouseDrag().subscribe { mouseX, mouseY, _, _, button ->
             return@subscribe if (button == 0) {
-                UIConfigModel.instance.uiOffsetX = client!!.window.scaledWidth - mouseX.toInt() - 32
-                UIConfigModel.instance.uiOffsetY = mouseY.toInt() - client!!.window.scaledHeight / 2
+                if (UIConfig.instance.simplify) {
+                    val slotSize = (clientPlayer?.skillContainer?.slotSize ?: 0)
+                    val maxSlotSize = if (slotSize <= 5) slotSize else slotSize / 2 + if (slotSize % 2 == 0) 0 else 1
+                    UIConfig.instance.uiOffsetX =
+                        client!!.window.scaledWidth - mouseX.toInt() - (maxSlotSize / 2.0 * 18).toInt()
+                    UIConfig.instance.uiOffsetY =
+                        mouseY.toInt() - client!!.window.scaledHeight + if (slotSize > 5) 20 else 12
+                } else {
+                    UIConfig.instance.uiOffsetX = client!!.window.scaledWidth - mouseX.toInt() - 32
+                    UIConfig.instance.uiOffsetY = mouseY.toInt() - client!!.window.scaledHeight / 2
+                }
                 true
             } else {
                 false
@@ -52,8 +73,8 @@ class SkillSlotScreen : BaseOwoScreen<FlowLayout>() {
 
         rootComponent.mouseDown().subscribe { mouseX, mouseY, button ->
             return@subscribe if (button == 1) {
-                UIConfigModel.instance.uiOffsetX = 0
-                UIConfigModel.instance.uiOffsetY = 0
+                UIConfig.instance.uiOffsetX = 0
+                UIConfig.instance.uiOffsetY = 0
                 true
             } else {
                 false
@@ -72,19 +93,19 @@ class SkillSlotScreen : BaseOwoScreen<FlowLayout>() {
         val amount = if (hasShiftDown()) 10 else 1
         when (keyCode) {
             GLFW.GLFW_KEY_LEFT -> {
-                UIConfigModel.instance.uiOffsetX += amount
+                UIConfig.instance.uiOffsetX += amount
             }
 
             GLFW.GLFW_KEY_RIGHT -> {
-                UIConfigModel.instance.uiOffsetX -= amount
+                UIConfig.instance.uiOffsetX -= amount
             }
 
             GLFW.GLFW_KEY_UP -> {
-                UIConfigModel.instance.uiOffsetY -= amount
+                UIConfig.instance.uiOffsetY -= amount
             }
 
             GLFW.GLFW_KEY_DOWN -> {
-                UIConfigModel.instance.uiOffsetY += amount
+                UIConfig.instance.uiOffsetY += amount
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers)

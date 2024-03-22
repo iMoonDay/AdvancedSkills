@@ -1,7 +1,6 @@
 package com.imoonday.render
 
-import com.imoonday.config.UIConfigModel
-import com.imoonday.init.ModSkills
+import com.imoonday.config.UIConfig
 import com.imoonday.init.isSilenced
 import com.imoonday.skill.LongPressSkill
 import com.imoonday.skill.Skill
@@ -9,6 +8,7 @@ import com.imoonday.trigger.AutoStopTrigger
 import com.imoonday.trigger.ProgressTrigger
 import com.imoonday.trigger.UsingProgressTrigger
 import com.imoonday.util.*
+import com.imoonday.util.SkillSlot.Companion.indexTexture
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -19,32 +19,77 @@ import kotlin.math.sin
 
 object SkillSlotRenderer {
 
-    val progressStrings: MutableList<ScrollingStringRenderer?> = mutableListOf(null, null, null, null)
+    val progressStrings: MutableMap<Int, ScrollingStringRenderer> = mutableMapOf()
     private const val NAME_MAX_WIDTH = 64
-
-    @JvmStatic
-    val indexTexture = id("index.png")
 
     fun render(client: MinecraftClient, context: DrawContext) {
         val player = client.player ?: return
         if (player.isSpectator) return
-        val startX = context.scaledWindowWidth - 20 - UIConfigModel.instance.uiOffsetX
-        val endX = startX + 16
-        player.equippedSkills.forEachIndexed { index, skill ->
-            val startY = context.scaledWindowHeight / 2 + (index - 2) * 18 + UIConfigModel.instance.uiOffsetY
-            val endY = startY + 16
-            renderIcon(context, startX, startY, player, skill)
-            renderIndex(context, index, endX, startY)
-            renderName(context, client, startX, startY, index, skill)
-            renderProgressBar(context, startX, endY, player, skill)
+        val slots = player.skillContainer.getAllSlots()
+        val halfSize = if (slots.size <= 5) 5 else slots.size / 2 + if (slots.size % 2 == 0) 0 else 1
+        val maxSlotSize = if (slots.size <= 5) slots.size else slots.size / 2 + if (slots.size % 2 == 0) 0 else 1
+        slots.forEach {
+            if (UIConfig.instance.simplify) {
+                val size = 17
+                var index = it.index
+                if (index > halfSize) index -= halfSize
+                val startX =
+                    context.scaledWindowWidth - size * (maxSlotSize - index + 1) - UIConfig.instance.uiOffsetX
+                val endX = startX + 16
+                val startY = if (slots.size > halfSize && it.index <= halfSize) {
+                    context.scaledWindowHeight - size * 2 - 5 + UIConfig.instance.uiOffsetY
+                } else {
+                    context.scaledWindowHeight - size - 1 + UIConfig.instance.uiOffsetY
+                }
+                val endY = startY + 16
+                renderIcon(context, startX, startY, player, it)
+                renderIndex(context, startX, startY, it)
+                renderProgressBar(context, startX, endY, 16, 1, player, it.skill)
+                renderCooldownBar(
+                    context,
+                    startX,
+                    startY,
+                    endX,
+                    endY,
+                    player,
+                    it.skill,
+                    Color.RED.alpha(0.25).rgb,
+                    0,
+                    true,
+                    16
+                )
+            } else {
+                val startX = context.scaledWindowWidth - 20 - UIConfig.instance.uiOffsetX
+                val endX = startX + 16
+                val startY =
+                    context.scaledWindowHeight / 2 + ((it.index - 1 - slots.size / 2.0) * 18).toInt() + UIConfig.instance.uiOffsetY
+                val endY = startY + 16
+                renderIcon(context, startX, startY, player, it)
+                renderIndex(context, endX, startY, it)
+                renderName(context, client, startX, startY, it)
+                renderProgressBar(context, startX - 34, endY - 2, 32, 1, player, it.skill)
+                renderCooldownBar(
+                    context,
+                    startX - 34,
+                    endY,
+                    startX - 2,
+                    endY + 1,
+                    player,
+                    it.skill,
+                    Color.RED.rgb,
+                    Color.GRAY.rgb,
+                    false,
+                    32
+                )
+            }
         }
     }
 
     private fun renderIndex(
         context: DrawContext,
-        index: Int,
         endX: Int,
         startY: Int,
+        slot: SkillSlot,
     ) {
         val stack = context.matrices
         stack.push()
@@ -56,8 +101,8 @@ object SkillSlotRenderer {
             indexTexture,
             ((endX - 3) / scale).toInt(),
             ((startY - 3) / scale).toInt(),
-            index * 9,
-            0,
+            slot.u,
+            slot.v,
             9,
             9
         )
@@ -69,28 +114,48 @@ object SkillSlotRenderer {
     private fun renderProgressBar(
         context: DrawContext,
         startX: Int,
-        endY: Int,
+        startY: Int,
+        width: Int,
+        height: Int,
         player: ClientPlayerEntity,
         skill: Skill,
     ) {
         if (skill.invalid) return
-        val lineEndX = startX - 2
-        val lineStartX = startX - 20 - 14
         if (skill is ProgressTrigger && skill.shouldDisplay(player)
             && (player.isUsing(skill) || skill !is UsingProgressTrigger)
         ) {
             val progress = skill.getProgress(player)
-            val centerX = lineStartX + (32 * progress).toInt()
-            context.fill(lineStartX, endY - 2, centerX, endY - 1, Color.GREEN.rgb)
-            context.fill(centerX, endY - 2, lineEndX, endY - 1, Color.GRAY.rgb)
+            val centerX = startX + (width * progress).toInt()
+            context.fill(startX, startY, centerX, startY + height, Color.GREEN.rgb)
+            context.fill(centerX, startY, startX + width, startY + height, Color.GRAY.rgb)
         }
-        if (player.isCooling(skill)) {
-            val cooldown = player.getCooldown(skill)
-            val maxCooldown = skill.getCooldown(player.world)
-            val progress = ((cooldown.toDouble() / maxCooldown).coerceIn(0.0, 1.0) * 32).toInt()
-            val centerX = lineStartX + progress
-            context.fill(lineStartX, endY, centerX, endY + 1, Color.RED.rgb)
-            context.fill(centerX, endY, lineEndX, endY + 1, Color.GRAY.rgb)
+    }
+
+    private fun renderCooldownBar(
+        context: DrawContext,
+        startX: Int,
+        startY: Int,
+        endX: Int,
+        endY: Int,
+        player: ClientPlayerEntity,
+        skill: Skill,
+        color: Int,
+        backgroundColor: Int,
+        vertical: Boolean,
+        length: Int,
+    ) {
+        if (!player.isCooling(skill)) return
+        val cooldown = player.getCooldown(skill)
+        val maxCooldown = skill.getCooldown(player.world)
+        val progress = ((cooldown.toDouble() / maxCooldown).coerceIn(0.0, 1.0) * length).toInt()
+        if (vertical) {
+            val centerY = endY - progress
+            context.fill(startX, centerY, endX, endY, color)
+            context.fill(startX, startY, endX, centerY, backgroundColor)
+        } else {
+            val centerX = startX + progress
+            context.fill(startX, startY, centerX, endY, color)
+            context.fill(centerX, startY, endX, endY, backgroundColor)
         }
     }
 
@@ -99,16 +164,16 @@ object SkillSlotRenderer {
         client: MinecraftClient,
         startX: Int,
         startY: Int,
-        index: Int,
-        skill: Skill,
+        slot: SkillSlot,
     ) {
+        val index = slot.index
+        val skill = slot.skill
         if (skill.invalid) return
-        if (index !in 0..3) return
         val text = skill.name.string
-        if (progressStrings[index] == null || progressStrings[index]!!.text.string != text) {
+        if (progressStrings[index]?.text?.string != text) {
             progressStrings[index] = ScrollingStringRenderer(text, NAME_MAX_WIDTH, client.textRenderer)
         }
-        progressStrings[index]!!.render(context, startX - NAME_MAX_WIDTH - 2, startY)
+        progressStrings[index]?.render(context, startX - NAME_MAX_WIDTH - 2, startY)
     }
 
     private fun renderIcon(
@@ -116,8 +181,9 @@ object SkillSlotRenderer {
         startX: Int,
         startY: Int,
         player: ClientPlayerEntity,
-        skill: Skill,
+        slot: SkillSlot,
     ) {
+        val skill = slot.skill
         if (skill is AutoStopTrigger && skill !is LongPressSkill) {
             val persistTime = skill.getPersistTime()
             val leftUseTime = persistTime - player.getUsedTime(skill)
@@ -128,7 +194,7 @@ object SkillSlotRenderer {
             }
         }
         context.drawTexture(
-            if (player.isSilenced) ModSkills.EMPTY.icon else skill.icon,
+            if (player.isSilenced) Skill.EMPTY.icon else skill.icon,
             startX,
             startY,
             0f,

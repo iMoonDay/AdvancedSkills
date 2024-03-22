@@ -1,7 +1,6 @@
 package com.imoonday.component
 
 import com.imoonday.effect.SyncClientEffect
-import com.imoonday.init.ModComponents
 import dev.onyxstudios.cca.api.v3.component.Component
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent
@@ -24,7 +23,7 @@ class EntityPropertyComponent(private val entity: Entity) :
     override var properties: NbtCompound = NbtCompound()
         set(value) {
             field = value
-            ModComponents.PROPERTY.sync(entity)
+            Components.PROPERTY.sync(entity)
         }
 
     override fun readFromNbt(tag: NbtCompound) {
@@ -44,9 +43,9 @@ class EntityPropertyComponent(private val entity: Entity) :
                         .map { NbtString.of(it.syncId) })
             })
         }
-        ModComponents.PROPERTY.sync(entity)
+        Components.PROPERTY.sync(entity)
     }
 }
 
 val Entity.properties: NbtCompound
-    get() = getComponent(ModComponents.PROPERTY).properties
+    get() = getComponent(Components.PROPERTY).properties

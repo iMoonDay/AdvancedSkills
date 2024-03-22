@@ -1,9 +1,5 @@
-package com.imoonday.init
+package com.imoonday.component
 
-import com.imoonday.component.DataComponent
-import com.imoonday.component.EntityPropertyComponent
-import com.imoonday.component.PlayerDataComponent
-import com.imoonday.component.PropertyComponent
 import com.imoonday.util.id
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
@@ -12,7 +8,7 @@ import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy
 import net.minecraft.entity.Entity
 
-object ModComponents : EntityComponentInitializer {
+object Components : EntityComponentInitializer {
 
     @JvmField
     val DATA: ComponentKey<DataComponent> =
