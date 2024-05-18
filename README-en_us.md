@@ -2,6 +2,8 @@
 
 [中文](README.md)
 
+### **Requires Fabric Language Kotlin pre-module**
+
 ### Play Description.
 
 1. Players can increase **Skill Experience** while gaining **Original Experience**, and can randomly learn a new skill every few levels.

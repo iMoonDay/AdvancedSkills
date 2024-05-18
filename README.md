@@ -2,6 +2,8 @@
 
 [English(AI Translation)](README-en_us.md)
 
+### **需要Fabric Language Kotlin前置模组**
+
 ### 玩法介绍:
 
 1. 玩家可以在获取**原版经验**的同时增加**技能经验**，每几级可以随机学习一个新技能。
