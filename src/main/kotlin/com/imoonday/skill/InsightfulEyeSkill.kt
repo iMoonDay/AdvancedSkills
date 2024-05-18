@@ -46,7 +46,7 @@ class InsightfulEyeSkill : PassiveSkill(
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f))
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f))
             matrices.translate(
-                index - 1.5f,
+                index - player.equippedSkills.size / 2f + 0.5f,
                 if (player.shouldRenderName() && !player.isSneaky) player.nameLabelHeight else player.height,
                 0.0f
             )

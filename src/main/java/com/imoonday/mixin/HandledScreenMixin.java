@@ -19,7 +19,7 @@ public class HandledScreenMixin {
             if (ModKeyBindings.OPEN_LIST_SCREEN.matchesKey(keyCode, scanCode)) {
                 MinecraftClient client = MinecraftClient.getInstance();
                 if (client.player != null) {
-                    client.setScreen(new SkillInventoryScreen(client.player, screen));
+                    client.setScreen(new SkillInventoryScreen(client.player, () -> screen));
                 }
                 cir.setReturnValue(true);
             }

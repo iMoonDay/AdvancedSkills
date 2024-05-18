@@ -6,11 +6,11 @@ import com.imoonday.init.ModGameRules
 import com.imoonday.init.isSilenced
 import com.imoonday.item.SkillItem
 import com.imoonday.network.UseSkillC2SRequest
-import com.imoonday.trigger.LongPressTrigger
-import com.imoonday.trigger.SkillTrigger
-import com.imoonday.trigger.SynchronousCoolingTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.*
+import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.util.ModelIdentifier
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -25,7 +25,10 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.world.World
+import java.awt.Color
 import java.util.*
+import kotlin.math.PI
+import kotlin.math.sin
 
 abstract class Skill(
     val id: Identifier,
@@ -98,7 +101,7 @@ abstract class Skill(
                     ).formatted(Formatting.GRAY),
                     170,
                     Style.EMPTY
-                ).map { Text.literal(it.string).formatted(Formatting.GRAY) }
+                ).map { it.string.toText().formatted(Formatting.GRAY) }
             )
             add(translate(
                 "screen",
@@ -213,6 +216,89 @@ abstract class Skill(
 
     fun message(key: String) = translateSkill(id.path, key)
 
+    open fun render(
+        context: DrawContext,
+        x: Int,
+        y: Int,
+        player: PlayerEntity,
+    ) {
+        val endY = y + 16
+        renderIcon(context, x, y, player)
+        renderProgressBar(context, x, endY, 16, 1, player)
+        renderCooldownOverlay(context, x, endY, 16, 16, player)
+    }
+
+    open fun renderIcon(
+        context: DrawContext,
+        x: Int,
+        y: Int,
+        player: PlayerEntity?,
+    ) {
+        context.fill(x, y, x + 16, y + 16, Color.LIGHT_GRAY.alpha(0.5).rgb)
+        var flashed = false
+        if (this is AutoStopTrigger && shouldFlashIcon() && player != null) {
+            flashed = true
+            val persistTime = getPersistTime()
+            val leftUseTime = persistTime - player.getUsedTime(this)
+            if (persistTime > 20 * 5 && leftUseTime <= persistTime / 5) {
+                val alpha = 0.5 * sin(2 * PI / 20 * (leftUseTime - persistTime / 5)) + 0.5
+                RenderSystem.enableBlend()
+                context.setShaderColor(1.0f, 1.0f, 1.0f, alpha.toFloat())
+            }
+        }
+        if (!isEmpty()) context.drawTexture(icon, x, y, 0f, 0f, 16, 16, 16, 16)
+        if (flashed) {
+            context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
+            RenderSystem.disableBlend()
+        }
+        if (player?.isSilenced == true) context.fill(x, y, x + 16, y + 16, Color.RED.alpha(0.25).rgb)
+    }
+
+    open fun renderProgressBar(
+        context: DrawContext,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        player: PlayerEntity,
+    ) {
+        if (invalid) return
+        if (this is ProgressTrigger && shouldDisplay(player)
+            && (player.isUsing() || this !is UsingProgressTrigger)
+        ) {
+            val progress = getProgress(player)
+            val centerX = x + (width * progress).toInt()
+            context.fill(x, y, centerX, y + height, progressColor)
+            context.fill(centerX, y, x + width, y + height, Color.GRAY.rgb)
+        }
+    }
+
+    open fun renderCooldownOverlay(
+        context: DrawContext,
+        startX: Int,
+        endY: Int,
+        width: Int,
+        maxHeight: Int,
+        player: PlayerEntity,
+    ) {
+        if (!player.isCooling()) return
+        val cooldown = player.getCooldown(this)
+        val maxCooldown = getCooldown(player.world)
+        val progress = (cooldown.toDouble() / maxCooldown).coerceIn(0.0, 1.0)
+        val startY = (endY - progress * maxHeight).toInt()
+        context.fill(startX, startY, startX + width, endY, Color.BLACK.alpha(0.25).rgb)
+        if (cooldown < 20 * 4) {
+            val time = if (cooldown <= 20) String.format("%.1f", cooldown / 20.0) else (cooldown / 20).toString()
+            context.drawCenteredTextWithShadow(
+                client!!.textRenderer,
+                time,
+                (startX + width / 2.0).toInt(),
+                (endY - width / 2.0).toInt(),
+                Color.WHITE.rgb
+            )
+        }
+    }
+
     enum class Rarity(
         val level: Int,
         val id: String,
@@ -252,13 +338,24 @@ abstract class Skill(
 
         @JvmField
         val EMPTY = EmptySkill().register()
+        private val progressColor = Color(128, 255, 130).rgb
         fun getSkills() = skills.toList()
         fun getValidSkills() = skills.filterNot { it.invalid }
         fun fromId(id: Identifier?) = skills.find { it.id == id } ?: EMPTY
-        fun fromId(id: String?) = skills.find { it.id == Identifier.tryParse(id) } ?: EMPTY
+        fun fromId(id: String?) = skills.find { it.id == id?.toIdentifier() } ?: EMPTY
         fun fromIdNullable(id: Identifier?) = skills.find { it.id == id }
         fun fromIdNullable(id: String?) = skills.find { it.id == Identifier.tryParse(id) }
         inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> =
             getSkills().filterIsInstance<T>().filter(predicate)
+
+        fun getLearnableSkills(
+            except: Collection<Skill> = emptyList(),
+            filter: (Skill) -> Boolean = { true },
+        ): List<Skill> = getValidSkills()
+            .filterNot { it in except }
+            .filter(filter)
+
+        fun random(except: Collection<Skill> = emptyList(), filter: (Skill) -> Boolean = { true }): Skill =
+            getLearnableSkills(except, filter).randomOrNull() ?: EMPTY
     }
 }

@@ -49,6 +49,16 @@ class SkillListScreen(
 
     override fun createAdapter(): OwoUIAdapter<FlowLayout> = OwoUIAdapter.create(this, Containers::verticalFlow)!!
 
+    private val learnButton = Components.button(translate("screen", "list.button.learn")) {
+        client!!.setScreen(SkillLearningScreen(player) { SkillListScreen(player) })
+    }.apply {
+        active(!player.learnableData.isEmpty())
+    }
+    private val skillsFlow = Containers.verticalFlow(
+        Sizing.fill(100),
+        Sizing.content()
+    )
+
     override fun build(rootComponent: FlowLayout) {
         rootComponent.surface(Surface.VANILLA_TRANSLUCENT)
             .horizontalAlignment(HorizontalAlignment.LEFT)
@@ -57,56 +67,60 @@ class SkillListScreen(
 
         rootComponent.gap(3)
 
-        rootComponent.child(Containers.verticalFlow(Sizing.fill(100), Sizing.content()).apply {
-            child(
-                Components.label(
-                    translate(
-                        "screen",
-                        "list.level",
-                        "${player.skillLevel % 100}${if (player.skillLevel > 100) " (+${player.skillLevel / 100})" else ""}"
+        rootComponent.child(
+            Containers.verticalFlow(
+                Sizing.fill(100),
+                Sizing.content()
+            ).apply {
+                child(
+                    Components.label(
+                        translate(
+                            "screen",
+                            "list.level",
+                            "${player.skillLevel % 100}${if (player.skillLevel > 100) " (+${player.skillLevel / 100})" else ""}"
+                        )
                     )
                 )
-            )
-            child(Components.label(translate("screen", "list.exp", player.skillExp)))
-            child(Containers.grid(Sizing.fill(100), Sizing.fill(80), 1, 2).apply {
-                gap(3)
-                child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100)).apply {
-                    child(Containers.verticalScroll(Sizing.fill(50), Sizing.fill(100), Containers.verticalFlow(
-                        Sizing.fill(100),
-                        Sizing.content()
-                    ).apply {
-                        player.learnedSkills.forEach { child(SkillLine(it)) }
-                    }).apply {
-                        scrollbar(ScrollContainer.Scrollbar.vanilla())
-                        padding(Insets.of(5))
-                        surface(Surface.PANEL)
-                    })
-                }, 0, 0)
-                child(Containers.verticalScroll(Sizing.content(), Sizing.fill(100), slotGrid).apply {
-                    scrollbarThiccness(0)
-                }, 0, 1)
-            })
-            if (player.isCreative && player.hasPermissionLevel(4)) {
-                child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                    fun createButton(text: Text, content: String) =
-                        Components.button(text) {
-                            (player as ClientPlayerEntity).networkHandler.sendCommand("skills @s $content")
-                            close()
-                        }.apply {
-                            tooltip(translate("screen", "list.button.tooltip"))
-                        }
-                    gap(5)
-                    child(createButton(translate("screen", "list.button.learnAll"), "learn-all"))
-                    child(createButton(translate("screen", "list.button.forgetAll"), "forget-all"))
-                    child(createButton(translate("screen", "list.button.resetCooldown"), "reset-cooldown"))
+                child(Components.label(translate("screen", "list.exp", player.skillExp)))
+                child(Containers.grid(Sizing.fill(100), Sizing.fill(80), 1, 2).apply {
+                    gap(3)
+                    child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100)).apply {
+                        child(Containers.verticalScroll(Sizing.fill(50), Sizing.fill(100), skillsFlow.apply {
+                            player.learnedSkills.forEach { child(SkillLine(it)) }
+                        }).apply {
+                            scrollbar(ScrollContainer.Scrollbar.vanilla())
+                            padding(Insets.of(5))
+                            surface(Surface.PANEL)
+                        })
+                    }, 0, 0)
+                    child(Containers.verticalScroll(Sizing.content(), Sizing.fill(100), slotGrid).apply {
+                        scrollbarThiccness(0)
+                    }, 0, 1)
                 })
-            }
-            child(Components.button(translate("screen", "list.button.inventory")) {
-                client!!.setScreen(SkillInventoryScreen(player, this@SkillListScreen))
-            }.apply {
-                positioning(Positioning.relative(100, 0))
+                if (player.isCreative && player.hasPermissionLevel(4)) {
+                    child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
+                        fun createButton(text: Text, content: String, close: Boolean = false) =
+                            Components.button(text) {
+                                (player as ClientPlayerEntity).networkHandler.sendCommand("skills @s $content")
+                                if (close) close()
+                            }.apply {
+                                tooltip(translate("screen", "list.button.tooltip"))
+                            }
+                        gap(5)
+                        child(createButton(translate("screen", "list.button.learnAll"), "learn-all"))
+                        child(createButton(translate("screen", "list.button.forgetAll"), "forget-all"))
+                        child(createButton(translate("screen", "list.button.resetCooldown"), "reset-cooldown", true))
+                    })
+                }
+                child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
+                    positioning(Positioning.relative(100, 0))
+                    gap(5)
+                    child(learnButton)
+                    child(Components.button(translate("screen", "list.button.inventory")) {
+                        client!!.setScreen(SkillInventoryScreen(player) { SkillListScreen(player) })
+                    })
+                })
             })
-        })
     }
 
     override fun update(data: NbtCompound) {
@@ -114,9 +128,16 @@ class SkillListScreen(
     }
 
     fun updateScreen() {
+        skillsFlow.run {
+            if (skillsFlow.children().size != player.learnedSkills.size) {
+                clearChildren()
+                player.learnedSkills.forEach { child(SkillLine(it)) }
+            }
+        }
         player.equippedSkills.forEachIndexed { i, _ ->
             slotLines[i].updateSkill()
         }
+        learnButton.active(!player.learnableData.isEmpty())
     }
 
     override fun shouldPause(): Boolean = false
@@ -144,7 +165,7 @@ class SkillListScreen(
 
             return when {
                 selectedSlotSkill != null && player.getSlot(selectedSlot!!)?.canEquip(skill) == true -> selectedSlot
-                emptyIndex != null && container.getAllSlots { it.skill == skill }.none() -> emptyIndex
+                emptyIndex != null && container.getSlot(skill) == null -> emptyIndex
                 else -> null
             }
         }
@@ -167,7 +188,7 @@ class SkillListScreen(
                 child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
                     gap(5)
                     child(Components.label(skill.formattedName))
-                    child(Components.label(Text.literal("(${skill.getCooldown(client?.world) / 20.0}s)")))
+                    child(Components.label("(${skill.getCooldown(client?.world) / 20.0}s)".toText()))
                 })
                 child(
                     ShiftScrollContainer.horizontalScroll(
@@ -196,9 +217,8 @@ class SkillListScreen(
             if (Util.getMeasuringTimeMs() - lastClickTime < 250L) {
                 client!!.setScreen(
                     SkillGalleryScreen(
-                        this@SkillListScreen,
                         skill
-                    )
+                    ) { this@SkillListScreen }
                 )
             }
             lastClickTime = Util.getMeasuringTimeMs()

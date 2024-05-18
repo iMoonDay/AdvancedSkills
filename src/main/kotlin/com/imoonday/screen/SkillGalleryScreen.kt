@@ -1,7 +1,10 @@
 package com.imoonday.screen
 
+import com.imoonday.screen.component.CustomScrollContainer
 import com.imoonday.skill.Skill
 import com.imoonday.util.alpha
+import com.imoonday.util.id
+import com.imoonday.util.toText
 import com.imoonday.util.translate
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
@@ -12,10 +15,16 @@ import io.wispforest.owo.ui.container.ScrollContainer
 import io.wispforest.owo.ui.core.*
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.text.Text
+import net.minecraft.util.Formatting
+import net.minecraft.util.Util
 import java.awt.Color
 
-class SkillGalleryScreen(private val parent: Screen? = null, private val positioning: Skill? = null) :
+private const val issueUrl = "https://github.com/iMoonDay/AdvancedSkills/issues"
+
+class SkillGalleryScreen(
+    private val positioning: Skill? = null,
+    private val parent: () -> Screen? = { null },
+) :
     BaseOwoScreen<FlowLayout>() {
 
     var selectedSkill: Skill? = null
@@ -23,8 +32,8 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
             field = value
             refreshInfoBox()
         }
-    private val skillScroll: ScrollContainer<FlowLayout> =
-        Containers.verticalScroll(Sizing.fill(55), Sizing.fill(100), Containers.verticalFlow(
+    private val skillScroll: CustomScrollContainer<FlowLayout> =
+        CustomScrollContainer.vertical(Sizing.fill(55), Sizing.fill(100), Containers.verticalFlow(
             Sizing.fill(100),
             Sizing.content()
         ).apply {
@@ -64,6 +73,20 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
             child(skillScroll)
             child(infoBox)
         })
+        rootComponent.child(Components.texture(id("suggestion.png"), 0, 0, 16, 16, 16, 16).apply {
+            tooltip(
+                listOf(
+                    translate("screen", "gallery.suggestion"),
+                    issueUrl.toText().formatted(Formatting.GRAY)
+                )
+            )
+            mouseDown().subscribe { _, _, button ->
+                if (button != 0) return@subscribe false
+                Util.getOperatingSystem().open(issueUrl)
+                true
+            }
+            positioning(Positioning.relative(100, 100))
+        })
     }
 
     override fun init() {
@@ -77,7 +100,7 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
     override fun resize(client: MinecraftClient, width: Int, height: Int) {
         val skill = selectedSkill
         super.resize(client, width, height)
-        client.setScreen(SkillGalleryScreen(parent, skill))
+        client.setScreen(SkillGalleryScreen(skill, parent))
     }
 
     fun refreshInfoBox() {
@@ -86,11 +109,16 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
             selectedSkill?.let {
                 child(Containers.horizontalFlow(Sizing.fill(100), Sizing.content()).apply {
                     alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                    child(Components.texture(it.icon, 0, 0, 16, 16, 16, 16))
+                    child(Components.texture(it.icon, 0, 0, 32, 32, 32, 32))
                 })
                 child(Components.label(translate("screen", "gallery.info.name", it.name.string)).trim())
                 child(
-                    Components.label(translate("screen", "gallery.info.type", it.types.joinToString(" ") { type -> type.displayName.string }))
+                    Components.label(
+                        translate(
+                            "screen",
+                            "gallery.info.type",
+                            it.types.joinToString(" ") { type -> type.displayName.string })
+                    )
                         .trim()
                 )
                 child(Components.label(translate("screen", "gallery.info.description", it.description.string)).trim())
@@ -111,12 +139,12 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
     private fun LabelComponent.trim() = apply { horizontalSizing(Sizing.fill(100)) }
 
     override fun close() {
-        client!!.setScreen(parent)
+        client!!.setScreen(parent())
     }
 
     fun scrollTo(skill: Skill) {
         (skillScroll.children().first() as FlowLayout).children().find { it is SkillLine && it.skill == skill }?.let {
-            skillScroll.scrollTo(it)
+            skillScroll.scrollToInstantly(it)
         }
     }
 
@@ -136,7 +164,7 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
             child(content)
             alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
 
-            content.child(Components.label(Text.literal(index.toString().padStart(3, '0'))))
+            content.child(Components.label(index.toString().padStart(3, '0').toText()))
             content.child(Components.texture(skill.icon, 0, 0, 16, 16, 16, 16))
             content.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
                 gap(2)
@@ -147,8 +175,8 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
                 child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
                     gap(5)
                     child(Components.label(skill.rarity.displayName))
-                    child(Components.label(Text.literal("|")))
-                    child(Components.label(Text.literal(skill.types.joinToString(" ") { it.displayName.string })))
+                    child(Components.label("|".toText()))
+                    child(Components.label(skill.types.joinToString(" ") { it.displayName.string }.toText()))
                 })
             })
 
@@ -161,7 +189,10 @@ class SkillGalleryScreen(private val parent: Screen? = null, private val positio
         override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) {
             super.draw(context, mouseX, mouseY, partialTicks, delta)
             if (selectedSkill == skill || hovered) {
-                context.fill(x, y, x + width, y + height, Color.WHITE.alpha(if (selectedSkill == skill) 0.4 else 0.2).rgb)
+                context.fill(
+                    x, y, x + width, y + height,
+                    Color.WHITE.alpha(if (selectedSkill == skill) 0.4 else 0.2).rgb
+                )
             }
         }
     }

@@ -18,4 +18,6 @@ abstract class LongPressSkill(
     override fun use(user: ServerPlayerEntity): UseResult = onRelease(user, 1)
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) = Unit
+
+    override fun shouldFlashIcon(): Boolean = false
 }

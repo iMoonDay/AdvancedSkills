@@ -6,6 +6,7 @@ import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.send
 import com.imoonday.util.spawnParticles
+import net.minecraft.entity.LivingEntity
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.ServerPlayerEntity
@@ -56,9 +57,10 @@ class RisingShockSkill : Skill(
             0.5,
             0.1
         )
-        player.world.getOtherEntities(player, player.boundingBox.expand(1.0)) { it.isLiving && it.isAlive }.forEach {
+        player.world.getNonSpectatingEntities(LivingEntity::class.java, player.boundingBox.expand(1.0)).forEach {
             it.velocityDirty = true
             it.velocity = it.velocity.withAxis(Direction.Axis.Y, max(it.velocity.y, 0.5))
+            (it as? ServerPlayerEntity)?.send(EntityVelocityUpdateS2CPacket(it))
         }
         super.serverTick(player, usedTime)
     }

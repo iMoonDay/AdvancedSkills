@@ -39,7 +39,7 @@ class PainFeedbackSkill : PassiveSkill(
         val damage = player.properties.getFloat("totalDamaged")
         if (damage >= 10f) {
             player.reset()
-            attacker.damage(player.damageSources.thorns(player), damage)
+            attacker.damage(player.damageSources.thorns(player), damage * 0.25f)
         }
     }
 

@@ -10,7 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 class FrostTrapSkill : Skill(
     id = "frost_trap",
     types = listOf(SkillType.CONTROL),
-    cooldown = 15,
+    cooldown = 8,
     rarity = Rarity.EPIC,
 ) {
 

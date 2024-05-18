@@ -36,7 +36,7 @@ class GroundWhackSkill : Skill(
             player.world.getOtherEntities(
                 player,
                 player.boundingBox.expand(newHeight)
-            ) { it.isLiving && it.isAlive && (player.y - it.y).absoluteValue <= 1 }
+            ) { it.isLiving && it.isAlive && !it.isSpectator && (player.y - it.y).absoluteValue <= 1 }
                 .forEach {
                     it.damage(player.damageSources.playerAttack(player), min(newHeight / 2, 5.0).toFloat())
                     it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(min(newHeight / 5, 2.0)))

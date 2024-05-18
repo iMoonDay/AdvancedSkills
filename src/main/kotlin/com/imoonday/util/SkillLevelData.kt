@@ -3,13 +3,13 @@ package com.imoonday.util
 import net.minecraft.nbt.NbtCompound
 
 data class SkillLevelData(
-    var experience: Long = 0,
+    var experience: Int = 0,
     var level: Int = 0,
     var cycle: Int = 0,
 ) {
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
-        putLong("experience", experience)
+        putInt("experience", experience)
         putInt("level", level)
         putInt("cycle", cycle)
     }
@@ -23,7 +23,7 @@ data class SkillLevelData(
     companion object {
 
         fun fromNbt(nbt: NbtCompound): SkillLevelData = SkillLevelData(
-            nbt.getLong("experience"),
+            nbt.getInt("experience"),
             nbt.getInt("level"),
             nbt.getInt("cycle")
         )

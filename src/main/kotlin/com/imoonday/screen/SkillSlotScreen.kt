@@ -3,11 +3,11 @@ package com.imoonday.screen
 import com.imoonday.config.UIConfig
 import com.imoonday.render.SkillSlotRenderer
 import com.imoonday.util.clientPlayer
+import com.imoonday.util.keyCode
 import com.imoonday.util.skillContainer
 import com.imoonday.util.translate
 import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
-import io.wispforest.owo.ui.component.SlimSliderComponent
 import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
@@ -30,55 +30,24 @@ class SkillSlotScreen : BaseOwoScreen<FlowLayout>() {
             )
         )
 
-        if (!UIConfig.instance.simplify && !SkillSlotRenderer.progressStrings.values.all { it.fixed }) {
-            rootComponent.child(Components.slimSlider(SlimSliderComponent.Axis.HORIZONTAL).apply {
-                horizontalSizing(Sizing.fill(25))
-                min(0.25)
-                max(5.0)
-                value(UIConfig.instance.nameScrollRate)
-                onChanged().subscribe {
-                    UIConfig.instance.nameScrollRate = it
-                }
-            })
-        }
-
-        rootComponent.child(Components.smallCheckbox(translate("screen", "slot.simplify")).apply {
-            checked(UIConfig.instance.simplify)
-            onChanged().subscribe {
-                UIConfig.instance.uiOffsetX = 0
-                UIConfig.instance.uiOffsetY = 0
-                UIConfig.instance.simplify = it
-            }
-            positioning(Positioning.relative(1, 1))
-        })
-
         rootComponent.mouseDrag().subscribe { mouseX, mouseY, _, _, button ->
             return@subscribe if (button == 0) {
-                if (UIConfig.instance.simplify) {
-                    val slotSize = (clientPlayer?.skillContainer?.slotSize ?: 0)
-                    val maxSlotSize = if (slotSize <= 5) slotSize else slotSize / 2 + if (slotSize % 2 == 0) 0 else 1
-                    UIConfig.instance.uiOffsetX =
-                        client!!.window.scaledWidth - mouseX.toInt() - (maxSlotSize / 2.0 * 18).toInt()
-                    UIConfig.instance.uiOffsetY =
-                        mouseY.toInt() - client!!.window.scaledHeight + if (slotSize > 5) 20 else 12
-                } else {
-                    UIConfig.instance.uiOffsetX = client!!.window.scaledWidth - mouseX.toInt() - 32
-                    UIConfig.instance.uiOffsetY = mouseY.toInt() - client!!.window.scaledHeight / 2
-                }
+                val layout = SkillSlotRenderer.getValidLayout(clientPlayer!!.skillContainer.slotSize)
+                UIConfig.instance.uiOffsetX =
+                    client!!.window.scaledWidth - mouseX.toInt() - 18 * layout.maxOf { it.size } - 2
+                UIConfig.instance.uiOffsetY = mouseY.toInt() - client!!.window.scaledHeight / 2 + (9 * layout.size) + 2
                 true
             } else {
                 false
             }
         }
 
-        rootComponent.mouseDown().subscribe { mouseX, mouseY, button ->
+        rootComponent.mouseDown().subscribe { _, _, button ->
             return@subscribe if (button == 1) {
                 UIConfig.instance.uiOffsetX = 0
                 UIConfig.instance.uiOffsetY = 0
                 true
-            } else {
-                false
-            }
+            } else false
         }
     }
 
@@ -92,19 +61,19 @@ class SkillSlotScreen : BaseOwoScreen<FlowLayout>() {
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
         val amount = if (hasShiftDown()) 10 else 1
         when (keyCode) {
-            GLFW.GLFW_KEY_LEFT -> {
+            GLFW.GLFW_KEY_LEFT, client!!.options.leftKey.keyCode -> {
                 UIConfig.instance.uiOffsetX += amount
             }
 
-            GLFW.GLFW_KEY_RIGHT -> {
+            GLFW.GLFW_KEY_RIGHT, client!!.options.rightKey.keyCode -> {
                 UIConfig.instance.uiOffsetX -= amount
             }
 
-            GLFW.GLFW_KEY_UP -> {
+            GLFW.GLFW_KEY_UP, client!!.options.forwardKey.keyCode -> {
                 UIConfig.instance.uiOffsetY -= amount
             }
 
-            GLFW.GLFW_KEY_DOWN -> {
+            GLFW.GLFW_KEY_DOWN, client!!.options.backKey.keyCode -> {
                 UIConfig.instance.uiOffsetY += amount
             }
         }

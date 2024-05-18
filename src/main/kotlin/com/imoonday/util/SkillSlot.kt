@@ -30,25 +30,25 @@ sealed class SkillSlot(
     fun equip(skill: Skill, callback: (Boolean) -> Unit = {}): Boolean =
         if (this.skill != skill && canEquip(skill)) {
             this.skill = skill
-            callback.invoke(true)
+            callback(true)
             true
         } else {
-            callback.invoke(false)
+            callback(false)
             false
         }
 
     fun unequip(callback: (Boolean) -> Unit = {}): Boolean =
         if (skill.isEmpty()) {
-            callback.invoke(false)
+            callback(false)
             false
         } else {
             skill = Skill.EMPTY
-            callback.invoke(true)
+            callback(true)
             true
         }
 
     fun unequipIf(predicate: (Skill) -> Boolean, callback: (Boolean) -> Unit = {}): Boolean =
-        if (predicate.invoke(skill)) {
+        if (predicate(skill)) {
             unequip(callback)
         } else false
 

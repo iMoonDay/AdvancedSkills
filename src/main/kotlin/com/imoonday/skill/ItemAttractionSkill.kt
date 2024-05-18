@@ -13,7 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class ItemAttractionSkill : LongPressSkill(
     id = "item_attraction",
-    types = listOf(SkillType.ENHANCEMENT),
+    types = listOf(SkillType.FUNCTION),
     cooldown = 15,
     rarity = Rarity.SUPERB,
 ), UsingRenderTrigger, GlowingTrigger {

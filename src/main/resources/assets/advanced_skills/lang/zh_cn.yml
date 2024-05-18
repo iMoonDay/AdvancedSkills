@@ -26,13 +26,14 @@ advancedSkills:
   learnSkill:
     toast: 学到了一项新技能！
     message: '学习了 %s'
-    all: 所有技能已学完
+    all: 已学习所有技能
     failed: '%s 已学习 %s'
     failedSelf: '你已学习 %s'
     invalid: '无法学习 %s'
   forgetSkill:
     message: '遗忘了 %s'
     failed: "%s 未学习 %s"
+    all: 已遗忘所有技能
   equipSkill:
     success: '%s 已装备 %s 至插槽 %d'
     failed: '%s 已经装备了 %s 在插槽 %d 上'
@@ -41,14 +42,24 @@ advancedSkills:
     failed: '%s 未装备技能在插槽 %d 上'
     banned: '%s 被服务器禁用'
   resetCooldown: '%s 重置了所有技能的冷却时间'
+  reset: '已重置 %s 的所有数据'
   skillExp:
     give:
-      single: 已增加 %s %d 点技能经验值
+      single: 已为 %2$s 增加 %1$d 点技能经验值
       multiple: 已为 %d 名玩家增加 %d 点技能经验值
     set:
-      single: 设置 %s %d 点技能经验值
-      multiple: 为 %d 名玩家设置 %d 点技能经验值
+      single: 已设置 %2$s 的技能经验值为 %1$d 点
+      multiple: 已设置 %d 名玩家技能经验值为 %d 点
     query: '%s 拥有 %d 点技能经验值'
+  skillLevel:
+    give:
+      single: 已为 %2$s 增加 %1$d 级技能等级
+      multiple: 已为 %d 名玩家增加 %d 级技能等级
+    set:
+      single: 已设置 %2$s 的技能等级为 %1$d 级
+      multiple: 已设置 %d 名玩家的技能等级为 %d 级
+    query: '%s 的技能等级为 %d 级'
+    addChoice: 你可以学习新技能了
   command:
     unknown: 未知的技能ID
     invalid: 无效的技能ID
@@ -284,7 +295,7 @@ advancedSkills:
       description: 缓慢增加额外血量上限,上限10
     pain_feedback:
       name: 痛苦反馈
-      description: 当同一个生物连续对自己造成一定量的伤害时，立即反弹之前该生物对自己造成的所有伤害
+      description: 当同一个生物连续对自己造成一定量的伤害时，立即反弹之前该生物对自己造成的所有伤害的25%
     thunder_fury:
       name: 雷霆之怒
       description: 召唤一道闪电
@@ -294,10 +305,33 @@ advancedSkills:
     time_rewind:
       name: 时间倒流
       description: 回溯坐标
+    living_detection:
+      name: 活体检测
+      description: 检测附近的移动中的生物
+    blood_seal:
+      name: 血印术
+      description: 封印生物的治疗效果
+      interrupt: 蓄力中断
+      failed: 未选中目标
+    sword_soul_guarding:
+      name: 剑魂守护
+      description: 召唤附魔剑跟随作战，攻击时有概率发动追加攻击，受伤时必定触发追加攻击
+    wind_blade:
+      name: 风刃剑
+      description: 触发横扫之刃效果时生成一个小龙卷风
+    biological_hook:
+      name: 生物钩爪
+      description: 发射一个生物抓钩，有一定概率被挣脱
+    duplication:
+      name: 分身术
+      description: 召唤一个分身并隐身一秒
+    magnetic_trap:
+      name: 磁力陷阱
+      description: 生成一个减速陷阱
   skillType:
     attack: 攻击
     defense: 防御
-    healing: 治疗
+    function: 功能
     control: 控制
     passive: 被动
     enhancement: 强化
@@ -324,6 +358,7 @@ advancedSkills:
         description: '描述：%s'
         cooldown: '冷却：%s'
         rarity: '稀有度：%s'
+      suggestion: "有新的技能建议?点击前往github提交issue或PR!"
     list:
       level: '等级：%s'
       exp: '经验：%d'
@@ -333,11 +368,19 @@ advancedSkills:
         forgetAll: 忘记全部
         resetCooldown: 重置冷却
         inventory: 背包
+        learn: 学习
     slot:
       title: 左键拖动移动，右键重置
-      simplify: 简化技能显示
+      compact: 紧凑技能显示
     inventory:
       title: '技能背包 %d/%d'
+    wheel:
+      cancel: 取消
+      tip: 左键/松开使用，右键取消，中键查看详情
+    learn:
+      refresh: 重抽
+      learn: 学习
+      count: '剩余技能数: %d'
   skillSlot:
     generic: '通用技能栏 %d'
     active: '主动技能栏 %d'
@@ -351,14 +394,22 @@ effect:
     silence: 沉默
     freeze: 冻结
     confinement: 禁锢
+    serious_injury: 重伤
 entity:
   advanced_skills:
     silence_energy_ball: 沉默能量球
+    freeze_energy_ball: 冻结能量球
+    slowness_energy_ball: 减速能量球
     unstable_tnt: 不稳定的TNT
     special_tame_horse: 特驯马
     servant_skeleton: 奴仆骷髅
     servant_wither_skeleton: 奴仆凋零骷髅
     meteorite: 陨石
+    hook: 钩子
+    enchanted_sword: 附魔剑
+    tornado: 龙卷风
+    clone_player: 玩家
+    magnet: 磁石
 block:
   advanced_skills:
     invisible_trap: 隐形陷阱

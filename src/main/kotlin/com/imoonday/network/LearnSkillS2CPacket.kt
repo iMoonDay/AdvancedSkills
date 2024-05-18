@@ -14,13 +14,14 @@ import net.minecraft.util.Util
 
 class LearnSkillS2CPacket(
     val skill: Skill,
+    val toast: Boolean,
 ) : FabricPacket {
 
     companion object {
 
         val id = id("learn_skill_s2c")
         val pType = PacketType.create(id) {
-            LearnSkillS2CPacket(Skill.fromId(it.readIdentifier()))
+            LearnSkillS2CPacket(Skill.fromId(it.readIdentifier()), it.readBoolean())
         }!!
         private val learningHistory = mutableListOf<Skill>()
         private var lastPlaySoundTime = 0L
@@ -29,7 +30,7 @@ class LearnSkillS2CPacket(
             ClientPlayNetworking.registerGlobalReceiver(pType) { packet, _, _ ->
                 client?.let {
                     val skill = packet.skill
-                    if (skill !in learningHistory) {
+                    if (skill !in learningHistory && packet.toast) {
                         learningHistory.add(skill)
                         it.toastManager.add(SkillToast(skill))
                     }
@@ -44,6 +45,7 @@ class LearnSkillS2CPacket(
 
     override fun write(buf: PacketByteBuf) {
         buf.writeIdentifier(skill.id)
+        buf.writeBoolean(toast)
     }
 
     override fun getType(): PacketType<*> = pType

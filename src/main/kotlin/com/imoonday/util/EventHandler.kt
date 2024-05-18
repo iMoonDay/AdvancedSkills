@@ -5,12 +5,14 @@ import com.imoonday.config.Config
 import com.imoonday.entity.render.feature.IceLayer
 import com.imoonday.entity.render.feature.SkillLayer
 import com.imoonday.entity.render.feature.StatusEffectLayer
+import com.imoonday.entity.render.feature.TargetLayer
 import com.imoonday.init.ModItems
 import com.imoonday.init.isDisarmed
 import com.imoonday.network.SyncConfigS2CPacket
 import com.imoonday.render.SkillSlotRenderer
 import com.imoonday.skill.Skill
 import com.imoonday.trigger.*
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
@@ -22,6 +24,7 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.block.Blocks
+import net.minecraft.client.render.entity.LivingEntityRenderer
 import net.minecraft.client.render.entity.PlayerEntityRenderer
 import net.minecraft.loot.LootPool
 import net.minecraft.loot.LootTables
@@ -117,12 +120,17 @@ object EventHandler {
             helper.register(IceLayer(renderer, context))
             if (renderer is PlayerEntityRenderer) Skill.getTriggers<FeatureRendererTrigger>()
                 .forEach { helper.register(SkillLayer(renderer, context, it)) }
+            if (renderer is LivingEntityRenderer) Skill.getTriggers<TargetRenderTrigger>()
+                .forEach { helper.register(TargetLayer(renderer, context, it)) }
         }
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
             Skill.getTriggers<WorldRendererTrigger>().forEach { it.renderAfterEntities(context) }
         }
         WorldRenderEvents.LAST.register { context ->
             Skill.getTriggers<WorldRendererTrigger>().forEach { it.renderLast(context) }
+        }
+        ModelLoadingPlugin.register {
+            it.addModels(TargetRenderTrigger.modelId)
         }
     }
 }

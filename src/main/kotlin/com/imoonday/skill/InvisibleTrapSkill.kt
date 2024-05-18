@@ -10,7 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 class InvisibleTrapSkill : Skill(
     id = "invisible_trap",
     types = listOf(SkillType.ATTACK),
-    cooldown = 15,
+    cooldown = 8,
     rarity = Rarity.UNCOMMON,
 ) {
 

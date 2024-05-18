@@ -25,13 +25,14 @@ advancedSkills:
   learnSkill:
     toast: Learned a new skill!
     message: 'Learned %s'
-    all: All skills learned
+    all: Learned all skills
     failed: '%s already know %s'
     failedSelf: 'You already know %s'
     invalid: 'Unable to learn %s'
   forgetSkill:
     message: 'Forgotten %s'
     failed: "%s don't know %s"
+    all: Forgotten all skills
   equipSkill:
     success: '%s equipped %s to Slot %d'
     failed: '%s already equipped %s on Slot %d'
@@ -40,6 +41,7 @@ advancedSkills:
     failed: '%s has no equipped skill on slot %d'
     banned: '%s was banned from server'
   resetCooldown: '%s reset all skills cooldown'
+  reset: 'All data for %s has been reset'
   skillExp:
     give:
       single: Gave %d skill experience points to %s
@@ -48,6 +50,15 @@ advancedSkills:
       single: Set %d skill experience points on %s
       multiple: Set %d skill experience points on %d players
     query: '%s has %d skill experience points'
+  skillLevel:
+    give:
+      single: Gave %d skill level to %s
+      multiple: Gave %d skill level to %d players
+    set:
+      single: Set %d skill level on %s
+      multiple: Set %d skill level on %d players
+    query: "%s's skill level is level %d"
+    addChoice: You can learn a new skill
   command:
     unknown: Unknown skill ID
     invalid: Invalid skill ID
@@ -283,7 +294,7 @@ advancedSkills:
       description: Slowly increase the absorption amount, the upper limit is 10
     pain_feedback:
       name: Pain Feedback
-      description: When the same creature continuously causes a certain amount of damage to you, all the damage previously caused by the creature to you will be immediately reflected
+      description: When the same creature continuously causes a certain amount of damage to you, 25% of the damage previously caused by the creature to you will be immediately reflected
     thunder_fury:
       name: Thunder Fury
       description: Summon a lightning bolt
@@ -293,10 +304,33 @@ advancedSkills:
     time_rewind:
       name: Time Rewind
       description: Backtracking coordinates
+    living_detection:
+      name: Living Detection
+      description: Detect nearby moving creatures
+    blood_seal:
+      name: Blood Seal
+      description: Seal the healing effect of the creature
+      interrupt: Charge interrupted
+      failed: No Target selected
+    sword_soul_guarding:
+      name: Sword Soul Guarding
+      description: Summons an enchanted sword to follow the battle. There is a probability of launching an additional attack when attacking. An additional attack will definitely be triggered when injured
+    wind_blade:
+      name: Wind Blade
+      description: Creates a small tornado when triggering Sweeping Blade
+    biological_hook:
+      name: Biological Hook
+      description: Launches a biological grappling hook, with a certain probability of being broken free
+    duplication:
+      name: Duplication
+      description: Summons a clone and becomes invisible for one second
+    magnetic_trap:
+      name: Magnetic Trap
+      description: Generate a slowdown trap
   skillType:
     attack: Attack
     defense: Defense
-    healing: Healing
+    function: Function
     control: Control
     passive: Passive
     enhancement: Enhancement
@@ -323,6 +357,7 @@ advancedSkills:
         description: 'Description: %s'
         cooldown: 'Cooldown: %s'
         rarity: 'Rarity: %s'
+      suggestion: Have a new skill suggestion? Click to go to github to submit an issue or PR!
     list:
       level: 'Level: %s'
       exp: 'Exp: %d'
@@ -332,11 +367,19 @@ advancedSkills:
         forgetAll: Forget All
         resetCooldown: Reset Cooldown
         inventory: Inventory
+        learn: Learn
     slot:
       title: Left drag to move, right click to reset
-      simplify: Simplify the skill display
+      compact: Compact skill display
     inventory:
       title: 'Skill Inventory %d/%d'
+    wheel:
+      cancel: Cancel
+      tip: Left click/release to use, right click to cancel, middle click to view details
+    learn:
+      refresh: Refresh
+      learn: Learn
+      count: 'Remaining Skills: %d'
   skillSlot:
     generic: 'Generic Skill Slot %d'
     active: 'Active Skill Slot %d'
@@ -350,14 +393,22 @@ effect:
     silence: Silence
     freeze: Freeze
     confinement: Confinement
+    serious_injury: Serious Injury
 entity:
   advanced_skills:
     silence_energy_ball: Silence Energy Ball
+    freeze_energy_ball: Frozen Energy Ball
+    slowness_energy_ball: Slowness Energy Ball
     unstable_tnt: Unstable TNT
     special_tame_horse: Special Tame Horse
     servant_skeleton: Servant Skeleton
     servant_wither_skeleton: Servant Wither Skeleton
     meteorite: Meteorite
+    hook: Hook
+    enchanted_sword: Enchanted Sword
+    tornado: Tornado
+    clone_player: Player
+    magnet: Magnet
 block:
   advanced_skills:
     invisible_trap: Invisible Trap

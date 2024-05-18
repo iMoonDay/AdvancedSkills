@@ -26,14 +26,13 @@ class UIConfig {
             field = value
             save()
         }
-    var nameScrollRate: Double = 1.0
-        set(value) {
-            field = value
-            save()
+    var layout: Array<IntArray> = defaultLayout
+        get() {
+            if (!isValidLayout(field)) field = defaultLayout
+            return field
         }
-    var simplify: Boolean = false
         set(value) {
-            field = value
+            if (isValidLayout(value)) field = value else return
             save()
         }
 
@@ -123,5 +122,28 @@ class UIConfig {
                 }
             }
         }
+
+        fun isValidLayout(layout: Array<IntArray>): Boolean {
+            val numbers = mutableSetOf<Int>()
+            for (row in layout) {
+                for (num in row) {
+                    if (num < 0 || num > 10) {
+                        return false
+                    }
+                    if (num != 0) {
+                        numbers.add(num)
+                    }
+                }
+            }
+            return numbers.size == 10
+        }
+
+        val defaultLayout = arrayOf(
+            intArrayOf(1, 2),
+            intArrayOf(3, 4),
+            intArrayOf(5, 6),
+            intArrayOf(7, 8),
+            intArrayOf(9, 10),
+        )
     }
 }

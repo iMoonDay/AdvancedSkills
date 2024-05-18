@@ -242,4 +242,8 @@ object SkillTriggerHandler {
         player.getTriggers<PostDamagedTrigger>()
             .forEach { it.postDamaged(amount, source, player, attacker) }
     }
+
+    fun postSweepAttack(player: PlayerEntity, target: LivingEntity) =
+        player.getTriggers<AttackTrigger>()
+            .forEach { it.postSweepAttack(player, target) }
 }

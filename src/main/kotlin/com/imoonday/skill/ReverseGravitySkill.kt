@@ -84,9 +84,9 @@ class ReverseGravitySkill : Skill(
         dimensions: EntityDimensions,
     ): Float = if (player.isUsing()) dimensions.height - original else original
 
-    override fun onStop() {
-        super<ClientUseTrigger>.onStop()
-        clientPlayer?.run {
+    override fun onStop(player: PlayerEntity) {
+        super<ClientUseTrigger>.onStop(player)
+        player.run {
             calculateDimensions()
             pitch = -pitch
         }

@@ -1,7 +1,5 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.InitTrigger
-
 object Skills {
 
     @JvmField
@@ -211,7 +209,26 @@ object Skills {
     @JvmField
     val TIME_REWIND = TimeRewindSkill().register()
 
-    fun init() {
-        Skill.getTriggers<InitTrigger>().forEach { it.init() }
-    }
+    @JvmField
+    val LIVING_DETECTION = LivingDetectionSkill().register()
+
+    @JvmField
+    val BLOOD_SEAL = BloodSealSkill().register()
+
+    @JvmField
+    val SWORD_SOUL_GUARDING = SwordSoulGuardingSkill().register()
+
+    @JvmField
+    val WIND_BLADE = WindBladeSkill().register()
+
+    @JvmField
+    val BIOLOGICAL_HOOK = BiologicalHookSkill().register()
+
+    @JvmField
+    val DUPLICATION = DuplicationSkill().register()
+
+    @JvmField
+    val MAGNETIC_TRAP = MagneticTrapSkill().register()
+
+    fun init() = Unit
 }

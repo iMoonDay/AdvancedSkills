@@ -47,5 +47,8 @@ class EntityPropertyComponent(private val entity: Entity) :
     }
 }
 
-val Entity.properties: NbtCompound
+var Entity.properties: NbtCompound
     get() = getComponent(Components.PROPERTY).properties
+    set(value) {
+        getComponent(Components.PROPERTY).properties = value
+    }

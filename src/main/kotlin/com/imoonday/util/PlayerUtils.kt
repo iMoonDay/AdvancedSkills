@@ -4,9 +4,7 @@ import com.imoonday.api.SkillChangeEvents
 import com.imoonday.component.Components
 import com.imoonday.component.DataComponent
 import com.imoonday.component.properties
-import com.imoonday.network.EquipSkillC2SRequest
-import com.imoonday.network.LearnSkillS2CPacket
-import com.imoonday.network.UseSkillC2SRequest
+import com.imoonday.network.*
 import com.imoonday.skill.Skill
 import com.imoonday.trigger.*
 import com.imoonday.util.PlayerUtils.getNextLevelExp
@@ -24,6 +22,7 @@ import net.minecraft.particle.ParticleEffect
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvent
+import net.minecraft.sound.SoundEvents
 import net.minecraft.text.HoverEvent
 import net.minecraft.util.Util
 import net.minecraft.util.hit.EntityHitResult
@@ -64,6 +63,11 @@ fun PlayerEntity.syncData() {
     if (!world.isClient) Components.DATA.sync(this)
 }
 
+fun PlayerEntity.resetData() {
+    data.reset()
+    properties = NbtCompound()
+}
+
 fun PlayerEntity.getSlot(index: Int): SkillSlot? = skillContainer.getSlot(index)
 
 fun PlayerEntity.getSlot(slot: SkillSlot): SkillSlot? = skillContainer.getSlot(slot.index)
@@ -92,7 +96,7 @@ fun PlayerEntity.stopCooling(skill: Skill) {
 
 fun PlayerEntity.modifyCooldown(skill: Skill, operation: (Int) -> Int) {
     modifySkillData(skill) {
-        it.cooldown = operation.invoke(getCooldown(skill))
+        it.cooldown = operation(getCooldown(skill))
         true
     }
 }
@@ -104,30 +108,37 @@ fun PlayerEntity.modifySkillData(skill: Skill, operation: (SkillData) -> Boolean
         return modified
     } ?: false
 
-fun PlayerEntity.learn(skill: Skill): Boolean =
+fun PlayerEntity.learn(skill: Skill, toast: Boolean = true, message: Boolean = true): Boolean =
     skillContainer.learn(skill) { result ->
         if (result) {
             skillContainer.getEmptySlot(skill)?.equip(skill)
             (this as? ServerPlayerEntity)?.let {
-                ServerPlayNetworking.send(it, LearnSkillS2CPacket(skill))
+                ServerPlayNetworking.send(it, LearnSkillS2CPacket(skill, toast))
             }
-            sendMessage(translate("learnSkill", "message", skill.name.string).styled {
-                it.withHoverEvent(
-                    HoverEvent(
-                        HoverEvent.Action.SHOW_ITEM,
-                        HoverEvent.ItemStackContent(skill.item?.defaultStack ?: Items.AIR.defaultStack)
+            if (message) {
+                sendMessage(translate("learnSkill", "message", skill.name.string).styled {
+                    it.withHoverEvent(
+                        HoverEvent(
+                            HoverEvent.Action.SHOW_ITEM,
+                            HoverEvent.ItemStackContent(skill.item?.defaultStack ?: Items.AIR.defaultStack)
+                        )
                     )
-                )
-            })
-            if (skillContainer.skillSize == Skill.getValidSkills().size)
-                sendMessage(translate("learnSkill", "all"))
+                })
+                if (skillContainer.getAllSkills().size == Skill.getValidSkills().size)
+                    sendMessage(translate("learnSkill", "all"))
+            }
         }
         syncData()
     }
 
-fun PlayerEntity.forget(skill: Skill): Boolean =
+fun PlayerEntity.learnAll(toast: Boolean = false) =
+    Skill.getLearnableSkills(learnedSkills)
+        .forEach { learn(it, toast, false) }
+        .also { sendMessage(translate("learnSkill", "all")) }
+
+fun PlayerEntity.forget(skill: Skill, message: Boolean = true): Boolean =
     skillContainer.forget(skill, { result ->
-        if (result) {
+        if (result && message) {
             sendMessage(translate("forgetSkill", "message", skill.name.string).styled {
                 it.withHoverEvent(
                     HoverEvent(
@@ -145,12 +156,76 @@ fun PlayerEntity.forget(skill: Skill): Boolean =
         }
     }
 
+fun PlayerEntity.forgetAll() =
+    learnedSkills.forEach { forget(it, false) }.also { sendMessage(translate("forgetSkill", "all")) }
+
 fun PlayerEntity.learnRandomly(filter: (Skill) -> Boolean = { true }): Boolean =
     Skill.getValidSkills()
         .filterNot { hasLearned(it) }
         .filter(filter)
         .takeUnless { it.isEmpty() }
         ?.let { learn(it.random()) } ?: false
+
+val PlayerEntity.learnableData: LearnableSkillData
+    get() = data.learnable
+
+fun ServerPlayerEntity.addChoice() {
+    learnableData.count++
+}
+
+fun PlayerEntity.getChoice(): SkillChoice = learnableData.get()
+
+fun PlayerEntity.refreshChoice(force: Boolean = false) = if (this is ServerPlayerEntity) {
+    learnableData.refresh(force, learnedSkills)
+    syncData()
+} else {
+    ClientPlayNetworking.send(RefreshChoiceC2SRequest())
+}
+
+fun PlayerEntity.canFreshChoice(): Boolean =
+    SkillChoice.canGenerate(learnedSkills) && !learnableData.refreshed
+
+fun PlayerEntity.choose(id: Int): Boolean = when (id) {
+    0 -> chooseFirst()
+    1 -> chooseSecond()
+    2 -> chooseThird()
+    else -> false
+}
+
+private fun ServerPlayerEntity.choose(index: Int): Boolean {
+    if (learnableData.isEmpty()) return false
+    learnableData.run {
+        val skill = when (index) {
+            0 -> first
+            1 -> second
+            2 -> third
+            else -> return false
+        }
+        if (skill.invalid) {
+            correct(learnedSkills)
+            return false
+        }
+        learn(skill)
+        next(learnedSkills)
+        syncData()
+    }
+    return true
+}
+
+fun PlayerEntity.chooseFirst(): Boolean = if (this is ServerPlayerEntity) choose(0) else {
+    ClientPlayNetworking.send(ChooseSkillC2SRequest(0))
+    true
+}
+
+fun PlayerEntity.chooseSecond(): Boolean = if (this is ServerPlayerEntity) choose(1) else {
+    ClientPlayNetworking.send(ChooseSkillC2SRequest(1))
+    true
+}
+
+fun PlayerEntity.chooseThird(): Boolean = if (this is ServerPlayerEntity) choose(2) else {
+    ClientPlayNetworking.send(ChooseSkillC2SRequest(2))
+    true
+}
 
 val PlayerEntity.equippedSkills: List<Skill>
     get() = skillContainer.getAllSlots().map { it.skill }
@@ -224,7 +299,7 @@ fun ClientPlayerEntity.requestUse(
     )
 }
 
-var PlayerEntity.skillExp: Long
+var PlayerEntity.skillExp: Int
     get() {
         updateLevel()
         return levelData.experience
@@ -250,11 +325,20 @@ val PlayerEntity.levelData: SkillLevelData
 private fun PlayerEntity.updateLevel() {
     updateCycle()
     var needed: Int
+    var added = false
     while (levelData.experience >= getNextLevelExp(levelData.level).also { needed = it }) {
         levelData.experience -= needed
         levelData.level++
         updateCycle()
-        if (shouldLearnSkill(levelData.level)) learnRandomly()
+        if (shouldLearnSkill(levelData.level) && this is ServerPlayerEntity) {
+            addChoice()
+            added = true
+        }
+    }
+    if (added && this is ServerPlayerEntity) {
+        sendMessage(translate("skillLevel", "addChoice"))
+        playSound(SoundEvents.ENTITY_PLAYER_LEVELUP)
+        syncData()
     }
 }
 
@@ -415,3 +499,5 @@ fun ServerPlayerEntity.playSound(sound: SoundEvent) = world.playSound(null, bloc
 
 val clientPlayer: ClientPlayerEntity?
     get() = client?.player
+val PlayerEntity.horizontalRotationVector: Vec3d
+    get() = getRotationVector(0f, yaw)

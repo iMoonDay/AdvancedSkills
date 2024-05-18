@@ -4,7 +4,6 @@ import com.imoonday.skill.Skill
 import com.imoonday.util.*
 import com.imoonday.util.SkillContainer.Companion.MAX_SLOT_SIZE
 import com.mojang.brigadier.arguments.IntegerArgumentType
-import com.mojang.brigadier.arguments.LongArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
@@ -13,7 +12,6 @@ import net.minecraft.server.command.CommandManager.argument
 import net.minecraft.server.command.CommandManager.literal
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
 
 object ModCommands {
 
@@ -32,6 +30,7 @@ object ModCommands {
                             .then(executeResetCooldown())
                             .then(executeList())
                             .then(executeSlot())
+                            .then(executeReset())
                     )
             )
 
@@ -43,6 +42,17 @@ object ModCommands {
             )
         }
     }
+
+    private fun executeReset(): LiteralArgumentBuilder<ServerCommandSource> =
+        literal("reset").executes { context ->
+            val target = getTarget(context)
+            target.resetData()
+            context.source.sendFeedback(
+                { translate("reset", null, target.displayName.string) },
+                true
+            )
+            1
+        }
 
     private fun executeSlot(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("slot")
@@ -94,94 +104,182 @@ object ModCommands {
     private fun executeQuery(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("query")
             .then(
-                argument("target", EntityArgumentType.player()).executes {
-                    val target = getTarget(it)
-                    val exp = target.skillExp
+                argument("target", EntityArgumentType.player())
+                    .executes(::executeQueryPoints)
+                    .then(literal("points").executes(::executeQueryPoints))
+                    .then(literal("levels").executes(::executeQueryLevels))
+            )
 
-                    it.source.sendFeedback(
-                        {
-                            translate(
-                                "skillExp", "query",
-                                target.displayName.string, exp
-                            )
-                        },
-                        true
-                    )
-                    1
-                })
+    private fun executeQueryPoints(context: CommandContext<ServerCommandSource>): Int {
+        val target = getTarget(context)
+        val exp = target.skillExp
+
+        context.source.sendFeedback(
+            {
+                translate(
+                    "skillExp", "query",
+                    target.displayName.string, exp
+                )
+            },
+            true
+        )
+        return 1
+    }
+
+    private fun executeQueryLevels(context: CommandContext<ServerCommandSource>): Int {
+        val target = getTarget(context)
+        val level = target.skillLevel
+
+        context.source.sendFeedback(
+            {
+                translate(
+                    "skillLevel", "query",
+                    target.displayName.string, level
+                )
+            },
+            true
+        )
+        return 1
+    }
 
     private fun executeSet(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("set")
             .then(
                 argument("targets", EntityArgumentType.players()).then(
-                    argument("amount", LongArgumentType.longArg(0)).executes {
-                        val amount = LongArgumentType.getLong(it, "amount")
-                        val targets = EntityArgumentType.getPlayers(it, "targets")
-
-                        for (entity in targets) {
-                            entity.skillExp = amount
-                        }
-                        if (targets.size == 1) {
-                            it.source.sendFeedback({
-                                translate(
-                                    "skillExp", "set.single",
-                                    amount,
-                                    targets.first().displayName.string
-                                )
-                            }, true)
-                        } else {
-                            it.source.sendFeedback({
-                                translate(
-                                    "skillExp", "set.multiple",
-                                    amount,
-                                    targets.size
-                                )
-                            }, true)
-                        }
-                        targets.size
-                    })
+                    argument("amount", IntegerArgumentType.integer(0))
+                        .executes(::executeSetPoints)
+                        .then(literal("points").executes(::executeSetPoints))
+                        .then(literal("levels").executes(::executeSetLevels))
+                )
             )
+
+    private fun executeSetPoints(context: CommandContext<ServerCommandSource>): Int {
+        val amount = IntegerArgumentType.getInteger(context, "amount")
+        val targets = EntityArgumentType.getPlayers(context, "targets")
+
+        for (entity in targets) {
+            entity.skillExp = amount
+        }
+        if (targets.size == 1) {
+            context.source.sendFeedback({
+                translate(
+                    "skillExp", "set.single",
+                    amount,
+                    targets.first().displayName.string
+                )
+            }, true)
+        } else {
+            context.source.sendFeedback({
+                translate(
+                    "skillExp", "set.multiple",
+                    amount,
+                    targets.size
+                )
+            }, true)
+        }
+        return targets.size
+    }
+
+    private fun executeSetLevels(context: CommandContext<ServerCommandSource>): Int {
+        val amount = IntegerArgumentType.getInteger(context, "amount")
+        val targets = EntityArgumentType.getPlayers(context, "targets")
+
+        for (entity in targets) {
+            entity.skillLevel = amount
+        }
+        if (targets.size == 1) {
+            context.source.sendFeedback({
+                translate(
+                    "skillLevel", "set.single",
+                    amount,
+                    targets.first().displayName.string
+                )
+            }, true)
+        } else {
+            context.source.sendFeedback({
+                translate(
+                    "skillLevel", "set.multiple",
+                    amount,
+                    targets.size
+                )
+            }, true)
+        }
+        return targets.size
+    }
 
     private fun executeAdd(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("add")
             .then(
                 argument("targets", EntityArgumentType.players())
-                    .then(argument("amount", LongArgumentType.longArg()).executes {
-                        val amount = LongArgumentType.getLong(it, "amount")
-                        val targets = EntityArgumentType.getPlayers(it, "targets")
-
-                        for (entity in targets) {
-                            entity.skillExp += amount
-                        }
-                        if (targets.size == 1) {
-                            it.source.sendFeedback({
-                                translate(
-                                    "skillExp", "give.single",
-                                    amount,
-                                    targets.first().displayName.string
-                                )
-                            }, true)
-                        } else {
-                            it.source.sendFeedback({
-                                translate(
-                                    "skillExp", "give.multiple",
-                                    amount,
-                                    targets.size
-                                )
-                            }, true)
-                        }
-                        targets.size
-                    })
+                    .then(
+                        argument("amount", IntegerArgumentType.integer())
+                            .executes(::executeAddPoints)
+                            .then(literal("points").executes(::executeAddPoints))
+                            .then(literal("levels").executes(::executeAddLevels))
+                    )
             )
+
+    private fun executeAddPoints(context: CommandContext<ServerCommandSource>): Int {
+        val amount = IntegerArgumentType.getInteger(context, "amount")
+        val targets = EntityArgumentType.getPlayers(context, "targets")
+
+        for (entity in targets) {
+            entity.skillExp += amount
+        }
+        if (targets.size == 1) {
+            context.source.sendFeedback({
+                translate(
+                    "skillExp", "give.single",
+                    amount,
+                    targets.first().displayName.string
+                )
+            }, true)
+        } else {
+            context.source.sendFeedback({
+                translate(
+                    "skillExp", "give.multiple",
+                    amount,
+                    targets.size
+                )
+            }, true)
+        }
+        return targets.size
+    }
+
+    private fun executeAddLevels(context: CommandContext<ServerCommandSource>): Int {
+        val amount = IntegerArgumentType.getInteger(context, "amount")
+        val targets = EntityArgumentType.getPlayers(context, "targets")
+
+        for (entity in targets) {
+            entity.skillLevel += amount
+        }
+        if (targets.size == 1) {
+            context.source.sendFeedback({
+                translate(
+                    "skillLevel", "give.single",
+                    amount,
+                    targets.first().displayName.string
+                )
+            }, true)
+        } else {
+            context.source.sendFeedback({
+                translate(
+                    "skillLevel", "give.multiple",
+                    amount,
+                    targets.size
+                )
+            }, true)
+        }
+        return targets.size
+    }
 
     private fun executeList(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("list").executes {
             val target = getTarget(it)
             val skills = target.learnedSkills
 
-            it.source.sendMessage(
-                Text.literal(skills.joinToString(", ") { it.name.string })
-            )
+            if (skills.isNotEmpty())
+                it.source.sendMessage(skills.joinToString(", ") { it.name.string }.toText())
             skills.size
         }
 
@@ -245,49 +343,44 @@ object ModCommands {
             argument("skill", SkillArgumentType.skill()).then(argument(
                 "slot",
                 IntegerArgumentType.integer(1, MAX_SLOT_SIZE)
-            )
-                .executes {
-                    val target = getTarget(it)
-                    val slot = IntegerArgumentType.getInteger(it, "slot")
-                    val skill = SkillArgumentType.getSkill(it)
-                    if (target.equip(skill, slot)) {
-                        it.source.sendFeedback(
-                            {
-                                translate(
-                                    "equipSkill",
-                                    "success",
-                                    target.displayName.string,
-                                    skill.name.string,
-                                    slot
-                                )
-                            },
-                            true
-                        )
-                    } else {
-                        it.source.sendFeedback(
-                            {
-                                translate(
-                                    "equipSkill", "failed",
-                                    target.displayName.string,
-                                    skill.name.string,
-                                    slot
-                                )
-                            },
-                            true
-                        )
-                    }
-                    1
-                })
+            ).executes {
+                val target = getTarget(it)
+                val slot = IntegerArgumentType.getInteger(it, "slot")
+                val skill = SkillArgumentType.getSkill(it)
+                if (target.equip(skill, slot)) {
+                    it.source.sendFeedback(
+                        {
+                            translate(
+                                "equipSkill",
+                                "success",
+                                target.displayName.string,
+                                skill.name.string,
+                                slot
+                            )
+                        },
+                        true
+                    )
+                } else {
+                    it.source.sendFeedback(
+                        {
+                            translate(
+                                "equipSkill", "failed",
+                                target.displayName.string,
+                                skill.name.string,
+                                slot
+                            )
+                        },
+                        true
+                    )
+                }
+                1
+            })
         )
 
     private fun executeForgetAll(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("forget-all").executes { context ->
             val target = EntityArgumentType.getPlayer(context, "target")
-            target.run {
-                learnedSkills.forEach {
-                    forget(it)
-                }
-            }
+            target.forgetAll()
             1
         }
 
@@ -316,9 +409,7 @@ object ModCommands {
     private fun executeLearnAll(): LiteralArgumentBuilder<ServerCommandSource> =
         literal("learn-all").executes { context ->
             val target = EntityArgumentType.getPlayer(context, "target")
-            Skill.getValidSkills().forEach { skill ->
-                target.learn(skill)
-            }
+            target.learnAll()
             1
         }
 

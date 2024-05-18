@@ -6,6 +6,8 @@ object Channels {
         UseSkillC2SRequest.register()
         EquipSkillC2SRequest.register()
         SendPlayerDataC2SPacket.register()
+        ChooseSkillC2SRequest.register()
+        RefreshChoiceC2SRequest.register()
     }
 
     fun registerClient() {

@@ -26,6 +26,9 @@ object ModEffects {
     @JvmField
     val CONFINEMENT = ConfinementEffect().register("confinement")
 
+    @JvmField
+    val SERIOUS_INJURY = SeriousInjuryEffect().register("serious_injury")
+
     fun <T : StatusEffect> T.register(id: String): T {
         if (this is SyncClientEffect) SYNC_CLIENT_EFFECTS.add(this)
         return Registry.register(Registries.STATUS_EFFECT, id(id), this)
@@ -42,6 +45,8 @@ val LivingEntity.isForceFrozen: Boolean
     get() = hasStatusEffect(this, ModEffects.FREEZE)
 val LivingEntity.isConfined: Boolean
     get() = hasStatusEffect(this, ModEffects.CONFINEMENT)
+val LivingEntity.isSeriousInjured: Boolean
+    get() = hasStatusEffect(this, ModEffects.SERIOUS_INJURY)
 
 private fun hasStatusEffect(entity: LivingEntity, effect: StatusEffect): Boolean =
     if (effect is SyncClientEffect) effect.syncId in entity.properties.getList(

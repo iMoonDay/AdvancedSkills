@@ -34,7 +34,7 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.sqrt
 
-class MeteoriteEntity(type: EntityType<*>, world: World) : Entity(type, world), Ownable {
+class MeteoriteEntity(type: EntityType<out MeteoriteEntity>, world: World) : Entity(type, world), Ownable {
 
     private var ownerUuid: UUID? = null
         get() = ownerEntity?.uuid ?: field

@@ -53,4 +53,9 @@ class LiquidShieldSkill : Skill(
         if (!player.isUsing()) speed else 0.0
 
     override fun canBreatheInWater(player: PlayerEntity): Boolean = player.isUsing()
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
+    }
 }

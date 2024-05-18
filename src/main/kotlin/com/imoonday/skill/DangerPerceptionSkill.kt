@@ -69,8 +69,8 @@ class DangerPerceptionSkill : Skill(
     }
 
     private fun dangerTest(player: ServerPlayerEntity, entity: Entity): Boolean = when {
-        safetyList.any { it.invoke(player, entity) } -> false
-        dangerList.any { it.invoke(player, entity) } -> true
+        safetyList.any { it(player, entity) } -> false
+        dangerList.any { it(player, entity) } -> true
         else -> false
     }
 

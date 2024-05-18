@@ -4,9 +4,7 @@ import com.imoonday.entity.Servant;
 import com.imoonday.trigger.SkillTriggerHandler;
 import com.imoonday.util.PlayerUtilsKt;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.MovementType;
+import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -99,6 +97,13 @@ public abstract class PlayerEntityMixin {
                 }
                 cir.setReturnValue(new Vec3d(d, movement.y, e));
             }
+        }
+    }
+
+    @Inject(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;spawnSweepAttackParticles()V", shift = At.Shift.AFTER))
+    private void advanced_skills$attack(Entity target, CallbackInfo ci) {
+        if (target instanceof LivingEntity entity) {
+            SkillTriggerHandler.INSTANCE.postSweepAttack((PlayerEntity) (Object) this, entity);
         }
     }
 }

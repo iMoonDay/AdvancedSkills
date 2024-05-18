@@ -1,8 +1,10 @@
 package com.imoonday.trigger
 
+import net.minecraft.entity.player.PlayerEntity
+
 interface ClientUseTrigger : SkillTrigger {
 
-    fun onUse() = Unit
+    fun onUse(player: PlayerEntity) = Unit
 
-    fun onStop() = Unit
+    fun onStop(player: PlayerEntity) = Unit
 }

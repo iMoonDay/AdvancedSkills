@@ -1,5 +1,6 @@
 package com.imoonday.screen
 
+import com.imoonday.screen.component.CustomScrollContainer
 import com.imoonday.skill.Skill
 import com.imoonday.util.*
 import com.imoonday.util.SkillSlot.Companion.indexTexture
@@ -23,7 +24,7 @@ import java.awt.Color
 
 class SkillInventoryScreen(
     val player: PlayerEntity,
-    val parent: Screen? = null,
+    val parent: () -> Screen? = { null },
 ) : BaseOwoScreen<FlowLayout>(), AutoSyncedScreen {
 
     var selectedSlot: Slot? = null
@@ -34,14 +35,14 @@ class SkillInventoryScreen(
     var selectedTab: Tab? = null
         set(value) {
             field = value
-            scrollContainer.onMouseScroll(0.0, 0.0, 100.0)
+            scrollContainer.scrollToTop()
             update()
         }
     var selectingSlot: Slot? = null
     private val tabs: MutableList<Tab> = mutableListOf()
     private val equippedSlots: MutableList<Slot> = mutableListOf()
     private lateinit var inventory: GridLayout
-    private lateinit var scrollContainer: ScrollContainer<*>
+    private lateinit var scrollContainer: CustomScrollContainer<*>
     private val slotSize = 24
     private val tabTexture = Identifier("textures/gui/container/creative_inventory/tabs.png")
     private val titleComponent = Components.label(
@@ -125,7 +126,7 @@ class SkillInventoryScreen(
             child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
                 alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
                 gap(3)
-                child(Containers.verticalScroll(
+                child(CustomScrollContainer.vertical(
                     Sizing.content(),
                     Sizing.fixed(slotSize * 5),
                     Containers.grid(Sizing.content(), Sizing.content(), rows, 9).apply {
@@ -249,7 +250,7 @@ class SkillInventoryScreen(
         return result
     }
 
-    override fun close() = client!!.setScreen(parent)
+    override fun close() = client!!.setScreen(parent())
 
     override fun init() {
         super.init()

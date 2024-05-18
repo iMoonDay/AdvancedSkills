@@ -6,6 +6,7 @@ import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.getUsingData
 import com.imoonday.util.send
+import net.minecraft.entity.LivingEntity
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Direction
@@ -59,10 +60,13 @@ class PiercingSkill : Skill(
                 player.send(EntityVelocityUpdateS2CPacket(player))
             }
         }
-        player.world.getOtherEntities(player, player.boundingBox) { it.isLiving && it.isAlive }.forEach {
+        player.world.getNonSpectatingEntities(
+            LivingEntity::class.java, player.boundingBox
+        ).forEach {
             it.damage(player.damageSources.playerAttack(player), 6.0f)
             it.velocityDirty = true
             it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(1.5).withAxis(Direction.Axis.Y, 1.0))
+            (it as? ServerPlayerEntity)?.send(EntityVelocityUpdateS2CPacket(it))
         }
         super.serverTick(player, usedTime)
     }

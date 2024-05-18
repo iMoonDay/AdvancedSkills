@@ -9,7 +9,6 @@ import net.minecraft.client.render.entity.EntityRenderer
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.RotationAxis
 import org.joml.Matrix3f
 import org.joml.Matrix4f
@@ -20,10 +19,6 @@ abstract class EffectEnergyBallEntityRenderer<T : EffectEnergyBallEntity>(contex
     abstract val texture: Identifier
     val layer: RenderLayer
         get() = RenderLayer.getEntityCutoutNoCull(texture)
-
-    override fun getBlockLight(entity: T, pos: BlockPos): Int {
-        return super.getBlockLight(entity, pos)
-    }
 
     protected open var scale = 2.0f
 

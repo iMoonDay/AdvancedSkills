@@ -54,7 +54,10 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
         super.onCollision(hitResult)
         if (world.isClient) return
         if (effects.isNotEmpty()) {
-            world.getOtherEntities(this, this.boundingBox.expand(range)) { it.isLiving && it.isAlive }
+            world.getNonSpectatingEntities(
+                LivingEntity::class.java,
+                this.boundingBox.expand(range)
+            )
                 .filterIsInstance<LivingEntity>()
                 .forEach {
                     for (entry in effects) {

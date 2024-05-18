@@ -11,7 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 
 class SelfHealingSkill : Skill(
     id = "self_healing",
-    types = listOf(SkillType.PASSIVE, SkillType.HEALING),
+    types = listOf(SkillType.PASSIVE, SkillType.RESTORATION),
     rarity = Rarity.RARE
 ), AutoTrigger, AutoStopTrigger, DamageTrigger {
 

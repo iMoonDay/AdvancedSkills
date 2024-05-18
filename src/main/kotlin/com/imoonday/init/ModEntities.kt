@@ -1,6 +1,7 @@
 package com.imoonday.init
 
 import com.imoonday.entity.*
+import com.imoonday.entity.render.*
 import com.imoonday.util.id
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
@@ -14,6 +15,7 @@ import net.minecraft.client.render.entity.model.EntityModelLayer
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.passive.AbstractHorseEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 
@@ -94,6 +96,55 @@ object ModEntities {
     @JvmField
     val METEORITE_MODEL_LAYER: EntityModelLayer = registerModelLayer("meteorite")
 
+    @JvmStatic
+    val ENCHANTED_SWORD: EntityType<EnchantedSwordEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.MISC, ::EnchantedSwordEntity)
+            .dimensions(EntityDimensions.fixed(0.5f, 0.5f))
+            .trackRangeChunks(8)
+            .build()
+            .register("enchanted_sword")
+
+    @JvmField
+    val TORNADO: EntityType<TornadoEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.MISC, ::TornadoEntity)
+            .dimensions(EntityDimensions.changing(1.0f, 2.0f))
+            .trackRangeChunks(8)
+            .build()
+            .register("tornado")
+
+    @JvmField
+    val TORNADO_MODEL_LAYER: EntityModelLayer = registerModelLayer("tornado")
+
+    @JvmField
+    val HOOK: EntityType<HookEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.MISC, ::HookEntity)
+            .dimensions(EntityDimensions.fixed(0.25f, 0.25f))
+            .trackRangeChunks(10)
+            .trackedUpdateRate(1)
+            .build()
+            .register("hook")
+
+    @JvmField
+    val CLONE_PLAYER: EntityType<ClonePlayerEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.MISC, ::ClonePlayerEntity)
+            .dimensions(EntityDimensions.fixed(0.6f, 1.8f))
+            .trackRangeChunks(32)
+            .trackedUpdateRate(2)
+            .build()
+            .register("clone_player", PlayerEntity.createPlayerAttributes().build())
+
+    @JvmField
+    val MAGNET: EntityType<MagnetEntity> =
+        FabricEntityTypeBuilder.create(SpawnGroup.MISC, ::MagnetEntity)
+            .dimensions(EntityDimensions.fixed(0.5f, 0.5f))
+            .trackRangeChunks(8)
+            .fireImmune()
+            .build()
+            .register("magnet", MagnetEntity.createLivingAttributes().build())
+
+    @JvmField
+    val MAGNET_MODEL_LAYER: EntityModelLayer = registerModelLayer("magnet")
+
     fun <T : Entity> EntityType<T>.register(name: String): EntityType<T> =
         Registry.register(Registries.ENTITY_TYPE, id(name), this)
 
@@ -119,7 +170,17 @@ object ModEntities {
         EntityRendererRegistry.register(SERVANT_SKELETON, ::SkeletonEntityRenderer)
         EntityRendererRegistry.register(SERVANT_WITHER_SKELETON, ::WitherSkeletonEntityRenderer)
         EntityRendererRegistry.register(METEORITE, MeteoriteEntity::Renderer)
+        EntityRendererRegistry.register(ENCHANTED_SWORD, ::EnchantedSwordEntityRenderer)
+        EntityRendererRegistry.register(TORNADO, ::TornadoEntityRenderer)
+        EntityRendererRegistry.register(HOOK, ::HookEntityRenderer)
+        EntityRendererRegistry.register(CLONE_PLAYER, ClonePlayerEntity::Renderer)
+        EntityRendererRegistry.register(MAGNET, ::MagnetEntityRenderer)
 
         EntityModelLayerRegistry.registerModelLayer(METEORITE_MODEL_LAYER, MeteoriteEntity.Renderer::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(TORNADO_MODEL_LAYER, TornadoEntityModel::texturedModelData)
+        EntityModelLayerRegistry.registerModelLayer(
+            MAGNET_MODEL_LAYER,
+            MagnetEntityModel::texturedModelData
+        )
     }
 }

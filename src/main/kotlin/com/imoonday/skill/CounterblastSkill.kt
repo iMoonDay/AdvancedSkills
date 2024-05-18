@@ -21,8 +21,10 @@ class CounterblastSkill : PassiveSkill(
             player.properties.putInt("damagedTimes", player.properties.getInt("damagedTimes") + 1)
             if (player.properties.getInt("damagedTimes") >= 5) {
                 player.properties.remove("damagedTimes")
-                player.world.getOtherEntities(player, player.boundingBox.expand(5.0)) { it.isAlive && it.isLiving }
-                    .filterIsInstance<LivingEntity>()
+                player.world.getNonSpectatingEntities(
+                    LivingEntity::class.java,
+                    player.boundingBox.expand(5.0)
+                ).filterIsInstance<LivingEntity>()
                     .forEach { it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(2.0)) }
                 player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
             }

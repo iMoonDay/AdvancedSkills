@@ -49,22 +49,22 @@ class ChargedSweepSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.removeAttributes()
         player.stopUsing()
-        player.world.getOtherEntities(player, player.boundingBox.expand(5.0)) { it.isLiving && it.isAlive }
-            .map { it as LivingEntity }
-            .filter {
-                (it.boundingBox.maxY >= player.boundingBox.minY
-                    && it.boundingBox.maxY <= player.boundingBox.maxY
-                    || it.boundingBox.minY <= player.boundingBox.maxY
-                    && it.boundingBox.minY >= player.boundingBox.minY)
-                    && player.calculateAngle(it) <= PI / 3
-            }.forEach {
-                val amount = (player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
-                    + EnchantmentHelper.getAttackDamage(
-                    player.mainHandStack,
-                    it.group
-                )) * (pressedTime.toFloat() / getMaxPressTime() * 2)
-                it.damage(player.damageSources.playerAttack(player), amount)
-            }
+        player.world.getNonSpectatingEntities(
+            LivingEntity::class.java, player.boundingBox.expand(5.0)
+        ).filter {
+            (it.boundingBox.maxY >= player.boundingBox.minY
+                && it.boundingBox.maxY <= player.boundingBox.maxY
+                || it.boundingBox.minY <= player.boundingBox.maxY
+                && it.boundingBox.minY >= player.boundingBox.minY)
+                && player.calculateAngle(it) <= PI / 3
+        }.forEach {
+            val amount = (player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
+                + EnchantmentHelper.getAttackDamage(
+                player.mainHandStack,
+                it.group
+            )) * (pressedTime.toFloat() / getMaxPressTime() * 2)
+            it.damage(player.damageSources.playerAttack(player), amount)
+        }
         player.swingHand(Hand.MAIN_HAND, true)
         player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
         player.startCooling(pressedTime * 3)

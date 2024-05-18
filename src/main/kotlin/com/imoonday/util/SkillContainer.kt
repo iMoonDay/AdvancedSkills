@@ -23,15 +23,15 @@ data class SkillContainer(
     }
 
     fun getAllSkills(predicate: (Skill, SkillData) -> Boolean = { _, _ -> true }) =
-        skills.filterNot { it.key.invalid }.filter { predicate.invoke(it.key, it.value) }.keys
+        skills.filterNot { it.key.invalid }.filter { predicate(it.key, it.value) }.keys
 
     fun learn(skill: Skill, data: SkillData = SkillData(), resultCallback: (Boolean) -> Unit = {}): Boolean =
-        if (skills.containsKey(skill)) {
-            resultCallback.invoke(false)
+        if (skills.containsKey(skill) || skill.invalid) {
+            resultCallback(false)
             false
         } else {
             skills[skill] = data
-            resultCallback.invoke(true)
+            resultCallback(true)
             true
         }
 
@@ -42,13 +42,13 @@ data class SkillContainer(
     ): Boolean =
         if (skills.containsKey(skill)) {
             slots.forEach { (_, slot) ->
-                unequipCallback.invoke(slot, slot.unequipIf({ it == skill }))
+                unequipCallback(slot, slot.unequipIf({ it == skill }))
             }
             skills.remove(skill)
-            resultCallback.invoke(true)
+            resultCallback(true)
             true
         } else {
-            resultCallback.invoke(false)
+            resultCallback(false)
             false
         }
 
@@ -65,6 +65,8 @@ data class SkillContainer(
         slots.values.find { it.isEmpty() && (skill == null || it.canEquip(skill)) }
 
     fun getAllSlots(predicate: (SkillSlot) -> Boolean = { true }) = slots.values.sortedBy { it.index }.filter(predicate)
+
+    fun findSlot(predicate: (SkillSlot) -> Boolean = { true }): SkillSlot? = slots.values.find(predicate)
 
     inline fun <reified T : SkillSlot> getSlotByType(): List<SkillSlot> = getAllSlots { T::class.isInstance(it) }
 

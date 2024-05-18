@@ -5,7 +5,7 @@ import net.minecraft.text.Text
 enum class SkillType(val translationKey: String) {
     ATTACK("advancedSkills.skillType.attack"),
     DEFENSE("advancedSkills.skillType.defense"),
-    HEALING("advancedSkills.skillType.healing"),
+    FUNCTION("advancedSkills.skillType.function"),
     CONTROL("advancedSkills.skillType.control"),
     PASSIVE("advancedSkills.skillType.passive"),
     ENHANCEMENT("advancedSkills.skillType.enhancement"),

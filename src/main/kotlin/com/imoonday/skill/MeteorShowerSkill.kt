@@ -6,7 +6,6 @@ import com.imoonday.trigger.UsingRenderTrigger
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import com.imoonday.util.translateSkill
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
@@ -63,9 +62,8 @@ class MeteorShowerSkill : LongPressSkill(
         return true
     }
 
-    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
+    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) =
         super<AttributeTrigger>.postUnequipped(player, slot)
-    }
 
     override fun isDangerousTo(player: ServerPlayerEntity): Boolean = player.isUsing()
 }
