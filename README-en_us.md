@@ -15,8 +15,8 @@
 
 ### Skills.
 1. **Rebound Skills**: Bounces back the first damage with a certain probability within a certain period of time.
-2. **Displacement Skills**: There are many types of displacement skills, including Dash, Teleport, Dodge, Jump, Grappling Hook, etc. 3. **Control Skills**: You can use any of these skills to control the movement of your opponent.
-3. **Control Skills**: There are a variety of control skills, including Imprison, Slow, Silence, etc. 4. **Passive Skills**: There are a variety of passive skills.
+2. **Displacement Skills**: There are many types of displacement skills, including Dash, Teleport, Dodge, Jump, Grappling Hook, etc.
+3. **Control Skills**: There are a variety of control skills, including Imprison, Slow, Silence, etc.
 4. **Passive Skills**: Skills other than passive skills are active skills. Passive skills include self-healing, passive effects, wall climbing, stealth, etc.
 5. **Enhancement Skills**: There are a variety of Enhancement Skills, including Perspective, Ignore Liquid, Negative Resistance, etc.
 6. **Summoning Skills**: e.g. Split, Mount, Servant, etc.
