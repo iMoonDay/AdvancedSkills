@@ -1,17 +1,15 @@
 package com.imoonday.config
 
-import com.imoonday.MOD_ID
+import com.imoonday.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import net.fabricmc.api.EnvType
-import net.fabricmc.loader.api.FabricLoader
-import java.io.File
-import java.io.FileWriter
-import java.nio.file.FileSystems
-import java.nio.file.Path
-import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
-import kotlin.concurrent.thread
-import kotlin.io.path.name
+import kotlinx.serialization.json.*
+import net.fabricmc.api.*
+import net.fabricmc.loader.api.*
+import java.io.*
+import java.nio.file.*
+import java.nio.file.StandardWatchEventKinds.*
+import kotlin.concurrent.*
+import kotlin.io.path.*
 
 @Serializable
 class UIConfig {
@@ -54,7 +52,7 @@ class UIConfig {
             if (loading) return
             loading = true
             println("Loading $MOD_ID-client configuration file")
-            var text = ""
+            var text: String
             try {
                 val file = file
                 if (!file.exists()) {
@@ -123,7 +121,8 @@ class UIConfig {
             }
         }
 
-        fun isValidLayout(layout: Array<IntArray>): Boolean {
+        fun isValidLayout(layout: Array<IntArray>?): Boolean {
+            if (layout == null) return false
             val numbers = mutableSetOf<Int>()
             for (row in layout) {
                 for (num in row) {
