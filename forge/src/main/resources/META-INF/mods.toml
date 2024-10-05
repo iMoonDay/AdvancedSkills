@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+issueTrackerURL = "https://github.com/iMoonDay/AdvancedSkills/issues"
+license = "MIT"
+
+[[mods]]
+modId = "advanced_skills_re"
+version = "${version}"
+displayName = "Advanced Skills: Remastered"
+authors = "iMoonDay"
+description = '''
+A large number of skills give you a more enjoyable combat experience
+'''
+logoFile = "assets/advanced_skills_re/icon.png"
+
+[[dependencies.advanced_skills_re]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.advanced_skills_re]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20,1.21)"
+ordering = "NONE"
+side = "BOTH"
+

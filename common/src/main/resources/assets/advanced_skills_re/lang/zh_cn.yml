@@ -1,0 +1,434 @@
+advancedSkills:
+  key:
+    category: 进阶技能
+    openGalleryScreen: 查看技能图鉴
+    openListScreen: 查看技能列表
+    openSlotScreen: 调整技能栏位置
+    quickCast: 快捷施法
+    useSkill1: 使用技能 1
+    useSkill2: 使用技能 2
+    useSkill3: 使用技能 3
+    useSkill4: 使用技能 4
+    useSkill5: 使用技能 5
+    useSkill6: 使用技能 6
+    useSkill7: 使用技能 7
+    useSkill8: 使用技能 8
+    useSkill9: 使用技能 9
+    useSkill10: 使用技能 10
+  useSkill:
+    cooling: '%s 正在冷却：%s'
+    failed: 使用 %s 失败
+    silenced: 沉默中，无法使用技能
+    passive: '%s 是被动技能'
+    active: '%s 已激活'
+    inactive: '%s 已关闭'
+    charging: '%s 开始蓄力'
+  learnSkill:
+    toast: 学到了一项新技能！
+    message: '学习了 %s'
+    all: 已学习所有技能
+    failed: '%s 已学习 %s'
+    failedSelf: '你已学习 %s'
+    invalid: '无法学习 %s'
+  forgetSkill:
+    message: '遗忘了 %s'
+    failed: "%s 未学习 %s"
+    all: 已遗忘所有技能
+  equipSkill:
+    success: '%s 已装备 %s 至插槽 %d'
+    failed: '%s 已经装备了 %s 在插槽 %d 上'
+  unequipSkill:
+    success: '%s 已将 %s 从插槽 %d 卸下'
+    failed: '%s 未装备技能在插槽 %d 上'
+    banned: '%s 被服务器禁用'
+  resetCooldown: '%s 重置了所有技能的冷却时间'
+  reset: '已重置 %s 的所有数据'
+  skillExp:
+    give:
+      single: 已为 %2$s 增加 %1$d 点技能经验值
+      multiple: 已为 %d 名玩家增加 %d 点技能经验值
+    set:
+      single: 已设置 %2$s 的技能经验值为 %1$d 点
+      multiple: 已设置 %d 名玩家技能经验值为 %d 点
+    query: '%s 拥有 %d 点技能经验值'
+  skillLevel:
+    give:
+      single: 已为 %2$s 增加 %1$d 级技能等级
+      multiple: 已为 %d 名玩家增加 %d 级技能等级
+    set:
+      single: 已设置 %2$s 的技能等级为 %1$d 级
+      multiple: 已设置 %d 名玩家的技能等级为 %d 级
+    query: '%s 的技能等级为 %d 级'
+    addChoice: 你可以学习新技能了
+  command:
+    unknown: 未知的技能ID
+    invalid: 无效的技能ID
+  skill:
+    empty:
+      name: 空
+    fireball:
+      name: 火球术
+      description: 发射火球
+    horizontal_dash:
+      name: 水平冲刺
+      description: 水平向前冲刺
+    teleport:
+      name: 传送
+      description: 向前传送
+      collide: 无容纳空间
+    jump:
+      name: 跳跃
+      description: 无需地面的跳跃
+    double_jump:
+      name: 二级跳跃
+      description: 无需地面的双倍高度跳跃
+    triple_jump:
+      name: 三级跳跃
+      description: 无需地面的三倍高度跳跃
+    dash:
+      name: 冲刺
+      description: 向前冲刺
+    ground_whack:
+      name: 地面重击
+      description: 从空中砸向地面，免疫10格以下摔落伤害，10格以上摔落伤害减半
+      failed: 不在空中！
+    absolute_defense:
+      name: 绝对防御
+      description: 格挡一次任意伤害，持续30s
+    extreme_reflection:
+      name: 极限反弹
+      description: 以75%的概率在0.25秒内反弹首个任意伤害，反弹后立即重置冷却时间，免伤100%
+      success: 成功反弹!
+      failed: 反弹失败
+      active: 反弹未结束
+      early: 早了 %d 秒
+      late: 晚了 %d 秒
+    rapid_reflection:
+      name: 快速反弹
+      description: 以50%的概率在0.5秒内反弹首个任意伤害，反弹后立即将冷却时间减半，免伤50%
+    micro_reflection:
+      name: 微反弹
+      description: 以25%的概率在1秒内反弹首个任意伤害的50%，免伤25%
+    perfect_reflection:
+      name: 完美反弹
+      description: 以100%的概率在0.1秒内反弹首个任意伤害的150%，反弹后立即重置冷却时间，并弹开伤害来源，免伤100%，治疗伤害量的10%
+      success: 完美反弹!%s
+    wall_climbing:
+      name: 爬墙
+      description: 允许爬墙
+    piercing:
+      name: 突刺
+      description: 向前冲刺一段距离，并对接触的生物造成伤害并击退
+    primary_healing:
+      name: 初级治疗术
+      description: 瞬间恢复4点血量，然后所有治疗术进入冷却
+    intermediate_healing:
+      name: 中级治疗术
+      description: 瞬间恢复8点血量，然后所有治疗术进入冷却
+    advanced_healing:
+      name: 高级治疗术
+      description: 瞬间恢复12点血量，然后所有治疗术进入冷却
+    top_healing:
+      name: 顶级治疗术
+      description: 瞬间恢复16点血量，然后所有治疗术进入冷却
+    extreme_evasion:
+      name: 极限闪避
+      description: 根据自身移动方向闪避，移动期间免疫任何伤害
+    self_healing:
+      name: 自愈
+      description: 每10秒自然恢复2点血量，受伤时重置时间
+    strong_physique:
+      name: 强健体魄
+      description: 增加4点血量上限
+    agility:
+      name: 身手敏捷
+      description: 略微增加移动速度
+    resuscitation:
+      name: 起死回生
+      description: 抵挡致命伤害，触发后无敌2s，并获得30s生命恢复
+    dying_counterattack:
+      name: 垂死反击
+      description: 受到致命伤害时，血量恢复到上限，然后进入死亡模式：持续扣血，攻击其他生物可以吸血，当血量不足时死亡
+    disarm:
+      name: 缴械
+      description: 下一次攻击有45%概率对目标施加缴械
+      success: 缴械成功！
+      failed: 缴械失败
+      disarmed: 你被缴械了！
+    primary_silence:
+      name: 初级沉默术
+      description: 发射一个30%概率沉默并100%概率减速小范围内生物的能量球
+    last_ditch_effort:
+      name: 回光返照
+      description: 血量低于30%时，血量恢复至50%，大幅增加移动速度，伤害+1，受到的伤害+1，持续15s
+    mastery:
+      name: 技能精通
+      description: 所有技能进入冷却时减少20%时间
+    primary_purification:
+      name: 初级净化术
+      description: 随机减少一个负面效果的20%剩余时间，最多15秒
+      success: '%s 已减少 %d 秒'
+      failed: 没有负面效果
+    advanced_purification:
+      name: 高级净化术
+      description: 去除时间剩余30秒以内时间最长的一个负面效果，若没有，则随机减少一个负面效果的剩余时间30秒
+      success: '成功净化 %s'
+      failed: 没有符合的负面效果
+    absolute_domain:
+      name: 绝对领域
+      description: 将周围1格内方块击碎
+    charged_sweep:
+      name: 蓄力横扫
+      description: 蓄力后对前方扇形范围内实体造成伤害
+    active_defense:
+      name: 主动防御
+      description: 长按使用时减伤20%
+    self_repair:
+      name: 自我修复
+      description: 自动修复身上装备，最高修复至50%
+    instant_explosive:
+      name: 瞬爆炸药
+      description: 投掷一个不稳定的Tnt
+    primary_freeze:
+      name: 初级冰冻术
+      description: 发射一个30%概率冰冻周围生物的冰球
+    primary_slowness:
+      name: 初级迟缓术
+      description: 发射一个50%概率减缓周围生物速度的小冰球
+    primary_confinement:
+      name: 初级禁锢术
+      description: 在一定范围内，最高80%概率将指向的生物禁锢3s
+      success: 禁锢成功
+      failed: 禁锢失败
+      empty: 未选中目标
+    exclusive_mount:
+      name: 专属坐骑
+      description: 召唤一匹专属坐骑马，可以直接乘骑，仅本人可用，马的血量、防御、速度和跳跃高度提升。若马已存在一只，则销毁原先的，并召唤一只新的，这将重置所有状态。若马死亡，该技能进入冷却
+      unsupportedStatus: 当前状态无法召唤马
+      unsupportedPlace: 不能在这里召唤马
+      customName: "%s的专属坐骑"
+      notOwner: 你不是马的主人
+      dead: 你的特驯马在 %d %d %d 死亡，冷却后可以再次召唤它
+      killed: 你的特驯马在 %d %d %d 被 %s 击杀，冷却后可以再次召唤它
+      inventory: 你无法打开特驯马的物品栏
+    night_vision:
+      name: 夜视
+      description: 夜视效果
+    undead_summoning:
+      name: 死灵召唤
+      description: 召唤一些不死仆从
+      customName: "%s的奴仆"
+    taunt:
+      name: 嘲讽
+      description: 嘲讽其他玩家的奴仆，并获得奴仆伤害减伤，持续15s
+    liquid_shield:
+      name: 液体护罩
+      description: 你将隔离周围液体
+    water_walker:
+      name: 水上行者
+      description: 你可以在水上行走
+    automatic_uphill:
+      name: 自动上坡
+      description: 可以自动爬上方块
+    water_breathing:
+      name: 水下呼吸
+      description: 你可以在水中呼吸
+    static_invisibility:
+      name: 静态隐身
+      description: 静止不动时隐身
+    faster_eating:
+      name: 快速进食
+      description: 加快进食速度
+    danger_perception:
+      name: 危险感知
+      description: 遇到危险时临时获得加速
+    rising_shock:
+      name: 上升冲击
+      description: 向上升起一段距离，同时将身边的生物一起带飞
+    catapult_gliding:
+      name: 弹射滑翔
+      description: 蓄力然后弹出去并使用鞘翅滑翔
+      failed: 你没有鞘翅或者已损坏
+      fallFlying: 无法在滑翔时使用
+    charged_dash:
+      name: 蓄力冲刺
+      description: 蓄力然后弹出去，可用于滑翔
+    laser_eye:
+      name: 激光眼
+      description: 发射一束激光，对路径上的所有生物造成伤害
+    meteor_shower:
+      name: 流星雨
+      description: 召唤一场陨石雨
+      failed: 蓄力中断
+    negative_resistance:
+      name: 负面抵抗
+      description: 短时间内抵挡一次负面效果
+    insightful_eye:
+      name: 洞察之眼
+      description: 可以看到其他玩家的技能
+    item_attraction:
+      name: 物品吸引
+      description: 吸引周围物品
+    doping:
+      name: 兴奋剂
+      description: 以少量血量为代价，获得大量速度
+    grappling_hook:
+      name: 抓钩
+      description: 抓住一个方块并向方块移动
+      failed: 无可抓方块
+    reverse_gravity:
+      name: 反重力
+      description: 颠倒重力
+    ore_perception:
+      name: 矿物感知
+      description: 可以透视周围矿石
+    invisible_trap:
+      name: 隐形陷阱
+      description: 放置一个隐形陷阱
+      failed: 没有空位
+    frost_trap:
+      name: 冰霜陷阱
+      description: 放置一个雪陷阱
+      failed: 没有空位
+    temporary_shield:
+      name: 临时护盾
+      description: 缓慢增加额外血量上限,上限10
+    pain_feedback:
+      name: 痛苦反馈
+      description: 当同一个生物连续对自己造成一定量的伤害时，立即反弹之前该生物对自己造成的所有伤害的25%
+    thunder_fury:
+      name: 雷霆之怒
+      description: 召唤一道闪电
+    counterblast:
+      name: 蓄势爆发
+      description: 被攻击一定次数后，击退周围生物
+    time_rewind:
+      name: 时间倒流
+      description: 回溯坐标
+    living_detection:
+      name: 活体检测
+      description: 检测附近的移动中的生物
+    blood_seal:
+      name: 血印术
+      description: 封印生物的治疗效果
+      interrupt: 蓄力中断
+      failed: 未选中目标
+    sword_soul_guarding:
+      name: 剑魂守护
+      description: 召唤附魔剑跟随作战，攻击时有概率发动追加攻击，受伤时必定触发追加攻击
+    wind_blade:
+      name: 风刃剑
+      description: 触发横扫之刃效果时生成一个小龙卷风
+    biological_hook:
+      name: 生物钩爪
+      description: 发射一个生物抓钩，有一定概率被挣脱
+    duplication:
+      name: 分身术
+      description: 召唤一个分身并隐身一秒
+    magnetic_trap:
+      name: 磁力陷阱
+      description: 生成一个减速陷阱
+  skillType:
+    attack: 攻击
+    defense: 防御
+    function: 功能
+    control: 控制
+    passive: 被动
+    enhancement: 强化
+    summon: 召唤
+    restoration: 恢复
+    movement: 移动
+    destruction: 破坏
+  skillRarity:
+    useless: 无用
+    common: 普通
+    uncommon: 罕见
+    rare: 稀有
+    superb: 卓越
+    epic: 史诗
+    legendary: 传奇
+    mythic: 神话
+    unique: 唯一
+  screen:
+    gallery:
+      title: 技能图鉴
+      info:
+        name: '名称：%s'
+        type: '类型：%s'
+        description: '描述：%s'
+        cooldown: '冷却：%s'
+        rarity: '稀有度：%s'
+      suggestion: "有新的技能建议?点击前往github提交issue或PR!"
+    list:
+      level: '等级：%s'
+      exp: '经验：%d'
+      button:
+        tooltip: 仅在创造模式下显示
+        learnAll: 学习全部
+        forgetAll: 忘记全部
+        resetCooldown: 重置冷却
+        inventory: 背包
+        learn: 学习
+    slot:
+      title: 左键拖动移动，右键重置
+      compact: 紧凑技能显示
+    inventory:
+      title: '技能背包 %d/%d'
+    wheel:
+      cancel: 取消
+      tip: 左键/松开使用，右键取消，中键查看详情
+    learn:
+      refresh: 重抽
+      learn: 学习
+      count: '剩余技能数: %d'
+  skillSlot:
+    generic: '通用技能栏 %d'
+    active: '主动技能栏 %d'
+    passive: '被动技能栏 %d'
+item:
+  advanced_skills_re:
+    skill_fruit: 技能果实
+effect:
+  advanced_skills_re:
+    disarm: 缴械
+    silence: 沉默
+    freeze: 冻结
+    confinement: 禁锢
+    serious_injury: 重伤
+entity:
+  advanced_skills_re:
+    silence_energy_ball: 沉默能量球
+    freeze_energy_ball: 冻结能量球
+    slowness_energy_ball: 减速能量球
+    unstable_tnt: 不稳定的TNT
+    special_tame_horse: 特驯马
+    servant_skeleton: 奴仆骷髅
+    servant_wither_skeleton: 奴仆凋零骷髅
+    meteorite: 陨石
+    hook: 钩子
+    enchanted_sword: 附魔剑
+    tornado: 龙卷风
+    clone_player: 玩家
+    magnet: 磁石
+block:
+  advanced_skills_re:
+    invisible_trap: 隐形陷阱
+    frost_trap: 冰霜陷阱
+subtitles:
+  advanced_skills_re:
+    heal: 治愈
+    purify: 净化
+    notice: 通知
+    dash: 冲刺
+    disarm: 缴械
+    piercing: 突刺
+    fire: 发射
+    laser: 激光
+gamerule:
+  skillCooldownMultiplier: 技能冷却乘数
+  skillCooldownMultiplier.description: 所有技能冷却时间按此倍率调整
+modmenu:
+  nameTranslation:
+    advanced_skills_re: 进阶技能
+  descriptionTranslation:
+    advanced_skills_re: 大量技能让你更畅快地体验战斗

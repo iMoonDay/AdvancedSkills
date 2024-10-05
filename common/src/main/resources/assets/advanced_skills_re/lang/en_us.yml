@@ -1,0 +1,428 @@
+advancedSkills:
+  key:
+    category: Advanced Skills
+    openGalleryScreen: View the Skill Atlas
+    openListScreen: View the list of skills
+    openSlotScreen: Adjust the position of the skill bar
+    quickCast: Quick Cast
+    useSkill1: Use Skill 1
+    useSkill2: Use Skill 2
+    useSkill3: Use Skill 3
+    useSkill4: Use Skill 4
+    useSkill5: Use Skill 5
+    useSkill6: Use Skill 6
+    useSkill7: Use Skill 7
+    useSkill8: Use Skill 8
+    useSkill9: Use Skill 9
+    useSkill10: Use Skill 10
+  useSkill:
+    cooling: '%s is cooling: %s'
+    failed: Use %s failed
+    silenced: You are silenced and cannot use skills
+    passive: '%s is passive skill'
+    active: '%s is active'
+    charging: '%s start charging'
+  learnSkill:
+    toast: Learned a new skill!
+    message: 'Learned %s'
+    all: Learned all skills
+    failed: '%s already know %s'
+    failedSelf: 'You already know %s'
+    invalid: 'Unable to learn %s'
+  forgetSkill:
+    message: 'Forgotten %s'
+    failed: "%s don't know %s"
+    all: Forgotten all skills
+  equipSkill:
+    success: '%s equipped %s to Slot %d'
+    failed: '%s already equipped %s on Slot %d'
+  unequipSkill:
+    success: '%s has removed %s from slot %d'
+    failed: '%s has no equipped skill on slot %d'
+    banned: '%s was banned from server'
+  resetCooldown: '%s reset all skills cooldown'
+  reset: 'All data for %s has been reset'
+  skillExp:
+    give:
+      single: Gave %d skill experience points to %s
+      multiple: Gave %d skill experience points to %d players
+    set:
+      single: Set %d skill experience points on %s
+      multiple: Set %d skill experience points on %d players
+    query: '%s has %d skill experience points'
+  skillLevel:
+    give:
+      single: Gave %d skill level to %s
+      multiple: Gave %d skill level to %d players
+    set:
+      single: Set %d skill level on %s
+      multiple: Set %d skill level on %d players
+    query: "%s's skill level is level %d"
+    addChoice: You can learn a new skill
+  command:
+    unknown: Unknown skill ID
+    invalid: Invalid skill ID
+  skill:
+    empty:
+      name: Empty
+    fireball:
+      name: Fireball
+      description: Fire a fireball
+    horizontal_dash:
+      name: Horizontal Dash
+      description: Dash forward horizontally
+    teleport:
+      name: Teleport
+      description: Teleport forward
+      collide: No space
+    jump:
+      name: Jump
+      description: Jump without the help of the ground
+    double_jump:
+      name: Double Jump
+      description: Double height jump without the help of the ground
+    triple_jump:
+      name: Triple Jump
+      description: Triple height jump without the help of the ground
+    dash:
+      name: Dash
+      description: Dash forward
+    ground_whack:
+      name: Ground Whack
+      description: Smashed from the air to the ground, immune to fall damage below 10 blocks, and half damage from falls above 10 blocks
+      failed: Not in the air!
+    absolute_defense:
+      name: Absolute Defense
+      description: Block any damage once. The skill lasts for 30s
+    extreme_reflection:
+      name: Extreme Reflection
+      description: Reflects the first arbitrary damage within 0.25 seconds at a 75% probability, and resets the cooldown immediately after the reflection
+      success: Successful Deflection!
+      failed: Failed Deflection
+      active: Reflection is not finished
+      early: '%ds early!'
+      late: '%ds late!'
+    rapid_reflection:
+      name: Rapid Reflection
+      description: Reflects the first arbitrary damage with a 50% damage reduction within 0.5 seconds at a 50% probability, and halves the cooldown immediately after the reflection
+    micro_reflection:
+      name: Micro Reflection
+      description: Reflects 50% of the first arbitrary damage with a 25% reduction within 1 seconds at a 25% probability
+    perfect_reflection:
+      name: Perfect Reflection
+      description: Reflects 150% of the first arbitrary damage with a 100% reduction with a 10% healing within 0.1 seconds at a 100% probability, and resets the cooldown immediately and the source of damage is bounced after the reflection
+      success: Perfect Deflection!%s
+    wall_climbing:
+      name: Wall Climbing
+      description: Allow to climb the wall
+    piercing:
+      name: Piercing
+      description: Dash forward for a distance, dealing damage and knocking back creatures on contact
+    primary_healing:
+      name: Primary Healing
+      description: Instantly heals 4 HP, and then all healing skills enter cooldown
+    intermediate_healing:
+      name: Intermediate Healing
+      description: Instantly heals 8 HP, and then all healing skills enter cooldown
+    advanced_healing:
+      name: Advanced Healing
+      description: Instantly heals 12 HP, and then all healing skills enter cooldown
+    top_healing:
+      name: Top Healing
+      description: Instantly heals 16 HP, and then all healing skills enter cooldown
+    extreme_evasion:
+      name: Extreme Evasion
+      description: Dodge based on the direction of your movement, making you immune to any damage while moving
+    self_healing:
+      name: Self Healing
+      description: Naturally regenerates 2 HP every 10 seconds, resetting time when injured
+    strong_physique:
+      name: Strong Physique
+      description: Increases 4 max health
+    agility:
+      name: Agility
+      description: Slightly increases movement speed
+    resuscitation:
+      name: Resuscitation
+      description: Blocks fatal damage, becomes invincible for 2 seconds and gains 30 seconds health regeneration
+    dying_counterattack:
+      name: Dying Counterattack
+      description: 'When receiving fatal damage, the HP returns to the upper limit, and then enters death mode: HP is continuously deducted, and HP can be sucked by attacking other creatures. When the HP is insufficient, you will die'
+    disarm:
+      name: Disarm
+      description: The next attack has a 45% chance of disarming the target
+      success: Disarm Successful!
+      failed: Disarm Failed
+      disarmed: You are disarmed!
+    primary_silence:
+      name: Primary Silence
+      description: Fires an energy ball with a 30% probability of silencing and a 100% probability of slowing down creatures within a small area
+    last_ditch_effort:
+      name: Last Ditch Effort
+      description: When the HP is lower than 30%, the HP will be restored to 50%, the movement speed will be greatly increased, the damage will increase 1, and the damage received will increase 1, lasting for 15 seconds
+    mastery:
+      name: Mastery
+      description: Reduce the cooldown time of all skills by 20%
+    primary_purification:
+      name: Primary Purification
+      description: Randomly reduces the remaining time of a negative effect by 20%, up to 15 seconds
+      success: '%s has been reduced by %d seconds'
+      failed: No negative effects
+    advanced_purification:
+      name: Advanced Purification
+      description: Remove the longest negative effect within 30 seconds remaining. If there is no negative effect within 30 seconds, the remaining time of a random negative effect will be reduced by 30 seconds
+      success: 'Successfully purified %s'
+      failed: No matching negative effects
+    absolute_domain:
+      name: Absolute Domain
+      description: Break the blocks within 1 square around
+    charged_sweep:
+      name: Charged Sweep
+      description: After charging, it will cause damage to entities within the fan-shaped range in front
+    active_defense:
+      name: Active Defense
+      description: Reduce damage by 20% when long pressed
+    self_repair:
+      name: Self Repair
+      description: Automatically repair your equipment, up to 50%
+    instant_explosive:
+      name: Instant Explosive
+      description: Throw a unstable tnt
+    primary_freeze:
+      name: Primary Freeze
+      description: Fires an ice ball with a 30% chance of freezing surrounding creatures
+    primary_slowness:
+      name: Primary Slowness
+      description: Fires an small ice ball with a 50% chance of slowing surrounding creatures
+    primary_confinement:
+      name: Primary Confinement
+      description: Within a certain range, there is a maximum 80% probability of confining the pointed creature for 3 seconds
+      success: Confinement successful
+      failed: Confinement failed
+      empty: No Target selected
+    exclusive_mount:
+      name: Exclusive Mount
+      description: Summons an exclusive horse that can be ridden directly. It is only available to you. The horse's health, defense, speed and jumping height are increased. If a horse already exists, discard the original one and summon a new one, which will reset all states. If the horse dies, this skill will go on cooldown
+      unsupportedStatus: You can't summon the horse in your current state
+      unsupportedPlace: You can't summon the horse here
+      customName: "%s's exclusive mount"
+      notOwner: You are not the owner of the horse
+      dead: You exclusive horse is dead at %d %d %d. You can summon it again after the cooldown
+      killed: Your exclusive horse is killed by %s at %d %d %d. You can summon it again after the cooldown
+      inventory: You can't open the inventory of your exclusive mount
+    night_vision:
+      name: Night Vision
+      description: Night vision effect
+    undead_summoning:
+      name: Undead Summoning
+      description: Summon some undead minions
+      customName: "%s's servant"
+    taunt:
+      name: Taunt
+      description: Taunt other players' minions and gain minion damage reduction for 15 s
+    liquid_shield:
+      name: Liquid Shield
+      description: You will isolate the liquid
+    water_walker:
+      name: Water Walker
+      description: You can walk on water
+    automatic_uphill:
+      name: Automatic Uphill
+      description: You can step up blocks smoothly
+    water_breathing:
+      name: Water Breathing
+      description: You can breathe in water
+    static_invisibility:
+      name: Static Invisibility
+      description: Be invisible when stationary
+    faster_eating:
+      name: Faster Eating
+      description: Increase the speed of eating
+    danger_perception:
+      name: Danger Perception
+      description: Gain temporary speed when in danger
+    rising_shock:
+      name: Rising Shock
+      description: Rise up a certain distance and take the creatures around you with it
+    catapult_gliding:
+      name: Catapult Gliding
+      description: Charge up, then pop out and use elytra to glide
+      failed: You have no elytra or your elytra is broken
+      fallFlying: Cannot be used while gliding
+    charged_dash:
+      name: Charged Dash
+      description: Charge up and pop out, which can be used to glide
+    laser_eye:
+      name: Laser Eye
+      description: Fires a laser beam, damaging all creatures in its path
+    meteor_shower:
+      name: Meteor Shower
+      description: Summon a meteor shower
+      failed: Charge interrupted
+    negative_resistance:
+      name: Negative Resistance
+      description: Resist a negative effect once for a short period of time
+    insightful_eye:
+      name: Insightful Eye
+      description: Can see the skills of other players
+    item_attraction:
+      name: Item Attraction
+      description: Attract surrounding items
+    doping:
+      name: Doping
+      description: Gain a lot of speed at the cost of a little health
+    grappling_hook:
+      name: Grappling Hook
+      description: Grab a block and move towards it
+      failed: No blocks to grab
+    reverse_gravity:
+      name: Reverse Gravity
+      description: Reverse gravity
+    ore_perception:
+      name: Ore Perception
+      description: Can see through surrounding ores
+    invisible_trap:
+      name: Invisible Trap
+      description: Place a invisible trap
+      failed: No empty place
+    frost_trap:
+      name: Frost Trap
+      description: Place a snow trap
+      failed: No empty place
+    temporary_shield:
+      name: Temporary Shield
+      description: Slowly increase the absorption amount, the upper limit is 10
+    pain_feedback:
+      name: Pain Feedback
+      description: When the same creature continuously causes a certain amount of damage to you, 25% of the damage previously caused by the creature to you will be immediately reflected
+    thunder_fury:
+      name: Thunder Fury
+      description: Summon a lightning bolt
+    counterblast:
+      name: Counterblast
+      description: After being attacked a certain number of times, repel surrounding creatures
+    time_rewind:
+      name: Time Rewind
+      description: Backtracking coordinates
+    living_detection:
+      name: Living Detection
+      description: Detect nearby moving creatures
+    blood_seal:
+      name: Blood Seal
+      description: Seal the healing effect of the creature
+      interrupt: Charge interrupted
+      failed: No Target selected
+    sword_soul_guarding:
+      name: Sword Soul Guarding
+      description: Summons an enchanted sword to follow the battle. There is a probability of launching an additional attack when attacking. An additional attack will definitely be triggered when injured
+    wind_blade:
+      name: Wind Blade
+      description: Creates a small tornado when triggering Sweeping Blade
+    biological_hook:
+      name: Biological Hook
+      description: Launches a biological grappling hook, with a certain probability of being broken free
+    duplication:
+      name: Duplication
+      description: Summons a clone and becomes invisible for one second
+    magnetic_trap:
+      name: Magnetic Trap
+      description: Generate a slowdown trap
+  skillType:
+    attack: Attack
+    defense: Defense
+    function: Function
+    control: Control
+    passive: Passive
+    enhancement: Enhancement
+    summon: Summon
+    restoration: Restoration
+    movement: Movement
+    destruction: Destruction
+  skillRarity:
+    useless: Useless
+    common: Common
+    uncommon: Uncommon
+    rare: Rare
+    superb: Superb
+    epic: Epic
+    legendary: Legendary
+    mythic: Mythic
+    unique: Unique
+  screen:
+    gallery:
+      title: Skill Atlas
+      info:
+        name: 'Name: %s'
+        type: 'Type: %s'
+        description: 'Description: %s'
+        cooldown: 'Cooldown: %s'
+        rarity: 'Rarity: %s'
+      suggestion: Have a new skill suggestion? Click to go to github to submit an issue or PR!
+    list:
+      level: 'Level: %s'
+      exp: 'Exp: %d'
+      button:
+        tooltip: Displayed in Creative Mode Only
+        learnAll: Learn All
+        forgetAll: Forget All
+        resetCooldown: Reset Cooldown
+        inventory: Inventory
+        learn: Learn
+    slot:
+      title: Left drag to move, right click to reset
+      compact: Compact skill display
+    inventory:
+      title: 'Skill Inventory %d/%d'
+    wheel:
+      cancel: Cancel
+      tip: Left click/release to use, right click to cancel, middle click to view details
+    learn:
+      refresh: Refresh
+      learn: Learn
+      count: 'Remaining Skills: %d'
+  skillSlot:
+    generic: 'Generic Skill Slot %d'
+    active: 'Active Skill Slot %d'
+    passive: 'Passive Skill Slot %d'
+item:
+  advanced_skills_re:
+    skill_fruit: Skill Fruit
+effect:
+  advanced_skills_re:
+    disarm: Disarm
+    silence: Silence
+    freeze: Freeze
+    confinement: Confinement
+    serious_injury: Serious Injury
+entity:
+  advanced_skills_re:
+    silence_energy_ball: Silence Energy Ball
+    freeze_energy_ball: Frozen Energy Ball
+    slowness_energy_ball: Slowness Energy Ball
+    unstable_tnt: Unstable TNT
+    special_tame_horse: Special Tame Horse
+    servant_skeleton: Servant Skeleton
+    servant_wither_skeleton: Servant Wither Skeleton
+    meteorite: Meteorite
+    hook: Hook
+    enchanted_sword: Enchanted Sword
+    tornado: Tornado
+    clone_player: Player
+    magnet: Magnet
+block:
+  advanced_skills_re:
+    invisible_trap: Invisible Trap
+    frost_trap: Frost Trap
+subtitles:
+  advanced_skills_re:
+    heal: Heal
+    purify: Purify
+    notice: Notice
+    dash: Dash
+    disarm: Disarm
+    piercing: Piercing
+    fire: Fire
+    laser: Laser
+gamerule:
+  skillCooldownMultiplier: Skill Cooldown Multiplier
+  skillCooldownMultiplier.description: The cooldown time of all skills is adjusted according to this multiplier
