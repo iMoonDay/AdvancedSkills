@@ -30,7 +30,7 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
     private val summonSkill
         get() = Skills.EXCLUSIVE_MOUNT
 
-    constructor(world: World, owner: PlayerEntity) : this(ModEntities.SPECIAL_TAME_HORSE, world) {
+    constructor(world: World, owner: PlayerEntity) : this(ModEntities.SPECIAL_TAME_HORSE.get(), world) {
         bondWithPlayer(owner)
         saddle(SoundCategory.NEUTRAL)
         equipHorseArmor(owner, Items.DIAMOND_HORSE_ARMOR.defaultStack)

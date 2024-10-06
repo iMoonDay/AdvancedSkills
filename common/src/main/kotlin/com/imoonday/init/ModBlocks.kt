@@ -1,25 +1,30 @@
 package com.imoonday.init
 
-import com.imoonday.block.FrostTrapBlock
-import com.imoonday.block.InvisibleTrapBlock
-import com.imoonday.block.entity.InvisibleTrapBlockEntity
-import com.imoonday.util.id
-import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
-import net.minecraft.block.Block
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.block.entity.BlockEntityType.BlockEntityFactory
-import net.minecraft.datafixer.TypeReferences
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.sound.BlockSoundGroup
-import net.minecraft.util.Util
+import com.imoonday.*
+import com.imoonday.block.*
+import com.imoonday.block.entity.*
+import com.imoonday.util.*
+import dev.architectury.registry.registries.*
+import net.minecraft.block.*
+import net.minecraft.block.entity.*
+import net.minecraft.block.entity.BlockEntityType.*
+import net.minecraft.datafixer.*
+import net.minecraft.registry.*
+import net.minecraft.sound.*
+import net.minecraft.util.*
+import java.util.function.*
 
 object ModBlocks {
 
     @JvmField
+    val BLOCKS = DeferredRegister.create(MOD_ID, RegistryKeys.BLOCK)
+
+    @JvmField
+    val BLOCK_ENTITIES = DeferredRegister.create(MOD_ID, RegistryKeys.BLOCK_ENTITY_TYPE)
+
+    @JvmField
     val INVISIBLE_TRAP = InvisibleTrapBlock(
-        FabricBlockSettings.create()
+        AbstractBlock.Settings.create()
             .dropsNothing()
             .noCollision()
             .breakInstantly()
@@ -33,7 +38,7 @@ object ModBlocks {
 
     @JvmField
     val FROST_TRAP = FrostTrapBlock(
-        FabricBlockSettings.create()
+        AbstractBlock.Settings.create()
             .sounds(BlockSoundGroup.SNOW)
             .replaceable()
             .breakInstantly()
@@ -43,19 +48,20 @@ object ModBlocks {
     @JvmField
     val FROST_TRAP_ENTITY = registerEntity("frost_trap", ::InvisibleTrapBlockEntity, FROST_TRAP)
 
-    fun <T : Block> T.register(id: String): T {
-        return Registry.register(Registries.BLOCK, id(id), this)
-    }
+    fun <T : Block> T.register(id: String): RegistrySupplier<T> = BLOCKS.register(id) { this }
 
     fun <T : BlockEntity> registerEntity(
         id: String,
         factory: BlockEntityFactory<T>,
-        vararg blocks: Block,
-    ): BlockEntityType<T> = Registry.register(
-        Registries.BLOCK_ENTITY_TYPE, id(id), BlockEntityType.Builder.create(factory, *blocks).build(
+        vararg blocks: Supplier<out Block>,
+    ): RegistrySupplier<BlockEntityType<T>> = BLOCK_ENTITIES.register(id) {
+        Builder.create(factory, *blocks.map(Supplier<out Block>::get).toTypedArray()).build(
             Util.getChoiceType(TypeReferences.BLOCK_ENTITY, id)
         )
-    )
+    }
 
-    fun init() = Unit
+    fun init() {
+        BLOCKS.register()
+        BLOCK_ENTITIES.register()
+    }
 }

@@ -1,34 +1,27 @@
 package com.imoonday.skill
 
-import com.imoonday.LOGGER
-import com.imoonday.config.Config
-import com.imoonday.init.ModGameRules
-import com.imoonday.init.isSilenced
-import com.imoonday.item.SkillItem
-import com.imoonday.network.UseSkillC2SRequest
+import com.imoonday.*
+import com.imoonday.config.*
+import com.imoonday.init.*
+import com.imoonday.item.*
+import com.imoonday.network.*
 import com.imoonday.trigger.*
 import com.imoonday.util.*
-import com.mojang.blaze3d.systems.RenderSystem
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.util.ModelIdentifier
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvent
-import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Style
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
-import net.minecraft.util.Identifier
-import net.minecraft.world.World
-import java.awt.Color
+import com.mojang.blaze3d.systems.*
+import net.minecraft.client.*
+import net.minecraft.client.gui.*
+import net.minecraft.client.util.*
+import net.minecraft.entity.*
+import net.minecraft.entity.player.*
+import net.minecraft.registry.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import net.minecraft.text.*
+import net.minecraft.util.*
+import net.minecraft.world.*
+import java.awt.*
 import java.util.*
-import kotlin.math.PI
-import kotlin.math.sin
+import kotlin.math.*
 
 abstract class Skill(
     val id: Identifier,
@@ -83,7 +76,12 @@ abstract class Skill(
             ?.get("cooldown")
             ?.toIntOrNull()
             ?: defaultCooldown) *
-            (world?.gameRules?.get(ModGameRules.COOLDOWN_MULTIPLIER)?.get() ?: 1.0)).toInt()
+            ((world?.gameRules
+                ?.get(ModGameRules.COOLDOWN_MULTIPLIER)
+                ?.get()
+                ?.div(100.0)) ?: 1.0)
+                .coerceIn(0.0, 1.0)
+            ).toInt()
 
     fun createUuid(content: String): UUID = UUID.nameUUIDFromBytes("$id-$content".toByteArray())
 

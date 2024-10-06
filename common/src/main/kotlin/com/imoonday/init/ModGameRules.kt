@@ -1,19 +1,21 @@
 package com.imoonday.init
 
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry
-import net.fabricmc.fabric.api.gamerule.v1.rule.DoubleRule
-import net.minecraft.world.GameRules
+import net.minecraft.world.*
 
 object ModGameRules {
 
     @JvmField
-    val COOLDOWN_MULTIPLIER: GameRules.Key<DoubleRule> =
-        GameRuleRegistry.register(
-            "skillCooldownMultiplier",
-            GameRules.Category.PLAYER,
-            GameRuleFactory.createDoubleRule(1.0, 0.0)
-        )
+    val COOLDOWN_MULTIPLIER = register(
+        "skillCooldownMultiplier",
+        GameRules.Category.PLAYER,
+        GameRules.IntRule.create(100)
+    )
 
     fun init() = Unit
+
+    private fun <T : GameRules.Rule<T>> register(
+        id: String,
+        type: GameRules.Category,
+        factory: GameRules.Type<T>
+    ): GameRules.Key<T> = GameRules.register(id, type, factory)
 }

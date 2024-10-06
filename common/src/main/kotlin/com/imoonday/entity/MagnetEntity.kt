@@ -1,31 +1,24 @@
 package com.imoonday.entity
 
-import com.imoonday.init.ModEntities
+import com.imoonday.init.*
 import net.minecraft.entity.*
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.listener.ClientPlayPacketListener
-import net.minecraft.network.packet.Packet
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
-import net.minecraft.particle.ParticleEffect
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.registry.tag.DamageTypeTags
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.Arm
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.entity.attribute.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.data.*
+import net.minecraft.entity.effect.*
+import net.minecraft.item.*
+import net.minecraft.nbt.*
+import net.minecraft.network.listener.*
+import net.minecraft.network.packet.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
+import net.minecraft.registry.tag.*
+import net.minecraft.server.world.*
+import net.minecraft.util.*
+import net.minecraft.util.math.*
+import net.minecraft.world.*
 import java.util.*
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.*
 
 class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : LivingEntity(entityType, world) {
 
@@ -56,7 +49,7 @@ class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : Liv
         get() = dataTracker.get(RADIUS)
         set(value) = dataTracker.set(RADIUS, value)
 
-    constructor(world: World, pos: Vec3d, owner: Entity) : this(ModEntities.MAGNET, world) {
+    constructor(world: World, pos: Vec3d, owner: Entity) : this(ModEntities.MAGNET.get(), world) {
         refreshPositionAndAngles(pos.x, pos.y, pos.z, yaw, pitch)
         this.owner = owner
     }

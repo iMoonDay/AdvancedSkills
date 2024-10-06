@@ -1,23 +1,17 @@
 package com.imoonday.config
 
-import com.imoonday.MOD_ID
-import com.imoonday.network.SyncConfigS2CPacket
-import com.imoonday.skill.Skill
-import kotlinx.serialization.*
-import kotlinx.serialization.json.Json
-import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtElement
-import net.minecraft.nbt.NbtList
-import net.minecraft.nbt.NbtString
-import net.minecraft.server.MinecraftServer
-import java.io.File
-import java.io.FileWriter
-import java.nio.file.FileSystems
-import java.nio.file.Path
-import java.nio.file.StandardWatchEventKinds
-import kotlin.concurrent.thread
-import kotlin.io.path.name
+import com.imoonday.*
+import com.imoonday.network.*
+import com.imoonday.skill.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.*
+import net.fabricmc.loader.api.*
+import net.minecraft.nbt.*
+import net.minecraft.server.*
+import java.io.*
+import java.nio.file.*
+import kotlin.concurrent.*
+import kotlin.io.path.*
 
 @Serializable
 class Config {
@@ -183,9 +177,10 @@ class Config {
                     ) {
                         load()
                         val tag = instance.toTag(NbtCompound())
-                        PlayerLookup.all(server).forEach {
-                            ServerPlayNetworking.send(it, SyncConfigS2CPacket(tag))
-                        }
+                        Channels.SYNC_CONFIG_S2C.sendToPlayers(
+                            server.playerManager.playerList,
+                            SyncConfigS2CPacket(tag)
+                        )
                         lastEventTime = System.currentTimeMillis()
                     }
                     if (!key.reset()) break

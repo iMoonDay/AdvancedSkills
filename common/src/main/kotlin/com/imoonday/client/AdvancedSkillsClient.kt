@@ -11,7 +11,6 @@ object AdvancedSkillsClient {
         UIConfig.load()
         UIConfig.initWatchService()
         ModKeyBindings.init()
-        Channels.registerClient()
         ModEntities.initClient()
         EventHandler.registerClient()
     }

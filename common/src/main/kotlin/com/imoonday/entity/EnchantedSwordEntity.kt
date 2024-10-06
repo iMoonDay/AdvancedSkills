@@ -50,7 +50,7 @@ class EnchantedSwordEntity(type: EntityType<out EnchantedSwordEntity>, world: Wo
         noClip = true
     }
 
-    constructor(world: World, owner: Entity, target: LivingEntity) : this(ModEntities.ENCHANTED_SWORD, world) {
+    constructor(world: World, owner: Entity, target: LivingEntity) : this(ModEntities.ENCHANTED_SWORD.get(), world) {
         this.owner = owner
         this.target = target
     }

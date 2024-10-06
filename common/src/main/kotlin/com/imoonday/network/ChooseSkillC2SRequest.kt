@@ -1,33 +1,22 @@
 package com.imoonday.network
 
-import com.imoonday.util.choose
-import com.imoonday.util.id
-import net.fabricmc.fabric.api.networking.v1.FabricPacket
-import net.fabricmc.fabric.api.networking.v1.PacketType
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.minecraft.network.PacketByteBuf
+import com.imoonday.util.*
+import dev.architectury.networking.*
+import net.minecraft.network.*
+import net.minecraft.server.network.*
 
 class ChooseSkillC2SRequest(
     val id: Int,
-) : FabricPacket {
+) : NetworkPacket {
 
-    companion object {
+    constructor(buf: PacketByteBuf) : this(buf.readInt())
 
-        val id = id("choose_skill_c2s")
-        val pType = PacketType.create(id) {
-            ChooseSkillC2SRequest(it.readInt())
-        }!!
-
-        fun register() {
-            ServerPlayNetworking.registerGlobalReceiver(pType) { packet, player, _ ->
-                player.choose(packet.id)
-            }
-        }
-    }
-
-    override fun write(buf: PacketByteBuf) {
+    override fun encode(buf: PacketByteBuf) {
         buf.writeInt(id)
     }
 
-    override fun getType(): PacketType<*> = pType
+    override fun apply(context: NetworkManager.PacketContext) {
+        if (context.player !is ServerPlayerEntity) return
+        context.player.choose(id)
+    }
 }

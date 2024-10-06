@@ -1,17 +1,14 @@
 package com.imoonday.item
 
-import com.imoonday.util.learnRandomly
-import com.imoonday.skill.Skill
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings
-import net.minecraft.client.item.TooltipContext
-import net.minecraft.entity.LivingEntity
-import net.minecraft.item.FoodComponent
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
-import net.minecraft.world.World
+import com.imoonday.skill.*
+import com.imoonday.util.*
+import net.minecraft.client.item.*
+import net.minecraft.entity.*
+import net.minecraft.item.*
+import net.minecraft.server.network.*
+import net.minecraft.text.*
+import net.minecraft.util.*
+import net.minecraft.world.*
 
 class SkillFruitItem(val rarity: Skill.Rarity, settings: Settings) : Item(settings) {
 
@@ -19,7 +16,7 @@ class SkillFruitItem(val rarity: Skill.Rarity, settings: Settings) : Item(settin
 
     constructor(rarity: Skill.Rarity) : this(
         rarity,
-        FabricItemSettings().food(FoodComponent.Builder().alwaysEdible().build())
+        Settings().food(FoodComponent.Builder().alwaysEdible().build())
     )
 
     override fun finishUsing(stack: ItemStack, world: World, user: LivingEntity): ItemStack {

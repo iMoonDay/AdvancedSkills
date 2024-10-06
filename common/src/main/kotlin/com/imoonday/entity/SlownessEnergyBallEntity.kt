@@ -27,7 +27,7 @@ class SlownessEnergyBallEntity(entityType: EntityType<out SlownessEnergyBallEnti
         directionY: Double,
         directionZ: Double,
         world: World,
-    ) : this(ModEntities.SLOWNESS_ENERGY_BALL, world) {
+    ) : this(ModEntities.SLOWNESS_ENERGY_BALL.get(), world) {
         update(x, y, z, directionX, directionY, directionZ)
     }
 

@@ -38,7 +38,7 @@ class ServantWitherSkeletonEntity(
         setPathfindingPenalty(PathNodeType.LAVA, 8.0f)
     }
 
-    constructor(world: World, owner: PlayerEntity) : this(ModEntities.SERVANT_WITHER_SKELETON, world) {
+    constructor(world: World, owner: PlayerEntity) : this(ModEntities.SERVANT_WITHER_SKELETON.get(), world) {
         ownerUuid = owner.uuid
         customName = translateSkill("undead_summoning", "customName", owner.displayName.string)
         equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.STONE_SWORD))

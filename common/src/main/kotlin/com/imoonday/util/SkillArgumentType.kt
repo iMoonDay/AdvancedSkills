@@ -1,19 +1,17 @@
 package com.imoonday.util
 
-import com.imoonday.MOD_ID
-import com.imoonday.skill.Skill
-import com.mojang.brigadier.StringReader
-import com.mojang.brigadier.arguments.ArgumentType
-import com.mojang.brigadier.context.CommandContext
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
-import com.mojang.brigadier.suggestion.Suggestions
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry
-import net.minecraft.command.CommandSource
-import net.minecraft.command.argument.serialize.ConstantArgumentSerializer
-import net.minecraft.util.Identifier
-import net.minecraft.util.InvalidIdentifierException
-import java.util.concurrent.CompletableFuture
+import com.imoonday.*
+import com.imoonday.init.*
+import com.imoonday.skill.*
+import com.mojang.brigadier.*
+import com.mojang.brigadier.arguments.*
+import com.mojang.brigadier.context.*
+import com.mojang.brigadier.exceptions.*
+import com.mojang.brigadier.suggestion.*
+import net.minecraft.command.*
+import net.minecraft.command.argument.serialize.*
+import net.minecraft.util.*
+import java.util.concurrent.*
 
 class SkillArgumentType : ArgumentType<Skill> {
 
@@ -48,11 +46,6 @@ class SkillArgumentType : ArgumentType<Skill> {
 
         val INVALID = SimpleCommandExceptionType(translate("command", "invalid"))
         val UNKNOWN = SimpleCommandExceptionType(translate("command", "unknown"))
-        fun register() = ArgumentTypeRegistry.registerArgumentType(
-            id("skill"),
-            SkillArgumentType::class.java,
-            ConstantArgumentSerializer.of(SkillArgumentType::skill)
-        )
 
         fun skill(): SkillArgumentType = SkillArgumentType()
 

@@ -1,50 +1,38 @@
 package com.imoonday.network
 
-import com.imoonday.skill.Skill
-import com.imoonday.trigger.SendPlayerDataTrigger
+import com.imoonday.skill.*
+import com.imoonday.trigger.*
 import com.imoonday.trigger.SendTime.*
-import com.imoonday.util.hasEquipped
-import com.imoonday.util.hasLearned
-import com.imoonday.util.id
-import com.imoonday.util.isUsing
-import net.fabricmc.fabric.api.networking.v1.FabricPacket
-import net.fabricmc.fabric.api.networking.v1.PacketType
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.PacketByteBuf
+import com.imoonday.util.*
+import dev.architectury.networking.*
+import net.minecraft.nbt.*
+import net.minecraft.network.*
+import net.minecraft.server.network.*
 
 class SendPlayerDataC2SPacket(
     val skill: Skill,
     val data: NbtCompound,
-) : FabricPacket {
+) : NetworkPacket {
 
-    companion object {
+    constructor(buf: PacketByteBuf) : this(
+        Skill.fromId(buf.readIdentifier()),
+        buf.readNbt()!!
+    )
 
-        val id = id("send_player_data_c2s")
-        val pType = PacketType.create(id) {
-            SendPlayerDataC2SPacket(Skill.fromId(it.readIdentifier()), it.readNbt()!!)
-        }!!
-
-        fun register() {
-            ServerPlayNetworking.registerGlobalReceiver(pType) { packet, player, _ ->
-                val skill = packet.skill
-                val data = packet.data
-                if (!skill.invalid && skill is SendPlayerDataTrigger && player.hasLearned(skill)) {
-                    when (skill.getSendTime()) {
-                        ALWAYS -> skill.apply(player, data)
-                        USING -> if (player.isUsing(skill)) skill.apply(player, data)
-                        EQUIPPED -> if (player.hasEquipped(skill)) skill.apply(player, data)
-                        else -> {}
-                    }
-                }
-            }
-        }
-    }
-
-    override fun write(buf: PacketByteBuf) {
+    override fun encode(buf: PacketByteBuf) {
         buf.writeIdentifier(skill.id)
         buf.writeNbt(data)
     }
 
-    override fun getType(): PacketType<*> = pType
+    override fun apply(context: NetworkManager.PacketContext) {
+        val player = context.player as? ServerPlayerEntity ?: return
+        if (!skill.invalid && skill is SendPlayerDataTrigger && player.hasLearned(skill)) {
+            when (skill.getSendTime()) {
+                ALWAYS -> skill.apply(player, data)
+                USING -> if (player.isUsing(skill)) skill.apply(player, data)
+                EQUIPPED -> if (player.hasEquipped(skill)) skill.apply(player, data)
+                else -> {}
+            }
+        }
+    }
 }

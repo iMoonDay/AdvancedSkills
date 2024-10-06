@@ -1,22 +1,16 @@
 package com.imoonday.item
 
-import com.imoonday.skill.Skill
-import com.imoonday.util.client
-import com.imoonday.util.learn
-import com.imoonday.util.translate
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings
-import net.minecraft.client.item.TooltipContext
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
-import net.minecraft.util.Hand
-import net.minecraft.util.TypedActionResult
-import net.minecraft.world.World
+import com.imoonday.skill.*
+import com.imoonday.util.*
+import net.minecraft.client.item.*
+import net.minecraft.entity.player.*
+import net.minecraft.item.*
+import net.minecraft.text.*
+import net.minecraft.util.*
+import net.minecraft.world.*
 
 class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
-    constructor(skill: Skill) : this(skill, FabricItemSettings().maxCount(1))
+    constructor(skill: Skill) : this(skill, Settings().maxCount(1))
 
     override fun getName(): Text =
         if (skill.invalid) skill.formattedName.copy().formatted(Formatting.STRIKETHROUGH) else skill.formattedName

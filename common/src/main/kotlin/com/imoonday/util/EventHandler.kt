@@ -10,10 +10,8 @@ import com.imoonday.skill.*
 import com.imoonday.trigger.*
 import dev.architectury.event.*
 import dev.architectury.event.events.client.*
-import dev.architectury.event.events.client.ClientTooltipEvent.Render
 import dev.architectury.event.events.common.*
 import net.minecraft.block.*
-import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.entity.*
 import net.minecraft.client.render.model.*
 import net.minecraft.loot.*
@@ -70,14 +68,14 @@ object EventHandler {
             LootTables.END_CITY_TREASURE_CHEST
         )
         val pool = LootPool.builder()
-            .with(ItemEntry.builder(ModItems.COMMON_SKILL_FRUIT).weight(256))
-            .with(ItemEntry.builder(ModItems.UNCOMMON_SKILL_FRUIT).weight(128))
-            .with(ItemEntry.builder(ModItems.RARE_SKILL_FRUIT).weight(32))
-            .with(ItemEntry.builder(ModItems.SUPERB_SKILL_FRUIT).weight(16))
-            .with(ItemEntry.builder(ModItems.EPIC_SKILL_FRUIT).weight(8))
-            .with(ItemEntry.builder(ModItems.LEGENDARY_SKILL_FRUIT).weight(4))
-            .with(ItemEntry.builder(ModItems.MYTHIC_SKILL_FRUIT).weight(2))
-            .with(ItemEntry.builder(ModItems.UNIQUE_SKILL_FRUIT).weight(1))
+            .with(ItemEntry.builder(ModItems.COMMON_SKILL_FRUIT.get()).weight(256))
+            .with(ItemEntry.builder(ModItems.UNCOMMON_SKILL_FRUIT.get()).weight(128))
+            .with(ItemEntry.builder(ModItems.RARE_SKILL_FRUIT.get()).weight(32))
+            .with(ItemEntry.builder(ModItems.SUPERB_SKILL_FRUIT.get()).weight(16))
+            .with(ItemEntry.builder(ModItems.EPIC_SKILL_FRUIT.get()).weight(8))
+            .with(ItemEntry.builder(ModItems.LEGENDARY_SKILL_FRUIT.get()).weight(4))
+            .with(ItemEntry.builder(ModItems.MYTHIC_SKILL_FRUIT.get()).weight(2))
+            .with(ItemEntry.builder(ModItems.UNIQUE_SKILL_FRUIT.get()).weight(1))
             .conditionally(RandomChanceLootCondition.builder(0.005f))
         LootEvent.MODIFY_LOOT_TABLE.register { _, identifier, context, builtin ->
             if (identifier in lootTables && builtin) {
@@ -85,7 +83,7 @@ object EventHandler {
             }
         }
         PlayerEvent.PLAYER_JOIN.register {
-            it.sendPacket(SyncConfigS2CPacket(Config.instance.toTag(NbtCompound())))
+            Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(Config.instance.toTag(NbtCompound())))
         }
         LifecycleEvent.SERVER_STARTED.register {
             Config.initWatchService(it)

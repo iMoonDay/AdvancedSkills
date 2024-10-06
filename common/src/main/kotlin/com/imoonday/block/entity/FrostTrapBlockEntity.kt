@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos
 import java.util.*
 
 class FrostTrapBlockEntity(pos: BlockPos, state: BlockState) :
-    BlockEntity(ModBlocks.FROST_TRAP_ENTITY, pos, state) {
+    BlockEntity(ModBlocks.FROST_TRAP_ENTITY.get(), pos, state) {
 
     var placer: UUID? = null
     override fun writeNbt(nbt: NbtCompound?) {

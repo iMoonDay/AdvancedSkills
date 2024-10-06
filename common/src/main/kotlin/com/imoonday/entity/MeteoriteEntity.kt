@@ -1,38 +1,27 @@
 package com.imoonday.entity
 
-import com.imoonday.init.ModEntities
-import com.imoonday.util.blockPosSet
-import com.imoonday.util.id
+import com.imoonday.init.*
+import com.imoonday.util.*
 import net.minecraft.client.model.*
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRenderer
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.util.math.*
 import net.minecraft.entity.*
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.projectile.ProjectileUtil
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtElement
-import net.minecraft.network.listener.ClientPlayPacketListener
-import net.minecraft.network.packet.Packet
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Identifier
-import net.minecraft.util.hit.EntityHitResult
-import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import net.minecraft.entity.data.*
+import net.minecraft.entity.projectile.*
+import net.minecraft.nbt.*
+import net.minecraft.network.listener.*
+import net.minecraft.network.packet.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
+import net.minecraft.server.world.*
+import net.minecraft.sound.*
+import net.minecraft.util.*
+import net.minecraft.util.hit.*
+import net.minecraft.util.math.*
+import net.minecraft.world.*
 import java.util.*
-import kotlin.math.max
-import kotlin.math.sqrt
+import kotlin.math.*
 
 class MeteoriteEntity(type: EntityType<out MeteoriteEntity>, world: World) : Entity(type, world), Ownable {
 
@@ -49,7 +38,10 @@ class MeteoriteEntity(type: EntityType<out MeteoriteEntity>, world: World) : Ent
             dataTracker.set(radiusData, max(value, 0.5f))
         }
 
-    constructor(world: World, pos: Vec3d, radius: Float, owner: LivingEntity?) : this(ModEntities.METEORITE, world) {
+    constructor(world: World, pos: Vec3d, radius: Float, owner: LivingEntity?) : this(
+        ModEntities.METEORITE.get(),
+        world
+    ) {
         this.setPosition(pos)
         this.radius = radius
         this.ownerEntity = owner

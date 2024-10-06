@@ -1,21 +1,18 @@
 package com.imoonday.entity
 
-import com.imoonday.init.ModEntities
-import com.imoonday.util.blockPosSet
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.MovementType
-import net.minecraft.entity.projectile.ProjectileEntity
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import com.imoonday.init.*
+import com.imoonday.util.*
+import net.minecraft.entity.*
+import net.minecraft.entity.projectile.*
+import net.minecraft.particle.*
+import net.minecraft.server.world.*
+import net.minecraft.util.math.*
+import net.minecraft.world.*
 
 class TornadoEntity(type: EntityType<out ProjectileEntity>, world: World) :
     ProjectileEntity(type, world) {
 
-    constructor(world: World, owner: Entity, velocity: Vec3d) : this(ModEntities.TORNADO, world) {
+    constructor(world: World, owner: Entity, velocity: Vec3d) : this(ModEntities.TORNADO.get(), world) {
         this.owner = owner
         this.velocity = velocity
         noClip = true

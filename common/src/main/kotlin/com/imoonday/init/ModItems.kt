@@ -1,13 +1,16 @@
 package com.imoonday.init
 
-import com.imoonday.item.SkillFruitItem
-import com.imoonday.skill.Skill
-import com.imoonday.util.id
-import net.minecraft.item.Item
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
+import com.imoonday.*
+import com.imoonday.item.*
+import com.imoonday.skill.*
+import dev.architectury.registry.registries.*
+import net.minecraft.item.*
+import net.minecraft.registry.*
 
 object ModItems {
+
+    @JvmField
+    val ITEMS: DeferredRegister<Item> = DeferredRegister.create(MOD_ID, RegistryKeys.ITEM)
 
     @JvmField
     val FRUITS: MutableList<SkillFruitItem> = mutableListOf()
@@ -36,9 +39,9 @@ object ModItems {
     @JvmField
     val UNIQUE_SKILL_FRUIT = SkillFruitItem(Skill.Rarity.UNIQUE).register("unique_skill_fruit")
 
-    fun <T : Item> T.register(id: String): T {
+    fun <T : Item> T.register(id: String): RegistrySupplier<T> {
         if (this is SkillFruitItem) FRUITS.add(this)
-        return Registry.register(Registries.ITEM, id(id), this)
+        return ITEMS.register(id) { this }
     }
 
     fun init() = Unit

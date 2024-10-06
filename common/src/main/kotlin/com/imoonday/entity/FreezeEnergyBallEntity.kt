@@ -21,7 +21,7 @@ class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>,
     EffectEnergyBallEntity(entityType, world) {
 
     override var effects = mutableMapOf(
-        StatusEffectInstance(ModEffects.FREEZE, 20 * 3, 0, false, false, true) to 0.3f,
+        StatusEffectInstance(ModEffects.FREEZE.get(), 20 * 3, 0, false, false, true) to 0.3f,
     )
     override var range: Double = 4.0
 
@@ -33,7 +33,7 @@ class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>,
         directionY: Double,
         directionZ: Double,
         world: World,
-    ) : this(ModEntities.FREEZE_ENERGY_BALL, world) {
+    ) : this(ModEntities.FREEZE_ENERGY_BALL.get(), world) {
         update(x, y, z, directionX, directionY, directionZ)
     }
 

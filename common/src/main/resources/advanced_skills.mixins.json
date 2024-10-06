@@ -17,6 +17,7 @@
     "MouseMixin"
   ],
   "mixins": [
+    "ArgumentTypesMixin",
     "BlazeEntity$ShootFireballGoalMixin",
     "BowAttackGoalMixin",
     "CreeperEntityMixin",

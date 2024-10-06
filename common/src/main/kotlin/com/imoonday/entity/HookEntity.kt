@@ -1,23 +1,17 @@
 package com.imoonday.entity
 
-import com.imoonday.init.ModEntities
-import com.imoonday.util.minus
-import com.imoonday.util.times
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.MovementType
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.projectile.ProjectileUtil
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.listener.ClientPlayPacketListener
-import net.minecraft.network.packet.Packet
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import com.imoonday.init.*
+import com.imoonday.util.*
+import net.minecraft.entity.*
+import net.minecraft.entity.data.*
+import net.minecraft.entity.projectile.*
+import net.minecraft.nbt.*
+import net.minecraft.network.listener.*
+import net.minecraft.network.packet.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.server.world.*
+import net.minecraft.util.math.*
+import net.minecraft.world.*
 import java.util.*
 
 class HookEntity(type: EntityType<out HookEntity>, world: World) : Entity(type, world) {
@@ -64,7 +58,7 @@ class HookEntity(type: EntityType<out HookEntity>, world: World) : Entity(type, 
         }
     var life: Int = 20 * 5
 
-    constructor(world: World, owner: Entity) : this(ModEntities.HOOK, world) {
+    constructor(world: World, owner: Entity) : this(ModEntities.HOOK.get(), world) {
         this.owner = owner
     }
 

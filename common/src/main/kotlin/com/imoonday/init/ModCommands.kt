@@ -1,22 +1,21 @@
 package com.imoonday.init
 
-import com.imoonday.skill.Skill
+import com.imoonday.skill.*
 import com.imoonday.util.*
 import com.imoonday.util.SkillContainer.Companion.MAX_SLOT_SIZE
-import com.mojang.brigadier.arguments.IntegerArgumentType
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.context.CommandContext
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
-import net.minecraft.command.argument.EntityArgumentType
-import net.minecraft.server.command.CommandManager.argument
-import net.minecraft.server.command.CommandManager.literal
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.server.network.ServerPlayerEntity
+import com.mojang.brigadier.arguments.*
+import com.mojang.brigadier.builder.*
+import com.mojang.brigadier.context.*
+import dev.architectury.event.events.common.*
+import net.minecraft.command.argument.*
+import net.minecraft.server.command.*
+import net.minecraft.server.command.CommandManager.*
+import net.minecraft.server.network.*
 
 object ModCommands {
 
     fun init() {
-        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
+        CommandRegistrationEvent.EVENT.register { dispatcher, _, _ ->
             dispatcher.register(
                 literal("skills").requires { it.hasPermissionLevel(2) }
                     .then(

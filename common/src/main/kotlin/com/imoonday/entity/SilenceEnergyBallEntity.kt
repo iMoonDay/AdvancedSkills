@@ -16,7 +16,7 @@ class SilenceEnergyBallEntity(entityType: EntityType<out SilenceEnergyBallEntity
     EffectEnergyBallEntity(entityType, world) {
 
     override var effects = mutableMapOf(
-        StatusEffectInstance(ModEffects.SILENCE, 20 * 5, 0, false, false, true) to 0.5f,
+        StatusEffectInstance(ModEffects.SILENCE.get(), 20 * 5, 0, false, false, true) to 0.5f,
         StatusEffectInstance(StatusEffects.SLOWNESS, 30, 2, false, false, true) to 1f
     )
     override var range: Double = 2.0
@@ -29,7 +29,7 @@ class SilenceEnergyBallEntity(entityType: EntityType<out SilenceEnergyBallEntity
         directionY: Double,
         directionZ: Double,
         world: World,
-    ) : this(ModEntities.SILENCE_ENERGY_BALL, world) {
+    ) : this(ModEntities.SILENCE_ENERGY_BALL.get(), world) {
         update(x, y, z, directionX, directionY, directionZ)
     }
 

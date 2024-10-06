@@ -1,17 +1,14 @@
 package com.imoonday.init
 
-import com.imoonday.network.UseSkillC2SRequest
+import com.imoonday.network.*
 import com.imoonday.screen.*
-import com.imoonday.skill.Skills
-import com.imoonday.util.SkillContainer
-import com.imoonday.util.isPressedInScreen
-import com.imoonday.util.learnableData
-import com.imoonday.util.requestUse
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.option.KeyBinding
-import org.lwjgl.glfw.GLFW
+import com.imoonday.skill.*
+import com.imoonday.util.*
+import dev.architectury.event.events.client.*
+import dev.architectury.registry.client.keymappings.*
+import net.minecraft.client.*
+import net.minecraft.client.option.*
+import org.lwjgl.glfw.*
 
 object ModKeyBindings {
 
@@ -63,17 +60,16 @@ object ModKeyBindings {
         releaseCallback: (MinecraftClient, KeyBinding) -> Unit = { _, _ -> },
         callback: (MinecraftClient, KeyBinding) -> Unit,
     ): KeyBinding {
-        val key = KeyBindingHelper.registerKeyBinding(
-            KeyBinding(
-                "advancedSkills.key.$name",
-                code,
-                "advancedSkills.key.category"
-            )
+        val key = KeyBinding(
+            "advancedSkills.key.$name",
+            code,
+            "advancedSkills.key.category"
         )
+        KeyMappingRegistry.register(key)
         if (longPressCheck) {
             pressStates[key] = false
         }
-        ClientTickEvents.END_CLIENT_TICK.register {
+        ClientTickEvent.CLIENT_POST.register {
             if (longPressCheck) {
                 if (key.isPressed && pressStates[key] == false) {
                     callback(it, key)
@@ -98,16 +94,15 @@ object ModKeyBindings {
         code: Int,
         callbacks: (MinecraftClient, UseSkillC2SRequest.KeyState) -> Unit,
     ): KeyBinding {
-        val key = KeyBindingHelper.registerKeyBinding(
-            KeyBinding(
-                "advancedSkills.key.useSkill$index",
-                code,
-                "advancedSkills.key.category"
-            )
+        val key = KeyBinding(
+            "advancedSkills.key.useSkill$index",
+            code,
+            "advancedSkills.key.category"
         )
+        KeyMappingRegistry.register(key)
         skillKeys.add(key)
         pressStates[key] = false
-        ClientTickEvents.END_CLIENT_TICK.register {
+        ClientTickEvent.CLIENT_POST.register {
             if (key.isPressed && pressStates[key] == false) {
                 callbacks(it, UseSkillC2SRequest.KeyState.PRESS)
                 pressStates[key] = true

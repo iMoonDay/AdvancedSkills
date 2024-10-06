@@ -20,7 +20,7 @@ class UnstableTntEntity(entityType: EntityType<out UnstableTntEntity>, world: Wo
         z: Double,
         igniter: LivingEntity?,
         velocity: Vec3d,
-    ) : this(ModEntities.UNSTABLE_TNT, world) {
+    ) : this(ModEntities.UNSTABLE_TNT.get(), world) {
         this.setPosition(x, y, z)
         this.prevX = x
         this.prevY = y

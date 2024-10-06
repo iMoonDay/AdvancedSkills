@@ -1,4 +1,5 @@
 advancedSkills:
+  itemGroup: 进阶技能
   key:
     category: 进阶技能
     openGalleryScreen: 查看技能图鉴

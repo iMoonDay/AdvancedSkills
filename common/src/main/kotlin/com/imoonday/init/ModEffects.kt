@@ -1,15 +1,19 @@
 package com.imoonday.init
 
-import com.imoonday.component.properties
+import com.imoonday.*
+import com.imoonday.component.*
 import com.imoonday.effect.*
-import com.imoonday.util.id
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.nbt.NbtElement
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
+import dev.architectury.registry.registries.*
+import net.minecraft.entity.*
+import net.minecraft.entity.effect.*
+import net.minecraft.nbt.*
+import net.minecraft.registry.*
+import java.util.function.*
 
 object ModEffects {
+
+    @JvmField
+    val EFFECTS = DeferredRegister.create(MOD_ID, RegistryKeys.STATUS_EFFECT)
 
     @JvmField
     val SYNC_CLIENT_EFFECTS: MutableList<SyncClientEffect> = mutableListOf()
@@ -29,12 +33,12 @@ object ModEffects {
     @JvmField
     val SERIOUS_INJURY = SeriousInjuryEffect().register("serious_injury")
 
-    fun <T : StatusEffect> T.register(id: String): T {
+    fun <T : StatusEffect> T.register(id: String): RegistrySupplier<T> {
         if (this is SyncClientEffect) SYNC_CLIENT_EFFECTS.add(this)
-        return Registry.register(Registries.STATUS_EFFECT, id(id), this)
+        return EFFECTS.register(id) { this }
     }
 
-    fun init() = Unit
+    fun init() = EFFECTS.register()
 }
 
 val LivingEntity.isDisarmed: Boolean
@@ -48,8 +52,10 @@ val LivingEntity.isConfined: Boolean
 val LivingEntity.isSeriousInjured: Boolean
     get() = hasStatusEffect(this, ModEffects.SERIOUS_INJURY)
 
-private fun hasStatusEffect(entity: LivingEntity, effect: StatusEffect): Boolean =
-    if (effect is SyncClientEffect) effect.syncId in entity.properties.getList(
+private fun hasStatusEffect(entity: LivingEntity, effect: Supplier<out StatusEffect>): Boolean {
+    val statusEffect = effect.get()
+    return if (statusEffect is SyncClientEffect) statusEffect.syncId in entity.properties.getList(
         "syncEffects",
         NbtElement.STRING_TYPE.toInt()
-    ).map { it.asString() } else entity.hasStatusEffect(effect)
+    ).map(NbtElement::asString) else entity.hasStatusEffect(statusEffect)
+}
