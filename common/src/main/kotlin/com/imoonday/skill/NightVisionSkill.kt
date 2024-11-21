@@ -1,6 +1,6 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.PersistentTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 
 class NightVisionSkill : PassiveSkill(
@@ -8,4 +8,4 @@ class NightVisionSkill : PassiveSkill(
     types = listOf(SkillType.PASSIVE),
     rarity = Rarity.SUPERB,
     toggleable = true
-), PersistentTrigger
+), PersistentTrigger, NightVisionTrigger

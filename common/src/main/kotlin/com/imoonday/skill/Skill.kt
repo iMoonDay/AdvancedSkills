@@ -3,6 +3,7 @@ package com.imoonday.skill
 import com.imoonday.*
 import com.imoonday.config.*
 import com.imoonday.init.*
+import com.imoonday.init.ModItems.ITEMS
 import com.imoonday.item.*
 import com.imoonday.network.*
 import com.imoonday.trigger.*
@@ -21,6 +22,7 @@ import net.minecraft.util.*
 import net.minecraft.world.*
 import java.awt.*
 import java.util.*
+import java.util.function.*
 import kotlin.math.*
 
 abstract class Skill(
@@ -31,7 +33,7 @@ abstract class Skill(
     val types: List<SkillType> = emptyList(),
     val defaultCooldown: Int = 0,
     rarity: Rarity,
-    val sound: SoundEvent? = null,
+    val sound: Supplier<SoundEvent>? = null,
     invalid: Boolean = false,
 ) : SkillTrigger {
 
@@ -41,7 +43,7 @@ abstract class Skill(
         get() = Config.instance.skillModifier[id.namespace]
             ?.get(id.path)
             ?.get("rarity")
-            ?.let { Rarity.parse(it) }
+            ?.let(Rarity.Companion::parse)
             ?: field
     val formattedName: Text
         get() = name.copy().formatted(rarity.formatting)
@@ -55,7 +57,7 @@ abstract class Skill(
         types: List<SkillType>,
         cooldown: Int = 0,
         rarity: Rarity,
-        sound: SoundEvent? = null,
+        sound: Supplier<SoundEvent>? = null,
     ) : this(
         id(id),
         translateSkill(id, "name"),
@@ -121,7 +123,7 @@ abstract class Skill(
             player.world.playSound(
                 null,
                 player.blockPos,
-                it,
+                it.get(),
                 SoundCategory.PLAYERS,
             )
         }
@@ -198,14 +200,14 @@ abstract class Skill(
 
     override fun getAsSkill(): Skill = this
 
-    open fun isDangerousTo(player: ServerPlayerEntity): Boolean = false
+    open fun isDangerous(player: ServerPlayerEntity): Boolean = false
 
     fun register(): Skill {
         if (this in skills) {
             LOGGER.warn("Skill $id is already registered")
             return this
         }
-        if (!invalid) Registry.register(Registries.ITEM, id, SkillItem(this))
+        if (!invalid) ITEMS.register(id.path) { SkillItem(this) }
         skills.add(this)
         return this
     }
@@ -222,7 +224,7 @@ abstract class Skill(
     ) {
         val endY = y + 16
         renderIcon(context, x, y, player)
-        renderProgressBar(context, x, endY, 16, 1, player)
+        renderProgressBar(context, x, endY - 1, 16, 1, player)
         renderCooldownOverlay(context, x, endY, 16, 16, player)
     }
 
@@ -244,13 +246,20 @@ abstract class Skill(
                 context.setShaderColor(1.0f, 1.0f, 1.0f, alpha.toFloat())
             }
         }
-        if (!isEmpty()) context.drawTexture(icon, x, y, 0f, 0f, 16, 16, 16, 16)
+        if (!isEmpty()) renderIcon(context, x, y)
         if (flashed) {
             context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
             RenderSystem.disableBlend()
         }
         if (player?.isSilenced == true) context.fill(x, y, x + 16, y + 16, Color.RED.alpha(0.25).rgb)
     }
+
+    fun renderIcon(
+        context: DrawContext,
+        x: Int,
+        y: Int,
+        size: Int = 16
+    ) = context.drawTexture(icon, x, y, 0f, 0f, size, size, size, size)
 
     open fun renderProgressBar(
         context: DrawContext,
@@ -264,9 +273,9 @@ abstract class Skill(
         if (this is ProgressTrigger && shouldDisplay(player)
             && (player.isUsing() || this !is UsingProgressTrigger)
         ) {
-            val progress = getProgress(player)
+            val progress = getProgress(player).coerceIn(0.0, 1.0)
             val centerX = x + (width * progress).toInt()
-            context.fill(x, y, centerX, y + height, progressColor)
+            context.fill(x, y, centerX, y + height, 0xFF00BFFF.toInt())
             context.fill(centerX, y, x + width, y + height, Color.GRAY.rgb)
         }
     }
@@ -287,13 +296,15 @@ abstract class Skill(
         context.fill(startX, startY, startX + width, endY, Color.BLACK.alpha(0.25).rgb)
         if (cooldown < 20 * 4) {
             val time = if (cooldown <= 20) String.format("%.1f", cooldown / 20.0) else (cooldown / 20).toString()
-            context.drawCenteredTextWithShadow(
-                client!!.textRenderer,
-                time,
-                (startX + width / 2.0).toInt(),
-                (endY - width / 2.0).toInt(),
-                Color.WHITE.rgb
+            val textRenderer = client!!.textRenderer
+            context.matrices.push()
+            context.matrices.translate(
+                startX + (width - textRenderer.getWidth(time)) / 2.0 + 0.5,
+                endY - width / 2.0,
+                0.0
             )
+            context.drawText(textRenderer, time, 0, 0, 0xFFFFFF, false)
+            context.matrices.pop()
         }
     }
 
@@ -333,18 +344,22 @@ abstract class Skill(
     companion object {
 
         private val skills = mutableSetOf<Skill>()
+        val triggers: MutableMap<Class<out SkillTrigger>, List<SkillTrigger>> = mutableMapOf()
 
         @JvmField
         val EMPTY = EmptySkill().register()
-        private val progressColor = Color(128, 255, 130).rgb
         fun getSkills() = skills.toList()
         fun getValidSkills() = skills.filterNot { it.invalid }
         fun fromId(id: Identifier?) = skills.find { it.id == id } ?: EMPTY
         fun fromId(id: String?) = skills.find { it.id == id?.toIdentifier() } ?: EMPTY
         fun fromIdNullable(id: Identifier?) = skills.find { it.id == id }
         fun fromIdNullable(id: String?) = skills.find { it.id == Identifier.tryParse(id) }
-        inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> =
-            getSkills().filterIsInstance<T>().filter(predicate)
+        inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> {
+            val triggers: List<T> = (triggers[T::class.java] ?: getSkills().filterIsInstance<T>().also {
+                triggers[T::class.java] = it
+            }) as List<T>
+            return triggers.filter(predicate)
+        }
 
         fun getLearnableSkills(
             except: Collection<Skill> = emptyList(),

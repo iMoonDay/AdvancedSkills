@@ -1,7 +1,7 @@
 package com.imoonday.trigger
 
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.damage.*
+import net.minecraft.server.network.*
 
 interface DeathTrigger : SkillTrigger {
 

@@ -13,6 +13,9 @@ object Channels {
     val REFRESH_CHOICE_C2S: NetworkChannel = registerChannel("refresh_choice_c2s")
     val SYNC_CONFIG_S2C: NetworkChannel = registerChannel("sync_config_s2c")
     val LEARN_SKILL_S2C: NetworkChannel = registerChannel("learn_skill_s2c")
+    val SYNC_PROPERTIES_S2C: NetworkChannel = registerChannel("sync_properties_s2c")
+    val SYNC_PLAYER_DATA_S2C: NetworkChannel = registerChannel("sync_player_data_s2c")
+    val REQUEST_SYNC_DATA_C2S: NetworkChannel = registerChannel("request_sync_data_c2s")
 
     fun register() {
         USE_SKILL_C2S.register(::UseSkillC2SRequest)
@@ -22,6 +25,9 @@ object Channels {
         REFRESH_CHOICE_C2S.register { _ -> RefreshChoiceC2SRequest() }
         SYNC_CONFIG_S2C.register(::SyncConfigS2CPacket)
         LEARN_SKILL_S2C.register(::LearnSkillS2CPacket)
+        SYNC_PROPERTIES_S2C.register(::SyncPropertiesS2CPacket)
+        SYNC_PLAYER_DATA_S2C.register(::SyncPlayerDataS2CPacket)
+        REQUEST_SYNC_DATA_C2S.register { _ -> RequestSyncDataC2SRequest() }
     }
 
     private fun registerChannel(name: String) = NetworkChannel.create(id(name))

@@ -1,6 +1,6 @@
 package com.imoonday.trigger
 
-import com.imoonday.skill.Skill
+import com.imoonday.skill.*
 
 interface SynchronousCoolingTrigger : SkillTrigger {
 

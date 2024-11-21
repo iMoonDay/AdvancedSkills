@@ -16,33 +16,38 @@ object ModItems {
     val FRUITS: MutableList<SkillFruitItem> = mutableListOf()
 
     @JvmField
-    val COMMON_SKILL_FRUIT = SkillFruitItem(Skill.Rarity.COMMON).register("common_skill_fruit")
+    val COMMON_SKILL_FRUIT: RegistrySupplier<SkillFruitItem> =
+        ITEMS.register("common_skill_fruit") { SkillFruitItem(Skill.Rarity.COMMON) }
 
     @JvmField
-    val UNCOMMON_SKILL_FRUIT = SkillFruitItem(Skill.Rarity.UNCOMMON).register("uncommon_skill_fruit")
+    val UNCOMMON_SKILL_FRUIT: RegistrySupplier<SkillFruitItem> =
+        ITEMS.register("uncommon_skill_fruit") { SkillFruitItem(Skill.Rarity.UNCOMMON) }
 
     @JvmField
-    val RARE_SKILL_FRUIT = SkillFruitItem(Skill.Rarity.RARE).register("rare_skill_fruit")
+    val RARE_SKILL_FRUIT: RegistrySupplier<SkillFruitItem> =
+        ITEMS.register("rare_skill_fruit") { SkillFruitItem(Skill.Rarity.RARE) }
 
     @JvmField
-    val SUPERB_SKILL_FRUIT = SkillFruitItem(Skill.Rarity.SUPERB).register("superb_skill_fruit")
+    val SUPERB_SKILL_FRUIT: RegistrySupplier<SkillFruitItem> =
+        ITEMS.register("superb_skill_fruit") { SkillFruitItem(Skill.Rarity.SUPERB) }
 
     @JvmField
-    val EPIC_SKILL_FRUIT = SkillFruitItem(Skill.Rarity.EPIC).register("epic_skill_fruit")
+    val EPIC_SKILL_FRUIT: RegistrySupplier<SkillFruitItem> =
+        ITEMS.register("epic_skill_fruit") { SkillFruitItem(Skill.Rarity.EPIC) }
 
     @JvmField
-    val LEGENDARY_SKILL_FRUIT = SkillFruitItem(Skill.Rarity.LEGENDARY).register("legendary_skill_fruit")
+    val LEGENDARY_SKILL_FRUIT: RegistrySupplier<SkillFruitItem> =
+        ITEMS.register("legendary_skill_fruit") { SkillFruitItem(Skill.Rarity.LEGENDARY) }
 
     @JvmField
-    val MYTHIC_SKILL_FRUIT = SkillFruitItem(Skill.Rarity.MYTHIC).register("mythic_skill_fruit")
+    val MYTHIC_SKILL_FRUIT: RegistrySupplier<SkillFruitItem> =
+        ITEMS.register("mythic_skill_fruit") { SkillFruitItem(Skill.Rarity.MYTHIC) }
 
     @JvmField
-    val UNIQUE_SKILL_FRUIT = SkillFruitItem(Skill.Rarity.UNIQUE).register("unique_skill_fruit")
+    val UNIQUE_SKILL_FRUIT: RegistrySupplier<SkillFruitItem> =
+        ITEMS.register("unique_skill_fruit") { SkillFruitItem(Skill.Rarity.UNIQUE) }
 
-    fun <T : Item> T.register(id: String): RegistrySupplier<T> {
-        if (this is SkillFruitItem) FRUITS.add(this)
-        return ITEMS.register(id) { this }
+    fun init() {
+        ITEMS.register()
     }
-
-    fun init() = Unit
 }

@@ -1,13 +1,11 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AttributeTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.*
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.attribute.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
+import net.minecraft.server.network.*
 
 class ChargedDashSkill : LongPressSkill(
     id = "charged_dash",

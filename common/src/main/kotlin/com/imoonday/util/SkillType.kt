@@ -1,6 +1,6 @@
 package com.imoonday.util
 
-import net.minecraft.text.Text
+import net.minecraft.text.*
 
 enum class SkillType(val translationKey: String) {
     ATTACK("advancedSkills.skillType.attack"),

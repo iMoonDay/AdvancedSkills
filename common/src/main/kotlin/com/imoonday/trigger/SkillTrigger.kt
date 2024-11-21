@@ -1,9 +1,9 @@
 package com.imoonday.trigger
 
-import com.imoonday.skill.Skill
+import com.imoonday.skill.*
 import com.imoonday.util.*
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.NbtCompound
+import net.minecraft.entity.player.*
+import net.minecraft.nbt.*
 
 interface SkillTrigger {
 

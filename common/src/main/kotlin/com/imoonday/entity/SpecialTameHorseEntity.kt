@@ -1,29 +1,23 @@
 package com.imoonday.entity
 
-import com.imoonday.util.startCooling
-import com.imoonday.component.properties
-import com.imoonday.util.stopCooling
-import com.imoonday.component.Components
-import com.imoonday.init.ModEntities
-import com.imoonday.skill.Skills
-import com.imoonday.util.translateSkill
-import net.minecraft.block.LeavesBlock
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.ai.pathing.LandPathNodeMaker
-import net.minecraft.entity.ai.pathing.PathNodeType
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.passive.HorseEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.Items
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundCategory
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.random.Random
-import net.minecraft.world.EntityView
-import net.minecraft.world.World
-import kotlin.math.abs
+import com.imoonday.component.*
+import com.imoonday.init.*
+import com.imoonday.skill.*
+import com.imoonday.util.*
+import net.minecraft.block.*
+import net.minecraft.entity.*
+import net.minecraft.entity.ai.pathing.*
+import net.minecraft.entity.attribute.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.passive.*
+import net.minecraft.entity.player.*
+import net.minecraft.item.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import net.minecraft.util.math.*
+import net.minecraft.util.math.random.*
+import net.minecraft.world.*
+import kotlin.math.*
 
 class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: World) : HorseEntity(entityType, world) {
 
@@ -138,7 +132,7 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
             owner?.let {
                 if (!it.properties.containsUuid("horseUuid")) {
                     it.properties.putUuid("horseUuid", uuid)
-                    Components.PROPERTY.sync(it)
+                    it.propertyComponent.sync()
                 } else if (it.properties.getUuid("horseUuid") != uuid) {
                     discard()
                     return

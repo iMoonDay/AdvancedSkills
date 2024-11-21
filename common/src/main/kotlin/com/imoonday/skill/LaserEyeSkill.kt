@@ -1,14 +1,14 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModSounds
+import com.imoonday.init.*
 import com.imoonday.util.*
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.projectile.ProjectileUtil
-import net.minecraft.particle.DustParticleEffect
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.Box
-import org.joml.Vector3f
+import net.minecraft.entity.*
+import net.minecraft.entity.projectile.*
+import net.minecraft.particle.*
+import net.minecraft.server.network.*
+import net.minecraft.util.hit.*
+import net.minecraft.util.math.*
+import org.joml.*
 
 class LaserEyeSkill : Skill(
     id = "laser_eye",
@@ -22,12 +22,12 @@ class LaserEyeSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val cameraPos = user.getCameraPosVec(0f)
-        val maxDistance = user.raycastVisualBlock(10.0).let {
-            if (it.type == HitResult.Type.MISS) 10.0 else it.pos.distanceTo(cameraPos)
+        val maxDistance = user.raycastVisualBlock(64.0).let {
+            if (it.type == HitResult.Type.MISS) 64.0 else it.pos.distanceTo(cameraPos)
         }
         var offset = 0.1
         while (offset <= maxDistance) {
-            user.spawnParticles(
+            user.spawnParticlesForced(
                 DustParticleEffect(particleColor, 1f),
                 user.eyePos + user.rotationVector * offset,
                 1,
@@ -51,7 +51,7 @@ class LaserEyeSkill : Skill(
                 entities.add(it.entity as LivingEntity)
             } ?: break
         }
-        entities.forEach { it.damage(user.damageSources.magic(), 4f) }
+        entities.forEach { it.damage(user.damageSources.magic(), 8f) }
         return UseResult.success()
     }
 }

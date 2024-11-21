@@ -1,16 +1,12 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AttributeTrigger
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.UsingRenderTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.server.network.ServerPlayerEntity
-import kotlin.math.max
+import net.minecraft.entity.attribute.*
+import net.minecraft.server.network.*
+import kotlin.math.*
 
 class DopingSkill : Skill(
     id = "doping",

@@ -1,16 +1,14 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.FallTrigger
-import com.imoonday.trigger.LandingTrigger
-import com.imoonday.trigger.PersistentTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.*
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.Vec3d
-import kotlin.math.absoluteValue
-import kotlin.math.min
+import net.minecraft.network.packet.c2s.play.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import net.minecraft.util.math.*
+import kotlin.math.*
 
 class GroundWhackSkill : Skill(
     id = "ground_whack",
@@ -22,8 +20,10 @@ class GroundWhackSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         if (user.isOnGround) return UseResult.fail(failedMessage())
         user.run {
+            if (abilities.flying) abilities.flying = false
             velocity = Vec3d(0.0, min(velocity.y, -1.0), 0.0)
             send(EntityVelocityUpdateS2CPacket(this))
+            send(PlayerAbilitiesS2CPacket(abilities))
             startUsing()
         }
         return UseResult.success()
@@ -60,5 +60,5 @@ class GroundWhackSkill : Skill(
         return if (fallDistance < 10) 0 else amount / 2
     }
 
-    override fun isDangerousTo(player: ServerPlayerEntity): Boolean = player.isUsing()
+    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 }

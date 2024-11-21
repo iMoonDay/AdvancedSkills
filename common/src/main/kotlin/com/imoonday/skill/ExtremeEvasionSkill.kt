@@ -1,18 +1,16 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModSounds
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.DamageTrigger
-import com.imoonday.trigger.SendPlayerVelocityTrigger
+import com.imoonday.init.*
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.send
-import net.minecraft.entity.Entity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.world.ServerWorld
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
+import net.minecraft.server.network.*
+import net.minecraft.server.world.*
 
 class ExtremeEvasionSkill : Skill(
     id = "extreme_evasion",

@@ -6,6 +6,7 @@ import net.minecraft.entity.attribute.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.data.*
 import net.minecraft.entity.effect.*
+import net.minecraft.entity.player.*
 import net.minecraft.item.*
 import net.minecraft.nbt.*
 import net.minecraft.network.listener.*
@@ -14,6 +15,7 @@ import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.registry.tag.*
 import net.minecraft.server.world.*
+import net.minecraft.sound.SoundEvents
 import net.minecraft.util.*
 import net.minecraft.util.math.*
 import net.minecraft.world.*
@@ -137,6 +139,14 @@ class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : Liv
     override fun onSpawnPacket(packet: EntitySpawnS2CPacket) {
         super.onSpawnPacket(packet)
         owner = world.getEntityById(packet.entityData)
+    }
+
+    override fun interact(player: PlayerEntity, hand: Hand): ActionResult {
+        if (player.uuid == ownerUuid && player.isSneaking) {
+            this.discard()
+            return ActionResult.SUCCESS
+        }
+        return super.interact(player, hand)
     }
 
     companion object {

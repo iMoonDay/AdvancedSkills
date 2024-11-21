@@ -1,11 +1,11 @@
 package com.imoonday.skill
 
-import com.imoonday.block.FrostTrapBlock
-import com.imoonday.init.ModBlocks
+import com.imoonday.block.*
+import com.imoonday.init.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.block.SnowBlock
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.block.*
+import net.minecraft.server.network.*
 
 class FrostTrapSkill : Skill(
     id = "frost_trap",
@@ -18,9 +18,9 @@ class FrostTrapSkill : Skill(
         val world = user.world
         val blockPos = user.blockPos
         val state = world.getBlockState(blockPos)
-        if (ModBlocks.FROST_TRAP.canPlaceAt(state, world, blockPos) && world.setBlockState(
+        if (ModBlocks.FROST_TRAP.get().canPlaceAt(state, world, blockPos) && world.setBlockState(
                 blockPos,
-                ModBlocks.FROST_TRAP.defaultState.with(
+                ModBlocks.FROST_TRAP.get().defaultState.with(
                     SnowBlock.LAYERS,
                     if (state.contains(SnowBlock.LAYERS)) (state.get(SnowBlock.LAYERS) + 1).coerceAtMost(8) else 1
                 )

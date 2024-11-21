@@ -1,11 +1,11 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModSounds
+import com.imoonday.init.*
 import com.imoonday.util.*
-import net.minecraft.entity.effect.StatusEffectCategory
-import net.minecraft.network.packet.s2c.play.EntityStatusEffectS2CPacket
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
+import net.minecraft.entity.effect.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.server.network.*
+import net.minecraft.text.*
 
 class AdvancedPurificationSkill : Skill(
     id = "advanced_purification",

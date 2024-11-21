@@ -21,7 +21,7 @@ public class DamageTrackerMixin {
     private LivingEntity entity;
 
     @Inject(method = "onDamage", at = @At("HEAD"))
-    public void advanced_skills$onDamage(DamageSource source, float amount, CallbackInfo ci) {
+    public void advanced_skills_re$onDamage(DamageSource source, float amount, CallbackInfo ci) {
         if (this.entity instanceof ServerPlayerEntity player) {
             LivingEntity attacker = null;
             if (source.getAttacker() instanceof LivingEntity entity) {

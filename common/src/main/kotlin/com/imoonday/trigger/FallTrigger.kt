@@ -1,6 +1,6 @@
 package com.imoonday.trigger
 
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.network.*
 
 interface FallTrigger : SkillTrigger {
 

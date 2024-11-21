@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "com.imoonday.advanced_skills_re.forge.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "client": [
+    "EntityRenderersMixin",
+    "LivingEntityRendererAccessor"
+  ],
+  "mixins": [
+    "BowAttackGoalMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

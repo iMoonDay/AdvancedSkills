@@ -1,10 +1,10 @@
 package com.imoonday.trigger
 
-import net.minecraft.block.BlockState
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.block.*
+import net.minecraft.entity.player.*
+import net.minecraft.item.*
+import net.minecraft.util.math.*
+import net.minecraft.world.*
 
 interface MiningTrigger : SkillTrigger {
 

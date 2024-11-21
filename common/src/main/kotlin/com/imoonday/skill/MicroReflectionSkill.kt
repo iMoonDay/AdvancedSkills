@@ -1,13 +1,12 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.DamageTrigger
-import com.imoonday.trigger.ReflectionTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.server.network.ServerPlayerEntity
-import kotlin.random.Random
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.server.network.*
+import kotlin.random.*
 
 class MicroReflectionSkill : Skill(
     id = "micro_reflection",

@@ -3,7 +3,6 @@ package com.imoonday.skill
 import com.imoonday.advanced_skills_re.api.*
 import com.imoonday.trigger.*
 import com.imoonday.util.*
-import fi.dy.masa.malilib.util.NBTUtils
 import net.minecraft.client.render.*
 import net.minecraft.client.render.entity.*
 import net.minecraft.client.render.entity.feature.*
@@ -11,7 +10,6 @@ import net.minecraft.client.render.entity.model.*
 import net.minecraft.client.util.math.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
-import net.minecraft.nbt.NbtHelper.*
 import net.minecraft.server.network.*
 import net.minecraft.util.hit.*
 import net.minecraft.util.math.*
@@ -37,7 +35,7 @@ class GrapplingHookSkill : LongPressSkill(
             UseResult.startUsing(
                 player,
                 this,
-                NBTUtils.writeVec3dToTag(raycast.pos, NbtCompound())
+                NbtUtils.writeVec3dToTag(raycast.pos, NbtCompound())
             ).withCooling(false)
         } else {
             UseResult.fail(failedMessage())
@@ -54,7 +52,7 @@ class GrapplingHookSkill : LongPressSkill(
             player.fallDistance = 0f
             player.stopFallFlying()
             player.getUsingData()?.let {
-                NBTUtils.readVec3d(it)?.run {
+                NbtUtils.readVec3d(it)?.run {
                     val pos = player.pos
                     val distance = distanceTo(pos)
                     if (player.blockPos.down() == toBlockPos()
@@ -104,7 +102,7 @@ class GrapplingHookSkill : LongPressSkill(
         thirdPerson: Boolean = true,
     ) {
         if (!player.isUsing() || player.getUsingData() == null) return
-        val pos = NBTUtils.readVec3d(player.getUsingData())!!
+        val pos = NbtUtils.readVec3d(player.getUsingData())!!
 
         if (thirdPerson) matrices.pop()
         matrices.push()

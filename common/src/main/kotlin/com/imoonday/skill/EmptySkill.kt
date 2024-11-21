@@ -1,11 +1,9 @@
 package com.imoonday.skill
 
-import com.imoonday.util.UseResult
-import com.imoonday.util.id
-import com.imoonday.util.translateSkill
-import net.minecraft.client.MinecraftClient
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
+import com.imoonday.util.*
+import net.minecraft.client.*
+import net.minecraft.server.network.*
+import net.minecraft.text.*
 
 class EmptySkill : Skill(
     id = id("empty"),

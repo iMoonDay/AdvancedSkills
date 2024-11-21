@@ -1,5 +1,6 @@
 package com.imoonday.item
 
+import com.imoonday.*
 import com.imoonday.skill.*
 import com.imoonday.util.*
 import net.minecraft.client.item.*
@@ -12,7 +13,7 @@ import net.minecraft.world.*
 
 class SkillFruitItem(val rarity: Skill.Rarity, settings: Settings) : Item(settings) {
 
-    private val translationKey = "item.advanced_skills.skill_fruit"
+    private val translationKey = "item.${MOD_ID}.skill_fruit"
 
     constructor(rarity: Skill.Rarity) : this(
         rarity,

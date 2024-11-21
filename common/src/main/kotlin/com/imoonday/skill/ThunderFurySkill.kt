@@ -3,9 +3,9 @@ package com.imoonday.skill
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.raycastVisualBlock
-import net.minecraft.entity.EntityType
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.hit.HitResult
+import net.minecraft.entity.*
+import net.minecraft.server.network.*
+import net.minecraft.util.hit.*
 
 class ThunderFurySkill : Skill(
     id = "thunder_fury",

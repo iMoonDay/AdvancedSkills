@@ -1,14 +1,14 @@
 package com.imoonday.util
 
-import com.imoonday.api.SkillChangeEvents
+import com.imoonday.advanced_skills_re.api.*
+import com.imoonday.advanced_skills_re.mixin.*
 import com.imoonday.component.*
 import com.imoonday.network.*
 import com.imoonday.skill.*
 import com.imoonday.trigger.*
 import com.imoonday.util.PlayerUtils.getNextLevelExp
 import com.imoonday.util.PlayerUtils.shouldLearnSkill
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import jdk.internal.org.jline.utils.Colors.*
 import net.minecraft.client.network.*
 import net.minecraft.entity.player.*
 import net.minecraft.entity.projectile.*
@@ -16,15 +16,14 @@ import net.minecraft.item.*
 import net.minecraft.nbt.*
 import net.minecraft.network.listener.*
 import net.minecraft.network.packet.*
+import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.text.*
-import net.minecraft.util.*
 import net.minecraft.util.hit.*
 import net.minecraft.util.math.*
 import net.minecraft.world.*
-import javax.swing.text.StyleConstants.*
 import kotlin.math.*
 
 object PlayerUtils {
@@ -48,20 +47,31 @@ object PlayerUtils {
     }
 }
 
-private val PlayerEntity.data: DataComponent
-    get() = getComponent(Components.DATA)
+val PlayerEntity.data: PlayerDataComponent
+    get() = (this as PlayerDataContainer).dataComponent
 val PlayerEntity.skillContainer: SkillContainer
     get() = data.container
 val PlayerEntity.learnedSkills: Set<Skill>
     get() = skillContainer.getAllSkills()
 
-fun PlayerEntity.syncData() {
-    if (!world.isClient) Components.DATA.sync(this)
+fun PlayerEntity.syncData(force: Boolean = true) {
+    if (this is ServerPlayerEntity) {
+        if (force) {
+            this.data.sync()
+        } else {
+            this.data.dirty = true
+        }
+    }
 }
 
 fun PlayerEntity.resetData() {
     data.reset()
+    data.dirty = true
     properties = NbtCompound()
+}
+
+fun PlayerEntity.copyDataFrom(other: PlayerEntity) {
+    data.readFromNbt(other.data.toNbt())
 }
 
 fun PlayerEntity.getSlot(index: Int): SkillSlot? = skillContainer.getSlot(index)
@@ -109,7 +119,7 @@ fun PlayerEntity.learn(skill: Skill, toast: Boolean = true, message: Boolean = t
         if (result) {
             skillContainer.getEmptySlot(skill)?.equip(skill)
             (this as? ServerPlayerEntity)?.let {
-                ServerPlayNetworking.send(it, LearnSkillS2CPacket(skill, toast))
+                Channels.LEARN_SKILL_S2C.sendToPlayer(it, LearnSkillS2CPacket(skill, toast))
             }
             if (message) {
                 sendMessage(translate("learnSkill", "message", skill.name.string).styled {
@@ -127,10 +137,15 @@ fun PlayerEntity.learn(skill: Skill, toast: Boolean = true, message: Boolean = t
         syncData()
     }
 
-fun PlayerEntity.learnAll(toast: Boolean = false) =
-    Skill.getLearnableSkills(learnedSkills)
-        .forEach { learn(it, toast, false) }
-        .also { sendMessage(translate("learnSkill", "all")) }
+fun PlayerEntity.learnAll() {
+    if (skillContainer.getAllSkills().size != Skill.getValidSkills().size) {
+        skillContainer.learnAll {
+            skillContainer.getEmptySlot(it)?.equip(it)
+        }
+        syncData()
+    }
+    sendMessage(translate("learnSkill", "all"))
+}
 
 fun PlayerEntity.forget(skill: Skill, message: Boolean = true): Boolean =
     skillContainer.forget(skill, { result ->
@@ -152,8 +167,18 @@ fun PlayerEntity.forget(skill: Skill, message: Boolean = true): Boolean =
         }
     }
 
-fun PlayerEntity.forgetAll() =
-    learnedSkills.forEach { forget(it, false) }.also { sendMessage(translate("forgetSkill", "all")) }
+fun PlayerEntity.forgetAll() {
+    if (skillContainer.getAllSkills().isNotEmpty()) {
+        skillContainer.forgetAll {
+            if (this is ServerPlayerEntity && it is UnequipTrigger) {
+                it.postUnequipped(this, it)
+                stopUsing(it.skill)
+            }
+        }
+        syncData()
+    }
+    sendMessage(translate("forgetSkill", "all"))
+}
 
 fun PlayerEntity.learnRandomly(filter: (Skill) -> Boolean = { true }): Boolean =
     Skill.getValidSkills()
@@ -175,7 +200,7 @@ fun PlayerEntity.refreshChoice(force: Boolean = false) = if (this is ServerPlaye
     learnableData.refresh(force, learnedSkills)
     syncData()
 } else {
-    ClientPlayNetworking.send(RefreshChoiceC2SRequest())
+    Channels.REFRESH_CHOICE_C2S.sendToServer(RefreshChoiceC2SRequest())
 }
 
 fun PlayerEntity.canFreshChoice(): Boolean =
@@ -209,17 +234,17 @@ private fun ServerPlayerEntity.choose(index: Int): Boolean {
 }
 
 fun PlayerEntity.chooseFirst(): Boolean = if (this is ServerPlayerEntity) choose(0) else {
-    ClientPlayNetworking.send(ChooseSkillC2SRequest(0))
+    Channels.CHOOSE_SKILL_C2S.sendToServer(ChooseSkillC2SRequest(0))
     true
 }
 
 fun PlayerEntity.chooseSecond(): Boolean = if (this is ServerPlayerEntity) choose(1) else {
-    ClientPlayNetworking.send(ChooseSkillC2SRequest(1))
+    Channels.CHOOSE_SKILL_C2S.sendToServer(ChooseSkillC2SRequest(1))
     true
 }
 
 fun PlayerEntity.chooseThird(): Boolean = if (this is ServerPlayerEntity) choose(2) else {
-    ClientPlayNetworking.send(ChooseSkillC2SRequest(2))
+    Channels.CHOOSE_SKILL_C2S.sendToServer(ChooseSkillC2SRequest(2))
     true
 }
 
@@ -235,7 +260,7 @@ fun PlayerEntity.equip(skill: Skill, slot: SkillSlot): Boolean = equip(skill, sl
 
 fun PlayerEntity.equip(skill: Skill, index: Int): Boolean {
     if (world.isClient) {
-        ClientPlayNetworking.send(EquipSkillC2SRequest(index, skill))
+        Channels.EQUIP_SKILL_C2S.sendToServer(EquipSkillC2SRequest(index, skill))
         return true
     } else if (this is ServerPlayerEntity) {
         if (skill.invalid && !skill.isEmpty()) return false
@@ -247,12 +272,12 @@ fun PlayerEntity.equip(skill: Skill, index: Int): Boolean {
         if (!skill.invalid) skillContainer.getSlot(skill)?.let { it.unequip { move = true } }
         if (!move) {
             if (skill.invalid) {
-                if (!SkillChangeEvents.UNEQUIPPED.invoker().onUnequipped(this, slot, original)) {
+                if (SkillChangeEvents.UNEQUIPPED.invoker().onUnequipped(this, slot, original).isFalse) {
                     syncData()
                     return false
                 }
-            } else if (!SkillChangeEvents.UNEQUIPPED.invoker().onUnequipped(this, slot, original)
-                || !SkillChangeEvents.EQUIPPED.invoker().onEquipped(this, slot, skill)
+            } else if (SkillChangeEvents.UNEQUIPPED.invoker().onUnequipped(this, slot, original).isFalse
+                || SkillChangeEvents.EQUIPPED.invoker().onEquipped(this, slot, skill).isFalse
             ) {
                 syncData()
                 return false
@@ -282,7 +307,7 @@ fun ClientPlayerEntity.requestUse(
     index: Int,
     keyState: UseSkillC2SRequest.KeyState,
 ) {
-    ClientPlayNetworking.send(
+    Channels.USE_SKILL_C2S.sendToServer(
         UseSkillC2SRequest(
             index,
             keyState,
@@ -394,6 +419,8 @@ fun PlayerEntity.getUsingData(skill: Skill): NbtCompound? = getData(skill)?.data
 
 fun PlayerEntity.getData(skill: Skill): SkillData? = skillContainer.getData(skill)
 
+fun PlayerEntity.isCharging(skill: Skill): Boolean = skill is LongPressTrigger && isUsing(skill)
+
 var ServerPlayerEntity.lastDamagedTime: Long
     get() = properties.getLong("lastDamagedTime")
     set(value) = properties.putLong("lastDamagedTime", value)
@@ -403,7 +430,7 @@ var ServerPlayerEntity.lastReflectedTime: Long
 
 fun ServerPlayerEntity.onDamage() {
     if (equippedSkills.none { it is ReflectionTrigger }) return
-    lastDamagedTime = Util.getMeasuringTimeMs()
+    lastDamagedTime = System.currentTimeMillis()
     val l = lastDamagedTime - lastReflectedTime
     if (l < 1000) {
         sendMessage(translateSkill("extreme_reflection", "early", (l / 1000.0).toString()), true)
@@ -458,16 +485,12 @@ fun PlayerEntity.raycastLivingEntity(distance: Double): EntityHitResult? {
     )
 }
 
-val PlayerEntity.skillInitialized: Boolean
-    get() = try {
-        Components.DATA.maybeGet(this).isPresent
-    } catch (e: Exception) {
-        false
-    }
-
-fun PlayerEntity.updateScreen(data: NbtCompound = NbtCompound()) {
+fun PlayerEntity.updateScreen() {
     if (world.isClient) {
-        (client!!.currentScreen as? AutoSyncedScreen)?.update(data)
+        val screen = client!!.currentScreen
+        if (screen is AutoSyncedScreen && (screen as ScreenAccessor).isScreenInitialized) {
+            screen.update()
+        }
     }
 }
 
@@ -491,9 +514,40 @@ fun ServerPlayerEntity.spawnParticles(
     serverWorld.spawnParticles(type, pos.x, pos.y, pos.z, count, deltaX, deltaY, deltaZ, speed)
 }
 
+fun <T : ParticleEffect> ServerPlayerEntity.spawnParticlesForced(
+    type: T,
+    pos: Vec3d,
+    count: Int,
+    deltaX: Double,
+    deltaY: Double,
+    deltaZ: Double,
+    speed: Double
+): Int {
+    val particleS2CPacket = ParticleS2CPacket(
+        type,
+        true,
+        pos.x,
+        pos.y,
+        pos.z,
+        deltaX.toFloat(),
+        deltaY.toFloat(),
+        deltaZ.toFloat(),
+        speed.toFloat(),
+        count
+    )
+    return serverWorld.players.count {
+        serverWorld.sendToPlayerIfNearby(
+            it,
+            true,
+            pos.x,
+            pos.y,
+            pos.z,
+            particleS2CPacket
+        )
+    }
+}
+
 fun ServerPlayerEntity.playSound(sound: SoundEvent) = world.playSound(null, blockPos, sound, SoundCategory.PLAYERS)
 
 val clientPlayer: ClientPlayerEntity?
     get() = client?.player
-val PlayerEntity.horizontalRotationVector: Vec3d
-    get() = getRotationVector(0f, yaw)

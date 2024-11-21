@@ -1,11 +1,10 @@
 package com.imoonday.effect
 
-import com.imoonday.component.properties
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.AttributeContainer
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.entity.effect.StatusEffectCategory
-import java.awt.Color
+import com.imoonday.component.*
+import net.minecraft.entity.*
+import net.minecraft.entity.attribute.*
+import net.minecraft.entity.effect.*
+import java.awt.*
 
 class SeriousInjuryEffect : StatusEffect(
     StatusEffectCategory.HARMFUL,

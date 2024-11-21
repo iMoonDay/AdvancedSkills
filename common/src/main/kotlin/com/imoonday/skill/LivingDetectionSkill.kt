@@ -1,12 +1,9 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.GlowingTrigger
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.entity.Entity
-import net.minecraft.server.network.ServerPlayerEntity
+import com.imoonday.trigger.*
+import com.imoonday.util.*
+import net.minecraft.entity.*
+import net.minecraft.server.network.*
 
 class LivingDetectionSkill : Skill(
     id = "living_detection",
@@ -19,6 +16,8 @@ class LivingDetectionSkill : Skill(
 
     override fun getPersistTime(): Int = 20 * 5
 
-    override fun isGlowing(player: ClientPlayerEntity, entity: Entity): Boolean =
-        player.isUsing() && entity != player && entity.isLiving && entity.isAlive && player.distanceTo(entity) <= 50 && (entity.x != entity.prevX || entity.y != entity.prevY || entity.z != entity.prevZ)
+    override fun isGlowing(entity: Entity): Boolean {
+        val player = clientPlayer ?: return false
+        return player.isUsing() && entity != player && entity.isLiving && entity.isAlive && player.distanceTo(entity) <= 50 && (entity.x != entity.prevX || entity.y != entity.prevY || entity.z != entity.prevZ)
+    }
 }

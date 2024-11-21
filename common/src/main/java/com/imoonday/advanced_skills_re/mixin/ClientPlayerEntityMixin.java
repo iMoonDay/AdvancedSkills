@@ -1,5 +1,6 @@
 package com.imoonday.advanced_skills_re.mixin;
 
+import com.imoonday.advanced_skills_re.api.PlayerDataContainer;
 import com.imoonday.trigger.SkillTriggerHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -14,13 +15,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientPlayerEntityMixin {
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void advanced_skills$tick(CallbackInfo ci) {
+    private void advanced_skills_re$tick(CallbackInfo ci) {
         ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
         SkillTriggerHandler.INSTANCE.sendPlayerData(player);
     }
 
     @ModifyArg(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;"), index = 1)
-    private double advanced_skills$tickMovement(double y) {
+    private double advanced_skills_re$tickMovement(double y) {
         if ((Entity) (Object) this instanceof PlayerEntity player) {
             if (SkillTriggerHandler.INSTANCE.shouldInvertJump(player) && y > 0 || SkillTriggerHandler.INSTANCE.shouldInvertSneak(player) && y < 0) {
                 return -y;

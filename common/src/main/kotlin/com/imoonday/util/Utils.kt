@@ -4,9 +4,9 @@ import com.imoonday.*
 import com.imoonday.advanced_skills_re.mixin.*
 import dev.architectury.event.*
 import net.minecraft.client.*
-import net.minecraft.client.gui.*
 import net.minecraft.client.option.*
 import net.minecraft.client.util.*
+import net.minecraft.entity.*
 import net.minecraft.entity.effect.*
 import net.minecraft.text.*
 import net.minecraft.util.*
@@ -54,38 +54,17 @@ val KeyBinding.isPressedInScreen: Boolean
             || keyCategory == InputUtil.Type.MOUSE
             && GLFW.glfwGetMouseButton(it.handle, keyCode) == GLFW.GLFW_PRESS
     } ?: false
+val KeyBinding.key: InputUtil.Key
+    get() = (this as KeyBindingAccessor).boundKey
 val KeyBinding.keyCode: Int
-    get() = (this as KeyBindingAccessor).boundKey.code
+    get() = key.code
 val KeyBinding.keyCategory: InputUtil.Type
-    get() = (this as KeyBindingAccessor).boundKey.category
-
-fun DrawContext.drawTextWithBackground(
-    text: Text,
-    centerX: Int,
-    y: Int,
-    color: Int,
-    backgroundColor: Int,
-    shadow: Boolean = true,
-) {
-    client?.textRenderer?.run {
-        val width = getWidth(text)
-        val x = centerX - width / 2
-        fill(x - 1, y - 1, x + width + 1, y + fontHeight + 1, backgroundColor)
-        drawText(this, text, x, y, color, shadow)
-    }
-}
-
-fun DrawContext.drawTextWithBackground(
-    text: String,
-    centerX: Int,
-    y: Int,
-    color: Int,
-    backgroundColor: Int,
-    shadow: Boolean = true,
-) = drawTextWithBackground(text.toText(), centerX, y, color, backgroundColor, shadow)
+    get() = key.category
 
 fun String.toText(): MutableText = Text.literal(this)
 
 fun String.toIdentifier() = Identifier.tryParse(this)
 
 fun Boolean?.toEventResult(): EventResult = EventResult.interrupt(this)
+val Entity.horizontalRotationVector: Vec3d
+    get() = getRotationVector(0f, yaw)

@@ -4,9 +4,9 @@ import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.send
 import com.imoonday.util.spawnParticles
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
+import net.minecraft.server.network.*
 
 class JumpSkill : Skill(
     id = "jump",

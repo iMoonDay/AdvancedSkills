@@ -203,7 +203,7 @@ advancedSkills:
       empty: No Target selected
     exclusive_mount:
       name: Exclusive Mount
-      description: Summons an exclusive horse that can be ridden directly. It is only available to you. The horse's health, defense, speed and jumping height are increased. If a horse already exists, discard the original one and summon a new one, which will reset all states. If the horse dies, this skill will go on cooldown
+      description: Summons a unique horse with enhanced health, defense, speed, and jumping ability. Summoning replaces any existing horse, resetting its state. If the horse dies, the skill enters cooldown
       unsupportedStatus: You can't summon the horse in your current state
       unsupportedPlace: You can't summon the horse here
       customName: "%s's exclusive mount"
@@ -255,7 +255,7 @@ advancedSkills:
       description: Charge up and pop out, which can be used to glide
     laser_eye:
       name: Laser Eye
-      description: Fires a laser beam, damaging all creatures in its path
+      description: Fires a laser beam, damaging all entities in its path
     meteor_shower:
       name: Meteor Shower
       description: Summon a meteor shower
@@ -328,6 +328,18 @@ advancedSkills:
     magnetic_trap:
       name: Magnetic Trap
       description: Generate a slowdown trap
+    multiple_laser:
+      name: Multiple Laser
+      description: Fires a laser continuously, causing small damage to all entities in its path
+    super_shadow_clone:
+      name: Super Shadow Clone
+      description: Summons several clones towards different directions and becomes invisible for 5 seconds
+    arrow_rain:
+      name: Arrow Rain
+      description: Summons several arrows randomly above the target
+    weed_cleaner:
+      name: Weed Cleaner
+      description: Clean up weeds around
   skillType:
     attack: Attack
     defense: Defense
@@ -362,6 +374,7 @@ advancedSkills:
     list:
       level: 'Level: %s'
       exp: 'Exp: %d'
+      empty: No skills learned yet
       button:
         tooltip: Displayed in Creative Mode Only
         learnAll: Learn All
@@ -376,7 +389,7 @@ advancedSkills:
       title: 'Skill Inventory %d/%d'
     wheel:
       cancel: Cancel
-      tip: Left click/release to use, right click to cancel, middle click to view details
+      tip: Release to select, left click to use, right click to cancel, middle click to view details
     learn:
       refresh: Refresh
       learn: Learn
@@ -410,6 +423,7 @@ entity:
     tornado: Tornado
     clone_player: Player
     magnet: Magnet
+    ungrounded_arrow: Ungrounded Arrow
 block:
   advanced_skills_re:
     invisible_trap: Invisible Trap
@@ -425,5 +439,5 @@ subtitles:
     fire: Fire
     laser: Laser
 gamerule:
-  skillCooldownMultiplier: Skill Cooldown Multiplier
+  skillCooldownMultiplier: Skill Cooldown Multiplier(0-100)
   skillCooldownMultiplier.description: The cooldown time of all skills is adjusted according to this multiplier

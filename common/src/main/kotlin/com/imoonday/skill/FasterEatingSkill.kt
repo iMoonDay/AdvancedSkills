@@ -1,10 +1,9 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.ItemMaxUseTimeTrigger
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.item.PotionItem
-import net.minecraft.util.UseAction
+import com.imoonday.trigger.*
+import net.minecraft.entity.player.*
+import net.minecraft.item.*
+import net.minecraft.util.*
 
 class FasterEatingSkill : PassiveSkill(
     id = "faster_eating",

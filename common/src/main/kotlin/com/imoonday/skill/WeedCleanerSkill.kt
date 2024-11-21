@@ -1,0 +1,54 @@
+package com.imoonday.skill
+
+import com.imoonday.util.*
+import net.minecraft.block.Blocks.*
+import net.minecraft.entity.*
+import net.minecraft.server.network.*
+import net.minecraft.util.math.*
+
+class WeedCleanerSkill : Skill(
+    id = "weed_cleaner",
+    types = listOf(SkillType.FUNCTION),
+    cooldown = 10,
+    rarity = Rarity.COMMON
+) {
+
+    override fun use(user: ServerPlayerEntity): UseResult {
+        val world = user.world
+        val userPos = user.pos
+        user.server.execute {
+            user.boundingBox.expand(25.0).blockPosSet.forEach { pos ->
+                val state = world.getBlockState(pos)
+                if (WEEDS.contains(state.block)) {
+                    if (world.breakBlock(pos, true, user)) {
+                        world.getEntitiesByClass(ItemEntity::class.java, Box(pos).expand(1.0)) { it.age == 0 }
+                            .forEach {
+                                it.resetPickupDelay()
+                                it.setPosition(userPos)
+                            }
+                    }
+                }
+            }
+        }
+        return UseResult.success()
+    }
+
+    companion object {
+
+        val WEEDS = listOf(
+            GRASS,
+            TALL_GRASS,
+            FERN,
+            LARGE_FERN,
+            SEAGRASS,
+            TALL_SEAGRASS,
+            DEAD_BUSH,
+            VINE,
+            CRIMSON_ROOTS,
+            WARPED_ROOTS,
+            NETHER_SPROUTS,
+            WEEPING_VINES,
+            TWISTING_VINES
+        )
+    }
+}

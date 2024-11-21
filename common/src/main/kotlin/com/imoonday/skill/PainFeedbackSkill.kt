@@ -1,13 +1,11 @@
 package com.imoonday.skill
 
-import com.imoonday.component.properties
-import com.imoonday.trigger.PostDamagedTrigger
-import com.imoonday.trigger.ProgressTrigger
-import com.imoonday.trigger.TickTrigger
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
+import com.imoonday.component.*
+import com.imoonday.trigger.*
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
 
 class PainFeedbackSkill : PassiveSkill(
     id = "pain_feedback",

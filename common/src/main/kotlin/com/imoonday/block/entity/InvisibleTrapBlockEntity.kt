@@ -1,10 +1,10 @@
 package com.imoonday.block.entity
 
-import com.imoonday.init.ModBlocks
-import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.math.BlockPos
+import com.imoonday.init.*
+import net.minecraft.block.*
+import net.minecraft.block.entity.*
+import net.minecraft.nbt.*
+import net.minecraft.util.math.*
 import java.util.*
 
 class InvisibleTrapBlockEntity(pos: BlockPos, state: BlockState) :

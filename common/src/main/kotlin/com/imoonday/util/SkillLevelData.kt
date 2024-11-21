@@ -1,6 +1,6 @@
 package com.imoonday.util
 
-import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.*
 
 data class SkillLevelData(
     var experience: Int = 0,

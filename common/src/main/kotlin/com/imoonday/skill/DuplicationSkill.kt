@@ -1,14 +1,10 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.ClonePlayerEntity
-import com.imoonday.trigger.SendPlayerVelocityTrigger
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
-import com.imoonday.util.horizontalRotationVector
-import com.imoonday.util.times
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.server.network.ServerPlayerEntity
+import com.imoonday.entity.*
+import com.imoonday.trigger.*
+import com.imoonday.util.*
+import net.minecraft.entity.effect.*
+import net.minecraft.server.network.*
 
 class DuplicationSkill : Skill(
     id = "duplication",
@@ -21,9 +17,12 @@ class DuplicationSkill : Skill(
         user.world.spawnEntity(ClonePlayerEntity(user.world, user).apply {
             moveVelocity = user.horizontalRotationVector * (user.velocity.length() * 2.0).coerceAtMost(1.0)
             moveTime = 20 * 3
-            setJumping(user.velocity.y > 0)
+            if (user.velocity.y > 0) {
+                jumpControl.setActive()
+                setJumping(true)
+            }
         })
-        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, 20))
+        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, 20, 0, true, false, true))
         return UseResult.success()
     }
 }

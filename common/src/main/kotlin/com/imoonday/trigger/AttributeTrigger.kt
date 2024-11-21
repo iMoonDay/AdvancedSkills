@@ -1,9 +1,8 @@
 package com.imoonday.trigger
 
-import com.imoonday.util.SkillSlot
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.server.network.ServerPlayerEntity
+import com.imoonday.util.*
+import net.minecraft.entity.attribute.*
+import net.minecraft.server.network.*
 
 interface AttributeTrigger : UnequipTrigger {
 

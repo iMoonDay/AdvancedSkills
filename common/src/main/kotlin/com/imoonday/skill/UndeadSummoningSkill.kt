@@ -1,19 +1,18 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.ServantSkeletonEntity
-import com.imoonday.entity.ServantWitherSkeletonEntity
+import com.imoonday.entity.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
-import kotlin.math.min
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import kotlin.math.*
 
 class UndeadSummoningSkill : Skill(
     id = "undead_summoning",
     types = listOf(SkillType.SUMMON),
     cooldown = 30,
     rarity = Rarity.EPIC,
-    sound = SoundEvents.ENTITY_WITHER_SPAWN
+    sound = SoundEvents::ENTITY_WITHER_SPAWN
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {

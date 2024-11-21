@@ -1,7 +1,7 @@
 package com.imoonday.util
 
-import com.imoonday.skill.Skill
-import net.minecraft.nbt.NbtCompound
+import com.imoonday.skill.*
+import net.minecraft.nbt.*
 
 data class SkillChoice(
     val first: Skill,

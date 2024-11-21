@@ -25,7 +25,7 @@ public class FluidBlockMixin {
     public static IntProperty LEVEL;
 
     @Inject(method = "getCollisionShape", at = @At("HEAD"), cancellable = true)
-    public void advanced_skills$getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
+    public void advanced_skills_re$getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (context instanceof EntityShapeContext entityShapeContext && entityShapeContext.getEntity() instanceof PlayerEntity && context.isAbove(COLLISION_SHAPE, pos, true) && state.get(LEVEL) == 0 && context.canWalkOnFluid(world.getFluidState(pos.up()), state.getFluidState())) {
             cir.setReturnValue(COLLISION_SHAPE);
         }

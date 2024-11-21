@@ -1,8 +1,6 @@
 package com.imoonday.advanced_skills_re.mixin;
 
-import com.imoonday.skill.Skills;
 import com.imoonday.trigger.SkillTriggerHandler;
-import com.imoonday.util.PlayerUtilsKt;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -21,17 +19,17 @@ public class GameRendererMixin {
 
     @Shadow
     @Final
-    private MinecraftClient client;
+    MinecraftClient client;
 
     @Inject(method = "getNightVisionStrength", at = @At("HEAD"), cancellable = true)
-    private static void advanced_skills$getNightVisionStrength(LivingEntity entity, float tickDelta, CallbackInfoReturnable<Float> cir) {
-        if (entity instanceof PlayerEntity player && PlayerUtilsKt.isUsing(player, Skills.NIGHT_VISION)) {
+    private static void advanced_skills_re$getNightVisionStrength(LivingEntity entity, float tickDelta, CallbackInfoReturnable<Float> cir) {
+        if (entity instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.hasNightVision(player)) {
             cir.setReturnValue(1.0f);
         }
     }
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;tiltViewWhenHurt(Lnet/minecraft/client/util/math/MatrixStack;F)V", shift = At.Shift.AFTER))
-    private void advanced_skills$renderWorld(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    private void advanced_skills_re$renderWorld(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
         SkillTriggerHandler.INSTANCE.worldRender(matrices, tickDelta, this.client);
     }
 }

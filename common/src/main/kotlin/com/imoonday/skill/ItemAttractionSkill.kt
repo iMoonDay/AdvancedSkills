@@ -1,15 +1,11 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.GlowingTrigger
-import com.imoonday.trigger.UsingRenderTrigger
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.entity.Entity
-import net.minecraft.entity.ItemEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.network.ServerPlayerEntity
+import com.imoonday.trigger.*
+import com.imoonday.util.*
+import net.minecraft.entity.*
+import net.minecraft.entity.player.*
+import net.minecraft.particle.*
+import net.minecraft.server.network.*
 
 class ItemAttractionSkill : LongPressSkill(
     id = "item_attraction",
@@ -51,7 +47,9 @@ class ItemAttractionSkill : LongPressSkill(
         super.tick(player, usedTime)
     }
 
-    override fun isGlowing(player: ClientPlayerEntity, entity: Entity): Boolean =
-        player.isUsing() && entity is ItemEntity && !entity.cannotPickup()
-            && player.boundingBox.expand(15.0).contains(entity.pos)
+    override fun isGlowing(entity: Entity): Boolean {
+        val player = clientPlayer ?: return false
+        return (player.isUsing() && entity is ItemEntity && !entity.cannotPickup()
+            && player.boundingBox.expand(15.0).contains(entity.pos))
+    }
 }

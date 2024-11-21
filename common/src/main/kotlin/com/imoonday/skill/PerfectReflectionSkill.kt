@@ -1,16 +1,15 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.DamageTrigger
-import com.imoonday.trigger.ReflectionTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.playSound
 import com.imoonday.util.translateSkill
-import net.minecraft.entity.Entity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Util
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import net.minecraft.util.*
 
 class PerfectReflectionSkill : Skill(
     id = "perfect_reflection",
@@ -31,7 +30,7 @@ class PerfectReflectionSkill : Skill(
     ): Boolean {
         if (!player.isUsing()) return false
         val time = getStartTime(player)?.let {
-            Util.getMeasuringTimeMs() - it
+            System.currentTimeMillis() - it
         }
         player.stopUsing()
         player.stopCooling()

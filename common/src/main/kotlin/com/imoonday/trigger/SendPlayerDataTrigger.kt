@@ -1,8 +1,8 @@
 package com.imoonday.trigger
 
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.client.network.*
+import net.minecraft.nbt.*
+import net.minecraft.server.network.*
 
 interface SendPlayerDataTrigger : SkillTrigger {
 

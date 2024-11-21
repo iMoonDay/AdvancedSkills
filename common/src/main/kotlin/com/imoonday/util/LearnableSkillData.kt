@@ -1,7 +1,7 @@
 package com.imoonday.util
 
-import com.imoonday.skill.Skill
-import net.minecraft.nbt.NbtCompound
+import com.imoonday.skill.*
+import net.minecraft.nbt.*
 
 class LearnableSkillData(
     private var choice: SkillChoice = SkillChoice.EMPTY,
@@ -60,13 +60,6 @@ class LearnableSkillData(
             next(except, filter)
             modified = true
         }
-//        if (choice.skills.any { it.invalid || it in except || !filter(it) }
-//            && SkillChoice.canGenerate(except, filter)) {
-//            choice = choice.replaceWith({ it.invalid || it in except || !filter(it) }) {
-//                Skill.random(except.intersect(it), filter)
-//            }
-//            modified = true
-//        }
         return modified
     }
 

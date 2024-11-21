@@ -4,13 +4,12 @@ import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.clientPlayer
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.EntityDimensions
-import net.minecraft.entity.EntityPose
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.math.Direction
+import net.minecraft.client.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
+import net.minecraft.util.math.*
 
 class ReverseGravitySkill : Skill(
     id = "reverse_gravity",

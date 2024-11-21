@@ -1,22 +1,18 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModEffects
-import com.imoonday.init.ModSounds
-import com.imoonday.trigger.AttackTrigger
-import com.imoonday.trigger.PersistentTrigger
-import com.imoonday.trigger.RespawnTrigger
+import com.imoonday.init.*
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.translate
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundCategory
-import kotlin.random.Random
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.effect.*
+import net.minecraft.entity.player.*
+import net.minecraft.item.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import kotlin.random.*
 
 class DisarmSkill : Skill(
     id = "disarm",
@@ -35,9 +31,9 @@ class DisarmSkill : Skill(
     ): Float {
         if (!player.isUsing()) return amount
         if (Random.nextFloat() <= 0.45f) {
-            target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM, 20 * 5, 0))
+            target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM.get(), 20 * 5, 0))
             player.sendMessage(translate("skill", "disarm.success"), true)
-            target.world.playSound(null, player.blockPos, ModSounds.DISARM, SoundCategory.PLAYERS)
+            target.world.playSound(null, player.blockPos, ModSounds.DISARM.get(), SoundCategory.PLAYERS)
             (target as? PlayerEntity)?.sendMessage(translate("skill", "disarm.disarmed"), true)
             if (Random.nextFloat() <= 0.01f) {
                 if (target is ServerPlayerEntity)

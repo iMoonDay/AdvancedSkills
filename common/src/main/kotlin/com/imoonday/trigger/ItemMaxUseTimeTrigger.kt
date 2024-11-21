@@ -1,7 +1,7 @@
 package com.imoonday.trigger
 
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
+import net.minecraft.entity.player.*
+import net.minecraft.item.*
 
 interface ItemMaxUseTimeTrigger : SkillTrigger {
 

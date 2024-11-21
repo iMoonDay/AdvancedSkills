@@ -13,19 +13,20 @@ val LOGGER: Logger = LogUtils.getLogger()
 
 object AdvancedSkills {
 
+    @JvmStatic
     fun init() {
         Config.load()
-        Skills.init()
         Channels.register()
         ModCommands.init()
-        SkillArgumentType.register()
-        ModItemGroups.init()
         ModItems.init()
         ModBlocks.init()
         ModEffects.init()
         ModSounds.init()
         ModEntities.init()
         ModGameRules.init()
+        ModParticleTypes.init()
+        Skills.init()
+        ModItemGroups.init()
         EventHandler.register()
     }
 }

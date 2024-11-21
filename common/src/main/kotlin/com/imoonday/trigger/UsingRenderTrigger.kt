@@ -1,11 +1,11 @@
 package com.imoonday.trigger
 
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.render.entity.feature.*
+import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.player.*
 
 interface UsingRenderTrigger : FeatureRendererTrigger {
 

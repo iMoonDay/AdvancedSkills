@@ -1,22 +1,20 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.Servant
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.DamageTrigger
-import com.imoonday.trigger.UsingRenderTrigger
+import com.imoonday.entity.*
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.server.network.*
 
 class TauntSkill : Skill(
     id = "taunt",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 30,
     rarity = Rarity.SUPERB,
-), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
+), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {
 
     override fun getPersistTime(): Int = 20 * 15
 

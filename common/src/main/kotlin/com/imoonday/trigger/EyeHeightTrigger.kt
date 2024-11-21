@@ -1,8 +1,7 @@
 package com.imoonday.trigger
 
-import net.minecraft.entity.EntityDimensions
-import net.minecraft.entity.EntityPose
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.entity.*
+import net.minecraft.entity.player.*
 
 interface EyeHeightTrigger : SkillTrigger {
 

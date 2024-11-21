@@ -1,13 +1,11 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.AutoTrigger
-import com.imoonday.trigger.DamageTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.server.network.*
 
 class SelfHealingSkill : Skill(
     id = "self_healing",

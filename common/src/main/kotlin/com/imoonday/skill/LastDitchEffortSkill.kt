@@ -1,16 +1,14 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModSounds
+import com.imoonday.init.*
 import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.*
+import net.minecraft.entity.attribute.*
+import net.minecraft.entity.damage.*
+import net.minecraft.server.network.*
 
 class LastDitchEffortSkill : Skill(
     id = "last_ditch_effort",

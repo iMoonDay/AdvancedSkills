@@ -18,7 +18,7 @@ public abstract class CreeperEntityMixin {
     public abstract void setFuseSpeed(int fuseSpeed);
 
     @Inject(method = "explode", at = @At("HEAD"), cancellable = true)
-    public void advanced_skills$explode(CallbackInfo ci) {
+    public void advanced_skills_re$explode(CallbackInfo ci) {
         if (ModEffectsKt.isSilenced((CreeperEntity) (Object) this)) {
             this.setFuseSpeed(-1);
             this.currentFuseTime -= 1;

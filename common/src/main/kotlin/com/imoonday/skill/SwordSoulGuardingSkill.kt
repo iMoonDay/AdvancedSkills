@@ -1,28 +1,24 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.EnchantedSwordEntity
-import com.imoonday.entity.render.EnchantedSwordEntityRenderer
-import com.imoonday.trigger.AttackTrigger
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.DamageTrigger
-import com.imoonday.trigger.FeatureRendererTrigger
+import com.imoonday.entity.*
+import com.imoonday.entity.render.*
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.minus
 import com.imoonday.util.playSound
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.render.model.json.ModelTransformationMode
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.RotationAxis
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.render.entity.feature.*
+import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.render.model.json.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import net.minecraft.util.math.*
 
 class SwordSoulGuardingSkill : Skill(
     id = "sword_soul_guarding",

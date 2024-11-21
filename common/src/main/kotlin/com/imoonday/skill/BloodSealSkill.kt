@@ -1,18 +1,14 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModEffects
-import com.imoonday.trigger.AttributeTrigger
-import com.imoonday.trigger.CrosshairTrigger
-import com.imoonday.trigger.UsingRenderTrigger
+import com.imoonday.init.*
+import com.imoonday.trigger.*
 import com.imoonday.util.*
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.Hand
-import net.minecraft.util.hit.HitResult
+import net.minecraft.entity.*
+import net.minecraft.entity.attribute.*
+import net.minecraft.entity.effect.*
+import net.minecraft.server.network.*
+import net.minecraft.util.*
+import net.minecraft.util.hit.*
 
 class BloodSealSkill : LongPressSkill(
     id = "blood_seal",
@@ -47,7 +43,7 @@ class BloodSealSkill : LongPressSkill(
         player.swingHand(Hand.MAIN_HAND, true)
         player.raycastLivingEntity(5.0)?.takeIf { it.type == HitResult.Type.ENTITY }?.let {
             it.entity.damage(player.damageSources.playerAttack(player), 3f)
-            (it.entity as? LivingEntity)?.addStatusEffect(StatusEffectInstance(ModEffects.SERIOUS_INJURY, 20 * 7))
+            (it.entity as? LivingEntity)?.addStatusEffect(StatusEffectInstance(ModEffects.SERIOUS_INJURY.get(), 20 * 7))
             return UseResult.success()
         }
         return UseResult.fail(failedMessage())
@@ -61,7 +57,7 @@ class BloodSealSkill : LongPressSkill(
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) =
         super<AttributeTrigger>.postUnequipped(player, slot)
 
-    override fun isDangerousTo(player: ServerPlayerEntity): Boolean = player.isUsing()
+    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 
     override fun getCrosshair(): Crosshair {
         clientPlayer?.run {

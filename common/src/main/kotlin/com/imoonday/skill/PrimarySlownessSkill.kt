@@ -1,10 +1,10 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.SlownessEnergyBallEntity
-import com.imoonday.init.ModSounds
+import com.imoonday.entity.*
+import com.imoonday.init.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.network.*
 
 class PrimarySlownessSkill : Skill(
     id = "primary_slowness",

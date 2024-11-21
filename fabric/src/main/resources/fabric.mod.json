@@ -24,12 +24,14 @@
     ]
   },
   "mixins": [
+    "advanced_skills_re_fabric.mixins.json",
     "advanced_skills_re.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16",
+    "fabricloader": ">=0.14",
     "minecraft": "~1.20",
     "java": ">=17",
     "fabric-api": "*"
-  }
+  },
+  "accessWidener": "advanced_skills_re.accesswidener"
 }

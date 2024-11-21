@@ -1,16 +1,14 @@
 package com.imoonday.entity.render.feature
 
-import com.imoonday.init.isForceFrozen
-import net.minecraft.block.Blocks
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.LivingEntity
-import net.minecraft.util.math.RotationAxis
+import com.imoonday.init.*
+import net.minecraft.block.*
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.render.entity.feature.*
+import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
+import net.minecraft.util.math.*
 
 class IceLayer<T : LivingEntity, M : EntityModel<T>>(
     renderer: FeatureRendererContext<T, M>,

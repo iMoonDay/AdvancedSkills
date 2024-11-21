@@ -3,9 +3,9 @@ package com.imoonday.config
 import com.imoonday.*
 import com.imoonday.network.*
 import com.imoonday.skill.*
+import dev.architectury.platform.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import net.fabricmc.loader.api.*
 import net.minecraft.nbt.*
 import net.minecraft.server.*
 import java.io.*
@@ -13,6 +13,7 @@ import java.nio.file.*
 import kotlin.concurrent.*
 import kotlin.io.path.*
 
+//TODO 增加指令修改
 @Serializable
 class Config {
 
@@ -107,7 +108,7 @@ class Config {
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
-        private var file: File = FabricLoader.getInstance().configDir.resolve("$MOD_ID.json").toFile()
+        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID.json").toFile()
         var instance = Config()
         private var loading = false
         private var saving = false

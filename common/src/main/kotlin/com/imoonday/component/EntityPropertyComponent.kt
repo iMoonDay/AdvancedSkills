@@ -1,29 +1,24 @@
 package com.imoonday.component
 
-import com.imoonday.effect.SyncClientEffect
-import dev.onyxstudios.cca.api.v3.component.Component
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
-import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtList
-import net.minecraft.nbt.NbtString
+import com.imoonday.advanced_skills_re.api.*
+import com.imoonday.effect.*
+import com.imoonday.network.*
+import net.minecraft.entity.*
+import net.minecraft.nbt.*
+import net.minecraft.server.world.*
 
 interface PropertyComponent : Component {
 
     var properties: NbtCompound
 }
 
-class EntityPropertyComponent(private val entity: Entity) :
-    PropertyComponent,
-    AutoSyncedComponent,
-    ServerTickingComponent {
+class EntityPropertyComponent(private val entity: Entity) : PropertyComponent {
 
+    var dirty = false
     override var properties: NbtCompound = NbtCompound()
         set(value) {
             field = value
-            Components.PROPERTY.sync(entity)
+            entity.propertyComponent.sync()
         }
 
     override fun readFromNbt(tag: NbtCompound) {
@@ -43,12 +38,29 @@ class EntityPropertyComponent(private val entity: Entity) :
                         .map { NbtString.of(it.syncId) })
             })
         }
-        Components.PROPERTY.sync(entity)
+        if (dirty) {
+            sync()
+            dirty = false
+        }
+    }
+
+    override fun sync() {
+        (entity.world as? ServerWorld)?.let {
+            Channels.SYNC_PROPERTIES_S2C.sendToPlayers(
+                it.players,
+                SyncPropertiesS2CPacket(entity.id, toNbt())
+            )
+        }
     }
 }
 
+val Entity.propertyComponent: EntityPropertyComponent
+    get() = (this as Propertied).propertyComponent
 var Entity.properties: NbtCompound
-    get() = getComponent(Components.PROPERTY).properties
+    get() = propertyComponent.run {
+        dirty = true
+        properties
+    }
     set(value) {
-        getComponent(Components.PROPERTY).properties = value
+        this.propertyComponent.properties = value
     }

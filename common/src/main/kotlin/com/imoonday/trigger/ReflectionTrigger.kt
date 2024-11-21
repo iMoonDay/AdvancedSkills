@@ -1,23 +1,21 @@
 package com.imoonday.trigger
 
-import com.imoonday.util.UseResult
-import com.imoonday.util.lastDamagedTime
-import com.imoonday.util.lastReflectedTime
-import com.imoonday.util.translateSkill
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.Util
+import com.imoonday.util.*
+import net.minecraft.server.network.*
 
 interface ReflectionTrigger : AutoStopTrigger {
 
-    fun startReflecting(user: PlayerEntity) = UseResult.of(
-        user.startUsing { it.putLong("startTime", Util.getMeasuringTimeMs()) },
-        null,
-        translateSkill("extreme_reflection", "active")
-    )
+    fun startReflecting(user: ServerPlayerEntity): UseResult {
+        val startTime = System.currentTimeMillis()
+        return UseResult.of(
+            user.startUsing { it.putLong("startTime", startTime) },
+            null,
+            translateSkill("extreme_reflection", "active")
+        )
+    }
 
     override fun onStop(player: ServerPlayerEntity) {
-        player.lastReflectedTime = Util.getMeasuringTimeMs()
+        player.lastReflectedTime = System.currentTimeMillis()
         getStartTime(player)?.let {
             val time = player.lastDamagedTime
             val l = it - time

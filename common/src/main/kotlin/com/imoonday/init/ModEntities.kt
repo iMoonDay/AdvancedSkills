@@ -11,11 +11,14 @@ import net.minecraft.client.render.entity.*
 import net.minecraft.client.render.entity.model.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
+import net.minecraft.entity.mob.*
 import net.minecraft.entity.passive.*
-import net.minecraft.entity.player.*
 import net.minecraft.registry.*
+import java.util.function.*
 
 object ModEntities {
+
+    private val livingAttributeRegistry: MutableList<() -> Unit> = mutableListOf()
 
     @JvmField
     val ENTITIES: DeferredRegister<EntityType<*>> = DeferredRegister.create(MOD_ID, RegistryKeys.ENTITY_TYPE)
@@ -58,14 +61,14 @@ object ModEntities {
         EntityType.Builder.create(::SpecialTameHorseEntity, SpawnGroup.CREATURE)
             .setDimensions(1.3964844f, 1.6f)
             .maxTrackingRange(10)
-            .register("special_tame_horse", AbstractHorseEntity.createBaseHorseAttributes())
+            .register("special_tame_horse") { AbstractHorseEntity.createBaseHorseAttributes() }
 
     @JvmField
     val SERVANT_SKELETON: RegistrySupplier<EntityType<ServantSkeletonEntity>> =
         EntityType.Builder.create(::ServantSkeletonEntity, SpawnGroup.CREATURE)
             .setDimensions(0.6f, 1.99f)
             .maxTrackingRange(8)
-            .register("servant_skeleton", ServantSkeletonEntity.createAttributes())
+            .register("servant_skeleton") { ServantSkeletonEntity.createAttributes() }
 
     @JvmStatic
     val SERVANT_WITHER_SKELETON: RegistrySupplier<EntityType<ServantWitherSkeletonEntity>> =
@@ -73,7 +76,7 @@ object ModEntities {
             .setDimensions(0.7f, 2.4f)
             .makeFireImmune()
             .maxTrackingRange(8)
-            .register("servant_wither_skeleton", ServantWitherSkeletonEntity.createAttributes())
+            .register("servant_wither_skeleton") { ServantWitherSkeletonEntity.createAttributes() }
 
     @JvmField
     val METEORITE: RegistrySupplier<EntityType<MeteoriteEntity>> =
@@ -117,7 +120,7 @@ object ModEntities {
             .setDimensions(0.6f, 1.8f)
             .maxTrackingRange(32)
             .trackingTickInterval(2)
-            .register("clone_player", PlayerEntity.createPlayerAttributes())
+            .register("clone_player") { MobEntity.createMobAttributes() }
 
     @JvmField
     val MAGNET: RegistrySupplier<EntityType<MagnetEntity>> =
@@ -125,26 +128,37 @@ object ModEntities {
             .setDimensions(0.5f, 0.5f)
             .maxTrackingRange(8)
             .makeFireImmune()
-            .register("magnet", MagnetEntity.createLivingAttributes())
+            .register("magnet") { MagnetEntity.createLivingAttributes() }
 
     @JvmField
     val MAGNET_MODEL_LAYER: EntityModelLayer = registerModelLayer("magnet")
+
+    @JvmField
+    val UNGROUNDED_ARROW: RegistrySupplier<EntityType<UngroundedArrowEntity>> =
+        EntityType.Builder.create(::UngroundedArrowEntity, SpawnGroup.MISC)
+            .setDimensions(0.5f, 0.5f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(20)
+            .register("ungrounded_arrow")
 
     fun <T : Entity> EntityType.Builder<T>.register(name: String): RegistrySupplier<EntityType<T>> =
         ENTITIES.register(name) { this.build(name) }
 
     fun <T : LivingEntity> EntityType.Builder<T>.register(
         name: String,
-        attributeContainer: DefaultAttributeContainer.Builder,
+        attributeContainerSupplier: Supplier<DefaultAttributeContainer.Builder>,
     ): RegistrySupplier<EntityType<T>> {
         val supplier = register(name)
-        EntityAttributeRegistry.register(supplier) { attributeContainer }
+        livingAttributeRegistry += { EntityAttributeRegistry.register(supplier, attributeContainerSupplier) }
         return supplier
     }
 
     private fun registerModelLayer(id: String): EntityModelLayer = EntityModelLayer(id(id), "main")
 
-    fun init() = ENTITIES.register()
+    fun init() {
+        ENTITIES.register()
+        livingAttributeRegistry.forEach { it() }
+    }
 
     fun initClient() {
         EntityRendererRegistry.register(SILENCE_ENERGY_BALL, SilenceEnergyBallEntity::Renderer)
@@ -160,12 +174,10 @@ object ModEntities {
         EntityRendererRegistry.register(HOOK, ::HookEntityRenderer)
         EntityRendererRegistry.register(CLONE_PLAYER, ClonePlayerEntity::Renderer)
         EntityRendererRegistry.register(MAGNET, ::MagnetEntityRenderer)
+        EntityRendererRegistry.register(UNGROUNDED_ARROW, ::ArrowEntityRenderer)
 
         EntityModelLayerRegistry.register(METEORITE_MODEL_LAYER, MeteoriteEntity.Renderer::texturedModelData)
         EntityModelLayerRegistry.register(TORNADO_MODEL_LAYER, TornadoEntityModel::texturedModelData)
-        EntityModelLayerRegistry.register(
-            MAGNET_MODEL_LAYER,
-            MagnetEntityModel::texturedModelData
-        )
+        EntityModelLayerRegistry.register(MAGNET_MODEL_LAYER, MagnetEntityModel::texturedModelData)
     }
 }

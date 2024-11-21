@@ -1,7 +1,56 @@
 package com.imoonday.util
 
 import net.minecraft.nbt.*
+import net.minecraft.util.math.*
 import java.util.*
+
+class NbtUtils {
+
+    companion object {
+
+        fun readVec3d(tag: NbtCompound?): Vec3d? {
+            if (tag != null &&
+                tag.contains("dx", 6) &&
+                tag.contains("dy", 6) &&
+                tag.contains("dz", 6)
+            ) {
+                return Vec3d(tag.getDouble("dx"), tag.getDouble("dy"), tag.getDouble("dz"))
+            }
+
+            return null
+        }
+
+        fun writeVec3dToTag(vec: Vec3d, tag: NbtCompound): NbtCompound {
+            tag.putDouble("dx", vec.x)
+            tag.putDouble("dy", vec.y)
+            tag.putDouble("dz", vec.z)
+            return tag
+        }
+
+        fun readEntityPositionFromTag(tag: NbtCompound?): Vec3d? {
+            if (tag != null && tag.contains("Pos", NbtElement.LIST_TYPE.toInt())) {
+                val tagList = tag.getList("Pos", NbtElement.DOUBLE_TYPE.toInt())
+
+                if (tagList.heldType == NbtElement.DOUBLE_TYPE && tagList.size == 3) {
+                    return Vec3d(tagList.getDouble(0), tagList.getDouble(1), tagList.getDouble(2))
+                }
+            }
+
+            return null
+        }
+
+        fun writeEntityPositionToTag(pos: Vec3d, tag: NbtCompound): NbtCompound {
+            val posList = NbtList()
+
+            posList.add(NbtDouble.of(pos.x))
+            posList.add(NbtDouble.of(pos.y))
+            posList.add(NbtDouble.of(pos.z))
+            tag.put("Pos", posList)
+
+            return tag
+        }
+    }
+}
 
 inline fun <reified T : Number> List<T>.toNbtNumberList(): NbtList = NbtList().apply {
     when (T::class) {

@@ -1,12 +1,11 @@
 package com.imoonday.skill
 
 import com.imoonday.util.*
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.math.Direction
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import net.minecraft.util.math.*
 
 class TeleportSkill : Skill(
     id = "teleport",

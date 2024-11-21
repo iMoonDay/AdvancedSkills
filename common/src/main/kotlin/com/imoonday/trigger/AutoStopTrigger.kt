@@ -1,8 +1,8 @@
 package com.imoonday.trigger
 
-import com.imoonday.util.SkillSlot
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
+import com.imoonday.util.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
 
 interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
 

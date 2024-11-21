@@ -2,16 +2,16 @@ package com.imoonday.skill
 
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.entity.projectile.FireballEntity
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
+import net.minecraft.entity.projectile.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
 
 class FireballSkill : Skill(
     id = "fireball",
     types = listOf(SkillType.DESTRUCTION),
     cooldown = 5,
     rarity = Rarity.SUPERB,
-    sound = SoundEvents.ENTITY_ENDER_DRAGON_SHOOT
+    sound = SoundEvents::ENTITY_ENDER_DRAGON_SHOOT
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {

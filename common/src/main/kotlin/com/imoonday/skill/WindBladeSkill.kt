@@ -1,16 +1,14 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.TornadoEntity
-import com.imoonday.trigger.AttackTrigger
-import com.imoonday.trigger.PersistentTrigger
-import com.imoonday.trigger.RespawnTrigger
+import com.imoonday.entity.*
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.horizontalRotationVector
 import com.imoonday.util.times
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
 
 class WindBladeSkill : Skill(
     id = "wind_blade",

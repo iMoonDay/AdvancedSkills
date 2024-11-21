@@ -1,6 +1,7 @@
 package com.imoonday.util
 
 import com.imoonday.advanced_skills_re.api.*
+import com.imoonday.component.*
 import com.imoonday.config.*
 import com.imoonday.entity.render.feature.*
 import com.imoonday.init.*
@@ -13,13 +14,10 @@ import dev.architectury.event.events.client.*
 import dev.architectury.event.events.common.*
 import net.minecraft.block.*
 import net.minecraft.client.render.entity.*
-import net.minecraft.client.render.model.*
 import net.minecraft.loot.*
 import net.minecraft.loot.condition.*
 import net.minecraft.loot.entry.*
 import net.minecraft.nbt.*
-import net.minecraft.server.network.*
-import net.minecraft.util.*
 
 object EventHandler {
 
@@ -67,41 +65,53 @@ object EventHandler {
             LootTables.BURIED_TREASURE_CHEST,
             LootTables.END_CITY_TREASURE_CHEST
         )
-        val pool = LootPool.builder()
-            .with(ItemEntry.builder(ModItems.COMMON_SKILL_FRUIT.get()).weight(256))
-            .with(ItemEntry.builder(ModItems.UNCOMMON_SKILL_FRUIT.get()).weight(128))
-            .with(ItemEntry.builder(ModItems.RARE_SKILL_FRUIT.get()).weight(32))
-            .with(ItemEntry.builder(ModItems.SUPERB_SKILL_FRUIT.get()).weight(16))
-            .with(ItemEntry.builder(ModItems.EPIC_SKILL_FRUIT.get()).weight(8))
-            .with(ItemEntry.builder(ModItems.LEGENDARY_SKILL_FRUIT.get()).weight(4))
-            .with(ItemEntry.builder(ModItems.MYTHIC_SKILL_FRUIT.get()).weight(2))
-            .with(ItemEntry.builder(ModItems.UNIQUE_SKILL_FRUIT.get()).weight(1))
-            .conditionally(RandomChanceLootCondition.builder(0.005f))
+        val pool = {
+            LootPool.builder()
+                .with(ItemEntry.builder(ModItems.COMMON_SKILL_FRUIT.get()).weight(256))
+                .with(ItemEntry.builder(ModItems.UNCOMMON_SKILL_FRUIT.get()).weight(128))
+                .with(ItemEntry.builder(ModItems.RARE_SKILL_FRUIT.get()).weight(32))
+                .with(ItemEntry.builder(ModItems.SUPERB_SKILL_FRUIT.get()).weight(16))
+                .with(ItemEntry.builder(ModItems.EPIC_SKILL_FRUIT.get()).weight(8))
+                .with(ItemEntry.builder(ModItems.LEGENDARY_SKILL_FRUIT.get()).weight(4))
+                .with(ItemEntry.builder(ModItems.MYTHIC_SKILL_FRUIT.get()).weight(2))
+                .with(ItemEntry.builder(ModItems.UNIQUE_SKILL_FRUIT.get()).weight(1))
+                .conditionally(RandomChanceLootCondition.builder(0.005f))
+        }
         LootEvent.MODIFY_LOOT_TABLE.register { _, identifier, context, builtin ->
             if (identifier in lootTables && builtin) {
-                context.addPool(pool.build())
+                context.addPool(pool().build())
             }
         }
         PlayerEvent.PLAYER_JOIN.register {
             Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(Config.instance.toTag(NbtCompound())))
+            println(Skill.getValidSkills().joinToString(", ") { it.name.string })
         }
         LifecycleEvent.SERVER_STARTED.register {
             Config.initWatchService(it)
+        }
+        PlayerEvent.PLAYER_CLONE.register { oldPlayer, newPlayer, _ ->
+            newPlayer.copyDataFrom(oldPlayer)
+            newPlayer.properties.copyFrom(oldPlayer.properties)
+            newPlayer.syncData(false)
         }
     }
 
     fun registerClient() {
         ClientGuiEvent.RENDER_HUD.register { context, _ ->
+            clientPlayer?.run {
+                Skill.getTriggers<SpecialStateRenderTrigger> { it.isInSpecialState(this) }
+                    .forEach { it.renderSpecialState(context) }
+            }
             SkillSlotRenderer.render(client!!, context)
             Skill.getTriggers<HudRenderTrigger>().forEach { it.render(context) }
             Skill.getTriggers<CrosshairTrigger> { it.shouldRender() && it.getPriority() < 0 }
-                .minByOrNull { it.getPriority() }
+                .minByOrNull(CrosshairTrigger::getPriority)
                 ?.render(context)
             Skill.getTriggers<CrosshairTrigger> { it.shouldRender() && it.getPriority() >= 0 }
-                .maxByOrNull { it.getPriority() }
+                .maxByOrNull(CrosshairTrigger::getPriority)
                 ?.render(context)
         }
-        LivingEntityFeatureRendererRegistrationCallback.EVENT.register { _, renderer, helper, context ->
+        LivingEntityFeatureRenderEvent.EVENT.register { _, renderer, helper, context ->
             helper.register(StatusEffectLayer(renderer, context))
             helper.register(IceLayer(renderer, context))
             if (renderer is PlayerEntityRenderer) Skill.getTriggers<FeatureRendererTrigger>()
@@ -115,8 +125,8 @@ object EventHandler {
         WorldRenderEvents.LAST.register { context ->
             Skill.getTriggers<WorldRendererTrigger>().forEach { it.renderLast(context) }
         }
-        ModelLoadingPlugin.register {
-            it.addModels(TargetRenderTrigger.modelId)
+        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register {
+            Channels.REQUEST_SYNC_DATA_C2S.sendToServer(RequestSyncDataC2SRequest())
         }
     }
 }

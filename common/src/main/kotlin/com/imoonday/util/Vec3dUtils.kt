@@ -1,6 +1,6 @@
 package com.imoonday.util
 
-import net.minecraft.util.math.Vec3d
+import net.minecraft.util.math.*
 
 operator fun Vec3d.plus(vec: Vec3d): Vec3d = Vec3d(x + vec.x, y + vec.y, z + vec.z)
 

@@ -1,15 +1,13 @@
 package com.imoonday.entity
 
-import com.imoonday.entity.render.EffectEnergyBallEntityRenderer
-import com.imoonday.init.ModEntities
-import com.imoonday.util.id
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.util.Identifier
-import net.minecraft.world.World
+import com.imoonday.entity.render.*
+import com.imoonday.init.*
+import com.imoonday.util.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.entity.*
+import net.minecraft.entity.effect.*
+import net.minecraft.util.*
+import net.minecraft.world.*
 
 class SlownessEnergyBallEntity(entityType: EntityType<out SlownessEnergyBallEntity>, world: World) :
     EffectEnergyBallEntity(entityType, world) {

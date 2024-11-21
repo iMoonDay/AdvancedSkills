@@ -1,14 +1,13 @@
 package com.imoonday.skill
 
-import com.imoonday.component.properties
-import com.imoonday.trigger.PostDamagedTrigger
-import com.imoonday.trigger.ProgressTrigger
+import com.imoonday.component.*
+import com.imoonday.trigger.*
 import com.imoonday.util.playSound
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
 
 class CounterblastSkill : PassiveSkill(
     id = "counterblast",

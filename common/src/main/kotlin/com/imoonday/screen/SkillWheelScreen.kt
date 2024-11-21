@@ -1,19 +1,14 @@
 package com.imoonday.screen
 
-import com.imoonday.init.ModKeyBindings
-import com.imoonday.network.UseSkillC2SRequest
-import com.imoonday.trigger.LongPressTrigger
+import com.imoonday.init.*
+import com.imoonday.network.*
 import com.imoonday.util.*
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.text.Style
-import net.minecraft.text.Text
-import org.joml.Vector2i
-import java.awt.Color
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
+import net.minecraft.client.gui.*
+import net.minecraft.client.gui.screen.*
+import net.minecraft.text.*
+import org.joml.*
+import java.awt.*
+import kotlin.math.*
 
 class SkillWheelScreen : Screen(Text.empty()) {
 
@@ -119,40 +114,47 @@ class SkillWheelScreen : Screen(Text.empty()) {
     }
 
     override fun close() {
-        selectingSlot?.let { index ->
-            val state = if (clientPlayer?.getSkill(index)
-                    ?.let { it is LongPressTrigger && clientPlayer!!.isUsing(it) } == true
-            ) UseSkillC2SRequest.KeyState.RELEASE else UseSkillC2SRequest.KeyState.PRESS
-            clientPlayer?.requestUse(index, state)
+        if (selectingSlot != null) {
+            quickCastSlot = selectingSlot!!
         }
         super.close()
     }
 
+    private fun requestUseSkill(index: Int) {
+        val state = if (clientPlayer?.getSkill(index)
+                ?.let { clientPlayer!!.isCharging(it) } == true
+        ) UseSkillC2SRequest.KeyState.RELEASE else UseSkillC2SRequest.KeyState.PRESS
+        clientPlayer?.requestUse(index, state)
+    }
+
     override fun shouldPause(): Boolean = false
 
-    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean = when (button) {
-        0 -> {
-            close()
-            true
-        }
-
-        1 -> {
-            selectingSlot = null
-            close()
-            true
-        }
-
-        2 -> {
-            selectingSlot?.let { index ->
-                clientPlayer?.getSkill(index)?.takeUnless { it.invalid }?.let {
-                    client!!.setScreen(SkillGalleryScreen(it))
-                    return true
-                }
+    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        return when (button) {
+            0 -> {
+                selectingSlot?.let(::requestUseSkill)
+                close()
+                true
             }
-            false
-        }
 
-        else -> super.mouseClicked(mouseX, mouseY, button)
+            1 -> {
+                selectingSlot = null
+                close()
+                true
+            }
+
+            2 -> {
+                selectingSlot?.let { index ->
+                    clientPlayer?.getSkill(index)?.takeUnless { it.invalid }?.let {
+                        client!!.setScreen(SkillGalleryScreen(it))
+                        return true
+                    }
+                }
+                false
+            }
+
+            else -> super.mouseClicked(mouseX, mouseY, button)
+        }
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
@@ -173,6 +175,13 @@ class SkillWheelScreen : Screen(Text.empty()) {
             options.jumpKey,
             options.sprintKey,
             options.sneakKey
-        ).forEach { it.isPressed = it.isPressedInScreen }
+        ).forEach {
+            it.isPressed = it.isPressedInScreen
+        }
+    }
+
+    companion object {
+
+        var quickCastSlot: Int? = null
     }
 }

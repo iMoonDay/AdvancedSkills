@@ -13,43 +13,64 @@ import org.lwjgl.glfw.*
 object ModKeyBindings {
 
     val skillKeys = mutableListOf<KeyBinding>()
-    private val pressStates = mutableMapOf<KeyBinding, Boolean>()
+    private var isUsingQuickCast = false
 
     @JvmField
-    val OPEN_LIST_SCREEN = register("openListScreen", GLFW.GLFW_KEY_K, false, callback = { client, _ ->
+    val OPEN_LIST_SCREEN = register("openListScreen", GLFW.GLFW_KEY_K, false) { client, _ ->
         val player = client.player!!
+        val listScreen = SkillListScreen(player)
         client.setScreen(
             if (!player.learnableData.isEmpty() && SkillLearningScreen.new)
-                SkillLearningScreen(player) { SkillListScreen(player) }
-            else SkillListScreen(player)
+                SkillLearningScreen(player) { listScreen }
+            else listScreen
         )
-    })
-
-    @JvmField
-    val OPEN_GALLERY_SCREEN = register("openGalleryScreen", GLFW.GLFW_KEY_G, false, callback = { client, _ ->
-        client.setScreen(SkillGalleryScreen().apply {
-            selectedSkill = Skills.FIREBALL
-        })
-    })
-
-    @JvmField
-    val OPEN_SLOT_SCREEN = register("openSlotScreen", GLFW.GLFW_KEY_N, false, callback = { client, _ ->
-        client.setScreen(SkillSlotScreen())
-    })
-
-    @JvmField
-    val QUICK_CAST = register("quickCast", GLFW.GLFW_KEY_R, true) { client, _ ->
-        client.setScreen(SkillWheelScreen())
     }
+
+    @JvmField
+    val OPEN_GALLERY_SCREEN = register("openGalleryScreen", GLFW.GLFW_KEY_G, false) { client, _ ->
+        client.setScreen(SkillGalleryScreen(Skills.FIREBALL))
+    }
+
+    @JvmField
+    val OPEN_SLOT_SCREEN = register("openSlotScreen", GLFW.GLFW_KEY_N, false) { client, _ ->
+        client.setScreen(SkillSlotScreen())
+    }
+
+    @JvmField
+    val QUICK_CAST = registerWithDoubleTrigger(
+        "quickCast",
+        GLFW.GLFW_KEY_R,
+        250,
+        firstTriggerCallback = { _, _ -> SkillWheelScreen.quickCastSlot != null },
+        secondTriggerCallback = { client, _ ->
+            if (!isUsingQuickCast) {
+                isUsingQuickCast = true
+                client.setScreen(SkillWheelScreen())
+            }
+        },
+        releaseCallback = { client, _, pressTime ->
+            isUsingQuickCast = false
+            if (pressTime <= 250) {
+                client.player?.run {
+                    val slot = SkillWheelScreen.quickCastSlot ?: return@run
+                    if (!isSpectator) {
+                        requestUse(
+                            slot,
+                            if (isCharging(getSkill(slot))) UseSkillC2SRequest.KeyState.RELEASE
+                            else UseSkillC2SRequest.KeyState.PRESS
+                        )
+                    }
+                }
+            }
+        }
+    )
 
     fun init() {
         for (index in 1..SkillContainer.MAX_SLOT_SIZE) registerSkill(
             index,
             if (index <= 6) (GLFW.GLFW_KEY_KP_0 + index) else GLFW.GLFW_KEY_UNKNOWN
         ) { client, keyState ->
-            if (client.player?.isSpectator == false) {
-                client.player?.requestUse(index, keyState)
-            }
+            client.player?.run { if (!isSpectator) requestUse(index, keyState) }
         }
     }
 
@@ -66,26 +87,81 @@ object ModKeyBindings {
             "advancedSkills.key.category"
         )
         KeyMappingRegistry.register(key)
-        if (longPressCheck) {
-            pressStates[key] = false
-        }
-        ClientTickEvent.CLIENT_POST.register {
+        // 按键状态变量
+        var isPressed = false
+
+        ClientTickEvent.CLIENT_POST.register { client ->
             if (longPressCheck) {
-                if (key.isPressed && pressStates[key] == false) {
-                    callback(it, key)
-                    pressStates[key] = true
-                } else if (!key.isPressed && !key.isPressedInScreen && pressStates[key] == true) {
-                    releaseCallback(it, key)
-                    pressStates[key] = false
+                if (key.isPressed) {
+                    if (!isPressed) {
+                        callback(client, key) // 按下触发
+                        isPressed = true
+                    }
+                } else {
+                    if (isPressed) {
+                        releaseCallback(client, key) // 松开触发
+                        isPressed = false
+                    }
                 }
             } else {
                 if (key.wasPressed()) {
-                    callback(it, key)
+                    callback(client, key) // 按下瞬间触发
                 } else if (!key.isPressed) {
-                    releaseCallback(it, key)
+                    releaseCallback(client, key) // 松开触发
                 }
             }
         }
+
+        return key
+    }
+
+    private fun registerWithDoubleTrigger(
+        name: String,
+        code: Int,
+        interval: Long, // 二次触发的间隔时间（毫秒）
+        firstTriggerCallback: (MinecraftClient, KeyBinding) -> Boolean,
+        secondTriggerCallback: (MinecraftClient, KeyBinding) -> Unit,
+        releaseCallback: (MinecraftClient, KeyBinding, pressTime: Long) -> Unit
+    ): KeyBinding {
+        val key = KeyBinding(
+            "advancedSkills.key.$name",
+            code,
+            "advancedSkills.key.category"
+        )
+        KeyMappingRegistry.register(key)
+        // 用于记录按键状态和计时
+        var isPressed = false
+        var secondTriggered = false
+        var pressStartTime: Long = 0
+
+        ClientTickEvent.CLIENT_POST.register { client ->
+            if (key.isPressed || isPressed && key.isPressedInScreen) {
+                if (!isPressed) {
+                    // 第一次触发
+                    val firstTriggerResult = firstTriggerCallback(client, key)
+                    isPressed = true
+
+                    pressStartTime = if (!firstTriggerResult) {
+                        // 如果第一次触发返回 false，则立即执行二次触发逻辑
+                        secondTriggerCallback(client, key)
+                        secondTriggered = true
+                        System.currentTimeMillis() - interval
+                    } else {
+                        secondTriggered = false
+                        System.currentTimeMillis()
+                    }
+                } else if (!secondTriggered && System.currentTimeMillis() - pressStartTime >= interval) {
+                    // 二次触发
+                    secondTriggerCallback(client, key)
+                    secondTriggered = true
+                }
+            } else if (isPressed) {
+                // 松开时触发
+                releaseCallback(client, key, System.currentTimeMillis() - pressStartTime)
+                isPressed = false
+            }
+        }
+
         return key
     }
 
@@ -101,16 +177,25 @@ object ModKeyBindings {
         )
         KeyMappingRegistry.register(key)
         skillKeys.add(key)
-        pressStates[key] = false
-        ClientTickEvent.CLIENT_POST.register {
-            if (key.isPressed && pressStates[key] == false) {
-                callbacks(it, UseSkillC2SRequest.KeyState.PRESS)
-                pressStates[key] = true
-            } else if (!key.isPressed && pressStates[key] == true) {
-                callbacks(it, UseSkillC2SRequest.KeyState.RELEASE)
-                pressStates[key] = false
+        // 按键状态变量
+        var isPressed = false
+
+        ClientTickEvent.CLIENT_POST.register { client ->
+            if (key.isPressed) {
+                if (!isPressed) {
+                    // 按下触发
+                    callbacks(client, UseSkillC2SRequest.KeyState.PRESS)
+                    isPressed = true
+                }
+            } else {
+                if (isPressed) {
+                    // 松开触发
+                    callbacks(client, UseSkillC2SRequest.KeyState.RELEASE)
+                    isPressed = false
+                }
             }
         }
+
         return key
     }
 }

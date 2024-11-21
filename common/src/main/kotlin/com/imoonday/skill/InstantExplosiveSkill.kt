@@ -1,11 +1,11 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.UnstableTntEntity
-import com.imoonday.init.ModSounds
-import com.imoonday.trigger.SendPlayerVelocityTrigger
+import com.imoonday.entity.*
+import com.imoonday.init.*
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.network.*
 
 class InstantExplosiveSkill : Skill(
     id = "instant_explosive",

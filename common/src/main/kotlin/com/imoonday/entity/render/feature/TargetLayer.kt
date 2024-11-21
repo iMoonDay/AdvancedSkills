@@ -1,14 +1,13 @@
 package com.imoonday.entity.render.feature
 
-import com.imoonday.trigger.TargetRenderTrigger
-import com.imoonday.util.clientPlayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.LivingEntity
+import com.imoonday.trigger.*
+import com.imoonday.util.*
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.render.entity.feature.*
+import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
 
 class TargetLayer<T : LivingEntity, M : EntityModel<T>>(
     private val renderer: FeatureRendererContext<T, M>,

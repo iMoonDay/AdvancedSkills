@@ -1,34 +1,29 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.BreatheInWaterTrigger
-import com.imoonday.trigger.FluidMovementTrigger
-import com.imoonday.trigger.TickTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.toBlockPos
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.fluid.Fluid
-import net.minecraft.fluid.Fluids
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
+import net.minecraft.entity.player.*
+import net.minecraft.fluid.*
+import net.minecraft.particle.*
+import net.minecraft.registry.tag.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
 
 class LiquidShieldSkill : Skill(
     id = "liquid_shield",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 60,
     rarity = Rarity.SUPERB,
-    sound = SoundEvents.BLOCK_WATER_AMBIENT
+    sound = SoundEvents::BLOCK_WATER_AMBIENT
 ), TickTrigger, AutoStopTrigger, FluidMovementTrigger, BreatheInWaterTrigger {
 
     override fun getPersistTime(): Int = 20 * 15
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user,this)
 
-    override fun clientTick(player: ClientPlayerEntity, usedTime: Int) {
+    override fun clientTick(player: PlayerEntity, usedTime: Int) {
         if (player.isUsing()
             && usedTime % 4 == 0
             && player.world.getFluidState(player.eyePos.toBlockPos()).isOf(Fluids.WATER)

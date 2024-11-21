@@ -1,21 +1,17 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AttributeTrigger
-import com.imoonday.trigger.EquipTrigger
-import com.imoonday.trigger.RespawnTrigger
-import com.imoonday.util.SkillSlot
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
-import com.imoonday.util.translateActive
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvent
+import com.imoonday.trigger.*
+import com.imoonday.util.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import java.util.function.*
 
 abstract class PassiveSkill(
     id: String,
     types: List<SkillType> = listOf(SkillType.PASSIVE),
     cooldown: Int = 0,
     rarity: Rarity,
-    sound: SoundEvent? = null,
+    sound: Supplier<SoundEvent>? = null,
     val toggleable: Boolean = false,
 ) : Skill(id, types, cooldown, rarity, sound),
     EquipTrigger, AttributeTrigger, RespawnTrigger {

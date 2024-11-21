@@ -230,5 +230,17 @@ object Skills {
     @JvmField
     val MAGNETIC_TRAP = MagneticTrapSkill().register()
 
+    @JvmField
+    val MULTIPLE_LASER = MultipleLaserSkill().register()
+
+    @JvmField
+    val SUPER_SHADOW_CLONE = SuperShadowCloneSkill().register()
+
+    @JvmField
+    val ARROW_RAIN = ArrowRainSkill().register()
+
+    @JvmField
+    val WEED_CLEANER = WeedCleanerSkill().register()
+
     fun init() = Unit
 }

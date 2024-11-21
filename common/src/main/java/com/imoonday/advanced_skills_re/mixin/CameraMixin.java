@@ -13,7 +13,7 @@ public class CameraMixin {
     @Shadow private float lastCameraY;
 
     @ModifyConstant(method = "updateEyeHeight", constant = @Constant(floatValue = 0.5f))
-    private float advanced_skills$updateEyeHeight(float constant) {
+    private float advanced_skills_re$updateEyeHeight(float constant) {
         return SkillTriggerHandler.INSTANCE.getCameraMovement(constant);
     }
 }

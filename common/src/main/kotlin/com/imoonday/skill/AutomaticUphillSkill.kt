@@ -1,9 +1,8 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.PersistentTrigger
-import com.imoonday.trigger.StepHeightTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.entity.player.*
 
 class AutomaticUphillSkill : PassiveSkill(
     id = "automatic_uphill",

@@ -1,15 +1,12 @@
 package com.imoonday.skill
 
-import com.imoonday.component.properties
-import com.imoonday.trigger.UsingRenderTrigger
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
-import com.imoonday.util.playSound
-import fi.dy.masa.malilib.util.NBTUtils
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
-import kotlin.math.absoluteValue
+import com.imoonday.component.*
+import com.imoonday.trigger.*
+import com.imoonday.util.*
+import net.minecraft.nbt.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import kotlin.math.*
 
 class TimeRewindSkill : LongPressSkill(
     id = "time_rewind",
@@ -26,7 +23,7 @@ class TimeRewindSkill : LongPressSkill(
                 .minByOrNull { (player.age - pressedTime - it).absoluteValue }
                 ?.let { age ->
                     getCompound(age.toString()).run {
-                        NBTUtils.readEntityPositionFromTag(this)?.let {
+                        NbtUtils.readEntityPositionFromTag(this)?.let {
                             player.playSound(SoundEvents.ENTITY_FOX_TELEPORT)
                             player.requestTeleport(it.x, it.y, it.z)
                             player.fallDistance = 0f
@@ -44,7 +41,7 @@ class TimeRewindSkill : LongPressSkill(
             player.properties.put(
                 "backups",
                 player.properties.getCompound("backups").apply {
-                    put(player.age.toString(), NBTUtils.writeEntityPositionToTag(player.pos, NbtCompound()))
+                    put(player.age.toString(), NbtUtils.writeEntityPositionToTag(player.pos, NbtCompound()))
                     keys.filter { (it.toIntOrNull() ?: 0) < player.age - 20 * 5 }.forEach { remove(it) }
                 })
         }

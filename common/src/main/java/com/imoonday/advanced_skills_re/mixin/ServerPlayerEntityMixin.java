@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ServerPlayerEntityMixin {
 
     @Inject(method = "onLanding", at = @At("HEAD"))
-    public void advanced_skills$onLanding(CallbackInfo ci) {
+    public void advanced_skills_re$onLanding(CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;
         if (entity instanceof ServerPlayerEntity player) {
             SkillTriggerHandler.INSTANCE.onLanding(player, player.fallDistance);
@@ -22,7 +22,7 @@ public class ServerPlayerEntityMixin {
     }
 
     @Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"), cancellable = true)
-    private void advanced_skills$damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    private void advanced_skills_re$damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         Entity attacker = source.getAttacker();
         if (attacker == null) {

@@ -1,25 +1,18 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AttributeTrigger
-import com.imoonday.trigger.UsingRenderTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.playSound
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Hand
-import kotlin.math.PI
-import kotlin.math.acos
-import kotlin.math.pow
-import kotlin.math.sqrt
+import net.minecraft.enchantment.*
+import net.minecraft.entity.*
+import net.minecraft.entity.attribute.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import net.minecraft.util.*
+import kotlin.math.*
 
 class ChargedSweepSkill : LongPressSkill(
     id = "charged_sweep",
@@ -81,5 +74,5 @@ class ChargedSweepSkill : LongPressSkill(
         return acos(product / magnitude)
     }
 
-    override fun isDangerousTo(player: ServerPlayerEntity): Boolean = player.isUsing()
+    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 }

@@ -2,7 +2,7 @@ package com.imoonday.skill
 
 import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.network.*
 
 class StaticInvisibilitySkill : PassiveSkill(
     id = "static_invisibility",

@@ -1,21 +1,17 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.FeatureRendererTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.clientPlayer
 import com.imoonday.util.equippedSkills
-import net.minecraft.client.network.OtherClientPlayerEntity
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.math.RotationAxis
-import org.joml.Matrix3f
-import org.joml.Matrix4f
+import net.minecraft.client.network.*
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.render.entity.feature.*
+import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.player.*
+import net.minecraft.util.math.*
+import org.joml.*
 
 class InsightfulEyeSkill : PassiveSkill(
     id = "insightful_eye",

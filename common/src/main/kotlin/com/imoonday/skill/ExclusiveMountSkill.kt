@@ -1,21 +1,20 @@
 package com.imoonday.skill
 
-import com.imoonday.component.properties
-import com.imoonday.entity.SpecialTameHorseEntity
-import com.imoonday.component.Components
+import com.imoonday.component.*
+import com.imoonday.entity.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.translateSkill
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundEvents
+import net.minecraft.server.network.*
+import net.minecraft.server.world.*
+import net.minecraft.sound.*
 
 class ExclusiveMountSkill : Skill(
     id = "exclusive_mount",
     types = listOf(SkillType.SUMMON),
     cooldown = 60,
     rarity = Rarity.EPIC,
-    sound = SoundEvents.ENTITY_HORSE_SADDLE
+    sound = SoundEvents::ENTITY_HORSE_SADDLE
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {
@@ -37,7 +36,7 @@ class ExclusiveMountSkill : Skill(
                 (user.world as ServerWorld).getEntity(user.properties.getUuid("horseUuid"))?.discard()
             }
             user.properties.putUuid("horseUuid", newHorse.uuid)
-            Components.PROPERTY.sync(user)
+            user.propertyComponent.sync()
             newHorse.requestTeleport(user.x, user.y, user.z)
             user.world.spawnEntity(newHorse)
             newHorse.putPlayerOnBack(user)

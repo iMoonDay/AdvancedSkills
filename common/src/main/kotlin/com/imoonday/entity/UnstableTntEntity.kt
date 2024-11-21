@@ -1,11 +1,10 @@
 package com.imoonday.entity
 
-import com.imoonday.init.ModEntities
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.TntEntity
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.World
+import com.imoonday.advanced_skills_re.mixin.*
+import com.imoonday.init.*
+import net.minecraft.entity.*
+import net.minecraft.util.math.*
+import net.minecraft.world.*
 
 class UnstableTntEntity(entityType: EntityType<out UnstableTntEntity>, world: World) : TntEntity(entityType, world) {
 

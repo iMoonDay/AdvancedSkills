@@ -1,9 +1,9 @@
 package com.imoonday.entity
 
-import net.minecraft.entity.Ownable
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.player.PlayerEntity
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
+import org.spongepowered.asm.mixin.injection.callback.*
 import java.util.*
 
 interface Servant : Ownable {

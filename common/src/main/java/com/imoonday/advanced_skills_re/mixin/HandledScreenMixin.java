@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class HandledScreenMixin {
 
     @Inject(method = "keyPressed", at = @At("RETURN"), cancellable = true)
-    public void advanced_skills$onKeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    public void advanced_skills_re$onKeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if ((HandledScreen<?>) (Object) this instanceof AbstractInventoryScreen<?> screen) {
             if (ModKeyBindings.OPEN_LIST_SCREEN.matchesKey(keyCode, scanCode)) {
                 MinecraftClient client = MinecraftClient.getInstance();

@@ -1,11 +1,11 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.HookEntity
+import com.imoonday.entity.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.plus
 import com.imoonday.util.times
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.network.*
 
 class BiologicalHookSkill : Skill(
     id = "biological_hook",

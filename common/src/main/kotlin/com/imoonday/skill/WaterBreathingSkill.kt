@@ -1,14 +1,13 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.BreatheInWaterTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.toBlockPos
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.fluid.Fluids
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.player.*
+import net.minecraft.fluid.*
+import net.minecraft.particle.*
+import net.minecraft.server.network.*
 
 class WaterBreathingSkill : Skill(
     id = "water_breathing",
@@ -26,7 +25,7 @@ class WaterBreathingSkill : Skill(
         super.onStop(player)
     }
 
-    override fun clientTick(player: ClientPlayerEntity, usedTime: Int) {
+    override fun clientTick(player: PlayerEntity, usedTime: Int) {
         if (player.isUsing()
             && usedTime % 4 == 0
             && player.world.getFluidState(player.eyePos.toBlockPos()).isOf(Fluids.WATER)

@@ -28,7 +28,7 @@ public abstract class InGameHudMixin {
     private static Identifier POWDER_SNOW_OUTLINE;
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getFrozenTicks()I", shift = At.Shift.AFTER))
-    public void advanced_skills$render(DrawContext context, float tickDelta, CallbackInfo ci) {
+    public void advanced_skills_re$render(DrawContext context, float tickDelta, CallbackInfo ci) {
         ClientPlayerEntity player = this.client.player;
         if (player != null && player.getFrozenTicks() <= 0 && ModEffectsKt.isForceFrozen(player)) {
             this.renderOverlay(context, POWDER_SNOW_OUTLINE, 1.0f);

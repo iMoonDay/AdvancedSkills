@@ -37,7 +37,7 @@ object ModSounds {
 
     fun init() = SOUNDS.register()
 
-    fun register(name: String): RegistrySupplier<SoundEvent>? {
+    fun register(name: String): RegistrySupplier<SoundEvent> {
         return SOUNDS.register(name) { SoundEvent.of(id(name)) }
     }
 }

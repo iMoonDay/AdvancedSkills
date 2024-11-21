@@ -1,188 +1,199 @@
 package com.imoonday.screen
 
-import com.imoonday.skill.Skill
+import com.imoonday.skill.*
 import com.imoonday.util.*
-import io.wispforest.owo.ui.base.BaseOwoScreen
-import io.wispforest.owo.ui.component.Components
-import io.wispforest.owo.ui.component.LabelComponent
-import io.wispforest.owo.ui.container.Containers
-import io.wispforest.owo.ui.container.FlowLayout
-import io.wispforest.owo.ui.core.*
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.util.Util
-import java.awt.Color
+import net.minecraft.client.gui.*
+import net.minecraft.client.gui.screen.*
+import net.minecraft.client.gui.screen.narration.*
+import net.minecraft.client.gui.widget.*
+import net.minecraft.entity.player.*
+import net.minecraft.text.*
 
 class SkillLearningScreen(
     val player: PlayerEntity,
     val parent: () -> Screen? = { null },
-) : BaseOwoScreen<FlowLayout>(), AutoSyncedScreen {
+) : Screen(Text.empty()), AutoSyncedScreen {
 
-    private val choice = player.getChoice()
+    private val choice: SkillChoice
+        get() = player.getChoice()
+    private val skillBoxes: MutableList<SkillBox> = mutableListOf()
     private var selectedBox: SkillBox? = null
+    private lateinit var refreshButton: ButtonWidget
+    private lateinit var learnButton: ButtonWidget
 
-    override fun createAdapter(): OwoUIAdapter<FlowLayout> = OwoUIAdapter.create(this, Containers::verticalFlow)!!
-    private val refreshButton = Components.button(translate("screen", "learn.refresh")) {
-        player.refreshChoice()
-    }.apply {
-        active(player.canFreshChoice())
-    }
-    private val learnButton =
-        Components.button(translate("screen", "learn.learn")) {
-            selectedBox?.choose()
-        }.apply {
-            active(selectedBox != null && !selectedBox!!.skill.invalid)
-        }
-    private val countLabel = Components.label(translate("screen", "learn.count", player.learnableData.count))
-
-    override fun build(rootComponent: FlowLayout) {
-        rootComponent.surface(Surface.VANILLA_TRANSLUCENT)
-            .horizontalAlignment(HorizontalAlignment.CENTER)
-            .verticalAlignment(VerticalAlignment.CENTER)
-
-        rootComponent.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-            gap(5)
-            horizontalAlignment(HorizontalAlignment.CENTER)
-            child(countLabel)
-            child(Containers.grid(Sizing.content(), Sizing.content(), 1, 3).apply {
-                child(SkillBox(choice.first) { player.chooseFirst() }, 0, 0)
-                child(SkillBox(choice.second) { player.chooseSecond() }, 0, 1)
-                child(SkillBox(choice.third) { player.chooseThird() }, 0, 2)
-            })
-            child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                child(Containers.horizontalFlow(Sizing.fixed(150), Sizing.content()).apply {
-                    alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                    child(refreshButton)
-                })
-                child(Containers.horizontalFlow(Sizing.fixed(150), Sizing.content()).apply {
-                    alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                    child(learnButton)
-                })
-            })
-        })
+    override fun init() {
+        super.init()
+        val boxWidth = 120
+        val boxHeight = (height * 0.65).toInt()
+        val spacing = ((width - 3 * boxWidth) / 5).coerceAtLeast(5)
+        val totalWidth = boxWidth * 3 + spacing * 2
+        val startX = (width - totalWidth) / 2
+        SkillBox({ choice.first }, player::chooseFirst, startX, 40, boxWidth, boxHeight)
+            .also {
+                skillBoxes += it
+                addDrawableChild(it)
+            }
+        SkillBox({ choice.second }, player::chooseSecond, startX + boxWidth + spacing, 40, boxWidth, boxHeight)
+            .also {
+                skillBoxes += it
+                addDrawableChild(it)
+            }
+        SkillBox({ choice.third }, player::chooseThird, startX + (boxWidth + spacing) * 2, 40, boxWidth, boxHeight)
+            .also {
+                skillBoxes += it
+                addDrawableChild(it)
+            }
+        val buttonY = (40 + boxHeight + height) / 2 - 10
+        refreshButton = ButtonWidget.builder(translate("screen", "learn.refresh")) { player.refreshChoice() }
+            .dimensions(width / 3 - 25, buttonY, 50, 20)
+            .build()
+            .also(::addDrawableChild)
+        learnButton = ButtonWidget.builder(translate("screen", "learn.learn")) { selectedBox?.choose() }
+            .dimensions(width / 3 * 2 - 25, buttonY, 50, 20)
+            .build()
+            .also(::addDrawableChild)
 
         new = false
     }
 
-    override fun update(data: NbtCompound) {
-        if (choice != player.learnableData.get()) {
-            if (!player.learnableData.isEmpty())
-                client!!.setScreen(
-                    SkillLearningScreen(
-                        player,
-                        this@SkillLearningScreen.parent
-                    )
-                ) else close()
-        }
-        refreshButton.active(player.canFreshChoice())
-        learnButton.active(selectedBox != null && !selectedBox!!.skill.invalid)
-        countLabel.text(translate("screen", "learn.count", player.learnableData.count))
+    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+        renderBackground(context)
+        super.render(context, mouseX, mouseY, delta)
+        val countText = translate("screen", "learn.count", player.learnableData.count)
+        context.drawText(
+            textRenderer,
+            countText,
+            width / 2 - textRenderer.getWidth(countText) / 2,
+            (40 - textRenderer.fontHeight) / 2,
+            0xFFFFFF,
+            false
+        )
+    }
+
+    override fun update() {
+        if (player.learnableData.isEmpty()) close()
+        else skillBoxes.forEach(SkillBox::updateSkill)
+        updateButtons()
+    }
+
+    private fun updateButtons() {
+        refreshButton.active = player.canFreshChoice()
+        learnButton.active = selectedBox != null && !selectedBox!!.skill.invalid
     }
 
     override fun close() = client!!.setScreen(parent())
 
-    inner class SkillBox(val skill: Skill, private val chooseAction: () -> Unit) :
-        FlowLayout(Sizing.fixed(100), Sizing.fill(65), Algorithm.VERTICAL) {
+    inner class SkillBox(
+        private val skillGetter: () -> Skill, private val chooseAction: () -> Unit,
+        x: Int, y: Int, width: Int, height: Int
+    ) : ClickableWidget(x, y, width, height, skillGetter().name) {
 
+        var skill: Skill = skillGetter()
         private var lastClickTime = 0L
+        var scrollAmount: Int = 0
+        var maxScrollAmount: Int? = null
 
-        init {
-            surface(Surface.DARK_PANEL.and { context, component ->
-                if (selectedBox == this)
-                    context.drawRectOutline(component.x(), component.y(), component.width(), component.height(), 0)
-            })
-            alignment(HorizontalAlignment.CENTER, VerticalAlignment.TOP)
-            padding(Insets.both(8, 5))
-            margins(Insets.horizontal(5))
-            skill.takeUnless { it.invalid }?.let {
-                child(
-                    Containers.verticalScroll(Sizing.content(), Sizing.fill(100), Containers.verticalFlow(
-                        Sizing.content(),
-                        Sizing.content()
-                    ).apply {
-                        alignment(HorizontalAlignment.CENTER, VerticalAlignment.TOP)
-                        gap(3)
-                        child(Containers.horizontalFlow(Sizing.fill(100), Sizing.content()).apply {
-                            alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                            child(Components.texture(it.icon, 0, 0, 32, 32, 32, 32))
-                        })
-                        child(Components.label(translate("screen", "gallery.info.name", it.name.string)).trim())
-                        child(
-                            Components.label(
-                                translate(
-                                    "screen",
-                                    "gallery.info.type",
-                                    it.types.joinToString(" ") { type -> type.displayName.string })
-                            )
-                                .trim()
-                        )
-                        child(
-                            Components.label(
-                                translate(
-                                    "screen",
-                                    "gallery.info.description",
-                                    it.description.string
-                                )
-                            ).trim()
-                        )
-                        child(
-                            Components.label(
-                                translate(
-                                    "screen",
-                                    "gallery.info.cooldown",
-                                    "${it.getCooldown(client?.world) / 20.0}s"
-                                )
-                            ).trim()
-                        )
-                        child(
-                            Components.label(
-                                translate(
-                                    "screen",
-                                    "gallery.info.rarity",
-                                    it.rarity.displayName.string
-                                )
-                            ).trim()
-                        )
-                    }).apply {
-                        scrollbarThiccness(0)
-                    }
-                )
+        override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+            val selected = selectedBox == this
+            if (selected || hovered) {
+                val light = if (selected) 0.45f else 0.35f
+                context.setShaderColor(light, light, light, 1f)
+                context.renderPanel(x, y, width, height)
+                context.setShaderColor(1f, 1f, 1f, 1f)
+            } else {
+                context.renderDarkPanel(x, y, width, height)
             }
-            mouseDown().subscribe { _, _, button ->
-                if (button == 0) {
-                    selectedBox = if (selectedBox == this) null else this
-                    update()
-                    if (Util.getMeasuringTimeMs() - lastClickTime < 250L) {
-                        choose()
-                    }
-                    lastClickTime = Util.getMeasuringTimeMs()
-                    true
-                } else false
+            if (skill.invalid) return
+            val gap = 5
+            val x = x + 8
+            var y = y + gap
+
+            skill.renderIcon(context, this.x + (width - 32) / 2, y, 32)
+            y += 32 + 3
+            val textBottomY = this.y + height - gap
+            context.enableScissor(x, y, x + width - 15, textBottomY)
+            y -= scrollAmount
+            context.drawScrollableText(
+                textRenderer,
+                skill.formattedName,
+                x, y,
+                x + width - 15, y + textRenderer.fontHeight,
+                0xFFFFFF, false
+            )
+            y += textRenderer.fontHeight + 2
+
+            context.drawScrollableText(
+                textRenderer,
+                Text.literal("${skill.getCooldown(client?.world) / 20.0}s"),
+                x, y,
+                x + width - 15, y + textRenderer.fontHeight,
+                0x81C784, false
+            )
+            y += textRenderer.fontHeight + 2
+
+            context.drawScrollableText(
+                textRenderer,
+                Text.literal(skill.types.joinToString(", ") { type -> type.displayName.string }),
+                x, y,
+                x + width - 15, y + textRenderer.fontHeight,
+                0x4FC3F7, false
+            )
+            y += textRenderer.fontHeight + 5
+
+            textRenderer.wrapLines(skill.description, width - 15).forEach { text ->
+                context.drawText(
+                    textRenderer,
+                    text,
+                    (x + x + width - 15 - textRenderer.getWidth(text)) / 2,
+                    y,
+                    0xBDBDBD,
+                    false
+                )
+                y += textRenderer.fontHeight + 3
+            }
+            y -= 2
+
+            context.disableScissor()
+
+            if (maxScrollAmount == null) {
+                maxScrollAmount = if (y - textBottomY > 0 && y - 3 - textBottomY <= 0) 0
+                else (y - textBottomY).coerceAtLeast(0)
             }
         }
 
-        private fun LabelComponent.trim() = apply { horizontalSizing(Sizing.fill(100)) }
+        override fun appendClickableNarrations(builder: NarrationMessageBuilder) = Unit
+
+        override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean {
+            val max = maxScrollAmount ?: 0
+            if (max > 0) {
+                if (amount > 0) {
+                    scrollAmount = (scrollAmount - 5).coerceAtLeast(0)
+                } else if (amount < 0) {
+                    scrollAmount = (scrollAmount + 5).coerceAtMost(max)
+                }
+            }
+            return super.mouseScrolled(mouseX, mouseY, amount)
+        }
+
+        override fun onClick(mouseX: Double, mouseY: Double) {
+            super.onClick(mouseX, mouseY)
+            selectedBox = if (selectedBox == this) null else this
+            updateButtons()
+            if (System.currentTimeMillis() - lastClickTime < 250L) {
+                choose()
+            }
+            lastClickTime = System.currentTimeMillis()
+        }
 
         fun choose() {
             chooseAction()
-            if (player.learnableData.hasNext())
-                client!!.setScreen(SkillLearningScreen(player, this@SkillLearningScreen.parent))
-            else close()
+            if (player.learnableData.hasNext()) updateSkill() else close()
         }
 
-        override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) {
-            super.draw(context, mouseX, mouseY, partialTicks, delta)
-            if (selectedBox == this || hovered) {
-                val edge = 3
-                context.fill(
-                    x + edge,
-                    y + edge,
-                    x + width - edge,
-                    y + height - edge,
-                    Color.WHITE.alpha(if (selectedBox == this) 0.4 else 0.2).rgb
-                )
-            }
+        fun updateSkill() {
+            skill = skillGetter()
+            selectedBox = null
+            updateButtons()
         }
     }
 

@@ -1,15 +1,15 @@
 package com.imoonday.skill
 
-import com.imoonday.component.properties
+import com.imoonday.component.*
 import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.getData
 import com.imoonday.util.syncData
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.client.network.*
+import net.minecraft.entity.player.*
+import net.minecraft.nbt.*
+import net.minecraft.server.network.*
 
 class WallClimbingSkill : PassiveSkill(
     id = "wall_climbing",
@@ -35,11 +35,17 @@ class WallClimbingSkill : PassiveSkill(
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
-        if (player.isUsing() && !player.horizontalCollision && !player.properties.getBoolean(HORIZONTAL_COLLISION_KEY)) {
-            player.getData(this)?.usingSpeed = -1
-            if (player.getUsedTime() <= 0) {
-                player.getData(this)?.usingSpeed = 1
-                player.stopUsing()
+        if (player.isUsing()) {
+            val horizontalCollision = player.properties.getBoolean(HORIZONTAL_COLLISION_KEY)
+            val data = player.getData(this)
+            if (!horizontalCollision) {
+                data?.usingSpeed = -1
+                if (usedTime <= 0) {
+                    data?.usingSpeed = 1
+                    player.stopUsing()
+                }
+            } else if (data?.usingSpeed == -1) {
+                data.usingSpeed = 1
             }
             player.syncData()
         }

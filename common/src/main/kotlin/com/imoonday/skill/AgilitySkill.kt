@@ -1,8 +1,6 @@
 package com.imoonday.skill
 
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
+import net.minecraft.entity.attribute.*
 
 class AgilitySkill : PassiveSkill(
     id = "agility",

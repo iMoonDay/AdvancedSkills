@@ -1,7 +1,7 @@
 package com.imoonday.trigger
 
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.entity.effect.*
+import net.minecraft.entity.player.*
 
 interface StatusEffectTrigger : SkillTrigger {
 

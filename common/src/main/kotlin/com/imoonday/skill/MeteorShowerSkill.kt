@@ -1,16 +1,13 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.MeteoriteEntity
-import com.imoonday.trigger.AttributeTrigger
-import com.imoonday.trigger.UsingRenderTrigger
+import com.imoonday.entity.*
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.math.Vec3d
+import net.minecraft.entity.attribute.*
+import net.minecraft.server.network.*
+import net.minecraft.util.math.*
 
 class MeteorShowerSkill : LongPressSkill(
     id = "meteor_shower",
@@ -65,5 +62,5 @@ class MeteorShowerSkill : LongPressSkill(
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) =
         super<AttributeTrigger>.postUnequipped(player, slot)
 
-    override fun isDangerousTo(player: ServerPlayerEntity): Boolean = player.isUsing()
+    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 }

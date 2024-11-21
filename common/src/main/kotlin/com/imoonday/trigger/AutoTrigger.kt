@@ -1,7 +1,7 @@
 package com.imoonday.trigger
 
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.nbt.*
+import net.minecraft.server.network.*
 
 interface AutoTrigger : SkillTrigger {
 

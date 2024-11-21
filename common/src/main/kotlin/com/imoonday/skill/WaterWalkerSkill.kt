@@ -1,26 +1,21 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.FluidMovementTrigger
-import com.imoonday.trigger.WalkOnFluidTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.toBlockPos
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.fluid.Fluid
-import net.minecraft.fluid.FluidState
-import net.minecraft.fluid.Fluids
-import net.minecraft.registry.tag.FluidTags
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
+import net.minecraft.entity.player.*
+import net.minecraft.fluid.*
+import net.minecraft.registry.tag.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
 
 class WaterWalkerSkill : Skill(
     id = "water_walker",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 15,
     rarity = Rarity.SUPERB,
-    sound = SoundEvents.BLOCK_WATER_AMBIENT
+    sound = SoundEvents::BLOCK_WATER_AMBIENT
 ), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger {
 
     override fun getPersistTime(): Int = 20 * 15

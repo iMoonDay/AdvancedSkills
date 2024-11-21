@@ -1,8 +1,7 @@
 package com.imoonday.effect
 
-import net.minecraft.entity.effect.StatusEffect
-import net.minecraft.entity.effect.StatusEffectCategory
-import java.awt.Color
+import net.minecraft.entity.effect.*
+import java.awt.*
 
 class SilenceEffect : StatusEffect(
     StatusEffectCategory.HARMFUL,

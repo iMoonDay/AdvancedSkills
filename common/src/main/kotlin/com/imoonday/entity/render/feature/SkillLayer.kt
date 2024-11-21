@@ -1,13 +1,12 @@
 package com.imoonday.entity.render.feature
 
-import com.imoonday.trigger.FeatureRendererTrigger
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.feature.FeatureRenderer
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.player.PlayerEntity
+import com.imoonday.trigger.*
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.render.entity.feature.*
+import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.player.*
 
 class SkillLayer<T : PlayerEntity, M : EntityModel<T>>(
     private val renderer: FeatureRendererContext<T, M>,

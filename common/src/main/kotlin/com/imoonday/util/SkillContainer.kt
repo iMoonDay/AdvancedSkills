@@ -1,19 +1,23 @@
 package com.imoonday.util
 
-import com.imoonday.config.Config
-import com.imoonday.skill.Skill
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtElement
+import com.imoonday.config.*
+import com.imoonday.skill.*
+import net.minecraft.nbt.*
 
 data class SkillContainer(
     private val skills: MutableMap<Skill, SkillData> = mutableMapOf(),
     private val slots: MutableMap<Int, SkillSlot> = createDefaultSlots(),
+    var selectedSlotIndex: Int = 1,
 ) {
 
     val skillSize: Int
         get() = skills.size
     val slotSize: Int
         get() = slots.size
+    val selectedSlot: SkillSlot?
+        get() = slots[selectedSlotIndex]
+    val selectedSkill: Skill?
+        get() = selectedSlot?.skill
 
     init {
         checkContinuous()
@@ -35,10 +39,17 @@ data class SkillContainer(
             true
         }
 
+    fun learnAll(callback: (skill: Skill) -> Unit = {}) {
+        Skill.getLearnableSkills(skills.keys).forEach {
+            skills[it] = SkillData()
+            callback(it)
+        }
+    }
+
     fun forget(
         skill: Skill,
         resultCallback: (Boolean) -> Unit = {},
-        unequipCallback: (SkillSlot, Boolean) -> Unit = { _, _ -> },
+        unequipCallback: (slot: SkillSlot, result: Boolean) -> Unit = { _, _ -> },
     ): Boolean =
         if (skills.containsKey(skill)) {
             slots.forEach { (_, slot) ->
@@ -51,6 +62,14 @@ data class SkillContainer(
             resultCallback(false)
             false
         }
+
+    fun forgetAll(unequipCallback: (slot: SkillSlot) -> Unit = { _ -> }) {
+        slots.forEach { (_, slot) ->
+            slot.unequip()
+            unequipCallback(slot)
+        }
+        skills.clear()
+    }
 
     fun getData(skill: Skill): SkillData? = skills[skill]
 

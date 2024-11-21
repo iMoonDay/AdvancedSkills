@@ -1,9 +1,9 @@
 package com.imoonday.trigger
 
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
 
 interface AttackTrigger : SkillTrigger {
 

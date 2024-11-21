@@ -11,21 +11,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class EndermanEntityMixin {
 
     @Inject(method = "teleportRandomly", at = @At("HEAD"), cancellable = true)
-    public void advanced_skills$teleportRandomly(CallbackInfoReturnable<Boolean> cir) {
+    public void advanced_skills_re$teleportRandomly(CallbackInfoReturnable<Boolean> cir) {
         if (ModEffectsKt.isSilenced((EndermanEntity) (Object) this)) {
             cir.setReturnValue(false);
         }
     }
 
     @Inject(method = "teleportTo(Lnet/minecraft/entity/Entity;)Z", at = @At("HEAD"), cancellable = true)
-    public void advanced_skills$teleportToEntity(CallbackInfoReturnable<Boolean> cir) {
+    public void advanced_skills_re$teleportToEntity(CallbackInfoReturnable<Boolean> cir) {
         if (ModEffectsKt.isSilenced((EndermanEntity) (Object) this)) {
             cir.setReturnValue(false);
         }
     }
 
     @Inject(method = "teleportTo(DDD)Z", at = @At("HEAD"), cancellable = true)
-    public void advanced_skills$teleportToPos(CallbackInfoReturnable<Boolean> cir) {
+    public void advanced_skills_re$teleportToPos(CallbackInfoReturnable<Boolean> cir) {
         if (ModEffectsKt.isSilenced((EndermanEntity) (Object) this)) {
             cir.setReturnValue(false);
         }

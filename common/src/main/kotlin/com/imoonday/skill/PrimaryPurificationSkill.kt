@@ -1,12 +1,12 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModSounds
+import com.imoonday.init.*
 import com.imoonday.util.*
-import net.minecraft.entity.effect.StatusEffectCategory
-import net.minecraft.network.packet.s2c.play.EntityStatusEffectS2CPacket
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.text.Text
-import kotlin.math.min
+import net.minecraft.entity.effect.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.server.network.*
+import net.minecraft.text.*
+import kotlin.math.*
 
 class PrimaryPurificationSkill : Skill(
     id = "primary_purification",

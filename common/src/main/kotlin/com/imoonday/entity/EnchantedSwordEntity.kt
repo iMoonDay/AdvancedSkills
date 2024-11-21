@@ -1,24 +1,18 @@
 package com.imoonday.entity
 
-import com.imoonday.init.ModEntities
-import net.minecraft.command.argument.EntityAnchorArgumentType
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.MovementType
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedData
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.entity.projectile.ProjectileEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.listener.ClientPlayPacketListener
-import net.minecraft.network.packet.Packet
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.sound.SoundCategory
-import net.minecraft.sound.SoundEvents
-import net.minecraft.world.World
+import com.imoonday.init.*
+import net.minecraft.command.argument.*
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.data.*
+import net.minecraft.entity.projectile.*
+import net.minecraft.nbt.*
+import net.minecraft.network.listener.*
+import net.minecraft.network.packet.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.server.world.*
+import net.minecraft.sound.*
+import net.minecraft.world.*
 import java.util.*
 
 class EnchantedSwordEntity(type: EntityType<out EnchantedSwordEntity>, world: World) : ProjectileEntity(type, world) {

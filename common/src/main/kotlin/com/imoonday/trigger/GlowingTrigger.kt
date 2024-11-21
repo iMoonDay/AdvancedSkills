@@ -1,9 +1,8 @@
 package com.imoonday.trigger
 
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.entity.Entity
+import net.minecraft.entity.*
 
 interface GlowingTrigger : SkillTrigger {
 
-    fun isGlowing(player: ClientPlayerEntity, entity: Entity): Boolean = false
+    fun isGlowing(entity: Entity): Boolean = false
 }

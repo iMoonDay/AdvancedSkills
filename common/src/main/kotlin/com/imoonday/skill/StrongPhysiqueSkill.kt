@@ -1,10 +1,8 @@
 package com.imoonday.skill
 
 import com.imoonday.util.SkillSlot
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.attribute.*
+import net.minecraft.server.network.*
 
 class StrongPhysiqueSkill : PassiveSkill(
     id = "strong_physique",

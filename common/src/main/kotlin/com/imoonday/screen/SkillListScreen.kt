@@ -1,333 +1,344 @@
 package com.imoonday.screen
 
-import com.imoonday.screen.component.ShiftScrollContainer
-import com.imoonday.skill.Skill
+import com.imoonday.screen.component.*
+import com.imoonday.skill.*
 import com.imoonday.util.*
 import com.imoonday.util.SkillSlot.Companion.indexTexture
-import io.wispforest.owo.ui.base.BaseOwoScreen
-import io.wispforest.owo.ui.component.Components
-import io.wispforest.owo.ui.container.Containers
-import io.wispforest.owo.ui.container.FlowLayout
-import io.wispforest.owo.ui.container.GridLayout
-import io.wispforest.owo.ui.container.ScrollContainer
-import io.wispforest.owo.ui.core.*
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.text.Text
-import net.minecraft.util.Util
-import java.awt.Color
+import net.minecraft.client.gui.*
+import net.minecraft.client.gui.screen.*
+import net.minecraft.client.gui.screen.narration.*
+import net.minecraft.client.gui.tooltip.*
+import net.minecraft.client.gui.widget.*
+import net.minecraft.client.network.*
+import net.minecraft.client.sound.*
+import net.minecraft.entity.player.*
+import net.minecraft.text.*
+import java.awt.*
 
 class SkillListScreen(
     val player: PlayerEntity,
-) : BaseOwoScreen<FlowLayout>(), AutoSyncedScreen {
+) : Screen(Text.empty()), AutoSyncedScreen {
 
     var selectedSkill: Skill? = null
     var selectedSlot: Int? = null
     private val selectedSlotSkill: Skill?
-        get() = selectedSlot?.let { player.getSkill(it) }
-    private val slotLines = mutableListOf<SlotLine>()
+        get() = selectedSlot?.let(player::getSkill)
+    private val skillSlots = mutableListOf<EquippedSkillSlot>()
     private val container
         get() = player.skillContainer
-    private var slotGrid: GridLayout =
-        Containers.grid(
-            Sizing.fill(50),
-            Sizing.fill(100),
-            (container.slotSize / 2 + if (container.slotSize % 2 == 0) 0 else 1).coerceAtLeast(1),
-            if (container.slotSize > 1) 2 else 1
-        ).apply {
-            alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-            container.getAllSlots().forEach {
-                val slotLine = SlotLine(it.index)
-                val column = if ((it.index - 1) % 2 == 0) 0 else 1
-                val row = (it.index - 1) / 2
-                child(slotLine, row, column)
-                slotLines.add(slotLine)
-            }
-            padding(Insets.horizontal(5))
+    private lateinit var skillScroll: SkillContainerWidget
+    private lateinit var learnButton: ButtonWidget
+
+    override fun init() {
+        super.init()
+        addSkillScroll()
+        addSkillSlots()
+        if (player.isCreative && player.hasPermissionLevel(4)) {
+            val learnAllButton = createButton(
+                5, height - 25,
+                translate("screen", "list.button.learnAll"),
+                "learn-all"
+            ).also(::addDrawableChild)
+            val forgetAllButton = createButton(
+                learnAllButton.x + learnAllButton.width + 5, height - 25,
+                translate("screen", "list.button.forgetAll"),
+                "forget-all"
+            ).also(::addDrawableChild)
+            createButton(
+                forgetAllButton.x + forgetAllButton.width + 5, height - 25,
+                translate("screen", "list.button.resetCooldown"),
+                "reset-cooldown",
+                true
+            ).also(::addDrawableChild)
         }
-
-    override fun createAdapter(): OwoUIAdapter<FlowLayout> = OwoUIAdapter.create(this, Containers::verticalFlow)!!
-
-    private val learnButton = Components.button(translate("screen", "list.button.learn")) {
-        client!!.setScreen(SkillLearningScreen(player) { SkillListScreen(player) })
-    }.apply {
-        active(!player.learnableData.isEmpty())
-    }
-    private val skillsFlow = Containers.verticalFlow(
-        Sizing.fill(100),
-        Sizing.content()
-    )
-
-    override fun build(rootComponent: FlowLayout) {
-        rootComponent.surface(Surface.VANILLA_TRANSLUCENT)
-            .horizontalAlignment(HorizontalAlignment.LEFT)
-            .verticalAlignment(VerticalAlignment.TOP)
-            .padding(Insets.of(5, 0, 5, 5))
-
-        rootComponent.gap(3)
-
-        rootComponent.child(
-            Containers.verticalFlow(
-                Sizing.fill(100),
-                Sizing.content()
-            ).apply {
-                child(
-                    Components.label(
-                        translate(
-                            "screen",
-                            "list.level",
-                            "${player.skillLevel % 100}${if (player.skillLevel > 100) " (+${player.skillLevel / 100})" else ""}"
-                        )
-                    )
-                )
-                child(Components.label(translate("screen", "list.exp", player.skillExp)))
-                child(Containers.grid(Sizing.fill(100), Sizing.fill(80), 1, 2).apply {
-                    gap(3)
-                    child(Containers.horizontalFlow(Sizing.fill(100), Sizing.fill(100)).apply {
-                        child(Containers.verticalScroll(Sizing.fill(50), Sizing.fill(100), skillsFlow.apply {
-                            player.learnedSkills.forEach { child(SkillLine(it)) }
-                        }).apply {
-                            scrollbar(ScrollContainer.Scrollbar.vanilla())
-                            padding(Insets.of(5))
-                            surface(Surface.PANEL)
-                        })
-                    }, 0, 0)
-                    child(Containers.verticalScroll(Sizing.content(), Sizing.fill(100), slotGrid).apply {
-                        scrollbarThiccness(0)
-                    }, 0, 1)
-                })
-                if (player.isCreative && player.hasPermissionLevel(4)) {
-                    child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                        fun createButton(text: Text, content: String, close: Boolean = false) =
-                            Components.button(text) {
-                                (player as ClientPlayerEntity).networkHandler.sendCommand("skills @s $content")
-                                if (close) close()
-                            }.apply {
-                                tooltip(translate("screen", "list.button.tooltip"))
-                            }
-                        gap(5)
-                        child(createButton(translate("screen", "list.button.learnAll"), "learn-all"))
-                        child(createButton(translate("screen", "list.button.forgetAll"), "forget-all"))
-                        child(createButton(translate("screen", "list.button.resetCooldown"), "reset-cooldown", true))
-                    })
-                }
-                child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                    positioning(Positioning.relative(100, 0))
-                    gap(5)
-                    child(learnButton)
-                    child(Components.button(translate("screen", "list.button.inventory")) {
-                        client!!.setScreen(SkillInventoryScreen(player) { SkillListScreen(player) })
-                    })
-                })
-            })
+        val inventoryText = translate("screen", "list.button.inventory")
+        val inventoryButtonWidth = (textRenderer.getWidth(inventoryText) + 10).coerceAtLeast(50)
+        val inventoryButton = ButtonWidget.builder(inventoryText) {
+            client!!.setScreen(SkillInventoryScreen(player) { SkillListScreen(player) })
+        }.dimensions(width - 5 - inventoryButtonWidth, 5, inventoryButtonWidth, 20)
+            .build()
+            .also(::addDrawableChild)
+        val learnText = translate("screen", "list.button.learn")
+        val learnButtonWidth = (textRenderer.getWidth(learnText) + 10).coerceAtLeast(50)
+        learnButton = ButtonWidget.builder(learnText) {
+            client!!.setScreen(SkillLearningScreen(player) { SkillListScreen(player) })
+        }.dimensions(inventoryButton.x - learnButtonWidth - 5, 5, learnButtonWidth, 20)
+            .build()
+            .apply { active = !player.learnableData.isEmpty() }
+            .also(::addDrawableChild)
     }
 
-    override fun update(data: NbtCompound) {
-        updateScreen()
+    private fun createButton(x: Int, y: Int, text: Text, content: String, close: Boolean = false) =
+        ButtonWidget.builder(text) {
+            (player as ClientPlayerEntity).networkHandler.sendCommand("skills @s $content")
+            if (close) close()
+        }.tooltip(Tooltip.of(translate("screen", "list.button.tooltip")))
+            .width((textRenderer.getWidth(text) + 10).coerceAtLeast(50))
+            .position(x, y)
+            .build()
+
+    private fun addSkillScroll() {
+        skillScroll = SkillContainerWidget(
+            client!!, 0, 30,
+            width / 2, height - 60, 40,
+            player::learnedSkills,
+            ::renderSkillLine
+        ).apply { onClick = ::handleSelectionButton }.also(::addDrawableChild)
     }
+
+    private fun handleSelectionButton(
+        mouseX: Double,
+        mouseY: Double,
+        button: Int,
+        line: SkillContainerWidget.SkillLine
+    ): Boolean {
+        if (button != 0) return false
+        val skill = line.skill
+        val validSlot = getValidSlot(skill)
+        val rightX = skillScroll.x + skillScroll.width
+        if (validSlot != null && mouseX.toInt() in rightX - 22..rightX - 6) {
+            player.equip(skill, validSlot)
+            selectedSlot = null
+        } else {
+            if (System.currentTimeMillis() - line.lastClickTime < 250L) {
+                client!!.setScreen(SkillGalleryScreen(skill) { this })
+            }
+            if (selectedSkill != skill) {
+                selectedSkill = skill
+            } else {
+                selectedSkill = null
+                skillScroll.focused = null
+            }
+            updateScreen()
+            if (selectedSkill == null) {
+                line.lastClickTime = System.currentTimeMillis()
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun renderSkillLine(
+        context: DrawContext,
+        index: Int,
+        skill: Skill,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        mouseX: Int,
+        mouseY: Int,
+        hovered: Boolean,
+        focused: Boolean,
+        tickDelta: Float
+    ) {
+        val equipX = x + width - 22
+        val right = x + width - 6
+        val selected = selectedSkill == skill
+        if (selected || focused || hovered) {
+            context.overlayHighlightWithSize(x, y, width, height, selected)
+        }
+        val gap = 5
+        var currentX = x + gap * 2
+
+        skill.renderIcon(context, currentX, y + (height - 16) / 2)
+
+        currentX += 16 + gap
+        val name = skill.formattedName
+        val titleY = y + height / 2 - textRenderer.fontHeight - 1
+        context.drawText(textRenderer, name, currentX, titleY, 0xFFFFFF, false)
+        context.drawText(
+            textRenderer,
+            "(${skill.getCooldown(client?.world) / 20.0}s)".toText(),
+            currentX + textRenderer.getWidth(name) + gap,
+            titleY,
+            0xFFFFFF,
+            false
+        )
+        val description = skill.description
+        val descriptionY = y + height / 2 + 1
+        val hasValidSlot = getValidSlot(skill) != null
+        renderDescription(context, currentX, descriptionY, equipX, description, hasValidSlot)
+        if (hasValidSlot) {
+            if (mouseX in equipX..<right && mouseY in y..<y + height) {
+                context.overlayHighlight(equipX, y, right, y + height, false)
+            }
+            context.drawTexture(equipTexture, equipX, y + (height - 16) / 2, 0f, 0f, 16, 16, 16, 16)
+        }
+    }
+
+    private fun renderDescription(
+        context: DrawContext,
+        left: Int,
+        top: Int,
+        right: Int,
+        description: Text,
+        hasValidSlot: Boolean
+    ) {
+        val maxWidth = (if (hasValidSlot) right - 5 else right + 8) - left
+        val text = if (textRenderer.getWidth(description) > maxWidth)
+            textRenderer.trimToWidth(description, maxWidth).string.run {
+                if (length > 2 && get(length - 2) == ' ')
+                    substring(0, length - 2) + "..."
+                else substring(0, length - 1) + "..."
+            } else description.string
+        context.drawText(textRenderer, text, left, top, 0xFFFFFF, false)
+    }
+
+    private fun addSkillSlots() {
+        val totalColumns = (container.slotSize / 2 + if (container.slotSize % 2 == 0) 0 else 1).coerceAtLeast(1)
+        val totalRows = if (container.slotSize > 1) 2 else 1
+        val centerX = width / 2
+        val bottomY = height - 60
+        val slotWidth = (centerX * 0.47).toInt()
+        val slotHeight = (bottomY * 0.17).toInt()
+        val horizontalSpacing = (centerX - totalRows * slotWidth) / (totalRows + 1)
+        val verticalSpacing = (bottomY - totalColumns * slotHeight) / (totalColumns)
+
+        container.getAllSlots().forEach { slot ->
+            val columnIndex = (slot.index - 1) % 2
+            val rowIndex = (slot.index - 1) / 2
+            val slotX = centerX + horizontalSpacing + columnIndex * (slotWidth + horizontalSpacing)
+            val slotY = 30 + verticalSpacing / 2 + rowIndex * (slotHeight + verticalSpacing)
+            val equippedSkillSlot = EquippedSkillSlot(
+                slot.index, slotX, slotY,
+                slotWidth, slotHeight
+            )
+            addDrawableChild(equippedSkillSlot)
+            skillSlots.add(equippedSkillSlot)
+        }
+    }
+
+    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+        renderBackground(context)
+        try {
+            super.render(context, mouseX, mouseY, delta)
+        } catch (e: Exception) {
+            val lines = skillScroll.children()
+            println(lines)
+        }
+        context.drawText(
+            textRenderer,
+            translate(
+                "screen",
+                "list.level",
+                "${player.skillLevel % 100}${if (player.skillLevel > 100) " (+${player.skillLevel / 100})" else ""}"
+            ),
+            5, 5, 0xFFFFFF, false
+        )
+        context.drawText(
+            textRenderer,
+            translate("screen", "list.exp", player.skillExp),
+            5, 5 + textRenderer.fontHeight + 3, 0xFFFFFF, false
+        )
+        if (skillScroll.children().isEmpty()) {
+            val emptyText = translate("screen", "list.empty")
+            context.drawText(
+                textRenderer,
+                emptyText,
+                width / 4 - textRenderer.getWidth(emptyText) / 2,
+                height / 2,
+                0xFFFFFF,
+                false
+            )
+        }
+    }
+
+    override fun update() = updateScreen()
 
     fun updateScreen() {
-        skillsFlow.run {
-            if (skillsFlow.children().size != player.learnedSkills.size) {
-                clearChildren()
-                player.learnedSkills.forEach { child(SkillLine(it)) }
-            }
+        if (skillScroll.children().size != player.learnedSkills.size) {
+            skillScroll.refresh()
         }
-        player.equippedSkills.forEachIndexed { i, _ ->
-            slotLines[i].updateSkill()
-        }
-        learnButton.active(!player.learnableData.isEmpty())
+        learnButton.active = !player.learnableData.isEmpty()
     }
 
     override fun shouldPause(): Boolean = false
 
-    inner class SkillLine(
-        private val skill: Skill,
-    ) : FlowLayout(Sizing.fill(98), Sizing.content(5), Algorithm.HORIZONTAL) {
+    private fun getValidSlot(skill: Skill): Int? {
+        val emptyIndex = container.getEmptySlot(skill)?.index
+        val selectedSkill = selectedSlotSkill
+        return when {
+            selectedSkill != null && selectedSkill != skill && player.getSlot(selectedSlot!!)
+                ?.canEquip(skill) == true -> selectedSlot
 
-        private val content: FlowLayout = Containers.horizontalFlow(Sizing.content(), Sizing.content())
-        private val equipButton = Components.texture(com.imoonday.util.id("equip.png"), 0, 0, 16, 16, 16, 16).apply {
-            mouseDown().subscribe { _, _, button ->
-                if (button == 0) {
-                    return@subscribe getValidSlot()?.run {
-                        player.equip(skill, this)
-                        selectedSlot = null
-                        true
-                    } ?: false
-                }
-                false
-            }
-        }
-
-        private fun getValidSlot(): Int? {
-            val emptyIndex = container.getEmptySlot(skill)?.index
-
-            return when {
-                selectedSlotSkill != null && player.getSlot(selectedSlot!!)?.canEquip(skill) == true -> selectedSlot
-                emptyIndex != null && container.getSlot(skill) == null -> emptyIndex
-                else -> null
-            }
-        }
-
-        private var lastClickTime: Long = 0
-
-        init {
-            gap(5)
-            surface(Surface.PANEL_INSET)
-            content.gap(7)
-                .alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-                .padding(Insets.of(5, 5, 2, 0))
-            child(content)
-            alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-            padding(Insets.horizontal(5))
-
-            content.child(Components.texture(skill.icon, 0, 0, 16, 16, 16, 16))
-            content.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                gap(5)
-                child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                    gap(5)
-                    child(Components.label(skill.formattedName))
-                    child(Components.label("(${skill.getCooldown(client?.world) / 20.0}s)".toText()))
-                })
-                child(
-                    ShiftScrollContainer.horizontalScroll(
-                        Sizing.fill(85),
-                        Sizing.content(),
-                        Components.label(skill.description)
-                    ).apply {
-                        scrollbarThiccness(0)
-                        mouseDown().subscribe { _, _, button ->
-                            onMouseDown(button)
-                        }
-                    }
-                )
-            })
-            child(equipButton.apply {
-                positioning(Positioning.relative(100, 50))
-            })
-
-            mouseDown().subscribe { _, _, button ->
-                onMouseDown(button)
-            }
-        }
-
-        private fun onMouseDown(button: Int): Boolean {
-            if (button != 0) return false
-            if (Util.getMeasuringTimeMs() - lastClickTime < 250L) {
-                client!!.setScreen(
-                    SkillGalleryScreen(
-                        skill
-                    ) { this@SkillListScreen }
-                )
-            }
-            lastClickTime = Util.getMeasuringTimeMs()
-            selectedSkill = if (selectedSkill != skill) skill else null
-            updateScreen()
-            return true
-        }
-
-        override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) {
-            if (hovered && getValidSlot() != null) {
-                equipButton.sizing(Sizing.content())
-            } else {
-                equipButton.sizing(Sizing.fill(0))
-            }
-            super.draw(context, mouseX, mouseY, partialTicks, delta)
-            if (selectedSkill == skill || hovered) {
-                context.fill(
-                    x,
-                    y,
-                    x + width,
-                    y + height,
-                    Color.WHITE.alpha(if (selectedSkill == skill) 0.4 else 0.2).rgb
-                )
-            }
+            emptyIndex != null && container.getSlot(skill) == null -> emptyIndex
+            else -> null
         }
     }
 
-    inner class SlotLine(
-        private val slot: Int,
-    ) : FlowLayout(
-        Sizing.fill(47),
-        Sizing.fill(17),
-        Algorithm.HORIZONTAL
-    ) {
+    inner class EquippedSkillSlot(
+        private val slot: Int, x: Int, y: Int, width: Int, height: Int,
+    ) : ClickableWidget(x, y, width, height, Text.empty()) {
 
         var skill: Skill
             get() = player.getSkill(slot)
             set(value) {
                 player.equip(value, slot)
             }
-        private val content: FlowLayout = Containers.horizontalFlow(Sizing.content(), Sizing.content())
+        private val skillSlot: SkillSlot?
+            get() = player.getSlot(slot)
         private var lastClickTime: Long = 0
 
-        init {
-            gap(5)
-            surface(Surface.TOOLTIP.and { context, component ->
-                context.drawTexture(
-                    indexTexture,
-                    component.x() + component.width() - 13,
-                    component.y() + 4,
-                    player.getSlot(slot)?.u ?: 0,
-                    player.getSlot(slot)?.v ?: 0,
-                    9,
-                    9
-                )
-            })
-            content.gap(5)
-                .alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-
-            padding(Insets.left(8))
-            alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-
-            updateSkill()
-
-            mouseDown().subscribe { _, _, button ->
-                onMouseDown(button)
-            }
-
-            player.getSlot(slot)?.let {
-                tooltip(it.tooltip)
-            }
-        }
-
-        private fun onMouseDown(button: Int): Boolean {
-            if (button != 0) return false
-            if (!skill.invalid && Util.getMeasuringTimeMs() - lastClickTime < 250L) {
+        override fun onClick(mouseX: Double, mouseY: Double) {
+            if (!skill.invalid && System.currentTimeMillis() - lastClickTime < 250L) {
                 player.equip(Skill.EMPTY, slot)
             }
-            lastClickTime = Util.getMeasuringTimeMs()
+            lastClickTime = System.currentTimeMillis()
             selectedSlot = if (selectedSlot != slot) slot else null
             updateScreen()
-            return true
         }
 
-        fun updateSkill() {
-            clearChildren()
-            if (!this.skill.invalid) {
-                content.clearChildren()
-                child(content)
+        override fun playDownSound(soundManager: SoundManager) = Unit
 
-                content.child(Components.texture(this.skill.icon, 0, 0, 16, 16, 16, 16))
-                content.child(Components.label(this@SlotLine.skill.formattedName))
-            }
-        }
-
-        override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) {
-            super.draw(context, mouseX, mouseY, partialTicks, delta)
-            if (selectedSlot == slot || hovered) {
+        override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+            context.renderTooltip(x, y, width, height)
+            val selected = selectedSlot == slot
+            if (selected || hovered) {
                 context.fill(
                     x + 3,
                     y + 3,
                     x + width - 3,
                     y + height - 3,
-                    Color.WHITE.alpha(if (selectedSkill == skill) 0.4 else 0.2).rgb
+                    Color.WHITE.alpha(if (selected) 0.4 else 0.2).rgb
                 )
+            }
+            val skill = skill
+            if (!skill.invalid) {
+                skill.renderIcon(context, x + 8, y + (height - 16) / 2)
+                val topY = y + (height - textRenderer.fontHeight) / 2 + 1
+                context.drawScrollableText(
+                    textRenderer,
+                    skill.formattedName,
+                    x + 24 + 3,
+                    topY,
+                    x + width - 16,
+                    topY + textRenderer.fontHeight,
+                    0xFFFFFF,
+                    shadow = false,
+                    center = false
+                )
+            }
+            val slot = skillSlot
+            context.drawTexture(
+                indexTexture,
+                x + width - 13,
+                y + 4,
+                slot?.u ?: 0,
+                slot?.v ?: 0,
+                9,
+                9
+            )
+            if (slot != null && mouseX in x + width - 13..x + width - 13 + 9 && mouseY in y + 4..y + 4 + 9) {
+                context.drawTooltip(textRenderer, slot.tooltip, mouseX, mouseY)
             }
         }
 
-        override fun shouldDrawTooltip(mouseX: Double, mouseY: Double): Boolean =
-            this.tooltip() != null && mouseX >= x + width - 13 && mouseX <= x + width - 4 && mouseY >= y + 4 && mouseY <= y + 13
+        override fun appendClickableNarrations(builder: NarrationMessageBuilder) = Unit
+    }
+
+    companion object {
+
+        private val equipTexture = id("equip.png")
     }
 }

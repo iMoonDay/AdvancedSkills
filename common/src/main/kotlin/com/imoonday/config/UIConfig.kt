@@ -1,6 +1,7 @@
 package com.imoonday.config
 
 import com.imoonday.*
+import dev.architectury.platform.Platform
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import net.fabricmc.api.*
@@ -43,7 +44,7 @@ class UIConfig {
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
-        private var file: File = FabricLoader.getInstance().configDir.resolve("$MOD_ID-client.json").toFile()
+        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID-client.json").toFile()
         var instance = UIConfig()
         private var loading = false
         private var saving = false
@@ -98,7 +99,7 @@ class UIConfig {
         fun fromJson(json: String): UIConfig = JSON.decodeFromString(serializer(), json)
 
         fun initWatchService() {
-            if (FabricLoader.getInstance().environmentType != EnvType.CLIENT) return
+            if (Platform.getEnv() != EnvType.CLIENT) return
             val service = FileSystems.getDefault().newWatchService()
             file.parentFile.toPath().register(service, ENTRY_MODIFY)
             val fileName = file.name

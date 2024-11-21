@@ -1,9 +1,9 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.MagnetEntity
+import com.imoonday.entity.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.network.*
 
 class MagneticTrapSkill : Skill(
     id = "magnetic_trap",

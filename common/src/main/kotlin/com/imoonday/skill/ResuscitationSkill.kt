@@ -1,18 +1,15 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.DamageTrigger
-import com.imoonday.trigger.DeathTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.playSound
-import net.minecraft.entity.Entity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.registry.tag.DamageTypeTags
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.effect.*
+import net.minecraft.registry.tag.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
 
 class ResuscitationSkill : Skill(
     id = "resuscitation",

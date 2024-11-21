@@ -1,15 +1,13 @@
 package com.imoonday.component
 
-import com.imoonday.screen.SkillLearningScreen
-import com.imoonday.trigger.ClientUseTrigger
+import com.imoonday.network.*
+import com.imoonday.screen.*
+import com.imoonday.trigger.*
 import com.imoonday.util.*
-import dev.onyxstudios.cca.api.v3.component.Component
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
-import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.PacketByteBuf
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.player.*
+import net.minecraft.nbt.*
+import net.minecraft.server.network.*
+import net.minecraft.server.world.*
 
 interface DataComponent : Component {
 
@@ -20,11 +18,9 @@ interface DataComponent : Component {
     fun reset()
 }
 
-class PlayerDataComponent(private val player: PlayerEntity) :
-    DataComponent,
-    AutoSyncedComponent,
-    CommonTickingComponent {
+class PlayerDataComponent(private val player: PlayerEntity) : DataComponent {
 
+    var dirty: Boolean = false
     override var container: SkillContainer = SkillContainer()
     override var level: SkillLevelData = SkillLevelData()
     override var learnable: LearnableSkillData = LearnableSkillData()
@@ -51,15 +47,16 @@ class PlayerDataComponent(private val player: PlayerEntity) :
             }
             player.updateScreen()
         }
-        (player as? ServerPlayerEntity)?.run {
-            if (learnable.correct(learnedSkills)) syncData()
+        if (player is ServerPlayerEntity && (dirty || learnable.correct(player.learnedSkills))) {
+            sync()
+            dirty = false
         }
     }
 
-    override fun applySyncPacket(buf: PacketByteBuf) {
+    override fun applySyncNbt(tag: NbtCompound) {
         val oldSkills = container.getAllSkills { _, data -> data.using }
         val hasChoice = learnable.hasNext()
-        super.applySyncPacket(buf)
+        super.applySyncNbt(tag)
         val newSkills = container.getAllSkills { _, data -> data.using }
         newSkills.subtract(oldSkills)
             .filterIsInstance<ClientUseTrigger>()
@@ -71,6 +68,15 @@ class PlayerDataComponent(private val player: PlayerEntity) :
             SkillLearningScreen.new = true
         }
         player.updateScreen()
+    }
+
+    override fun sync() {
+        (player.world as? ServerWorld)?.let {
+            Channels.SYNC_PLAYER_DATA_S2C.sendToPlayers(
+                it.players,
+                SyncPlayerDataS2CPacket(player.id, toNbt())
+            )
+        }
     }
 
     override fun reset() {

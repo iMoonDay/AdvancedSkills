@@ -1,16 +1,15 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModSounds
-import com.imoonday.trigger.AutoStopTrigger
+import com.imoonday.init.*
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.getUsingData
 import com.imoonday.util.send
-import net.minecraft.entity.LivingEntity
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3d
+import net.minecraft.entity.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.server.network.*
+import net.minecraft.util.math.*
 
 class PiercingSkill : Skill(
     id = "piercing",
@@ -63,6 +62,7 @@ class PiercingSkill : Skill(
         player.world.getNonSpectatingEntities(
             LivingEntity::class.java, player.boundingBox
         ).forEach {
+            if (it === player) return@forEach
             it.damage(player.damageSources.playerAttack(player), 6.0f)
             it.velocityDirty = true
             it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(1.5).withAxis(Direction.Axis.Y, 1.0))
@@ -71,5 +71,5 @@ class PiercingSkill : Skill(
         super.serverTick(player, usedTime)
     }
 
-    override fun isDangerousTo(player: ServerPlayerEntity): Boolean = player.isUsing()
+    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 }

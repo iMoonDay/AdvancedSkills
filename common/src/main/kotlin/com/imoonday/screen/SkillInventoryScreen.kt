@@ -1,221 +1,129 @@
 package com.imoonday.screen
 
-import com.imoonday.screen.component.CustomScrollContainer
-import com.imoonday.skill.Skill
+import com.imoonday.skill.*
 import com.imoonday.util.*
 import com.imoonday.util.SkillSlot.Companion.indexTexture
-import io.wispforest.owo.ui.base.BaseOwoScreen
-import io.wispforest.owo.ui.component.Components
-import io.wispforest.owo.ui.container.Containers
-import io.wispforest.owo.ui.container.FlowLayout
-import io.wispforest.owo.ui.container.GridLayout
-import io.wispforest.owo.ui.container.ScrollContainer
-import io.wispforest.owo.ui.core.*
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.sound.PositionedSoundInstance
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Formatting
-import net.minecraft.util.Identifier
-import org.lwjgl.glfw.GLFW
-import java.awt.Color
+import net.minecraft.client.*
+import net.minecraft.client.gui.*
+import net.minecraft.client.gui.screen.*
+import net.minecraft.client.gui.screen.narration.*
+import net.minecraft.client.gui.tooltip.*
+import net.minecraft.client.gui.widget.*
+import net.minecraft.entity.player.*
+import net.minecraft.text.*
+import net.minecraft.util.*
+import org.lwjgl.glfw.*
+import java.awt.*
+import java.util.*
 
 class SkillInventoryScreen(
     val player: PlayerEntity,
     val parent: () -> Screen? = { null },
-) : BaseOwoScreen<FlowLayout>(), AutoSyncedScreen {
+) : Screen(Text.empty()), AutoSyncedScreen {
 
     var selectedSlot: Slot? = null
-        set(value) {
-            field = value
-            update()
-        }
     var selectedTab: Tab? = null
         set(value) {
             field = value
-            scrollContainer.scrollToTop()
             update()
         }
     var selectingSlot: Slot? = null
     private val tabs: MutableList<Tab> = mutableListOf()
-    private val equippedSlots: MutableList<Slot> = mutableListOf()
-    private lateinit var inventory: GridLayout
-    private lateinit var scrollContainer: CustomScrollContainer<*>
-    private val slotSize = 24
-    private val tabTexture = Identifier("textures/gui/container/creative_inventory/tabs.png")
-    private val titleComponent = Components.label(
-        translate(
+    private val equippedSlots: MutableList<EquippedSlot> = mutableListOf()
+    private lateinit var slotGrid: SlotGrid
+    private val displaySkills
+        get() = player.learnedSkills
+            .filterNot(player::hasEquipped)
+            .filter { (selectedTab?.type ?: return@filter true) in it.types }
+    var bgWidth: Int = width
+    var bgHeight: Int = height
+    val bgX: Int
+        get() = (width - bgWidth) / 2
+    val bgY: Int
+        get() = (height - bgHeight) / 2
+    private var equippedSlotOffset: Int = 0
+        set(value) {
+            field = value.coerceIn(0, equippedSlots.size - 6)
+        }
+
+    override fun update() {
+        slotGrid.replaceSlots(displaySkills)
+        player.equippedSkills.forEachIndexed { index, skill ->
+            equippedSlots[index].skill = skill
+        }
+    }
+
+    override fun init() {
+        super.init()
+        bgWidth = 9 * (SLOT_SIZE + 4) + 15 + 13
+        bgHeight = 6 * (SLOT_SIZE + 4)
+        val halfSize = SkillType.entries.size / 2
+        val gap = (bgWidth - 5 * 26) / 10
+        tabs.clear()
+        SkillType.entries.forEachIndexed { index, type ->
+            val reverse = index >= halfSize
+            val (x, y) = if (!reverse) {
+                bgX + (26 + gap * 2) * index + gap to bgY - 28
+            } else {
+                bgX + (26 + gap * 2) * (index - halfSize) + gap to bgY + bgHeight - 4
+            }
+            Tab(type, index, x, y, reverse).also {
+                addDrawableChild(it)
+                tabs.add(it)
+            }
+        }
+        slotGrid = SlotGrid(bgX, bgY + 15, 4, 9, 5, Insets(5, 8, 5, 15))
+            .apply { replaceSlots(displaySkills) }
+            .also(::addDrawableChild)
+        equippedSlots.clear()
+        player.skillContainer.getAllSlots().forEachIndexed { index, slot ->
+            EquippedSlot(
+                slot, bgX + 25 + index * (SLOT_SIZE + 14 + 5) - equippedSlotOffset * 43, bgY + bgHeight - 8 - SLOT_SIZE
+            ).apply { visible = index in equippedSlotOffset..<equippedSlotOffset + 6 }
+                .also {
+                    addDrawableChild(it)
+                    equippedSlots.add(it)
+                }
+        }
+    }
+
+    override fun resize(client: MinecraftClient, width: Int, height: Int) {
+        val scrollAmount = slotGrid.scrollOffset
+        super.resize(client, width, height)
+        slotGrid.scrollOffset = scrollAmount
+    }
+
+    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+        renderBackground(context)
+        super.render(context, mouseX, mouseY, delta)
+        val title = if (selectedTab == null) translate(
             "screen",
             "inventory.title",
             player.learnedSkills.size,
             Skill.getValidSkills().size
-        ).formatted(Formatting.BLACK)
-    )
-    private val rows: Int
-        get() = Skill.getValidSkills().size / 9 + if (Skill.getValidSkills().size % 9 == 0) 0 else 1
-    private val displaySkills
-        get() = player.learnedSkills
-            .filterNot { player.hasEquipped(it) }
-            .filter { skill ->
-                (selectedTab?.type ?: return@filter true) in skill.types
-            }
-
-    override fun createAdapter(): OwoUIAdapter<FlowLayout> = OwoUIAdapter.create(this, Containers::verticalFlow)!!
-    override fun build(rootComponent: FlowLayout) {
-        setupRootComponent(rootComponent)
-        setupInventory(rootComponent)
-    }
-
-    private fun setupRootComponent(rootComponent: FlowLayout) {
-        rootComponent.surface(Surface.VANILLA_TRANSLUCENT)
-            .horizontalAlignment(HorizontalAlignment.CENTER)
-            .verticalAlignment(VerticalAlignment.CENTER)
-            .padding(Insets.of(5, 2, 5, 5))
-    }
-
-    private fun setupInventory(rootComponent: FlowLayout) {
-        rootComponent.child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-            horizontalAlignment(HorizontalAlignment.CENTER)
-            val halfSize = SkillType.entries.size / 2
-            val width = 9 * (slotSize + 4) + 15
-            addTopTabs(width, halfSize)
-            addSkills(width)
-            addBottomTabs(width, halfSize)
-        })
-    }
-
-    private fun FlowLayout.addBottomTabs(width: Int, halfSize: Int) {
-        child(Containers.grid(Sizing.fixed(width), Sizing.content(), 1, 5).apply {
-            horizontalAlignment(HorizontalAlignment.CENTER)
-            SkillType.entries.drop(halfSize).forEachIndexed { index, skillType ->
-                child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                    val tab = Tab(skillType, halfSize + index)
-                    child(tab)
-                    tabs.add(tab)
-                }, 0, index)
-            }
-        })
-    }
-
-    private fun FlowLayout.addSkills(width: Int) {
-        child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-            surface(Surface.PANEL.and { context, component ->
-                selectedTab?.run {
-                    context.drawTexture(
-                        tabTexture,
-                        x(),
-                        if (reverse) component.y() + component.height() - 4 else component.y(),
-                        26,
-                        v + if (reverse) 0 else 28,
-                        26,
-                        4
-                    )
-                }
-            })
-            padding(Insets.vertical(7))
-            horizontalAlignment(HorizontalAlignment.CENTER)
-            gap(3)
-            child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                child(titleComponent)
-            })
-            val skills = displaySkills
-            val rows = rows
-            child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                gap(3)
-                child(CustomScrollContainer.vertical(
-                    Sizing.content(),
-                    Sizing.fixed(slotSize * 5),
-                    Containers.grid(Sizing.content(), Sizing.content(), rows, 9).apply {
-                        padding(Insets.right(5))
-                        alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER)
-                        for (index in (0 until rows * 9)) {
-                            child(
-                                Slot(null, skills.getOrElse(index) { Skill.EMPTY }),
-                                index / 9,
-                                index % 9
-                            )
-                        }
-                    }.also { inventory = it }
-                ).apply {
-                    scrollbar(ScrollContainer.Scrollbar.vanilla())
-                    padding(Insets.horizontal(5))
-                }.also { scrollContainer = it })
-                val slots = player.skillContainer.getAllSlots()
-                child(
-                    Containers.horizontalScroll(
-                        Sizing.fixed(width - 15),
-                        Sizing.content(),
-                        Containers.grid(Sizing.content(), Sizing.content(), 1, slots.size).apply {
-                            alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                            slots.forEach {
-                                child(Containers.horizontalFlow(Sizing.content(), Sizing.content()).apply {
-                                    padding(Insets.of(1))
-                                    alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                                    gap(3)
-                                    child(Components.texture(indexTexture, it.u, it.v, 9, 9).apply {
-                                        tooltip(it.tooltip)
-                                    })
-                                    val slot = Slot(it, it.skill)
-                                    child(slot)
-                                    equippedSlots.add(slot)
-                                }, 0, it.index - 1)
-                            }
-                        }).apply {
-                        scrollbarThiccness(0)
-                        scrollStep(42)
-                    }
-                )
-            })
-        })
-    }
-
-    private fun FlowLayout.addTopTabs(width: Int, halfSize: Int) {
-        child(Containers.grid(Sizing.fixed(width), Sizing.content(), 1, 5).apply {
-            horizontalAlignment(HorizontalAlignment.CENTER)
-            SkillType.entries.take(halfSize).forEachIndexed { index, skillType ->
-                child(Containers.verticalFlow(Sizing.content(), Sizing.content()).apply {
-                    val tab = Tab(skillType, index)
-                    child(tab, 0, index)
-                    tabs.add(tab)
-                })
-            }
-        })
-    }
-
-    override fun update(data: NbtCompound) {
-        val size = inventory.children().size
-        val skills = displaySkills
-        inventory.run {
-            for (index in 0 until size) {
-                child(
-                    Slot(null, skills.getOrElse(index) { Skill.EMPTY }),
-                    index / 9,
-                    index % 9
-                )
-            }
-        }
-        player.equippedSkills.forEachIndexed { index, skill ->
-            equippedSlots[index].updateSkill(skill)
-        }
-        titleComponent.text(
-            (if (selectedTab == null) translate(
-                "screen",
-                "inventory.title",
-                player.learnedSkills.size,
-                Skill.getValidSkills().size
-            ) else selectedTab!!.type.displayName).copy().formatted(Formatting.BLACK)
+        ) else selectedTab!!.type.displayName.copy().formatted(Formatting.BLACK)
+        context.drawText(
+            textRenderer,
+            title,
+            width / 2 - textRenderer.getWidth(title) / 2,
+            bgY + 8,
+            0x000000,
+            false
         )
-    }
-
-    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        super.render(context, mouseX, mouseY, delta)
         selectedSlot?.run {
             context.drawTexture(skill.icon, mouseX - 8, mouseY - 8, 90, 0f, 0f, 16, 16, 16, 16)
         }
+        selectingSlot?.renderTooltip(context, mouseX, mouseY)
+        equippedSlots.firstOrNull { it.isMouseOverIndex(mouseX, mouseY) }?.run {
+            slot?.tooltip?.let {
+                context.drawTooltip(textRenderer, it, mouseX, mouseY)
+            }
+        }
+    }
+
+    override fun renderBackground(context: DrawContext) {
+        context.fillGradient(0, 0, this.width, this.height, -1, -1072689136, -804253680)
+        context.renderPanel(bgX, bgY, bgWidth, bgHeight)
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
@@ -250,127 +158,312 @@ class SkillInventoryScreen(
         return result
     }
 
-    override fun close() = client!!.setScreen(parent())
-
-    override fun init() {
-        super.init()
-        tabs.forEach {
-            it.updateY(it.y() + if (it.reverse) -4 else 4)
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean {
+        if (mouseX.toInt() in bgX..bgX + bgWidth && mouseY.toInt() in bgY + bgHeight - 8 - SLOT_SIZE..bgY + bgHeight - 8) {
+            val slotWidth = 43
+            if (amount > 0) {
+                equippedSlotOffset--
+            } else if (amount < 0) {
+                equippedSlotOffset++
+            }
+            equippedSlots.forEachIndexed { index, slot ->
+                slot.x = bgX + 25 + index * (SLOT_SIZE + 14 + 5) - equippedSlotOffset * slotWidth
+                slot.visible = index in equippedSlotOffset..<equippedSlotOffset + 6
+            }
         }
+        return super.mouseScrolled(mouseX, mouseY, amount)
     }
+
+    override fun close() = client!!.setScreen(parent())
 
     override fun shouldPause(): Boolean = false
 
-    inner class Slot(
+    open inner class Slot(
         val slot: SkillSlot?,
         var skill: Skill,
-    ) : FlowLayout(Sizing.fixed(slotSize), Sizing.fixed(slotSize), Algorithm.VERTICAL) {
+        var x: Int,
+        var y: Int,
+    ) : Drawable, Element, Selectable {
 
-        private val slotTexture = com.imoonday.util.id("slot.png")
+        var width: Int = SLOT_SIZE
+        var height: Int = SLOT_SIZE
+        var visible: Boolean = true
 
-        init {
-            padding(Insets.of(1))
-            surface { context, component ->
-                context.drawTexture(
-                    slotTexture,
-                    component.x(),
-                    component.y(),
-                    skill.rarity.level * 24f,
-                    0f,
-                    component.width(),
-                    component.height(),
-                    256,
-                    256
-                )
-                context.fill(
-                    component.x() + component.width() - 3,
-                    component.y() + 1,
-                    component.x() + component.width() - 1,
-                    component.y() + 3,
-                    skill.rarity.formatting.colorValue ?: 0
-                )
+        override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+            if (!visible) return
+            context.drawTexture(
+                slotTexture,
+                x,
+                y,
+                skill.rarity.level * 24f,
+                0f,
+                width,
+                height,
+                256,
+                256
+            )
+            context.fill(
+                x + width - 3,
+                y + 1,
+                x + width - 1,
+                y + 3,
+                skill.rarity.formatting.colorValue ?: 0
+            )
+            if (!skill.invalid && selectedSlot?.skill != skill) {
+                skill.renderIcon(context, x + 4, y + 4)
             }
-            alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-            margins(Insets.of(2))
-            updateSkill(skill)
-            mouseDown().subscribe { _, _, button ->
-                if (button != 0) return@subscribe false
-                if (slot == null) {
-                    if (hasShiftDown()) {
-                        player.equip(skill)
-                    } else {
-                        if (selectedSlot != null && selectedSlot!!.slot != null) {
-                            player.equip(Skill.EMPTY, selectedSlot!!.slot!!)
-                            selectedSlot = null
-                        } else {
-                            selectedSlot = if (selectedSlot == null && !skill.invalid) this else null
-                        }
-                    }
-                } else if (selectedSlot != null && selectedSlot != this) {
-                    if (!slot.canEquip(selectedSlot!!.skill)) return@subscribe false
-                    player.equip(selectedSlot!!.skill, slot)
-                    if (selectedSlot!!.slot != null && !selectedSlot!!.skill.invalid) player.equip(
-                        skill,
-                        selectedSlot!!.slot!!
-                    )
-                    selectedSlot = null
-                } else if (!skill.invalid) {
-                    if (hasShiftDown()) {
-                        player.equip(Skill.EMPTY, slot)
-                    } else {
-                        selectedSlot = if (selectedSlot != this) this else null
-                    }
-                }
-                true
-            }
-        }
-
-        fun updateSkill(skill: Skill) {
-            this.skill = skill
-            clearChildren()
-            skill.takeUnless { it.invalid || this == selectedSlot }?.run {
-                child(Components.texture(icon, 0, 0, 16, 16, 16, 16))
-            }
-            tooltip(skill.name)
-        }
-
-        override fun draw(context: OwoUIDrawContext, mouseX: Int, mouseY: Int, partialTicks: Float, delta: Float) {
-            if (hovered) selectingSlot = if (!skill.invalid) this else null
-            else if (selectingSlot == this) selectingSlot = null
-            if (hasShiftDown()) tooltip(skill.getItemTooltips(client!!, true)) else tooltip(skill.name)
-            super.draw(context, mouseX, mouseY, partialTicks, delta)
+            val hovered = isMouseOver(mouseX.toDouble(), mouseY.toDouble())
             if (hovered) {
                 val edge = 4
-                context.fill(
+                context.overlayHighlight(
                     x + edge,
                     y + edge,
                     x + width - edge,
                     y + height - edge,
-                    Color.WHITE.alpha(0.4).rgb
+                    true
+                )
+                selectingSlot = if (!skill.invalid) this else null
+            } else if (selectingSlot == this) {
+                selectingSlot = null
+            }
+        }
+
+        fun renderTooltip(context: DrawContext, mouseX: Int, mouseY: Int) {
+            if (hasShiftDown()) {
+                context.drawTooltip(textRenderer, skill.getItemTooltips(client!!, true), mouseX, mouseY)
+            } else {
+                context.drawTooltip(textRenderer, skill.name, mouseX, mouseY)
+            }
+        }
+
+        override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+            if (!visible || button != 0 || !isMouseOver(mouseX, mouseY)) return false
+            if (slot == null) {
+                if (hasShiftDown()) {
+                    player.equip(skill)
+                } else {
+                    if (selectedSlot != null && selectedSlot!!.slot != null) {
+                        player.equip(Skill.EMPTY, selectedSlot!!.slot!!)
+                        selectedSlot = null
+                    } else {
+                        selectedSlot = if (selectedSlot == null && !skill.invalid) this else null
+                    }
+                }
+            } else if (selectedSlot != null && selectedSlot != this) {
+                if (!slot.canEquip(selectedSlot!!.skill)) return false
+                player.equip(selectedSlot!!.skill, slot)
+                if (selectedSlot!!.slot != null && !selectedSlot!!.skill.invalid) player.equip(
+                    skill,
+                    selectedSlot!!.slot!!
+                )
+                selectedSlot = null
+            } else if (!skill.invalid) {
+                if (hasShiftDown()) {
+                    player.equip(Skill.EMPTY, slot)
+                } else {
+                    selectedSlot = if (selectedSlot != this) this else null
+                }
+            }
+            return true
+        }
+
+        override fun setFocused(focused: Boolean) = Unit
+
+        override fun isFocused(): Boolean = selectedSlot == this
+
+        override fun isMouseOver(mouseX: Double, mouseY: Double): Boolean =
+            visible && mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height
+
+        override fun getNavigationFocus(): ScreenRect = ScreenRect(x, y, width, height)
+
+        override fun appendNarrations(builder: NarrationMessageBuilder) = Unit
+
+        override fun getType(): Selectable.SelectionType =
+            if (this.isFocused) Selectable.SelectionType.FOCUSED
+            else if (visible && selectingSlot == this) Selectable.SelectionType.HOVERED
+            else Selectable.SelectionType.NONE
+    }
+
+    inner class EquippedSlot(slot: SkillSlot, x: Int, y: Int) : Slot(slot, slot.skill, x, y) {
+
+        val indexX: Int
+            get() = x - 14
+        val indexY: Int
+            get() = y + (height - 9) / 2
+        val indexSize: Int = 9
+
+        override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+            if (!visible) return
+            super.render(context, mouseX, mouseY, delta)
+            selectingSlot?.let {
+                if (hasShiftDown() && player.skillContainer.getEmptySlot(it.skill)?.index == slot?.index) {
+                    context.drawBorder(x - 1, y - 1, width + 2, height + 2, 0xFF00FF00.toInt())
+                }
+            }
+            slot?.let {
+                context.drawTexture(
+                    indexTexture,
+                    indexX,
+                    indexY,
+                    it.u.toFloat(),
+                    it.v.toFloat(),
+                    indexSize,
+                    indexSize,
+                    256,
+                    256
                 )
             }
         }
 
-        override fun shouldDrawTooltip(mouseX: Double, mouseY: Double): Boolean =
-            super.shouldDrawTooltip(mouseX, mouseY) && selectedSlot == null && !skill.invalid
+        fun isMouseOverIndex(mouseX: Int, mouseY: Int): Boolean =
+            visible && mouseX >= indexX && mouseY >= indexY && mouseX < indexX + indexSize && mouseY < indexY + indexSize
+    }
 
-        override fun equals(other: Any?): Boolean = other is Slot && other.skill == skill
-        override fun hashCode(): Int {
-            var result = slot.hashCode()
-            result = 31 * result + skill.hashCode()
-            return result
+    inner class SlotGrid(
+        val x: Int,
+        val y: Int,
+        var rows: Int,
+        var columns: Int,
+        var gap: Int,
+        var padding: Insets,
+    ) : AbstractParentElement(), Drawable, Selectable {
+
+        val slots: MutableList<Slot> = mutableListOf()
+        var hoveredSlot: Slot? = null
+        var scrollOffset: Int = 0
+            set(value) {
+                field = value.coerceIn(0, maxScrollAmount)
+            }
+        private var draggingScrollbar: Boolean = false
+        val width: Int
+            get() = columns * (SLOT_SIZE + gap) + padding.left + padding.right
+        val contentHeight: Int
+            get() = ((slots.size + columns - 1) / columns) * (SLOT_SIZE + gap) - gap + padding.top + padding.bottom
+        val viewportHeight: Int
+            get() = rows * SLOT_SIZE + (rows - 1) * gap + padding.top + padding.bottom
+        private val maxScrollAmount: Int
+            get() = (contentHeight - viewportHeight).coerceAtLeast(0)
+
+        init {
+            require(rows > 0 && columns > 0) { "rows and columns must be greater than 0" }
         }
+
+        fun addSlot(skill: Skill) {
+            slots.add(Slot(null, skill, 0, 0))
+        }
+
+        fun replaceSlots(skills: Collection<Skill>) {
+            slots.clear()
+            skills.forEach(::addSlot)
+            scrollOffset = scrollOffset
+        }
+
+        override fun children(): MutableList<out Element> = slots
+        override fun isMouseOver(mouseX: Double, mouseY: Double): Boolean =
+            mouseX.toInt() in x..x + width && mouseY.toInt() in y..y + viewportHeight
+
+        fun isMouseOverScrollbar(mouseX: Int, mouseY: Int): Boolean =
+            mouseX in x + width - 16..x + width - 10 && mouseY in y + padding.top..y + viewportHeight - padding.bottom
+
+        override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+            hoveredSlot = null
+            // 计算可见行范围
+            val startRow = (scrollOffset / (SLOT_SIZE + gap)).coerceAtLeast(0)
+            val endRow = ((scrollOffset + viewportHeight) / (SLOT_SIZE + gap) + 1)
+                .coerceAtMost((slots.size + columns - 1) / columns + 1)
+            // 渲染可见插槽
+            context.enableScissor(x, y + padding.top, x + width, y + viewportHeight - padding.bottom)
+            for (index in (startRow * columns) until minOf((endRow * columns), slots.size)) {
+                if (index >= slots.size) break
+                val slot = slots[index]
+                slot.x = x + padding.left + (index % columns) * (SLOT_SIZE + gap)
+                slot.y = y + padding.top + (index / columns) * (SLOT_SIZE + gap) - scrollOffset
+                slot.render(context, mouseX, mouseY, delta)
+                if (slot.isMouseOver(mouseX.toDouble(), mouseY.toDouble()) && !isOutOfBound(mouseX, mouseY)) {
+                    hoveredSlot = slot
+                }
+            }
+            if (selectingSlot?.isMouseOver(mouseX.toDouble(), mouseY.toDouble()) == true && isOutOfBound(
+                    mouseX, mouseY
+                )
+            ) {
+                selectingSlot = null
+            }
+            context.disableScissor()
+            // 渲染滚动条
+            context.renderScrollbar(
+                x + width - 16,
+                y + padding.top,
+                viewportHeight - padding.top - padding.bottom,
+                scrollOffset,
+                maxScrollAmount
+            )
+        }
+
+        override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean {
+            val scrollAmount = SLOT_SIZE + gap
+            scrollOffset -= (amount * scrollAmount).toInt()
+            return super.mouseScrolled(mouseX, mouseY, amount)
+        }
+
+        override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+            if (isMouseOverScrollbar(mouseX.toInt(), mouseY.toInt())) {
+                draggingScrollbar = true
+                return true
+            }
+            if (isOutOfBound(mouseX.toInt(), mouseY.toInt())) return false
+            return super.mouseClicked(mouseX, mouseY, button)
+        }
+
+        override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
+            draggingScrollbar = false
+            return super.mouseReleased(mouseX, mouseY, button)
+        }
+
+        override fun mouseDragged(
+            mouseX: Double,
+            mouseY: Double,
+            button: Int,
+            deltaX: Double,
+            deltaY: Double
+        ): Boolean {
+            if (draggingScrollbar) {
+                val scrollbarHeight = viewportHeight - padding.top - padding.bottom
+                val sliderRange = scrollbarHeight - Renderer2d.SLIDER_HEIGHT
+                if (sliderRange > 0) {
+                    // 鼠标 Y 坐标转为滑块位置
+                    val relativeY = (mouseY - y - padding.top - 1).coerceIn(0.0, sliderRange.toDouble())
+                    // 滑块位置按比例映射到 scrollAmount
+                    scrollOffset = ((relativeY / sliderRange) * maxScrollAmount).toInt()
+                }
+                return true
+            }
+            return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
+        }
+
+        override fun hoveredElement(mouseX: Double, mouseY: Double): Optional<Element> {
+            if (isOutOfBound(mouseX.toInt(), mouseY.toInt())) return Optional.empty()
+            return super.hoveredElement(mouseX, mouseY)
+        }
+
+        fun isOutOfBound(mouseX: Int, mouseY: Int) =
+            mouseX !in x + padding.left..x + width - padding.right || mouseY !in y + padding.top..y + viewportHeight - padding.bottom
+
+        override fun appendNarrations(builder: NarrationMessageBuilder) = Unit
+        override fun getType(): Selectable.SelectionType =
+            if (this.isFocused) Selectable.SelectionType.FOCUSED
+            else if (this.hoveredSlot != null) Selectable.SelectionType.HOVERED
+            else Selectable.SelectionType.NONE
     }
 
     inner class Tab(
         val type: SkillType,
-        val index: Int,
-    ) : FlowLayout(Sizing.fixed(26), Sizing.fixed(32), Algorithm.HORIZONTAL) {
+        val index: Int, x: Int, y: Int,
+        var reverse: Boolean
+    ) : ClickableWidget(x, y, 26, 32, type.displayName) {
 
         val selected
-            get() = selectedTab == this
-        val reverse
-            get() = index > SkillType.entries.size / 2 - 1
+            get() = selectedTab?.type == this.type
         val v: Int
             get() {
                 var v = 0
@@ -378,48 +471,40 @@ class SkillInventoryScreen(
                 if (selected) v += 32
                 return v
             }
+        private val displaySkill = Skill.getValidSkills().firstOrNull { type in it.types } ?: Skill.EMPTY
 
         init {
-            surface { context, component ->
-                context.drawTexture(
-                    tabTexture,
-                    component.x(),
-                    component.y(),
-                    26,
-                    v,
-                    component.width(),
-                    component.height()
-                )
-            }
-            alignment(HorizontalAlignment.CENTER, VerticalAlignment.TOP)
-            tooltip(type.displayName)
-            mouseDown().subscribe { _, _, button ->
-                if (button != 0) return@subscribe false
-                selectedTab = if (selectedTab != this) this else null
-                client!!.soundManager.play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f))
-                true
-            }
-            child(
-                Containers.verticalFlow(Sizing.content(), Sizing.fixed(32)).apply {
-                    if (!reverse) {
-                        padding(Insets.top(2))
-                    } else {
-                        padding(Insets.bottom(2))
-                    }
-                    alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
-                    child(
-                        Components.texture(
-                            Skill.getValidSkills().first { type in it.types }.icon,
-                            0,
-                            0,
-                            16,
-                            16,
-                            16,
-                            16
-                        )
-                    )
-                }
-            )
+            tooltip = Tooltip.of(type.displayName)
         }
+
+        override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+            context.drawTexture(
+                tabTexture,
+                x,
+                y,
+                if (selected) 0 else -1,
+                26f,
+                v.toFloat(),
+                width,
+                if (selected) height else height - 4,
+                256,
+                256
+            )
+            displaySkill.renderIcon(context, x + (width - 16) / 2, y + (height - 16) / 2 + if (reverse) -2 else 2)
+        }
+
+        override fun appendClickableNarrations(builder: NarrationMessageBuilder) = Unit
+
+        override fun onClick(mouseX: Double, mouseY: Double) {
+            super.onClick(mouseX, mouseY)
+            selectedTab = if (selectedTab != this) this else null
+        }
+    }
+
+    companion object {
+
+        private val tabTexture = Identifier("textures/gui/container/creative_inventory/tabs.png")
+        private val slotTexture = id("slot.png")
+        private const val SLOT_SIZE = 24
     }
 }

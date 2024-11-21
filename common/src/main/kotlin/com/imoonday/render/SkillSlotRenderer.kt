@@ -1,11 +1,11 @@
 package com.imoonday.render
 
-import com.imoonday.config.UIConfig
-import com.imoonday.util.alpha
-import com.imoonday.util.skillContainer
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.DrawContext
-import java.awt.Color
+import com.imoonday.config.*
+import com.imoonday.screen.*
+import com.imoonday.util.*
+import net.minecraft.client.*
+import net.minecraft.client.gui.*
+import java.awt.*
 
 object SkillSlotRenderer {
 
@@ -13,10 +13,14 @@ object SkillSlotRenderer {
         val player = client.player ?: return
         if (player.isSpectator) return
         val layout = getValidLayout(player.skillContainer.slotSize)
+        if (layout.isEmpty()) return
         renderBackground(context, layout)
         player.skillContainer.getAllSlots().forEach {
             val (x, y) = calculateXY(context, layout, it.index) ?: return@forEach
             it.skill.render(context, x, y, player)
+            if (it.index == SkillWheelScreen.quickCastSlot) {
+                context.drawBorder(x - 1, y - 1, 18, 18, 0xFF00FF00.toInt())
+            }
         }
     }
 

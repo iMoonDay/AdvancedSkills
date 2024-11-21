@@ -1,7 +1,7 @@
 package com.imoonday.trigger
 
-import net.minecraft.client.gui.hud.InGameHud.HeartType
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.client.gui.hud.InGameHud.*
+import net.minecraft.entity.player.*
 
 interface HeartTypeTrigger : SkillTrigger {
 

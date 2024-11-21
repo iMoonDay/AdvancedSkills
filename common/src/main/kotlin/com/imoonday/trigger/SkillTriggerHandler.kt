@@ -1,30 +1,26 @@
 package com.imoonday.trigger
 
-import com.imoonday.network.SendPlayerDataC2SPacket
-import com.imoonday.skill.Skill
+import com.imoonday.network.*
+import com.imoonday.skill.*
 import com.imoonday.trigger.SendTime.*
 import com.imoonday.util.*
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.minecraft.block.BlockState
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.hud.InGameHud.HeartType
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityDimensions
-import net.minecraft.entity.EntityPose
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.fluid.Fluid
-import net.minecraft.fluid.FluidState
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.tag.TagKey
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.block.*
+import net.minecraft.client.*
+import net.minecraft.client.gui.hud.InGameHud.*
+import net.minecraft.client.network.*
+import net.minecraft.client.render.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.effect.*
+import net.minecraft.entity.player.*
+import net.minecraft.fluid.*
+import net.minecraft.item.*
+import net.minecraft.nbt.*
+import net.minecraft.registry.tag.*
+import net.minecraft.server.network.*
+import net.minecraft.util.math.*
+import net.minecraft.world.*
 
 object SkillTriggerHandler {
 
@@ -65,12 +61,13 @@ object SkillTriggerHandler {
             .filterNot { player.isUsing(it.getAsSkill()) }
             .forEach { onStart(player, it.getAsSkill()) }
         getTriggers<AutoTrigger>().forEach { it.tick(this) }
+        player.getTriggers<TickTrigger>()
+            .forEach { it.serverTick(player, player.getUsedTime(it.getAsSkill())) }
     }
 
-    fun tick(player: PlayerEntity) {
-        if (player is ServerPlayerEntity) player.getTriggers<TickTrigger>()
-            .forEach { it.serverTick(player, player.getUsedTime(it.getAsSkill())) }
-        else if (player is ClientPlayerEntity) player.getTriggers<TickTrigger>()
+    fun playerTick(player: PlayerEntity) {
+        if (player is ServerPlayerEntity) serverTick(player)
+        else player.getTriggers<TickTrigger>()
             .forEach { it.clientTick(player, player.getUsedTime(it.getAsSkill())) }
     }
 
@@ -169,7 +166,12 @@ object SkillTriggerHandler {
                     EQUIPPED -> player.hasEquipped(skill)
                     else -> false
                 }.run {
-                    if (this) ClientPlayNetworking.send(SendPlayerDataC2SPacket(skill, it.write(player, NbtCompound())))
+                    if (this) Channels.SEND_PLAYER_DATA_C2S.sendToServer(
+                        SendPlayerDataC2SPacket(
+                            skill,
+                            it.write(player, NbtCompound())
+                        )
+                    )
                 }
             }
 
@@ -185,10 +187,10 @@ object SkillTriggerHandler {
             .map { it.cannotHaveStatusEffect(player, effect) }
             .any { it }
 
-    fun isGlowing(player: ClientPlayerEntity, entity: Entity): Boolean =
-        player.getTriggers<GlowingTrigger>()
-            .map { it.isGlowing(player, entity) }
-            .any { it }
+    fun isGlowing(entity: Entity): Boolean =
+        clientPlayer?.getTriggers<GlowingTrigger>()
+            ?.map { it.isGlowing(entity) }
+            ?.any { it } ?: false
 
     fun worldRender(matrixStack: MatrixStack, tickDelta: Float, client: MinecraftClient) {
         client.player?.getTriggers<WorldRenderTrigger>()
@@ -206,7 +208,6 @@ object SkillTriggerHandler {
             .any { it }
 
     fun getEyeHeight(player: PlayerEntity, original: Float, pose: EntityPose, dimensions: EntityDimensions): Float {
-        if (!player.skillInitialized) return original
         var height = original
         player.getTriggers<EyeHeightTrigger>()
             .forEach { height = it.getEyeHeight(player, height, pose, dimensions) }
@@ -238,12 +239,37 @@ object SkillTriggerHandler {
         return movement
     }
 
-    fun postDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
+    fun postDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) =
         player.getTriggers<PostDamagedTrigger>()
             .forEach { it.postDamaged(amount, source, player, attacker) }
-    }
 
     fun postSweepAttack(player: PlayerEntity, target: LivingEntity) =
         player.getTriggers<AttackTrigger>()
             .forEach { it.postSweepAttack(player, target) }
+
+    fun hasNightVision(player: PlayerEntity): Boolean =
+        player.getTriggers<NightVisionTrigger>()
+            .map { it.hasNightVision(player) }
+            .any { it }
+
+    fun isTaunter(player: PlayerEntity): Boolean =
+        player.getTriggers<TauntTrigger>()
+            .map { it.isTaunting(player) }
+            .any { it }
+
+    fun renderAfterEntity(
+        client: MinecraftClient,
+        camera: Camera,
+        entity: Entity,
+        yaw: Float,
+        tickDelta: Float,
+        matrices: MatrixStack,
+        vertexConsumers: VertexConsumerProvider,
+        light: Int
+    ) {
+        val player = client.player ?: return
+        player.getTriggers<EntityRenderTrigger>()
+            .filter { it.shouldRender(player, entity) }
+            .forEach { it.render(camera, entity, yaw, tickDelta, matrices, vertexConsumers, light) }
+    }
 }

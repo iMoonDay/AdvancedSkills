@@ -1,19 +1,15 @@
 package com.imoonday.trigger
 
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.TexturedRenderLayers
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.render.model.BakedModel
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.util.math.Direction
-import net.minecraft.util.math.RotationAxis
-import kotlin.math.cos
-import kotlin.math.sin
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.render.entity.feature.*
+import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.render.model.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.player.*
+import net.minecraft.item.*
+import net.minecraft.util.math.*
+import kotlin.math.*
 
 interface FeatureRendererTrigger : SkillTrigger {
 

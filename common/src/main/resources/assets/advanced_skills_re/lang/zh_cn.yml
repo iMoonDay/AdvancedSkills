@@ -329,6 +329,18 @@ advancedSkills:
     magnetic_trap:
       name: 磁力陷阱
       description: 生成一个减速陷阱
+    multiple_laser:
+      name: 多重激光
+      description: 连续发射激光，对路径上的所有生物造成少量伤害
+    super_shadow_clone:
+      name: 超级影分身
+      description: 向不同方向召唤数个分身并隐身 5 秒
+    arrow_rain:
+      name: 箭雨
+      description: 在目标上方随机召唤数根箭
+    weed_cleaner:
+      name: 杂草清理者
+      description: 扫除周围杂草
   skillType:
     attack: 攻击
     defense: 防御
@@ -363,6 +375,7 @@ advancedSkills:
     list:
       level: '等级：%s'
       exp: '经验：%d'
+      empty: 暂未学习技能
       button:
         tooltip: 仅在创造模式下显示
         learnAll: 学习全部
@@ -377,7 +390,7 @@ advancedSkills:
       title: '技能背包 %d/%d'
     wheel:
       cancel: 取消
-      tip: 左键/松开使用，右键取消，中键查看详情
+      tip: 松开选中，左键使用，右键取消，中键查看详情
     learn:
       refresh: 重抽
       learn: 学习
@@ -411,6 +424,7 @@ entity:
     tornado: 龙卷风
     clone_player: 玩家
     magnet: 磁石
+    ungrounded_arrow: 不可接地的箭
 block:
   advanced_skills_re:
     invisible_trap: 隐形陷阱
@@ -426,7 +440,7 @@ subtitles:
     fire: 发射
     laser: 激光
 gamerule:
-  skillCooldownMultiplier: 技能冷却乘数
+  skillCooldownMultiplier: 技能冷却倍率(0-100)
   skillCooldownMultiplier.description: 所有技能冷却时间按此倍率调整
 modmenu:
   nameTranslation:

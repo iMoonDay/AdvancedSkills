@@ -22,11 +22,12 @@
  */
 package com.imoonday.advanced_skills_re.mixin;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
+import com.imoonday.advanced_skills_re.api.PlayerDataContainer;
+import com.imoonday.advanced_skills_re.api.Propertied;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -36,19 +37,19 @@ public abstract class ClientWorldMixin {
 
     @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.AFTER))
     private void tick(Entity entity, CallbackInfo ci) {
-        ((ComponentProvider) entity).getComponentContainer()
-                .keys().stream()
-                .filter(key -> key.get(entity) instanceof ClientTickingComponent)
-                .map(key -> (ClientTickingComponent) key.get(entity))
-                .forEach(ClientTickingComponent::clientTick);
+        clientTick(entity);
     }
 
     @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickRiding()V", shift = At.Shift.AFTER))
     private void tickRiding(Entity vehicle, Entity passenger, CallbackInfo ci) {
-        ((ComponentProvider) passenger).getComponentContainer()
-                .keys().stream()
-                .filter(key -> key.get(passenger) instanceof ClientTickingComponent)
-                .map(key -> (ClientTickingComponent) key.get(passenger))
-                .forEach(ClientTickingComponent::clientTick);
+        clientTick(passenger);
+    }
+
+    @Unique
+    private static void clientTick(Entity entity) {
+        ((Propertied) entity).getPropertyComponent().clientTick();
+        if (entity instanceof PlayerDataContainer container) {
+            container.getDataComponent().clientTick();
+        }
     }
 }

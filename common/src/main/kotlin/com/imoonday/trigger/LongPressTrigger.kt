@@ -1,10 +1,9 @@
 package com.imoonday.trigger
 
-import com.imoonday.network.UseSkillC2SRequest
-import com.imoonday.util.UseResult
-import com.imoonday.util.translate
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
+import com.imoonday.network.*
+import com.imoonday.util.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
 
 interface LongPressTrigger : TickTrigger, AutoStopTrigger {
 

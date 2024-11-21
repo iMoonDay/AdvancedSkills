@@ -1,7 +1,7 @@
 package com.imoonday.trigger
 
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.fluid.FluidState
+import net.minecraft.entity.player.*
+import net.minecraft.fluid.*
 
 interface WalkOnFluidTrigger : SkillTrigger {
 

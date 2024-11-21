@@ -1,23 +1,31 @@
 package com.imoonday.advanced_skills_re.mixin;
 
+import com.imoonday.advanced_skills_re.api.PlayerDataContainer;
+import com.imoonday.component.PlayerDataComponent;
 import com.imoonday.entity.Servant;
 import com.imoonday.trigger.SkillTriggerHandler;
 import com.imoonday.util.PlayerUtilsKt;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
-public abstract class PlayerEntityMixin {
+public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDataContainer {
+
+    protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
+        super(entityType, world);
+        throw new AssertionError("Mixin constructor called!");
+    }
 
     @Shadow
     protected abstract boolean clipAtLedge();
@@ -25,8 +33,19 @@ public abstract class PlayerEntityMixin {
     @Shadow
     protected abstract boolean method_30263();
 
+    @Unique
+    private PlayerDataComponent dataComponent;
+
+    @Override
+    public PlayerDataComponent getDataComponent() {
+        if (dataComponent == null) {
+            dataComponent = new PlayerDataComponent((PlayerEntity) (Object) this);
+        }
+        return dataComponent;
+    }
+
     @Inject(method = "addExperience", at = @At("TAIL"))
-    public void advanced_skills$addExperience(int experience, CallbackInfo ci) {
+    public void advanced_skills_re$addExperience(int experience, CallbackInfo ci) {
         if (experience > 0) {
             PlayerEntity player = (PlayerEntity) (Object) this;
             PlayerUtilsKt.setSkillExp(player, PlayerUtilsKt.getSkillExp(player) + experience);
@@ -34,27 +53,24 @@ public abstract class PlayerEntityMixin {
     }
 
     @Inject(method = "isInvulnerableTo", at = @At("HEAD"), cancellable = true)
-    public void advanced_skills$isInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
+    public void advanced_skills_re$isInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         Servant.Companion.invulnerableToServant(damageSource, cir, player);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void advanced_skills$tick(CallbackInfo ci) {
+    private void advanced_skills_re$tick(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
-        if (player instanceof ServerPlayerEntity serverPlayer) {
-            SkillTriggerHandler.INSTANCE.serverTick(serverPlayer);
-        }
-        SkillTriggerHandler.INSTANCE.tick(player);
+        SkillTriggerHandler.INSTANCE.playerTick(player);
     }
 
-    @ModifyReturnValue(method = "getActiveEyeHeight", at = @At("RETURN"))
-    private float advanced_skills$getActiveEyeHeight(float original, EntityPose pose, EntityDimensions dimensions) {
-        return SkillTriggerHandler.INSTANCE.getEyeHeight((PlayerEntity) (Object) this, original, pose, dimensions);
+    @Inject(method = "getActiveEyeHeight", at = @At("RETURN"), cancellable = true)
+    private void advanced_skills_re$getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions, CallbackInfoReturnable<Float> cir) {
+        cir.setReturnValue(SkillTriggerHandler.INSTANCE.getEyeHeight((PlayerEntity) (Object) this, cir.getReturnValue(), pose, dimensions));
     }
 
     @Inject(method = "adjustMovementForSneaking", at = @At("HEAD"), cancellable = true)
-    private void advanced_skills$adjustMovementForSneaking(Vec3d movement, MovementType type, CallbackInfoReturnable<Vec3d> cir) {
+    private void advanced_skills_re$adjustMovementForSneaking(Vec3d movement, MovementType type, CallbackInfoReturnable<Vec3d> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (SkillTriggerHandler.INSTANCE.shouldInvertSneak(player)) {
             if (!player.getAbilities().flying && movement.y >= 0.0 && (type == MovementType.SELF || type == MovementType.PLAYER) && this.clipAtLedge() && this.method_30263()) {
@@ -101,9 +117,22 @@ public abstract class PlayerEntityMixin {
     }
 
     @Inject(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;spawnSweepAttackParticles()V", shift = At.Shift.AFTER))
-    private void advanced_skills$attack(Entity target, CallbackInfo ci) {
+    private void advanced_skills_re$attack(Entity target, CallbackInfo ci) {
         if (target instanceof LivingEntity entity) {
             SkillTriggerHandler.INSTANCE.postSweepAttack((PlayerEntity) (Object) this, entity);
+        }
+    }
+
+    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
+    private void advanced_skills_re$writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
+        nbt.put("playerDataComponent", getDataComponent().toNbt());
+    }
+
+    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
+    private void advanced_skills_re$readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
+        PlayerDataComponent component = getDataComponent();
+        if (nbt.contains("playerDataComponent")) {
+            component.readFromNbt(nbt.getCompound("playerDataComponent"));
         }
     }
 }

@@ -1,18 +1,16 @@
 package com.imoonday.trigger
 
-import com.imoonday.util.id
-import com.mojang.blaze3d.systems.RenderSystem
-import me.x150.renderer.render.Renderer2d
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.entity.feature.FeatureRendererContext
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.util.ModelIdentifier
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.math.RotationAxis
+import com.imoonday.util.*
+import com.mojang.blaze3d.systems.*
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.render.entity.feature.*
+import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.util.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
+import net.minecraft.entity.player.*
+import net.minecraft.util.math.*
 
 interface TargetRenderTrigger : SkillTrigger {
 

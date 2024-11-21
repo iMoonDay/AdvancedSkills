@@ -1,7 +1,7 @@
 package com.imoonday.trigger
 
-import com.imoonday.util.SkillSlot
-import net.minecraft.server.network.ServerPlayerEntity
+import com.imoonday.util.*
+import net.minecraft.server.network.*
 
 interface UnequipTrigger : SkillTrigger {
 

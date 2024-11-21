@@ -16,12 +16,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ItemStackMixin {
 
     @Inject(method = "postMine", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
-    private void advanced_skills$postMine(World world, BlockState state, BlockPos pos, PlayerEntity miner, CallbackInfo ci) {
+    private void advanced_skills_re$postMine(World world, BlockState state, BlockPos pos, PlayerEntity miner, CallbackInfo ci) {
         SkillTriggerHandler.INSTANCE.postMine(world, state, pos, miner, (ItemStack) (Object) this);
     }
 
     @Inject(method = "postHit", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
-    private void advanced_skills$postHit(LivingEntity target, PlayerEntity attacker, CallbackInfo ci) {
+    private void advanced_skills_re$postHit(LivingEntity target, PlayerEntity attacker, CallbackInfo ci) {
         SkillTriggerHandler.INSTANCE.postHit(target, attacker, (ItemStack) (Object) this);
     }
 }

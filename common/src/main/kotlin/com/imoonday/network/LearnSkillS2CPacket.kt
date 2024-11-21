@@ -7,7 +7,6 @@ import com.imoonday.util.*
 import dev.architectury.networking.*
 import net.minecraft.client.sound.*
 import net.minecraft.network.*
-import net.minecraft.util.*
 
 class LearnSkillS2CPacket(
     val skill: Skill,
@@ -30,9 +29,9 @@ class LearnSkillS2CPacket(
                 learningHistory.add(skill)
                 it.toastManager.add(SkillToast(skill))
             }
-            if (Util.getMeasuringTimeMs() - lastPlaySoundTime > 500) {
-                it.soundManager.play(PositionedSoundInstance.master(ModSounds.NOTICE, 1.0f, 1.0f))
-                lastPlaySoundTime = Util.getMeasuringTimeMs()
+            if (System.currentTimeMillis() - lastPlaySoundTime > 500) {
+                it.soundManager.play(PositionedSoundInstance.master(ModSounds.NOTICE.get(), 1.0f, 1.0f))
+                lastPlaySoundTime = System.currentTimeMillis()
             }
         }
     }

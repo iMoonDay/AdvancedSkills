@@ -1,30 +1,19 @@
 package com.imoonday.entity
 
-import com.imoonday.util.isUsing
-import com.imoonday.init.ModEntities
-import com.imoonday.skill.Skills
-import com.imoonday.util.translateSkill
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.ai.goal.ActiveTargetGoal
-import net.minecraft.entity.ai.goal.LookAroundGoal
-import net.minecraft.entity.ai.goal.LookAtEntityGoal
-import net.minecraft.entity.ai.goal.WanderAroundFarGoal
-import net.minecraft.entity.ai.pathing.PathNodeType
-import net.minecraft.entity.attribute.DefaultAttributeContainer
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.damage.DamageTypes
-import net.minecraft.entity.mob.HostileEntity
-import net.minecraft.entity.mob.WitherSkeletonEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.server.ServerConfigHandler
-import net.minecraft.world.World
+import com.imoonday.init.*
+import com.imoonday.trigger.*
+import com.imoonday.util.*
+import net.minecraft.entity.*
+import net.minecraft.entity.ai.goal.*
+import net.minecraft.entity.ai.pathing.*
+import net.minecraft.entity.attribute.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.mob.*
+import net.minecraft.entity.player.*
+import net.minecraft.item.*
+import net.minecraft.nbt.*
+import net.minecraft.server.*
+import net.minecraft.world.*
 import java.util.*
 
 class ServantWitherSkeletonEntity(
@@ -55,7 +44,7 @@ class ServantWitherSkeletonEntity(
                 this,
                 PlayerEntity::class.java,
                 true
-            ) { it.uuid != ownerUuid && (it as PlayerEntity).isUsing(Skills.TAUNT) })
+            ) { it.uuid != ownerUuid && (it as? PlayerEntity)?.run { SkillTriggerHandler.isTaunter(this) } == true })
         targetSelector.add(
             1,
             ActiveTargetGoal(this, LivingEntity::class.java, true) { it is Servant && it.ownerUuid != this.ownerUuid })

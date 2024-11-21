@@ -1,13 +1,13 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AutoStopTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.blockPosSet
 import com.imoonday.util.spawnParticles
-import net.minecraft.block.Blocks
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.block.*
+import net.minecraft.particle.*
+import net.minecraft.server.network.*
 
 class AbsoluteDomainSkill : Skill(
     id = "absolute_domain",

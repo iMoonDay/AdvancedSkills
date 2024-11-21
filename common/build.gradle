@@ -9,3 +9,7 @@ dependencies {
 
     modImplementation("net.fabricmc:fabric-language-kotlin:${rootProject.fabric_kotlin_version}")
 }
+
+loom {
+    accessWidenerPath = file("src/main/resources/advanced_skills_re.accesswidener")
+}

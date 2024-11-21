@@ -17,40 +17,43 @@ import java.util.function.*
 object ModBlocks {
 
     @JvmField
-    val BLOCKS = DeferredRegister.create(MOD_ID, RegistryKeys.BLOCK)
+    val BLOCKS: DeferredRegister<Block> = DeferredRegister.create(MOD_ID, RegistryKeys.BLOCK)
 
     @JvmField
-    val BLOCK_ENTITIES = DeferredRegister.create(MOD_ID, RegistryKeys.BLOCK_ENTITY_TYPE)
+    val BLOCK_ENTITIES: DeferredRegister<BlockEntityType<*>> =
+        DeferredRegister.create(MOD_ID, RegistryKeys.BLOCK_ENTITY_TYPE)
 
     @JvmField
-    val INVISIBLE_TRAP = InvisibleTrapBlock(
-        AbstractBlock.Settings.create()
-            .dropsNothing()
-            .noCollision()
-            .breakInstantly()
-            .replaceable()
-            .sounds(BlockSoundGroup.GLASS)
-            .noBlockBreakParticles()
-    ).register("invisible_trap")
+    val INVISIBLE_TRAP: RegistrySupplier<InvisibleTrapBlock> = BLOCKS.register("invisible_trap") {
+        InvisibleTrapBlock(
+            AbstractBlock.Settings.create()
+                .dropsNothing()
+                .noCollision()
+                .breakInstantly()
+                .replaceable()
+                .sounds(BlockSoundGroup.GLASS)
+                .noBlockBreakParticles()
+        )
+    }
 
     @JvmField
     val INVISIBLE_TRAP_ENTITY = registerEntity("invisible_trap", ::InvisibleTrapBlockEntity, INVISIBLE_TRAP)
 
     @JvmField
-    val FROST_TRAP = FrostTrapBlock(
-        AbstractBlock.Settings.create()
-            .sounds(BlockSoundGroup.SNOW)
-            .replaceable()
-            .breakInstantly()
-            .noCollision()
-    ).register("frost_trap")
+    val FROST_TRAP: RegistrySupplier<FrostTrapBlock> = BLOCKS.register("frost_trap") {
+        FrostTrapBlock(
+            AbstractBlock.Settings.create()
+                .sounds(BlockSoundGroup.SNOW)
+                .replaceable()
+                .breakInstantly()
+                .noCollision()
+        )
+    }
 
     @JvmField
     val FROST_TRAP_ENTITY = registerEntity("frost_trap", ::InvisibleTrapBlockEntity, FROST_TRAP)
 
-    fun <T : Block> T.register(id: String): RegistrySupplier<T> = BLOCKS.register(id) { this }
-
-    fun <T : BlockEntity> registerEntity(
+    private fun <T : BlockEntity> registerEntity(
         id: String,
         factory: BlockEntityFactory<T>,
         vararg blocks: Supplier<out Block>,

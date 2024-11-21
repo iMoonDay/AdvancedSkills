@@ -7,6 +7,6 @@ public final class AdvancedSkillsFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        AdvancedSkills.INSTANCE.init();
+        AdvancedSkills.init();
     }
 }

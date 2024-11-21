@@ -1,9 +1,9 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.AutoStopTrigger
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.network.*
 
 class TemporaryShieldSkill : Skill(
     id = "temporary_shield",

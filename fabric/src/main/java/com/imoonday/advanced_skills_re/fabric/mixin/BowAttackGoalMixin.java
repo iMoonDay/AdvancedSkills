@@ -1,7 +1,6 @@
-package com.imoonday.advanced_skills_re.mixin;
+package com.imoonday.advanced_skills_re.fabric.mixin;
 
 import com.imoonday.init.ModEffectsKt;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.ai.goal.BowAttackGoal;
 import net.minecraft.entity.mob.HostileEntity;
 import org.spongepowered.asm.mixin.Final;
@@ -10,6 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BowAttackGoal.class)
 public abstract class BowAttackGoalMixin<T extends HostileEntity> {
@@ -21,18 +21,22 @@ public abstract class BowAttackGoalMixin<T extends HostileEntity> {
     @Shadow
     public abstract void stop();
 
-    @ModifyReturnValue(method = "canStart", at = @At("RETURN"))
-    public boolean advanced_skills$canStart(boolean original) {
-        return !ModEffectsKt.isDisarmed(this.actor) && original;
+    @Inject(method = "canStart", at = @At("RETURN"), cancellable = true)
+    public void advanced_skills_re$canStart(CallbackInfoReturnable<Boolean> cir) {
+        if (ModEffectsKt.isDisarmed(this.actor)) {
+            cir.setReturnValue(false);
+        }
     }
 
-    @ModifyReturnValue(method = "shouldContinue", at = @At("RETURN"))
-    public boolean advanced_skills$shouldContinue(boolean original) {
-        return !ModEffectsKt.isDisarmed(this.actor) && original;
+    @Inject(method = "shouldContinue", at = @At("RETURN"), cancellable = true)
+    public void advanced_skills_re$shouldContinue(CallbackInfoReturnable<Boolean> cir) {
+        if (ModEffectsKt.isDisarmed(this.actor)) {
+            cir.setReturnValue(false);
+        }
     }
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-    public void advanced_skills$tick(CallbackInfo ci) {
+    public void advanced_skills_re$tick(CallbackInfo ci) {
         if (ModEffectsKt.isDisarmed(this.actor)) {
             this.stop();
             ci.cancel();

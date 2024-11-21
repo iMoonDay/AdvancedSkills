@@ -1,18 +1,17 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.LongPressTrigger
-import com.imoonday.util.SkillSlot
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvent
+import com.imoonday.trigger.*
+import com.imoonday.util.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import java.util.function.*
 
 abstract class LongPressSkill(
     id: String,
     types: List<SkillType>,
     cooldown: Int,
     rarity: Rarity,
-    sound: SoundEvent? = null,
+    sound: Supplier<SoundEvent>? = null,
 ) : Skill(id, types, cooldown, rarity, sound), LongPressTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = onRelease(user, 1)

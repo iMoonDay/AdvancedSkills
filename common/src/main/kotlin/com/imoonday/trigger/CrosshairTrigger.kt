@@ -1,8 +1,7 @@
 package com.imoonday.trigger
 
-import com.imoonday.util.Crosshair
-import com.imoonday.util.Crosshairs
-import net.minecraft.client.gui.DrawContext
+import com.imoonday.util.*
+import net.minecraft.client.gui.*
 
 interface CrosshairTrigger : SkillTrigger {
 

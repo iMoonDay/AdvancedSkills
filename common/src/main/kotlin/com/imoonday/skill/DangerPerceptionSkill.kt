@@ -1,31 +1,23 @@
 package com.imoonday.skill
 
-import com.imoonday.entity.Servant
-import com.imoonday.init.ModSounds
-import com.imoonday.trigger.AttributeTrigger
-import com.imoonday.trigger.AutoStopTrigger
-import com.imoonday.trigger.DamageTrigger
+import com.imoonday.entity.*
+import com.imoonday.init.*
+import com.imoonday.trigger.*
 import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.equippedSkills
 import com.imoonday.util.playSound
 import com.imoonday.util.resetUsedTime
-import net.minecraft.entity.Entity
-import net.minecraft.entity.FallingBlockEntity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.TntEntity
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.mob.HostileEntity
-import net.minecraft.entity.mob.Monster
-import net.minecraft.entity.passive.PufferfishEntity
-import net.minecraft.entity.projectile.ProjectileEntity
-import net.minecraft.entity.projectile.thrown.PotionEntity
-import net.minecraft.potion.PotionUtil
-import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.entity.*
+import net.minecraft.entity.attribute.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.mob.*
+import net.minecraft.entity.passive.*
+import net.minecraft.entity.projectile.*
+import net.minecraft.entity.projectile.thrown.*
+import net.minecraft.potion.*
+import net.minecraft.server.network.*
 
 class DangerPerceptionSkill : Skill(
     id = "danger_perception",
@@ -90,7 +82,7 @@ class DangerPerceptionSkill : Skill(
     }
 
     private fun start(player: ServerPlayerEntity) {
-        player.playSound(ModSounds.DASH)
+        player.playSound(ModSounds.DASH.get())
         player.startUsing()
         player.startCooling()
         player.addAttributes()
@@ -129,7 +121,7 @@ class DangerPerceptionSkill : Skill(
                         it is TntEntity -> true
                         it is PufferfishEntity && it.puffState > 0 -> true
                         it is FallingBlockEntity && it.blockX == player.blockX && it.blockY >= player.blockY && it.blockZ == player.blockZ -> true
-                        it is ServerPlayerEntity && it.equippedSkills.any { skill -> skill.isDangerousTo(it) } -> true
+                        it is ServerPlayerEntity && it.equippedSkills.any { skill -> skill.isDangerous(it) } -> true
                         else -> false
                     }
                 }

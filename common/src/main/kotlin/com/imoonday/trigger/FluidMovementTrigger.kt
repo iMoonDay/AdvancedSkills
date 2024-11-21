@@ -1,8 +1,8 @@
 package com.imoonday.trigger
 
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.fluid.Fluid
-import net.minecraft.registry.tag.TagKey
+import net.minecraft.entity.player.*
+import net.minecraft.fluid.*
+import net.minecraft.registry.tag.*
 
 interface FluidMovementTrigger : SkillTrigger {
 

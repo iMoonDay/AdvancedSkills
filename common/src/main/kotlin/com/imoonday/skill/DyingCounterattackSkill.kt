@@ -5,13 +5,13 @@ import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.playSound
-import net.minecraft.client.gui.hud.InGameHud.HeartType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.registry.tag.DamageTypeTags
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
+import net.minecraft.client.gui.hud.InGameHud.*
+import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
+import net.minecraft.registry.tag.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
 
 class DyingCounterattackSkill : Skill(
     id = "dying_counterattack",

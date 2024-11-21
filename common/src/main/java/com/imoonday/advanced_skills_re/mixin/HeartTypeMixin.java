@@ -1,18 +1,21 @@
 package com.imoonday.advanced_skills_re.mixin;
 
 import com.imoonday.trigger.SkillTriggerHandler;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(InGameHud.HeartType.class)
 public class HeartTypeMixin {
 
-    @ModifyReturnValue(method = "fromPlayerState", at = @At("RETURN"))
-    private static InGameHud.HeartType advanced_skills$fromPlayerState(InGameHud.HeartType original, PlayerEntity player) {
+    @Inject(method = "fromPlayerState", at = @At("RETURN"), cancellable = true)
+    private static void advanced_skills_re$fromPlayerState(PlayerEntity player, CallbackInfoReturnable<InGameHud.HeartType> cir) {
         InGameHud.HeartType type = SkillTriggerHandler.INSTANCE.getHeartType(player);
-        return type != null ? type : original;
+        if (type != null) {
+            cir.setReturnValue(type);
+        }
     }
 }

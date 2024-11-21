@@ -1,18 +1,18 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModSounds
-import com.imoonday.trigger.SynchronousCoolingTrigger
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvent
+import com.imoonday.init.*
+import com.imoonday.trigger.*
+import com.imoonday.util.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import java.util.function.*
 
 abstract class HealingSkill(
     id: String,
     types: List<SkillType>,
     cooldown: Int,
     rarity: Rarity,
-    sound: SoundEvent? = ModSounds.HEAL,
+    sound: Supplier<SoundEvent>? = ModSounds.HEAL,
     val amount: Float,
 ) : Skill(id, types, cooldown, rarity, sound), SynchronousCoolingTrigger {
 

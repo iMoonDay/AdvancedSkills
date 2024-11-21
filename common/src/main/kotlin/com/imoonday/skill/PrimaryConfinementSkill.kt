@@ -1,25 +1,23 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModEffects
-import com.imoonday.trigger.CrosshairTrigger
-import com.imoonday.trigger.TargetRenderTrigger
-import com.imoonday.trigger.UsingRenderTrigger
+import com.imoonday.init.*
+import com.imoonday.trigger.*
 import com.imoonday.util.*
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Hand
-import net.minecraft.util.hit.HitResult
-import kotlin.random.Random
+import net.minecraft.entity.*
+import net.minecraft.entity.effect.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
+import net.minecraft.sound.*
+import net.minecraft.util.*
+import net.minecraft.util.hit.*
+import kotlin.random.*
 
 class PrimaryConfinementSkill : LongPressSkill(
     id = "primary_confinement",
     types = listOf(SkillType.CONTROL),
     cooldown = 12,
     rarity = Rarity.SUPERB,
-    sound = SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE
+    sound = SoundEvents::BLOCK_ENCHANTMENT_TABLE_USE
 ), UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
 
     override fun getMaxPressTime(): Int = 5 * 20
@@ -32,7 +30,7 @@ class PrimaryConfinementSkill : LongPressSkill(
             if (Random.nextFloat() < 0.8f * pressedTime / getMaxPressTime()) {
                 (it.entity as LivingEntity).addStatusEffect(
                     StatusEffectInstance(
-                        ModEffects.CONFINEMENT,
+                        ModEffects.CONFINEMENT.get(),
                         20 * 3,
                         0,
                         false,

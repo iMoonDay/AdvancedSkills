@@ -5,7 +5,11 @@ plugins {
 loom {
     forge {
         mixinConfig "advanced_skills_re.mixins.json"
+        mixinConfig "advanced_skills_re_forge.mixins.json"
+        convertAccessWideners = true
+//        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
     }
+    accessWidenerPath = project(":common").loom.accessWidenerPath
 }
 
 architectury {

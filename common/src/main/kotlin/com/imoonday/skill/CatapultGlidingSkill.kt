@@ -1,14 +1,14 @@
 package com.imoonday.skill
 
-import com.imoonday.init.ModSounds
+import com.imoonday.init.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.send
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.item.ElytraItem
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket
-import net.minecraft.server.network.ServerPlayerEntity
-import net.minecraft.util.math.Direction
+import net.minecraft.entity.*
+import net.minecraft.item.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.server.network.*
+import net.minecraft.util.math.*
 
 class CatapultGlidingSkill : LongPressSkill(
     id = "catapult_gliding",
