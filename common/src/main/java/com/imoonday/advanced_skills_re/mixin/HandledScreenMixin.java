@@ -1,7 +1,7 @@
 package com.imoonday.advanced_skills_re.mixin;
 
-import com.imoonday.init.ModKeyBindings;
-import com.imoonday.screen.SkillInventoryScreen;
+import com.imoonday.client.ModKeyBindings;
+import com.imoonday.client.screen.SkillInventoryScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;

@@ -1,5 +1,6 @@
 package com.imoonday.advanced_skills_re.mixin;
 
+import com.imoonday.client.ClientTriggerHandler;
 import com.imoonday.trigger.SkillTriggerHandler;
 import net.minecraft.client.render.Camera;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,6 +15,6 @@ public class CameraMixin {
 
     @ModifyConstant(method = "updateEyeHeight", constant = @Constant(floatValue = 0.5f))
     private float advanced_skills_re$updateEyeHeight(float constant) {
-        return SkillTriggerHandler.INSTANCE.getCameraMovement(constant);
+        return ClientTriggerHandler.INSTANCE.getCameraMovement(constant);
     }
 }

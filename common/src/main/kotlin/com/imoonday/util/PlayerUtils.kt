@@ -1,15 +1,14 @@
 package com.imoonday.util
 
 import com.imoonday.advanced_skills_re.api.*
-import com.imoonday.advanced_skills_re.mixin.*
 import com.imoonday.component.*
 import com.imoonday.network.*
+import com.imoonday.network.c2s.*
+import com.imoonday.network.s2c.*
 import com.imoonday.skill.*
 import com.imoonday.trigger.*
 import com.imoonday.util.PlayerUtils.getNextLevelExp
 import com.imoonday.util.PlayerUtils.shouldLearnSkill
-import jdk.internal.org.jline.utils.Colors.*
-import net.minecraft.client.network.*
 import net.minecraft.entity.player.*
 import net.minecraft.entity.projectile.*
 import net.minecraft.item.*
@@ -85,7 +84,7 @@ fun PlayerEntity.isCooling(skill: Skill): Boolean = getCooldown(skill) > 0
 fun PlayerEntity.startCooling(skill: Skill, cooldown: Int? = null) {
     if (isCooling(skill)) return
     modifySkillData(skill) {
-        var time = cooldown ?: skill.getCooldown(world)
+        var time = cooldown ?: skill.cooldown
         getTriggers<CooldownTrigger>().forEach { trigger -> time = trigger.getCooldown(time) }
         it.cooldown = if (isCreative) min(20, time) else time
         true
@@ -303,23 +302,6 @@ fun PlayerEntity.getSkill(slot: Int) = skillContainer.getSlot(slot)?.skill ?: Sk
 
 fun PlayerEntity.getSkill(slot: SkillSlot) = skillContainer.getSlot(slot.index)?.skill ?: Skill.EMPTY
 
-fun ClientPlayerEntity.requestUse(
-    index: Int,
-    keyState: UseSkillC2SRequest.KeyState,
-) {
-    Channels.USE_SKILL_C2S.sendToServer(
-        UseSkillC2SRequest(
-            index,
-            keyState,
-            NbtCompound().apply {
-                (getSkill(index) as? SendPlayerDataTrigger)
-                    ?.takeIf { it.getSendTime() == SendTime.USE }
-                    ?.write(this@requestUse, this)
-            }
-        )
-    )
-}
-
 var PlayerEntity.skillExp: Int
     get() {
         updateLevel()
@@ -403,6 +385,7 @@ fun PlayerEntity.toggleUsing(skill: Skill, data: NbtCompound? = null): Boolean =
     } else startUsing(skill, data)
 
 fun PlayerEntity.isUsing(skill: Skill) = skill in usingSkills
+
 fun PlayerEntity.getUsedTime(skill: Skill): Int = getData(skill)?.usedTime ?: 0
 
 fun PlayerEntity.modifyUsedTime(skill: Skill, operation: (Int) -> Int) {
@@ -485,21 +468,10 @@ fun PlayerEntity.raycastLivingEntity(distance: Double): EntityHitResult? {
     )
 }
 
-fun PlayerEntity.updateScreen() {
-    if (world.isClient) {
-        val screen = client!!.currentScreen
-        if (screen is AutoSyncedScreen && (screen as ScreenAccessor).isScreenInitialized) {
-            screen.update()
-        }
-    }
-}
-
-fun PlayerEntity.send(packet: Packet<out PacketListener>) {
-    if (this is ServerPlayerEntity) {
-        networkHandler.sendPacket(packet)
-    } else if (this is ClientPlayerEntity) {
-        networkHandler.sendPacket(packet)
-    }
+fun PlayerEntity.sendToServer(packet: Packet<out PacketListener>) = if (this is ServerPlayerEntity) {
+    networkHandler.sendPacket(packet)
+} else {
+    com.imoonday.util.sendToServer(packet)
 }
 
 fun ServerPlayerEntity.spawnParticles(
@@ -548,6 +520,3 @@ fun <T : ParticleEffect> ServerPlayerEntity.spawnParticlesForced(
 }
 
 fun ServerPlayerEntity.playSound(sound: SoundEvent) = world.playSound(null, blockPos, sound, SoundCategory.PLAYERS)
-
-val clientPlayer: ClientPlayerEntity?
-    get() = client?.player

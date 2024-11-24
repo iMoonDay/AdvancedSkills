@@ -1,5 +1,7 @@
 package com.imoonday.network
 
+import com.imoonday.network.c2s.*
+import com.imoonday.network.s2c.*
 import com.imoonday.util.*
 import dev.architectury.networking.*
 import net.minecraft.network.*

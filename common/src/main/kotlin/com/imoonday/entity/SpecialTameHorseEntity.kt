@@ -21,9 +21,6 @@ import kotlin.math.*
 
 class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: World) : HorseEntity(entityType, world) {
 
-    private val summonSkill
-        get() = Skills.EXCLUSIVE_MOUNT
-
     constructor(world: World, owner: PlayerEntity) : this(ModEntities.SPECIAL_TAME_HORSE.get(), world) {
         bondWithPlayer(owner)
         saddle(SoundCategory.NEUTRAL)
@@ -140,5 +137,11 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
             }
         }
         super.tick()
+    }
+
+    companion object {
+
+        private val summonSkill
+            get() = Skills.EXCLUSIVE_MOUNT
     }
 }

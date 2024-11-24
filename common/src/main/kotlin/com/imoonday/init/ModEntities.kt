@@ -2,13 +2,8 @@ package com.imoonday.init
 
 import com.imoonday.*
 import com.imoonday.entity.*
-import com.imoonday.entity.render.*
-import com.imoonday.util.*
-import dev.architectury.registry.client.level.entity.*
 import dev.architectury.registry.level.entity.*
 import dev.architectury.registry.registries.*
-import net.minecraft.client.render.entity.*
-import net.minecraft.client.render.entity.model.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.mob.*
@@ -18,7 +13,7 @@ import java.util.function.*
 
 object ModEntities {
 
-    private val livingAttributeRegistry: MutableList<() -> Unit> = mutableListOf()
+//    private val livingAttributeRegistry: MutableList<() -> Unit> = mutableListOf()
 
     @JvmField
     val ENTITIES: DeferredRegister<EntityType<*>> = DeferredRegister.create(MOD_ID, RegistryKeys.ENTITY_TYPE)
@@ -86,9 +81,6 @@ object ModEntities {
             .trackingTickInterval(1)
             .register("meteorite")
 
-    @JvmField
-    val METEORITE_MODEL_LAYER: EntityModelLayer = registerModelLayer("meteorite")
-
     @JvmStatic
     val ENCHANTED_SWORD: RegistrySupplier<EntityType<EnchantedSwordEntity>> =
         EntityType.Builder.create(::EnchantedSwordEntity, SpawnGroup.MISC)
@@ -102,9 +94,6 @@ object ModEntities {
             .setDimensions(1.0f, 2.0f)
             .maxTrackingRange(8)
             .register("tornado")
-
-    @JvmField
-    val TORNADO_MODEL_LAYER: EntityModelLayer = registerModelLayer("tornado")
 
     @JvmField
     val HOOK: RegistrySupplier<EntityType<HookEntity>> =
@@ -131,9 +120,6 @@ object ModEntities {
             .register("magnet") { MagnetEntity.createLivingAttributes() }
 
     @JvmField
-    val MAGNET_MODEL_LAYER: EntityModelLayer = registerModelLayer("magnet")
-
-    @JvmField
     val UNGROUNDED_ARROW: RegistrySupplier<EntityType<UngroundedArrowEntity>> =
         EntityType.Builder.create(::UngroundedArrowEntity, SpawnGroup.MISC)
             .setDimensions(0.5f, 0.5f)
@@ -149,35 +135,13 @@ object ModEntities {
         attributeContainerSupplier: Supplier<DefaultAttributeContainer.Builder>,
     ): RegistrySupplier<EntityType<T>> {
         val supplier = register(name)
-        livingAttributeRegistry += { EntityAttributeRegistry.register(supplier, attributeContainerSupplier) }
+        EntityAttributeRegistry.register(supplier, attributeContainerSupplier)
+//        livingAttributeRegistry += { EntityAttributeRegistry.register(supplier, attributeContainerSupplier) }
         return supplier
     }
 
-    private fun registerModelLayer(id: String): EntityModelLayer = EntityModelLayer(id(id), "main")
-
     fun init() {
         ENTITIES.register()
-        livingAttributeRegistry.forEach { it() }
-    }
-
-    fun initClient() {
-        EntityRendererRegistry.register(SILENCE_ENERGY_BALL, SilenceEnergyBallEntity::Renderer)
-        EntityRendererRegistry.register(UNSTABLE_TNT, ::TntEntityRenderer)
-        EntityRendererRegistry.register(FREEZE_ENERGY_BALL, FreezeEnergyBallEntity::Renderer)
-        EntityRendererRegistry.register(SLOWNESS_ENERGY_BALL, SlownessEnergyBallEntity::Renderer)
-        EntityRendererRegistry.register(SPECIAL_TAME_HORSE, ::HorseEntityRenderer)
-        EntityRendererRegistry.register(SERVANT_SKELETON, ::SkeletonEntityRenderer)
-        EntityRendererRegistry.register(SERVANT_WITHER_SKELETON, ::WitherSkeletonEntityRenderer)
-        EntityRendererRegistry.register(METEORITE, MeteoriteEntity::Renderer)
-        EntityRendererRegistry.register(ENCHANTED_SWORD, ::EnchantedSwordEntityRenderer)
-        EntityRendererRegistry.register(TORNADO, ::TornadoEntityRenderer)
-        EntityRendererRegistry.register(HOOK, ::HookEntityRenderer)
-        EntityRendererRegistry.register(CLONE_PLAYER, ClonePlayerEntity::Renderer)
-        EntityRendererRegistry.register(MAGNET, ::MagnetEntityRenderer)
-        EntityRendererRegistry.register(UNGROUNDED_ARROW, ::ArrowEntityRenderer)
-
-        EntityModelLayerRegistry.register(METEORITE_MODEL_LAYER, MeteoriteEntity.Renderer::texturedModelData)
-        EntityModelLayerRegistry.register(TORNADO_MODEL_LAYER, TornadoEntityModel::texturedModelData)
-        EntityModelLayerRegistry.register(MAGNET_MODEL_LAYER, MagnetEntityModel::texturedModelData)
+//        livingAttributeRegistry.forEach { it() }
     }
 }

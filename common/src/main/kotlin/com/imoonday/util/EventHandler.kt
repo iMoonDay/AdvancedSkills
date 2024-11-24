@@ -3,21 +3,18 @@ package com.imoonday.util
 import com.imoonday.advanced_skills_re.api.*
 import com.imoonday.component.*
 import com.imoonday.config.*
-import com.imoonday.entity.render.feature.*
 import com.imoonday.init.*
 import com.imoonday.network.*
-import com.imoonday.render.*
-import com.imoonday.skill.*
+import com.imoonday.network.s2c.*
 import com.imoonday.trigger.*
 import dev.architectury.event.*
-import dev.architectury.event.events.client.*
 import dev.architectury.event.events.common.*
 import net.minecraft.block.*
-import net.minecraft.client.render.entity.*
 import net.minecraft.loot.*
 import net.minecraft.loot.condition.*
 import net.minecraft.loot.entry.*
 import net.minecraft.nbt.*
+import net.minecraft.server.network.*
 
 object EventHandler {
 
@@ -36,17 +33,26 @@ object EventHandler {
             SkillTriggerHandler.postUnequipped(player, slot, skill)
             player.stopUsing(skill)
         }
-        PlayerEvent.PLAYER_CLONE.register { oldPlayer, newPlayer, alive ->
-            newPlayer.usingSkills.forEach { newPlayer.stopUsing(it) }
-            newPlayer.getTriggers<RespawnTrigger>()
-                .forEach { it.afterRespawn(oldPlayer, newPlayer, alive) }
+        PlayerEvent.PLAYER_CLONE.register { oldPlayer, newPlayer, _ ->
+            newPlayer.copyDataFrom(oldPlayer)
+            newPlayer.properties.copyFrom(oldPlayer.properties)
+            newPlayer.syncData(false)
         }
-        AllowDeathEvent.EVENT.register { entity, source, amount ->
-            entity.run {
-                getTriggers<DeathTrigger>()
-                    .filterNot { isCooling(it.getAsSkill()) }
-                    .all { it.allowDeath(this, source, amount) }
-            }.toEventResult()
+        AllowDeathEvent.EVENT.register { player, source, amount ->
+            player.getTriggers<DeathTrigger>()
+                .all { it.allowDeath(player, source, amount) }
+        }
+        EntityEvent.LIVING_DEATH.register { entity, source ->
+            if (entity is ServerPlayerEntity) {
+                entity.getTriggers<DeathTrigger>()
+                    .forEach { it.onDeath(entity, source) }
+            }
+            EventResult.pass()
+        }
+        PlayerEvent.PLAYER_RESPAWN.register { player, _ ->
+            player.usingSkills.forEach { player.stopUsing(it) }
+            player.getTriggers<RespawnTrigger>()
+                .forEach { it.afterRespawn(player) }
         }
         PlayerEvent.ATTACK_ENTITY.register { player, _, _, _, _ ->
             if (player.isDisarmed) EventResult.interruptFalse()
@@ -83,50 +89,10 @@ object EventHandler {
             }
         }
         PlayerEvent.PLAYER_JOIN.register {
-            Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(Config.instance.toTag(NbtCompound())))
-            println(Skill.getValidSkills().joinToString(", ") { it.name.string })
+            Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(SkillConfig.instance.toTag(NbtCompound())))
         }
         LifecycleEvent.SERVER_STARTED.register {
-            Config.initWatchService(it)
-        }
-        PlayerEvent.PLAYER_CLONE.register { oldPlayer, newPlayer, _ ->
-            newPlayer.copyDataFrom(oldPlayer)
-            newPlayer.properties.copyFrom(oldPlayer.properties)
-            newPlayer.syncData(false)
-        }
-    }
-
-    fun registerClient() {
-        ClientGuiEvent.RENDER_HUD.register { context, _ ->
-            clientPlayer?.run {
-                Skill.getTriggers<SpecialStateRenderTrigger> { it.isInSpecialState(this) }
-                    .forEach { it.renderSpecialState(context) }
-            }
-            SkillSlotRenderer.render(client!!, context)
-            Skill.getTriggers<HudRenderTrigger>().forEach { it.render(context) }
-            Skill.getTriggers<CrosshairTrigger> { it.shouldRender() && it.getPriority() < 0 }
-                .minByOrNull(CrosshairTrigger::getPriority)
-                ?.render(context)
-            Skill.getTriggers<CrosshairTrigger> { it.shouldRender() && it.getPriority() >= 0 }
-                .maxByOrNull(CrosshairTrigger::getPriority)
-                ?.render(context)
-        }
-        LivingEntityFeatureRenderEvent.EVENT.register { _, renderer, helper, context ->
-            helper.register(StatusEffectLayer(renderer, context))
-            helper.register(IceLayer(renderer, context))
-            if (renderer is PlayerEntityRenderer) Skill.getTriggers<FeatureRendererTrigger>()
-                .forEach { helper.register(SkillLayer(renderer, context, it)) }
-            if (renderer is LivingEntityRenderer) Skill.getTriggers<TargetRenderTrigger>()
-                .forEach { helper.register(TargetLayer(renderer, context, it)) }
-        }
-        WorldRenderEvents.AFTER_ENTITIES.register { context ->
-            Skill.getTriggers<WorldRendererTrigger>().forEach { it.renderAfterEntities(context) }
-        }
-        WorldRenderEvents.LAST.register { context ->
-            Skill.getTriggers<WorldRendererTrigger>().forEach { it.renderLast(context) }
-        }
-        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register {
-            Channels.REQUEST_SYNC_DATA_C2S.sendToServer(RequestSyncDataC2SRequest())
+            SkillConfig.initWatchService(it)
         }
     }
 }

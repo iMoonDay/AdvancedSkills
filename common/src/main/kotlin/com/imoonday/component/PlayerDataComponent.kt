@@ -1,7 +1,8 @@
 package com.imoonday.component
 
+import com.imoonday.client.screen.*
 import com.imoonday.network.*
-import com.imoonday.screen.*
+import com.imoonday.network.s2c.*
 import com.imoonday.trigger.*
 import com.imoonday.util.*
 import net.minecraft.entity.player.*

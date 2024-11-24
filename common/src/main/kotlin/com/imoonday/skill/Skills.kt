@@ -242,5 +242,11 @@ object Skills {
     @JvmField
     val WEED_CLEANER = WeedCleanerSkill().register()
 
+    @JvmField
+    val UNHINDERED_STRIDE = UnhinderedStrideSkill().register()
+
+    @JvmField
+    val DAMAGE_ABSORPTION = DamageAbsorptionSkill().register()
+
     fun init() = Unit
 }

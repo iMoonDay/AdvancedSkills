@@ -5,5 +5,7 @@ import net.minecraft.server.network.*
 
 interface DeathTrigger : SkillTrigger {
 
-    fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean
+    fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean = true
+
+    fun onDeath(player: ServerPlayerEntity, source: DamageSource) = Unit
 }

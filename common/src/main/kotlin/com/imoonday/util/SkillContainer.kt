@@ -92,6 +92,17 @@ data class SkillContainer(
     fun getLastSlot(predicate: (SkillSlot) -> Boolean = { true }): SkillSlot? =
         slots.values.sortedByDescending { it.index }.find(predicate)
 
+    fun getLastSlot(
+        vararg predicates: (SkillSlot) -> Boolean = emptyArray()
+    ): SkillSlot? =
+        slots.values.sortedByDescending { it.index }.run {
+            for (it in predicates) {
+                val slot = find(it) ?: continue
+                return slot
+            }
+            null
+        }
+
     /**
      * Can only have a maximum of 10 slots
      * @return the final index of the slot
@@ -187,7 +198,7 @@ data class SkillContainer(
 
         fun createDefaultSlots(): MutableMap<Int, SkillSlot> = mutableMapOf<Int, SkillSlot>().apply {
             var index = 1
-            val slots = Config.instance.defaultSkillSlots
+            val slots = SkillConfig.instance.defaultSkillSlots
             slots["active"]?.takeIf { it > 0 }?.let {
                 repeat(it) {
                     put(index, SkillSlot.Active(index))

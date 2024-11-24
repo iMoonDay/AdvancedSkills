@@ -5,7 +5,7 @@ import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
 import com.imoonday.util.getUsingData
-import com.imoonday.util.send
+import com.imoonday.util.sendToServer
 import net.minecraft.entity.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.server.network.*
@@ -25,7 +25,7 @@ class PiercingSkill : Skill(
         user.velocity = user.rotationVector.normalize().multiply(1.5, 0.0, 1.5)
         val noGravity = user.hasNoGravity()
         user.setNoGravity(true)
-        user.send(EntityVelocityUpdateS2CPacket(user))
+        user.sendToServer(EntityVelocityUpdateS2CPacket(user))
         return UseResult.of(user.startUsing {
             it.putDouble("x", user.velocity.x)
             it.putDouble("z", user.velocity.z)
@@ -33,15 +33,15 @@ class PiercingSkill : Skill(
         })
     }
 
-    override fun getPersistTime(): Int = 8
+    override val persistTime: Int = 8
 
     override fun onStop(player: ServerPlayerEntity) {
         player.velocityDirty = true
         player.velocity = Vec3d.ZERO
-        player.getUsingData(this)?.let {
+        player.getUsingData()?.let {
             player.setNoGravity(it.getBoolean("noGravity"))
         }
-        player.send(EntityVelocityUpdateS2CPacket(player))
+        player.sendToServer(EntityVelocityUpdateS2CPacket(player))
         super.onStop(player)
     }
 
@@ -52,11 +52,11 @@ class PiercingSkill : Skill(
             player.stopUsing()
             return
         }
-        player.getUsingData(this)?.let {
+        player.getUsingData()?.let {
             if (it.contains("x") && it.contains("z")) {
                 player.velocityDirty = true
                 player.velocity = Vec3d(it.getDouble("x"), 0.0, it.getDouble("z"))
-                player.send(EntityVelocityUpdateS2CPacket(player))
+                player.sendToServer(EntityVelocityUpdateS2CPacket(player))
             }
         }
         player.world.getNonSpectatingEntities(
@@ -66,7 +66,7 @@ class PiercingSkill : Skill(
             it.damage(player.damageSources.playerAttack(player), 6.0f)
             it.velocityDirty = true
             it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(1.5).withAxis(Direction.Axis.Y, 1.0))
-            (it as? ServerPlayerEntity)?.send(EntityVelocityUpdateS2CPacket(it))
+            (it as? ServerPlayerEntity)?.sendToServer(EntityVelocityUpdateS2CPacket(it))
         }
         super.serverTick(player, usedTime)
     }

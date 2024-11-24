@@ -44,6 +44,19 @@ advancedSkills:
     banned: '%s 被服务器禁用'
   resetCooldown: '%s 重置了所有技能的冷却时间'
   reset: '已重置 %s 的所有数据'
+  cooldown:
+    set: 已将 %s 的冷却时间设置为 %d 秒
+    reset: 已重置 %s 的冷却时间
+  rarity:
+    set: '已将 %s 的稀有度设置为 %s'
+    reset: 已重置 %s 的稀有度
+    invalid: '无效的稀有度: %s'
+  time:
+    set: 已将 %s 的持续时间设置为 %d
+    reset: 已重置 %s 的持续时间
+  resetXp:
+    single: 已重置 %s 的技能经验
+    multiple: 已重置 %d 名玩家的技能经验
   skillExp:
     give:
       single: 已为 %2$s 增加 %1$d 点技能经验值
@@ -325,7 +338,7 @@ advancedSkills:
       description: 发射一个生物抓钩，有一定概率被挣脱
     duplication:
       name: 分身术
-      description: 召唤一个分身并隐身一秒
+      description: 召唤一个分身并隐身3秒
     magnetic_trap:
       name: 磁力陷阱
       description: 生成一个减速陷阱
@@ -334,13 +347,19 @@ advancedSkills:
       description: 连续发射激光，对路径上的所有生物造成少量伤害
     super_shadow_clone:
       name: 超级影分身
-      description: 向不同方向召唤数个分身并隐身 5 秒
+      description: 向不同方向召唤数个分身并隐身5秒
     arrow_rain:
       name: 箭雨
       description: 在目标上方随机召唤数根箭
     weed_cleaner:
       name: 杂草清理者
       description: 扫除周围杂草
+    unhindered_stride:
+      name: 如履平地
+      description: 可以跨过任何障碍，不会被阻挡
+    damage_absorption:
+      name: 伤害吸收
+      description: 一定时间内，吸收一次伤害，并根据其伤害量回复自身血量
   skillType:
     attack: 攻击
     defense: 防御
@@ -390,7 +409,7 @@ advancedSkills:
       title: '技能背包 %d/%d'
     wheel:
       cancel: 取消
-      tip: 松开选中，左键使用，右键取消，中键查看详情
+      tip: 松开选中，左键使用，右键取消，中键查看详情，按下 %s 打开技能背包
     learn:
       refresh: 重抽
       learn: 学习
@@ -439,9 +458,6 @@ subtitles:
     piercing: 突刺
     fire: 发射
     laser: 激光
-gamerule:
-  skillCooldownMultiplier: 技能冷却倍率(0-100)
-  skillCooldownMultiplier.description: 所有技能冷却时间按此倍率调整
 modmenu:
   nameTranslation:
     advanced_skills_re: 进阶技能

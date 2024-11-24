@@ -1,5 +1,6 @@
 package com.imoonday.advanced_skills_re.mixin;
 
+import com.imoonday.client.ClientTriggerHandler;
 import com.imoonday.trigger.SkillTriggerHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
@@ -30,6 +31,6 @@ public class GameRendererMixin {
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;tiltViewWhenHurt(Lnet/minecraft/client/util/math/MatrixStack;F)V", shift = At.Shift.AFTER))
     private void advanced_skills_re$renderWorld(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
-        SkillTriggerHandler.INSTANCE.worldRender(matrices, tickDelta, this.client);
+        ClientTriggerHandler.INSTANCE.worldRender(matrices, tickDelta, this.client);
     }
 }

@@ -22,7 +22,7 @@ class AbsoluteDefenseSkill : Skill(
     rarity = Rarity.SUPERB
 ), DamageTrigger, AutoStopTrigger, FeatureRendererTrigger {
 
-    override fun getPersistTime() = 20 * 30
+    override val persistTime = 20 * 30
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 

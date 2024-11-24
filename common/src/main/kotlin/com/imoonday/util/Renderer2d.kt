@@ -36,7 +36,7 @@ object Renderer2d {
         regionWidth: Double,
         regionHeight: Double,
         textureWidth: Double,
-        textureHeight: Double
+        textureHeight: Double,
     ) {
         val x1 = x0 + width
         val y1 = y0 + height
@@ -65,7 +65,7 @@ object Renderer2d {
         u0: Float,
         u1: Float,
         v0: Float,
-        v1: Float
+        v1: Float,
     ) {
         val buffer = Tessellator.getInstance().buffer
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE)
@@ -103,7 +103,7 @@ object Renderer2d {
         height: Int,
         z: Int,
         startColor: Int,
-        endColor: Int
+        endColor: Int,
     ) {
         renderVerticalLine(context, x, y, height - 2, z, startColor, endColor)
         renderVerticalLine(context, x + width - 1, y, height - 2, z, startColor, endColor)
@@ -122,7 +122,7 @@ object Renderer2d {
         height: Int,
         z: Int,
         startColor: Int,
-        endColor: Int
+        endColor: Int,
     ) {
         context.fillGradient(x, y, x + 1, y + height, z, startColor, endColor)
     }
@@ -151,7 +151,7 @@ fun DrawContext.renderPanel(
     centerColor: Int,
     lightEdgeColor: Int,
     darkEdgeColor: Int,
-    borderColor: Int = 0xFF000000.toInt()
+    borderColor: Int = 0xFF000000.toInt(),
 ) {
     if (width < 8 || height < 8) throw IllegalArgumentException("Panel size must be at least 8x8")
     val rightX = x + width
@@ -218,7 +218,7 @@ fun DrawContext.drawScrollableText(
     bottom: Int,
     color: Int,
     shadow: Boolean = true,
-    center: Boolean = true
+    center: Boolean = true,
 ) {
     val textWidth = textRenderer.getWidth(text)
     val y = (top + bottom - 9) / 2 + 1
@@ -293,6 +293,15 @@ fun DrawContext.drawTextWithBackground(
 
 fun DrawContext.drawTextWithBackground(
     text: Text,
+    centerX: Int,
+    y: Int,
+    color: Int,
+    backgroundColor: Int,
+    shadow: Boolean = true,
+) = drawTextWithBackground(text.asOrderedText(), centerX, y, color, backgroundColor, shadow)
+
+fun DrawContext.drawTextWithBackground(
+    text: OrderedText,
     centerX: Int,
     y: Int,
     color: Int,

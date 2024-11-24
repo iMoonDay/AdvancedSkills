@@ -3,7 +3,7 @@ package com.imoonday.skill
 import com.imoonday.init.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import com.imoonday.util.send
+import com.imoonday.util.sendToServer
 import com.imoonday.util.spawnParticles
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
@@ -22,7 +22,7 @@ class DashSkill : Skill(
             velocityDirty = true
             stopFallFlying()
             velocity = rotationVector.normalize().multiply(1.5)
-            send(EntityVelocityUpdateS2CPacket(this))
+            sendToServer(EntityVelocityUpdateS2CPacket(this))
             spawnParticles(
                 ParticleTypes.CLOUD,
                 pos,

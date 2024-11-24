@@ -28,7 +28,8 @@ class DangerPerceptionSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
 
-    override fun getPersistTime(): Int = 20 * 2
+    override val persistTime: Int = 20 * 2
+
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Danger Perception"),

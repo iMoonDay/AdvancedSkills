@@ -18,6 +18,8 @@ class LastDitchEffortSkill : Skill(
     sound = ModSounds.HEAL
 ), DamageTrigger, AutoStopTrigger, AttackTrigger, AttributeTrigger, AutoTrigger, DeathTrigger {
 
+    override val persistTime: Int = 20 * 15
+
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Last Ditch Effort"),
@@ -32,8 +34,6 @@ class LastDitchEffortSkill : Skill(
         super<AttributeTrigger>.postUnequipped(player, slot)
     }
 
-    override fun getPersistTime(): Int = 20 * 15
-
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
 
     override fun onAttack(
@@ -44,9 +44,9 @@ class LastDitchEffortSkill : Skill(
     ): Float = if (!player.isUsing()) amount else amount + 1
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean =
-        if (!player.isCooling() && !player.isUsing() && !player.isDead && (player.health / player.maxHealth) < 0.3f) {
+        if (player.isReady() && !player.isDead && (player.health / player.maxHealth) < 0.3f) {
             player.health = player.maxHealth * 0.5f
-            playSoundFrom(player)
+            player.playSkillSound()
             player.addAttributes()
             true
         } else false
@@ -64,8 +64,10 @@ class LastDitchEffortSkill : Skill(
         super.onStop(player)
     }
 
-    override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean {
-        player.startCooling()
-        return true
+    override fun onDeath(player: ServerPlayerEntity, source: DamageSource) {
+        super.onDeath(player, source)
+        if (player.isUsing()) {
+            player.startCooling()
+        }
     }
 }

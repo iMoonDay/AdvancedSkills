@@ -4,5 +4,5 @@ import net.minecraft.server.network.*
 
 interface RespawnTrigger : SkillTrigger {
 
-    fun afterRespawn(oldPlayer: ServerPlayerEntity, newPlayer: ServerPlayerEntity, alive: Boolean) = Unit
+    fun afterRespawn(player: ServerPlayerEntity) = Unit
 }

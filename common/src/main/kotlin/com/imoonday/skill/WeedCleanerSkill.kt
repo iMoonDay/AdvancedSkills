@@ -16,17 +16,15 @@ class WeedCleanerSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         val world = user.world
         val userPos = user.pos
-        user.server.execute {
-            user.boundingBox.expand(25.0).blockPosSet.forEach { pos ->
-                val state = world.getBlockState(pos)
-                if (WEEDS.contains(state.block)) {
-                    if (world.breakBlock(pos, true, user)) {
-                        world.getEntitiesByClass(ItemEntity::class.java, Box(pos).expand(1.0)) { it.age == 0 }
-                            .forEach {
-                                it.resetPickupDelay()
-                                it.setPosition(userPos)
-                            }
-                    }
+        user.boundingBox.expand(25.0).blockPosSet.forEach { pos ->
+            val state = world.getBlockState(pos)
+            if (WEEDS.contains(state.block)) {
+                if (world.breakBlock(pos, true, user)) {
+                    world.getEntitiesByClass(ItemEntity::class.java, Box(pos).expand(1.0)) { it.age == 0 }
+                        .forEach {
+                            it.resetPickupDelay()
+                            it.setPosition(userPos)
+                        }
                 }
             }
         }

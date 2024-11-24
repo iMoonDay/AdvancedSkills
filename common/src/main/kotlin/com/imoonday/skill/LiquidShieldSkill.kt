@@ -19,7 +19,7 @@ class LiquidShieldSkill : Skill(
     sound = SoundEvents::BLOCK_WATER_AMBIENT
 ), TickTrigger, AutoStopTrigger, FluidMovementTrigger, BreatheInWaterTrigger {
 
-    override fun getPersistTime(): Int = 20 * 15
+    override val persistTime: Int = 20 * 15
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user,this)
 
@@ -45,7 +45,7 @@ class LiquidShieldSkill : Skill(
     override fun ignoreFluid(player: PlayerEntity, tag: TagKey<Fluid>): Boolean = player.isUsing()
 
     override fun getMovementInFluid(player: PlayerEntity, tag: TagKey<Fluid>, speed: Double): Double =
-        if (!player.isUsing()) speed else 0.0
+        if (player.isUsing()) 0.0 else speed
 
     override fun canBreatheInWater(player: PlayerEntity): Boolean = player.isUsing()
 

@@ -1,5 +1,6 @@
 package com.imoonday.advanced_skills_re.mixin;
 
+import com.imoonday.client.ClientTriggerHandler;
 import com.imoonday.trigger.SkillTriggerHandler;
 import kotlin.Pair;
 import net.minecraft.client.input.Input;
@@ -14,7 +15,7 @@ public class KeyboardInputMixin extends Input {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/KeyboardInput;getMovementMultiplier(ZZ)F", ordinal = 0))
     private void advanced_skills_re$tick(CallbackInfo ci) {
-        Pair<Boolean, Boolean> invertInput = SkillTriggerHandler.INSTANCE.shouldInvertInput();
+        Pair<Boolean, Boolean> invertInput = ClientTriggerHandler.INSTANCE.shouldInvertInput();
         if (invertInput.getFirst()) {
             boolean temp = this.pressingLeft;
             this.pressingLeft = this.pressingRight;

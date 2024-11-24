@@ -20,7 +20,7 @@ class OrePerceptionSkill : Skill(
 ), AutoStopTrigger, WorldRendererTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
-    override fun getPersistTime(): Int = 20 * 5
+    override val persistTime: Int = 20 * 5
 
     override fun renderLast(context: WorldRenderContext) {
         super.renderLast(context)

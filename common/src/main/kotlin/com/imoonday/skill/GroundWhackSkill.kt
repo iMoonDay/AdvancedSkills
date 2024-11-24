@@ -2,7 +2,6 @@ package com.imoonday.skill
 
 import com.imoonday.trigger.*
 import com.imoonday.util.*
-import net.minecraft.network.packet.c2s.play.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
@@ -22,8 +21,8 @@ class GroundWhackSkill : Skill(
         user.run {
             if (abilities.flying) abilities.flying = false
             velocity = Vec3d(0.0, min(velocity.y, -1.0), 0.0)
-            send(EntityVelocityUpdateS2CPacket(this))
-            send(PlayerAbilitiesS2CPacket(abilities))
+            sendToServer(EntityVelocityUpdateS2CPacket(this))
+            sendToServer(PlayerAbilitiesS2CPacket(abilities))
             startUsing()
         }
         return UseResult.success()

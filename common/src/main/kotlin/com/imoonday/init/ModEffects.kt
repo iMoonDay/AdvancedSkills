@@ -13,7 +13,7 @@ import java.util.function.*
 object ModEffects {
 
     @JvmField
-    val EFFECTS = DeferredRegister.create(MOD_ID, RegistryKeys.STATUS_EFFECT)
+    val EFFECTS: DeferredRegister<StatusEffect> = DeferredRegister.create(MOD_ID, RegistryKeys.STATUS_EFFECT)
 
     @JvmField
     val SYNC_CLIENT_EFFECTS: MutableList<SyncClientEffect> = mutableListOf()

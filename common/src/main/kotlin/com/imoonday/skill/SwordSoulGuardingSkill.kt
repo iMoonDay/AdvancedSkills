@@ -62,7 +62,7 @@ class SwordSoulGuardingSkill : Skill(
         player.playSound(SoundEvents.ENTITY_ARROW_SHOOT)
     }
 
-    override fun getPersistTime(): Int = 20 * 10
+    override val persistTime: Int = 20 * 10
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (player.isUsing() && usedTime % 25 == 0)

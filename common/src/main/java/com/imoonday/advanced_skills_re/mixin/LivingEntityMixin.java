@@ -1,5 +1,7 @@
 package com.imoonday.advanced_skills_re.mixin;
 
+import com.imoonday.advanced_skills_re.api.AllowDeathEvent;
+import com.imoonday.effect.SeriousInjuryEffect;
 import com.imoonday.init.ModEffectsKt;
 import com.imoonday.trigger.SkillTriggerHandler;
 import net.minecraft.entity.LivingEntity;
@@ -14,10 +16,12 @@ import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -34,6 +38,12 @@ public abstract class LivingEntityMixin {
 
     @Shadow
     public abstract ItemStack getStackInHand(Hand hand);
+
+    @Shadow
+    public abstract boolean isDead();
+
+    @Shadow
+    public abstract float getMaxHealth();
 
     @Inject(method = "modifyAppliedDamage", at = @At("RETURN"), cancellable = true)
     private void advanced_skills_re$modifyAppliedDamage(DamageSource source, float amount, CallbackInfoReturnable<Float> cir) {
@@ -146,6 +156,20 @@ public abstract class LivingEntityMixin {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.shouldInvertJump(player)) {
             cir.setReturnValue(-cir.getReturnValue());
+        }
+    }
+
+    @Redirect(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isDead()Z", ordinal = 1))
+    private boolean advanced_skills_re$beforeEntityKilled(LivingEntity livingEntity, DamageSource source, float amount) {
+        return isDead() && (!(livingEntity instanceof ServerPlayerEntity player) || AllowDeathEvent.EVENT.invoker().allowDeath(player, source, amount));
+    }
+
+    @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true)
+    public void advanced_skills_re$setHealth(float health, CallbackInfo ci) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        health = MathHelper.clamp(health, 0.0F, this.getMaxHealth());
+        if (SeriousInjuryEffect.Companion.cancelSetHealth(entity, health)) {
+            ci.cancel();
         }
     }
 }

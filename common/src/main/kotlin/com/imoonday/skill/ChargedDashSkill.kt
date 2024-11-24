@@ -36,7 +36,7 @@ class ChargedDashSkill : LongPressSkill(
             removeAttributes()
             velocityDirty = true
             velocity = rotationVector.normalize().multiply(2.0 * pressedTime / getMaxPressTime())
-            send(EntityVelocityUpdateS2CPacket(this))
+            sendToServer(EntityVelocityUpdateS2CPacket(this))
             spawnParticles(
                 ParticleTypes.CLOUD,
                 pos,

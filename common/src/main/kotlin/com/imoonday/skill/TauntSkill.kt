@@ -16,7 +16,7 @@ class TauntSkill : Skill(
     rarity = Rarity.SUPERB,
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {
 
-    override fun getPersistTime(): Int = 20 * 15
+    override val persistTime: Int = 20 * 15
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
     override fun onDamaged(

@@ -18,7 +18,7 @@ class NegativeResistanceSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override fun getPersistTime(): Int = 20 * 5
+    override val persistTime: Int = 20 * 5
 
     override fun cannotHaveStatusEffect(player: PlayerEntity, effect: StatusEffectInstance): Boolean =
         if (player.isUsing() && !effect.effectType.isBeneficial) {

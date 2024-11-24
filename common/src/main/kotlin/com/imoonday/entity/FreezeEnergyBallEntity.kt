@@ -1,15 +1,11 @@
 package com.imoonday.entity
 
-import com.imoonday.entity.render.*
 import com.imoonday.init.*
-import com.imoonday.util.*
-import net.minecraft.client.render.entity.*
 import net.minecraft.entity.*
 import net.minecraft.entity.effect.*
 import net.minecraft.particle.*
 import net.minecraft.server.world.*
 import net.minecraft.sound.*
-import net.minecraft.util.*
 import net.minecraft.world.*
 import org.joml.*
 import kotlin.random.Random
@@ -44,17 +40,9 @@ class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>,
         update(owner)
     }
 
-    class Renderer(context: EntityRendererFactory.Context) :
-        EffectEnergyBallEntityRenderer<FreezeEnergyBallEntity>(context) {
-
-        override val texture: Identifier = id("textures/entity/freeze_energy_ball.png")
-    }
-
-    private val particleColor = Vector3f(178 / 255f, 1f, 1f)
-
     override fun spawnParticles() {
         (world as? ServerWorld)?.spawnParticles(
-            DustParticleEffect(particleColor, 1f),
+            DustParticleEffect(Companion.particleColor, 1f),
             x,
             y,
             z,
@@ -71,4 +59,9 @@ class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>,
 
     override fun canApply(effect: StatusEffectInstance, chance: Float, target: LivingEntity): Boolean =
         target.isWet && Random.nextFloat() < chance * 2f
+
+    companion object {
+
+        private val particleColor = Vector3f(178 / 255f, 1f, 1f)
+    }
 }

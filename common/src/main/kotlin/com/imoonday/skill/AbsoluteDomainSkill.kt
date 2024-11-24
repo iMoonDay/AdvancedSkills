@@ -20,7 +20,7 @@ class AbsoluteDomainSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override fun getPersistTime(): Int = 20 * 3
+    override val persistTime: Int = 20 * 3
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)

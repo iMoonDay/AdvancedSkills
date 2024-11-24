@@ -14,7 +14,7 @@ class LivingDetectionSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override fun getPersistTime(): Int = 20 * 5
+    override val persistTime: Int = 20 * 5
 
     override fun isGlowing(entity: Entity): Boolean {
         val player = clientPlayer ?: return false

@@ -23,7 +23,7 @@ class DyingCounterattackSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
 
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean {
-        if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || player.isUsing()) return true
+        if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || player.isUsing() || player.isCooling()) return true
         player.health = player.maxHealth
         player.startUsing()
         player.playSound(SoundEvents.ITEM_TOTEM_USE)

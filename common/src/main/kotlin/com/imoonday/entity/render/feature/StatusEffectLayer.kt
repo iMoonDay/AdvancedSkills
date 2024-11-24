@@ -1,6 +1,5 @@
 package com.imoonday.entity.render.feature
 
-import com.imoonday.advanced_skills_re.mixin.*
 import com.imoonday.init.*
 import com.imoonday.skill.*
 import net.minecraft.client.render.*
@@ -95,8 +94,8 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
 
     companion object {
 
-        val silenceModelId = ModelIdentifier(Registries.ITEM.getId(Skills.PRIMARY_SILENCE.item), "inventory")
-        val disarmModelId = ModelIdentifier(Registries.ITEM.getId(Skills.DISARM.item), "inventory")
+        val silenceModelId = Skills.PRIMARY_SILENCE.modelId
+        val disarmModelId = Skills.DISARM.modelId
         val confinementModelId = ModelIdentifier(Registries.ITEM.getId(Items.BARRIER), "inventory")
     }
 }

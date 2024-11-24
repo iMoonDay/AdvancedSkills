@@ -32,7 +32,7 @@ class DopingSkill : Skill(
         return result
     }
 
-    override fun getPersistTime(): Int = 20 * 10
+    override val persistTime: Int = 20 * 10
 
     override fun onStop(player: ServerPlayerEntity) {
         player.removeAttributes()

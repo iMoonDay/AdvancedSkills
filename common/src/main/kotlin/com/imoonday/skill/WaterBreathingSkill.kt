@@ -16,7 +16,7 @@ class WaterBreathingSkill : Skill(
     rarity = Rarity.RARE,
 ), AutoStopTrigger, BreatheInWaterTrigger {
 
-    override fun getPersistTime(): Int = 20 * 30
+    override val persistTime: Int = 20 * 30
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(false)
 

@@ -6,7 +6,6 @@ import com.imoonday.util.SkillSlot
 import com.imoonday.util.SkillType
 import com.imoonday.util.getData
 import com.imoonday.util.syncData
-import net.minecraft.client.network.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.server.network.*
@@ -21,7 +20,7 @@ class WallClimbingSkill : PassiveSkill(
     override fun isClimbing(player: PlayerEntity): Boolean =
         player.isUsing() && player.shouldClimb()
 
-    override fun getPersistTime(): Int = 20 * 15
+    override val persistTime: Int = 20 * 15
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
         player.startCooling()
@@ -51,7 +50,7 @@ class WallClimbingSkill : PassiveSkill(
         }
     }
 
-    override fun write(player: ClientPlayerEntity, data: NbtCompound): NbtCompound =
+    override fun write(player: PlayerEntity, data: NbtCompound): NbtCompound =
         data.apply { putBoolean(HORIZONTAL_COLLISION_KEY, player.horizontalCollision) }
 
     override fun apply(player: ServerPlayerEntity, data: NbtCompound) {

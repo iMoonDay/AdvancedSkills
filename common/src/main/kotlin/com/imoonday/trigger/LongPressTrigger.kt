@@ -1,6 +1,6 @@
 package com.imoonday.trigger
 
-import com.imoonday.network.*
+import com.imoonday.network.c2s.*
 import com.imoonday.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
@@ -8,7 +8,9 @@ import net.minecraft.server.network.*
 interface LongPressTrigger : TickTrigger, AutoStopTrigger {
 
     fun getMaxPressTime(): Int
-    override fun getPersistTime(): Int = getMaxPressTime()
+
+    override val persistTime: Int
+        get() = getMaxPressTime()
 
     fun use(player: ServerPlayerEntity, keyState: UseSkillC2SRequest.KeyState): UseResult =
         if (keyState == UseSkillC2SRequest.KeyState.PRESS) onPress(player)

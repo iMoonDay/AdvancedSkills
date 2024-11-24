@@ -3,7 +3,7 @@ package com.imoonday.skill
 import com.imoonday.init.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import com.imoonday.util.send
+import com.imoonday.util.sendToServer
 import net.minecraft.entity.*
 import net.minecraft.item.*
 import net.minecraft.network.packet.s2c.play.*
@@ -31,7 +31,7 @@ class CatapultGlidingSkill : LongPressSkill(
         if (player.isFallFlying) return fallFlyingResult()
         player.stopUsing()
         player.startCooling()
-        playSoundFrom(player)
+        player.playSkillSound()
         player.setOnGround(false)
         player.startFallFlying()
         player.velocityDirty = true
@@ -39,7 +39,7 @@ class CatapultGlidingSkill : LongPressSkill(
         player.velocity =
             player.rotationVector.normalize().multiply(1.5 * progress, 0.0, 1.5 * progress)
                 .withAxis(Direction.Axis.Y, 3.0 * progress)
-        player.send(EntityVelocityUpdateS2CPacket(player))
+        player.sendToServer(EntityVelocityUpdateS2CPacket(player))
         return UseResult.success()
     }
 

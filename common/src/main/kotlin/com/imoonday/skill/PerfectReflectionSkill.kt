@@ -1,26 +1,18 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.*
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
 import com.imoonday.util.playSound
 import com.imoonday.util.translateSkill
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
-import net.minecraft.util.*
 
-class PerfectReflectionSkill : Skill(
+class PerfectReflectionSkill : ReflectionSkill(
     id = "perfect_reflection",
-    types = listOf(SkillType.DEFENSE),
     cooldown = 5,
-    rarity = Rarity.EPIC
-), DamageTrigger, ReflectionTrigger {
-
-    override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
-
-    override fun getPersistTime(): Int = 2
+    rarity = Rarity.EPIC,
+    duration = 2
+) {
 
     override fun ignoreDamage(
         amount: Float,

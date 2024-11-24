@@ -11,5 +11,5 @@ class AutomaticUphillSkill : PassiveSkill(
     toggleable = true
 ), StepHeightTrigger, PersistentTrigger {
 
-    override fun getStepHeight(player: PlayerEntity): Float? = if (!player.isUsing()) null else 1.0f
+    override fun getStepHeight(player: PlayerEntity): Float? = if (player.isUsing()) 1.0f else null
 }

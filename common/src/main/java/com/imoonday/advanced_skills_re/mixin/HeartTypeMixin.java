@@ -1,5 +1,6 @@
 package com.imoonday.advanced_skills_re.mixin;
 
+import com.imoonday.client.ClientTriggerHandler;
 import com.imoonday.trigger.SkillTriggerHandler;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,7 +14,7 @@ public class HeartTypeMixin {
 
     @Inject(method = "fromPlayerState", at = @At("RETURN"), cancellable = true)
     private static void advanced_skills_re$fromPlayerState(PlayerEntity player, CallbackInfoReturnable<InGameHud.HeartType> cir) {
-        InGameHud.HeartType type = SkillTriggerHandler.INSTANCE.getHeartType(player);
+        InGameHud.HeartType type = ClientTriggerHandler.INSTANCE.getHeartType(player);
         if (type != null) {
             cir.setReturnValue(type);
         }

@@ -1,6 +1,7 @@
 package com.imoonday.advanced_skills_re.mixin;
 
 import com.imoonday.advanced_skills_re.api.Propertied;
+import com.imoonday.client.ClientTriggerHandler;
 import com.imoonday.component.EntityPropertyComponent;
 import com.imoonday.init.ModEffectsKt;
 import com.imoonday.trigger.SkillTriggerHandler;
@@ -128,7 +129,7 @@ public abstract class EntityMixin implements Propertied {
     @Inject(method = "isGlowing", at = @At("HEAD"), cancellable = true)
     private void advanced_skills_re$isGlowing(CallbackInfoReturnable<Boolean> cir) {
         Entity entity = (Entity) (Object) this;
-        if (entity.getWorld().isClient && SkillTriggerHandler.INSTANCE.isGlowing(entity)) {
+        if (entity.getWorld().isClient && ClientTriggerHandler.INSTANCE.isGlowing(entity)) {
             cir.setReturnValue(true);
         }
     }

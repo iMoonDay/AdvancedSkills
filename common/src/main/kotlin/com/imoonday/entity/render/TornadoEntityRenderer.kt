@@ -1,5 +1,6 @@
 package com.imoonday.entity.render
 
+import com.imoonday.client.*
 import com.imoonday.entity.TornadoEntity
 import com.imoonday.init.ModEntities
 import com.imoonday.util.id
@@ -16,7 +17,7 @@ import net.minecraft.util.math.RotationAxis
 class TornadoEntityRenderer(val context: EntityRendererFactory.Context) :
     EntityRenderer<TornadoEntity>(context) {
 
-    private val main: ModelPart = context.getPart(ModEntities.TORNADO_MODEL_LAYER)
+    private val main: ModelPart = context.getPart(ClientRegistry.TORNADO_MODEL_LAYER)
 
     override fun render(
         entity: TornadoEntity,

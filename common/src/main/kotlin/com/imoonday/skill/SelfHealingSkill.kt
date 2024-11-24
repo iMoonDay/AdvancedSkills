@@ -15,7 +15,7 @@ class SelfHealingSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
 
-    override fun getPersistTime(): Int = 20 * 10
+    override val persistTime: Int = 20 * 10
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = !player.isDead && player.health < player.maxHealth
 

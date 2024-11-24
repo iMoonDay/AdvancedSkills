@@ -18,7 +18,7 @@ class WaterWalkerSkill : Skill(
     sound = SoundEvents::BLOCK_WATER_AMBIENT
 ), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger {
 
-    override fun getPersistTime(): Int = 20 * 15
+    override val persistTime: Int = 20 * 15
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 

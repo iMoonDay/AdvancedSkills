@@ -3,6 +3,7 @@ package com.imoonday.component
 import com.imoonday.advanced_skills_re.api.*
 import com.imoonday.effect.*
 import com.imoonday.network.*
+import com.imoonday.network.s2c.*
 import net.minecraft.entity.*
 import net.minecraft.nbt.*
 import net.minecraft.server.world.*

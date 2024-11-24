@@ -4,7 +4,7 @@ import com.imoonday.init.*
 import com.imoonday.trigger.*
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import com.imoonday.util.send
+import com.imoonday.util.sendToServer
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.network.packet.s2c.play.*
@@ -20,14 +20,14 @@ class ExtremeEvasionSkill : Skill(
     sound = ModSounds.DASH
 ), AutoStopTrigger, DamageTrigger, SendPlayerVelocityTrigger {
 
-    override fun getPersistTime(): Int = 10
+    override val persistTime: Int = 10
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             stopFallFlying()
             velocity = (if (velocity.x == 0.0 && velocity.z == 0.0) rotationVector else velocity).normalize()
                 .multiply(2.0, 0.0, 2.0)
-            send(EntityVelocityUpdateS2CPacket(this))
+            sendToServer(EntityVelocityUpdateS2CPacket(this))
             (world as ServerWorld).spawnParticles(
                 ParticleTypes.CLOUD,
                 x,

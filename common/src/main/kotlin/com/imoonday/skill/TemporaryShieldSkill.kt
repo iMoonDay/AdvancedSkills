@@ -14,7 +14,7 @@ class TemporaryShieldSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override fun getPersistTime(): Int = 20 * 10
+    override val persistTime: Int = 20 * 10
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (player.isUsing() && usedTime % 20 == 0) player.absorptionAmount =

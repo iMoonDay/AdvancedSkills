@@ -1,23 +1,15 @@
 package com.imoonday.skill
 
-import com.imoonday.trigger.*
-import com.imoonday.util.SkillType
-import com.imoonday.util.UseResult
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.server.network.*
-import kotlin.random.*
 
-class ExtremeReflectionSkill : Skill(
+class ExtremeReflectionSkill : ReflectionSkill(
     id = "extreme_reflection",
-    types = listOf(SkillType.DEFENSE),
     cooldown = 3,
-    rarity = Rarity.RARE
-), DamageTrigger, ReflectionTrigger {
-
-    override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
-
-    override fun getPersistTime(): Int = 5
+    rarity = Rarity.RARE,
+    duration = 5
+) {
 
     override fun ignoreDamage(
         amount: Float,
@@ -28,7 +20,7 @@ class ExtremeReflectionSkill : Skill(
         if (!player.isUsing()) return false
         player.stopUsing()
         player.stopCooling()
-        return if (Random.nextFloat() <= 0.75f) {
+        return if (player.random.nextFloat() <= 0.75f) {
             reflect(player, attacker as? LivingEntity, amount)
             true
         } else {

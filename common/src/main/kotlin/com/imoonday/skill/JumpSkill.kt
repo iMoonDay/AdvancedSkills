@@ -2,7 +2,7 @@ package com.imoonday.skill
 
 import com.imoonday.util.SkillType
 import com.imoonday.util.UseResult
-import com.imoonday.util.send
+import com.imoonday.util.sendToServer
 import com.imoonday.util.spawnParticles
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
@@ -19,7 +19,7 @@ class JumpSkill : Skill(
         user.run {
             stopFallFlying()
             jump()
-            send(EntityVelocityUpdateS2CPacket(this))
+            sendToServer(EntityVelocityUpdateS2CPacket(this))
             user.spawnParticles(
                 ParticleTypes.CLOUD,
                 pos,

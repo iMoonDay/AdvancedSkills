@@ -5,10 +5,12 @@
   "minVersion": "0.8",
   "client": [
     "EntityRenderersMixin",
-    "LivingEntityRendererAccessor"
+    "LivingEntityRendererAccessor",
+    "WorldRendererMixin"
   ],
   "mixins": [
-    "BowAttackGoalMixin"
+    "BowAttackGoalMixin",
+    "PlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -29,7 +29,7 @@ class MultipleLaserSkill : LongPressSkill(
             (if (it.type == HitResult.Type.MISS) 64.0 else it.pos.distanceTo(cameraPos))
         }
         if (usedTime % 4 == 0) {
-            playSoundFrom(player)
+            player.playSkillSound()
         }
         if (usedTime % 2 == 0) {
             val entities: MutableList<LivingEntity> = mutableListOf()
@@ -84,7 +84,7 @@ class MultipleLaserSkill : LongPressSkill(
     }
 
     private fun calculateCooldown(world: World?, pressedTime: Int) =
-        (pressedTime.toFloat() / getMaxPressTime() * getCooldown(world)).toInt()
+        (pressedTime.toFloat() / getMaxPressTime() * cooldown).toInt()
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(calculateCooldown(player.world, player.getUsedTime()))

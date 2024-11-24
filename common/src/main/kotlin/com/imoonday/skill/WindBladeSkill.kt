@@ -7,6 +7,7 @@ import com.imoonday.util.UseResult
 import com.imoonday.util.horizontalRotationVector
 import com.imoonday.util.times
 import net.minecraft.entity.*
+import net.minecraft.entity.damage.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
@@ -15,7 +16,7 @@ class WindBladeSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 10,
     rarity = Rarity.RARE,
-), AttackTrigger, PersistentTrigger, RespawnTrigger {
+), AttackTrigger, PersistentTrigger, DeathTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(false)
 
@@ -29,7 +30,10 @@ class WindBladeSkill : Skill(
         player.startCooling()
     }
 
-    override fun afterRespawn(oldPlayer: ServerPlayerEntity, newPlayer: ServerPlayerEntity, alive: Boolean) {
-        if (oldPlayer.isUsing()) newPlayer.startCooling()
+    override fun onDeath(player: ServerPlayerEntity, source: DamageSource) {
+        super.onDeath(player, source)
+        if (player.isUsing()) {
+            player.startCooling()
+        }
     }
 }

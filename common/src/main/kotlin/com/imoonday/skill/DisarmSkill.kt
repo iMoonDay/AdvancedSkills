@@ -19,7 +19,7 @@ class DisarmSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 15,
     rarity = Rarity.SUPERB,
-), AttackTrigger, PersistentTrigger, RespawnTrigger {
+), AttackTrigger, PersistentTrigger, DeathTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(false)
 
@@ -53,7 +53,10 @@ class DisarmSkill : Skill(
         return amount
     }
 
-    override fun afterRespawn(oldPlayer: ServerPlayerEntity, newPlayer: ServerPlayerEntity, alive: Boolean) {
-        if (oldPlayer.isUsing()) newPlayer.startCooling()
+    override fun onDeath(player: ServerPlayerEntity, source: DamageSource) {
+        super.onDeath(player, source)
+        if (player.isUsing()) {
+            player.startCooling()
+        }
     }
 }

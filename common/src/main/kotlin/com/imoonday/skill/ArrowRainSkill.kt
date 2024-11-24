@@ -8,7 +8,7 @@ import net.minecraft.util.hit.*
 
 class ArrowRainSkill : Skill(
     id = "arrow_rain",
-    types = listOf(SkillType.ATTACK),
+    types = listOf(SkillType.ATTACK, SkillType.SUMMON),
     cooldown = 15,
     rarity = Rarity.RARE,
     sound = SoundEvents::ENTITY_ARROW_SHOOT

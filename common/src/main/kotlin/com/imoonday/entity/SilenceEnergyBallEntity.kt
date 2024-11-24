@@ -1,12 +1,8 @@
 package com.imoonday.entity
 
-import com.imoonday.entity.render.*
 import com.imoonday.init.*
-import com.imoonday.util.*
-import net.minecraft.client.render.entity.*
 import net.minecraft.entity.*
 import net.minecraft.entity.effect.*
-import net.minecraft.util.*
 import net.minecraft.world.*
 
 class SilenceEnergyBallEntity(entityType: EntityType<out SilenceEnergyBallEntity>, world: World) :
@@ -38,11 +34,5 @@ class SilenceEnergyBallEntity(entityType: EntityType<out SilenceEnergyBallEntity
         world: World,
     ) : this(owner.x, owner.y, owner.z, directionX, directionY, directionZ, world) {
         update(owner)
-    }
-
-    class Renderer(context: EntityRendererFactory.Context) :
-        EffectEnergyBallEntityRenderer<SilenceEnergyBallEntity>(context) {
-
-        override val texture: Identifier = id("textures/entity/silence_energy_ball.png")
     }
 }

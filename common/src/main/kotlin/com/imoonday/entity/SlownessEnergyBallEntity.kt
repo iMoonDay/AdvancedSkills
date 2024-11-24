@@ -1,12 +1,8 @@
 package com.imoonday.entity
 
-import com.imoonday.entity.render.*
 import com.imoonday.init.*
-import com.imoonday.util.*
-import net.minecraft.client.render.entity.*
 import net.minecraft.entity.*
 import net.minecraft.entity.effect.*
-import net.minecraft.util.*
 import net.minecraft.world.*
 
 class SlownessEnergyBallEntity(entityType: EntityType<out SlownessEnergyBallEntity>, world: World) :
@@ -37,12 +33,5 @@ class SlownessEnergyBallEntity(entityType: EntityType<out SlownessEnergyBallEnti
         world: World,
     ) : this(owner.x, owner.y, owner.z, directionX, directionY, directionZ, world) {
         update(owner)
-    }
-
-    class Renderer(context: EntityRendererFactory.Context) :
-        EffectEnergyBallEntityRenderer<SlownessEnergyBallEntity>(context) {
-
-        override val texture: Identifier = id("textures/entity/freeze_energy_ball.png")
-        override var scale = 1f
     }
 }

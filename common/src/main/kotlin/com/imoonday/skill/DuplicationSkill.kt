@@ -22,7 +22,7 @@ class DuplicationSkill : Skill(
                 setJumping(true)
             }
         })
-        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, 20, 0, true, false, true))
+        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, 20 * 3, 0, true, false, true))
         return UseResult.success()
     }
 }

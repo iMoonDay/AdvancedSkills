@@ -10,5 +10,5 @@ public interface AllowDeathEvent {
 
     Event<AllowDeathEvent> EVENT = EventFactory.createEventResult();
 
-    EventResult allowDeath(ServerPlayerEntity player, DamageSource source, float amount);
+    Boolean allowDeath(ServerPlayerEntity player, DamageSource source, float amount);
 }

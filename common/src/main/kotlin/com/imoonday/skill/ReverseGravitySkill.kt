@@ -28,7 +28,7 @@ class ReverseGravitySkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 
-    override fun getPersistTime(): Int = 20 * 10
+    override val persistTime: Int = 20 * 15
 
     override fun onStop(player: ServerPlayerEntity) {
         player.startCooling()

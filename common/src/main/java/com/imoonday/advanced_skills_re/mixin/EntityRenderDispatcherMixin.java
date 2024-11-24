@@ -1,6 +1,6 @@
 package com.imoonday.advanced_skills_re.mixin;
 
-import com.imoonday.trigger.SkillTriggerHandler;
+import com.imoonday.client.ClientTriggerHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.option.GameOptions;
@@ -35,6 +35,6 @@ public class EntityRenderDispatcherMixin {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
     public <E extends Entity> void render(E entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        SkillTriggerHandler.INSTANCE.renderAfterEntity(advanced_skills_re$client, this.camera, entity, yaw, tickDelta, matrices, vertexConsumers, light);
+        ClientTriggerHandler.INSTANCE.renderAfterEntity(advanced_skills_re$client, this.camera, entity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 }

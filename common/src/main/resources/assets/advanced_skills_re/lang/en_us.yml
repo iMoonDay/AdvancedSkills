@@ -43,12 +43,25 @@ advancedSkills:
     banned: '%s was banned from server'
   resetCooldown: '%s reset all skills cooldown'
   reset: 'All data for %s has been reset'
+  cooldown:
+    set: Cooldown of %s has been set to %d seconds
+    reset: Cooldown of %s has been reset
+  rarity:
+    set: 'Rarity of %s has been set to %s'
+    reset: Rarity of %s has been reset
+    invalid: 'Invalid rarity: %s'
+  time:
+    set: Time of %s has been set to %s
+    reset: Time of %s has been reset
+  resetXp:
+    single: "%s's skill xp has been reset"
+    multiple: Skill xp has been reset for %d players
   skillExp:
     give:
-      single: Gave %d skill experience points to %s
+      single: 'Gave %d skill experience points to %s'
       multiple: Gave %d skill experience points to %d players
     set:
-      single: Set %d skill experience points on %s
+      single: 'Set %d skill experience points on %s'
       multiple: Set %d skill experience points on %d players
     query: '%s has %d skill experience points'
   skillLevel:
@@ -324,7 +337,7 @@ advancedSkills:
       description: Launches a biological grappling hook, with a certain probability of being broken free
     duplication:
       name: Duplication
-      description: Summons a clone and becomes invisible for one second
+      description: Summons a clone and becomes invisible for 3 second
     magnetic_trap:
       name: Magnetic Trap
       description: Generate a slowdown trap
@@ -340,6 +353,12 @@ advancedSkills:
     weed_cleaner:
       name: Weed Cleaner
       description: Clean up weeds around
+    unhindered_stride:
+      name: Unhindered Stride
+      description: Can cross any obstacle without being blocked
+    damage_absorption:
+      name: Damage Absorption
+      description: Within a certain period of time, absorb one damage and restore your own health according to the amount of damage
   skillType:
     attack: Attack
     defense: Defense
@@ -389,7 +408,7 @@ advancedSkills:
       title: 'Skill Inventory %d/%d'
     wheel:
       cancel: Cancel
-      tip: Release to select, left click to use, right click to cancel, middle click to view details
+      tip: Release to select, left click to use, right click to cancel, middle click to view details, press %s to open Skill Inventory
     learn:
       refresh: Refresh
       learn: Learn
@@ -438,6 +457,3 @@ subtitles:
     piercing: Piercing
     fire: Fire
     laser: Laser
-gamerule:
-  skillCooldownMultiplier: Skill Cooldown Multiplier(0-100)
-  skillCooldownMultiplier.description: The cooldown time of all skills is adjusted according to this multiplier

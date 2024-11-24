@@ -1,15 +1,11 @@
 package com.imoonday.trigger
 
 import com.imoonday.network.*
+import com.imoonday.network.c2s.*
 import com.imoonday.skill.*
 import com.imoonday.trigger.SendTime.*
 import com.imoonday.util.*
 import net.minecraft.block.*
-import net.minecraft.client.*
-import net.minecraft.client.gui.hud.InGameHud.*
-import net.minecraft.client.network.*
-import net.minecraft.client.render.*
-import net.minecraft.client.util.math.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.effect.*
@@ -117,11 +113,6 @@ object SkillTriggerHandler {
             .map { it.canWalkOnFluid(player, fluidState) }
             .any { it }
 
-    fun getHeartType(player: PlayerEntity): HeartType? =
-        player.getTriggers<HeartTypeTrigger>()
-            .mapNotNull { it.getHeartType(player) }
-            .maxByOrNull { it.second }?.first
-
     fun getStepHeight(player: PlayerEntity): Float? =
         player.getTriggers<StepHeightTrigger>()
             .mapNotNull { it.getStepHeight(player) }
@@ -155,7 +146,7 @@ object SkillTriggerHandler {
             .map { it.isInvisibleTo(player, otherPlayer) }
             .any { it }
 
-    fun sendPlayerData(player: ClientPlayerEntity) =
+    fun sendPlayerData(player: PlayerEntity) =
         player.getTriggers<SendPlayerDataTrigger>()
             .filter { it.getSendTime() != USE }
             .forEach {
@@ -187,21 +178,6 @@ object SkillTriggerHandler {
             .map { it.cannotHaveStatusEffect(player, effect) }
             .any { it }
 
-    fun isGlowing(entity: Entity): Boolean =
-        clientPlayer?.getTriggers<GlowingTrigger>()
-            ?.map { it.isGlowing(entity) }
-            ?.any { it } ?: false
-
-    fun worldRender(matrixStack: MatrixStack, tickDelta: Float, client: MinecraftClient) {
-        client.player?.getTriggers<WorldRenderTrigger>()
-            ?.forEach { it.apply(matrixStack, tickDelta, client) }
-    }
-
-    fun shouldInvertMouse(): Pair<Boolean, Boolean> =
-        clientPlayer?.getTriggers<InvertMouseTrigger>()?.run {
-            map { it.shouldInvertMouseX() }.any { it } to map { it.shouldInvertMouseY() }.any { it }
-        } ?: (false to false)
-
     fun shouldFlipUpsideDown(player: PlayerEntity): Boolean =
         player.getTriggers<FlipUpsideDownTrigger>()
             .map { it.shouldFlipUpsideDown(player) }
@@ -219,11 +195,6 @@ object SkillTriggerHandler {
             .forEach { it.postStop(player) }
     }
 
-    fun shouldInvertInput(): Pair<Boolean, Boolean> =
-        clientPlayer?.getTriggers<InvertInputTrigger>()?.run {
-            map { it.shouldInvertHorizontalInput() }.any { it } to map { it.shouldInvertVerticalInput() }.any { it }
-        } ?: (false to false)
-
     fun shouldInvertJump(player: PlayerEntity): Boolean =
         player.getTriggers<InvertInputTrigger>()
             .map { it.shouldInvertJump(player) }.any { it }
@@ -231,13 +202,6 @@ object SkillTriggerHandler {
     fun shouldInvertSneak(player: PlayerEntity): Boolean =
         player.getTriggers<InvertInputTrigger>()
             .map { it.shouldInvertSneak(player) }.any { it }
-
-    fun getCameraMovement(original: Float): Float {
-        var movement = original
-        clientPlayer?.getTriggers<CameraUpdateMovementTrigger>()
-            ?.forEach { movement = it.getDelta(movement) }
-        return movement
-    }
 
     fun postDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) =
         player.getTriggers<PostDamagedTrigger>()
@@ -256,20 +220,4 @@ object SkillTriggerHandler {
         player.getTriggers<TauntTrigger>()
             .map { it.isTaunting(player) }
             .any { it }
-
-    fun renderAfterEntity(
-        client: MinecraftClient,
-        camera: Camera,
-        entity: Entity,
-        yaw: Float,
-        tickDelta: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
-        light: Int
-    ) {
-        val player = client.player ?: return
-        player.getTriggers<EntityRenderTrigger>()
-            .filter { it.shouldRender(player, entity) }
-            .forEach { it.render(camera, entity, yaw, tickDelta, matrices, vertexConsumers, light) }
-    }
 }

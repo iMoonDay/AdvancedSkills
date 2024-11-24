@@ -1,25 +1,24 @@
 package com.imoonday.skill
 
-import com.imoonday.*
 import com.imoonday.config.*
 import com.imoonday.init.*
 import com.imoonday.init.ModItems.ITEMS
 import com.imoonday.item.*
-import com.imoonday.network.*
+import com.imoonday.network.c2s.*
 import com.imoonday.trigger.*
 import com.imoonday.util.*
 import com.mojang.blaze3d.systems.*
+import com.mojang.logging.*
 import net.minecraft.client.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.util.*
-import net.minecraft.entity.*
 import net.minecraft.entity.player.*
 import net.minecraft.registry.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.text.*
 import net.minecraft.util.*
-import net.minecraft.world.*
+import org.slf4j.*
 import java.awt.*
 import java.util.*
 import java.util.function.*
@@ -38,12 +37,11 @@ abstract class Skill(
 ) : SkillTrigger {
 
     val invalid = invalid
-        get() = Config.instance.skillBlackList[id.namespace]?.contains(id.path) == true || field
+        get() = SkillConfig.instance.skillBlackList[id.namespace]?.contains(id.path) == true || field
     val rarity = rarity
-        get() = Config.instance.skillModifier[id.namespace]
+        get() = SkillConfig.instance.skillModifier[id.namespace]
             ?.get(id.path)
-            ?.get("rarity")
-            ?.let(Rarity.Companion::parse)
+            ?.rarity
             ?: field
     val formattedName: Text
         get() = name.copy().formatted(rarity.formatting)
@@ -51,6 +49,13 @@ abstract class Skill(
         get() = Registries.ITEM[id] as? SkillItem
     val modelId
         get() = ModelIdentifier(Registries.ITEM.getId(item), "inventory")
+    val cooldown: Int
+        get() = ((SkillConfig.instance.skillModifier[id.namespace]
+            ?.get(id.path)
+            ?.cooldown
+            ?: defaultCooldown) *
+            SkillConfig.instance.skillCooldownMultiplier.coerceIn(0.0, 1.0)
+            ).toInt()
 
     constructor(
         id: String,
@@ -71,19 +76,6 @@ abstract class Skill(
     )
 
     fun isEmpty(): Boolean = this == EMPTY
-
-    fun getCooldown(world: World?): Int =
-        ((Config.instance.skillModifier[id.namespace]
-            ?.get(id.path)
-            ?.get("cooldown")
-            ?.toIntOrNull()
-            ?: defaultCooldown) *
-            ((world?.gameRules
-                ?.get(ModGameRules.COOLDOWN_MULTIPLIER)
-                ?.get()
-                ?.div(100.0)) ?: 1.0)
-                .coerceIn(0.0, 1.0)
-            ).toInt()
 
     fun createUuid(content: String): UUID = UUID.nameUUIDFromBytes("$id-$content".toByteArray())
 
@@ -109,7 +101,7 @@ abstract class Skill(
                 types.joinToString(" ") { it.displayName.string }
             ).formatted(Formatting.GRAY))
             add(
-                translate("screen", "gallery.info.cooldown", "${getCooldown(client.world) / 20.0}s").formatted(
+                translate("screen", "gallery.info.cooldown", "${cooldown / 20.0}s").formatted(
                     Formatting.GRAY
                 )
             )
@@ -118,11 +110,12 @@ abstract class Skill(
     }
 
     abstract fun use(user: ServerPlayerEntity): UseResult
-    open fun playSoundFrom(player: PlayerEntity) {
+
+    open fun PlayerEntity.playSkillSound() {
         sound?.let {
-            player.world.playSound(
+            world.playSound(
                 null,
-                player.blockPos,
+                blockPos,
                 it.get(),
                 SoundCategory.PLAYERS,
             )
@@ -139,23 +132,6 @@ abstract class Skill(
     }
 
     override fun hashCode(): Int = id.hashCode()
-    protected fun reflectedFailed(player: ServerPlayerEntity) {
-        player.sendMessage(translateSkill("extreme_reflection", "failed"), true)
-    }
-
-    protected fun reflect(
-        player: ServerPlayerEntity,
-        attacker: LivingEntity?,
-        amount: Float,
-    ) {
-        player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
-        attacker?.damage(player.damageSources.thorns(player), amount)?.let {
-            player.sendMessage(
-                translateSkill("extreme_reflection", if (it) "success" else "failed"),
-                true
-            )
-        }
-    }
 
     fun tryUse(
         player: ServerPlayerEntity,
@@ -184,7 +160,7 @@ abstract class Skill(
         result: UseResult,
     ) {
         if (result.success) {
-            playSoundFrom(serverPlayerEntity)
+            serverPlayerEntity.playSkillSound()
             serverPlayerEntity.sendMessage(result.message ?: this.name, true)
         } else {
             val message =
@@ -194,14 +170,13 @@ abstract class Skill(
         }
         if (result.cooling) {
             serverPlayerEntity.startCooling()
-            (this as? SynchronousCoolingTrigger)?.getOtherSkills()?.forEach { serverPlayerEntity.startCooling(it) }
+            (this as? SynchronousCoolingTrigger)?.getOtherSkills()
+                ?.forEach(serverPlayerEntity::startCooling)
         }
     }
 
     override fun getAsSkill(): Skill = this
-
     open fun isDangerous(player: ServerPlayerEntity): Boolean = false
-
     fun register(): Skill {
         if (this in skills) {
             LOGGER.warn("Skill $id is already registered")
@@ -238,7 +213,7 @@ abstract class Skill(
         var flashed = false
         if (this is AutoStopTrigger && shouldFlashIcon() && player != null) {
             flashed = true
-            val persistTime = getPersistTime()
+            val persistTime = getPersistTimeModified()
             val leftUseTime = persistTime - player.getUsedTime(this)
             if (persistTime > 20 * 5 && leftUseTime <= persistTime / 5) {
                 val alpha = 0.5 * sin(2 * PI / 20 * (leftUseTime - persistTime / 5)) + 0.5
@@ -290,7 +265,7 @@ abstract class Skill(
     ) {
         if (!player.isCooling()) return
         val cooldown = player.getCooldown(this)
-        val maxCooldown = getCooldown(player.world)
+        val maxCooldown = this.cooldown
         val progress = (cooldown.toDouble() / maxCooldown).coerceIn(0.0, 1.0)
         val startY = (endY - progress * maxHeight).toInt()
         context.fill(startX, startY, startX + width, endY, Color.BLACK.alpha(0.25).rgb)
@@ -343,6 +318,7 @@ abstract class Skill(
 
     companion object {
 
+        private val LOGGER: Logger = LogUtils.getLogger()
         private val skills = mutableSetOf<Skill>()
         val triggers: MutableMap<Class<out SkillTrigger>, List<SkillTrigger>> = mutableMapOf()
 
@@ -354,6 +330,8 @@ abstract class Skill(
         fun fromId(id: String?) = skills.find { it.id == id?.toIdentifier() } ?: EMPTY
         fun fromIdNullable(id: Identifier?) = skills.find { it.id == id }
         fun fromIdNullable(id: String?) = skills.find { it.id == Identifier.tryParse(id) }
+
+        @Suppress("UNCHECKED_CAST")
         inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> {
             val triggers: List<T> = (triggers[T::class.java] ?: getSkills().filterIsInstance<T>().also {
                 triggers[T::class.java] = it

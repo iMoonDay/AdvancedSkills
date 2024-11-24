@@ -16,7 +16,9 @@
     "KeyboardInputMixin",
     "LivingEntityRendererMixin",
     "ModelLoaderMixin",
-    "MouseMixin"
+    "MouseMixin",
+    "ScreenAccessor",
+    "WorldRendererAccessor"
   ],
   "mixins": [
     "ArgumentTypesMixin",
@@ -36,13 +38,11 @@
     "MeleeAttackGoalMixin",
     "PlayerEntityMixin",
     "ProjectileAttackGoalMixin",
-    "ScreenAccessor",
     "ServerPlayerEntityMixin",
     "ServerWorldMixin",
     "ShulkerEntity$ShootBulletGoalMixin",
     "StatusEffectInstanceAccessor",
-    "WardenEntityMixin",
-    "WorldRendererAccessor"
+    "WardenEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

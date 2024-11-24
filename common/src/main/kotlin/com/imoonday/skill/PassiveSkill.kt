@@ -21,6 +21,6 @@ abstract class PassiveSkill(
 
     override fun postEquipped(player: ServerPlayerEntity, slot: SkillSlot) = player.addAttributes()
 
-    override fun afterRespawn(oldPlayer: ServerPlayerEntity, newPlayer: ServerPlayerEntity, alive: Boolean) =
-        newPlayer.addAttributes()
+    override fun afterRespawn(player: ServerPlayerEntity) =
+        player.addAttributes()
 }
