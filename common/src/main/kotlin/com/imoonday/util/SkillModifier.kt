@@ -10,8 +10,11 @@ import net.minecraft.nbt.*
 data class SkillModifier(
     var cooldown: Int?,
     var rarity: Skill.Rarity?,
-    var time: Int?
+    var time: Int?,
 ) {
+
+    val isEmpty: Boolean
+        get() = cooldown == null && rarity == null && time == null
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
         if (cooldown != null) {

@@ -150,7 +150,7 @@ class SkillGalleryScreen(
                 translate(
                     "screen",
                     "gallery.info.type",
-                    skill.types.joinToString(" ") { type -> type.displayName.string }
+                    skill.types.joinToString(" ") { it.displayName.string }
                 ),
                 xOffset,
                 yOffset,
@@ -160,10 +160,10 @@ class SkillGalleryScreen(
             yOffset += textRenderer.fontHeight + gap
             // 4. 渲染技能描述（灰色，多行显示）
             val description = skill.description
-            textRenderer.wrapLines(description, width - 15).forEach { text ->
+            textRenderer.wrapLines(description, width - 15).forEach {
                 context.drawText(
                     textRenderer,
-                    text,
+                    it,
                     xOffset,
                     yOffset,
                     0xBDBDBD,

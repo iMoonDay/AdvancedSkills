@@ -9,14 +9,11 @@ interface SkillTrigger {
 
     fun getAsSkill(): Skill
     fun PlayerEntity.isUsing(): Boolean = isUsing(getAsSkill())
-
     fun PlayerEntity.isCooling(): Boolean = isCooling(getAsSkill())
     fun PlayerEntity.hasEquipped(): Boolean = hasEquipped(getAsSkill())
     fun PlayerEntity.getUsingData(): NbtCompound? = getUsingData(getAsSkill())
-
     fun PlayerEntity.getUsedTime(): Int = getUsedTime(getAsSkill())
     fun PlayerEntity.modifyUsedTime(operation: (Int) -> Int) = modifyUsedTime(getAsSkill(), operation)
-
     fun PlayerEntity.startCooling() = startCooling(getAsSkill())
     fun PlayerEntity.startCooling(cooldown: Int) = startCooling(getAsSkill(), cooldown)
     fun PlayerEntity.stopCooling() = stopCooling(getAsSkill())

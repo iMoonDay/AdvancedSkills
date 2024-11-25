@@ -11,7 +11,7 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
 
     fun getPersistTimeModified(): Int {
         val id = getAsSkill().id
-        return SkillConfig.instance.skillModifier[id.namespace]?.get(id.path)?.time ?: persistTime
+        return SkillConfig.instance.getModifier(id)?.time ?: persistTime
     }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {

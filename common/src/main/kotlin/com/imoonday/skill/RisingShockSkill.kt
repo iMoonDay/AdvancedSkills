@@ -49,6 +49,7 @@ class RisingShockSkill : Skill(
         player.sendToServer(EntityVelocityUpdateS2CPacket(player))
         player.spawnParticles(
             ParticleTypes.CLOUD,
+            false,
             Vec3d(player.x, player.boundingBox.minY, player.z),
             10,
             0.5,

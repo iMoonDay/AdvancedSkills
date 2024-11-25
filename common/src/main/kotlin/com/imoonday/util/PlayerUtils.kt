@@ -476,6 +476,7 @@ fun PlayerEntity.sendToServer(packet: Packet<out PacketListener>) = if (this is 
 
 fun ServerPlayerEntity.spawnParticles(
     type: ParticleEffect,
+    force: Boolean,
     pos: Vec3d,
     count: Int,
     deltaX: Double,
@@ -483,39 +484,31 @@ fun ServerPlayerEntity.spawnParticles(
     deltaZ: Double,
     speed: Double,
 ) {
-    serverWorld.spawnParticles(type, pos.x, pos.y, pos.z, count, deltaX, deltaY, deltaZ, speed)
-}
-
-fun <T : ParticleEffect> ServerPlayerEntity.spawnParticlesForced(
-    type: T,
-    pos: Vec3d,
-    count: Int,
-    deltaX: Double,
-    deltaY: Double,
-    deltaZ: Double,
-    speed: Double
-): Int {
-    val particleS2CPacket = ParticleS2CPacket(
-        type,
-        true,
-        pos.x,
-        pos.y,
-        pos.z,
-        deltaX.toFloat(),
-        deltaY.toFloat(),
-        deltaZ.toFloat(),
-        speed.toFloat(),
-        count
-    )
-    return serverWorld.players.count {
-        serverWorld.sendToPlayerIfNearby(
-            it,
+    if (force) {
+        val particleS2CPacket = ParticleS2CPacket(
+            type,
             true,
             pos.x,
             pos.y,
             pos.z,
-            particleS2CPacket
+            deltaX.toFloat(),
+            deltaY.toFloat(),
+            deltaZ.toFloat(),
+            speed.toFloat(),
+            count
         )
+        serverWorld.players.forEach {
+            serverWorld.sendToPlayerIfNearby(
+                it,
+                true,
+                pos.x,
+                pos.y,
+                pos.z,
+                particleS2CPacket
+            )
+        }
+    } else {
+        serverWorld.spawnParticles(type, pos.x, pos.y, pos.z, count, deltaX, deltaY, deltaZ, speed)
     }
 }
 

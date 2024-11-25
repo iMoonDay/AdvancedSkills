@@ -1,6 +1,5 @@
 package com.imoonday.util
 
-import com.imoonday.*
 import com.imoonday.skill.*
 import com.mojang.brigadier.*
 import com.mojang.brigadier.arguments.*
@@ -17,10 +16,7 @@ class SkillArgumentType : ArgumentType<Skill> {
         context: CommandContext<S>,
         builder: SuggestionsBuilder,
     ): CompletableFuture<Suggestions> =
-        CommandSource.suggestMatching(mutableListOf<String>().apply {
-            addAll(Skill.getValidSkills().map { it.id.toString() })
-            addAll(Skill.getValidSkills().filter { it.id.namespace == MOD_ID }.map { it.id.path })
-        }, builder)
+        CommandSource.suggestFromIdentifier(Skill.getValidSkills(), builder, Skill::id, Skill::name)
 
     override fun parse(reader: StringReader): Skill {
         val i = reader.cursor

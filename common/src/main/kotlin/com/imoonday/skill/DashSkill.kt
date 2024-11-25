@@ -25,6 +25,7 @@ class DashSkill : Skill(
             sendToServer(EntityVelocityUpdateS2CPacket(this))
             spawnParticles(
                 ParticleTypes.CLOUD,
+                false,
                 pos,
                 10,
                 0.5,

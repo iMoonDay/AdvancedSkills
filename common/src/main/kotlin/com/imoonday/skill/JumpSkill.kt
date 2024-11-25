@@ -22,6 +22,7 @@ class JumpSkill : Skill(
             sendToServer(EntityVelocityUpdateS2CPacket(this))
             user.spawnParticles(
                 ParticleTypes.CLOUD,
+                false,
                 pos,
                 10,
                 0.5,

@@ -53,10 +53,7 @@ object ModifySkillCommand : BaseCommand("modify") {
     private fun setTime(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
         val time = IntegerArgumentType.getInteger(context, "time")
-        SkillConfig.instance.skillModifier
-            .computeIfAbsent(skill.id.namespace) { mutableMapOf() }
-            .computeIfAbsent(skill.id.path) { SkillModifier.EMPTY }
-            .time = time
+        SkillConfig.instance.getOrCreateModifier(skill.id).time = time
         SkillConfig.save()
         context.syncConfig()
         context.sendFeedback(
@@ -69,12 +66,15 @@ object ModifySkillCommand : BaseCommand("modify") {
 
     private fun resetTime(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
-        SkillConfig.instance.skillModifier
-            .computeIfAbsent(skill.id.namespace) { mutableMapOf() }
-            .computeIfAbsent(skill.id.path) { SkillModifier.EMPTY }
-            .time = null
-        SkillConfig.save()
-        context.syncConfig()
+        val id = skill.id
+        SkillConfig.instance.getModifier(id)?.run {
+            time = null
+            if (isEmpty) {
+                SkillConfig.instance.removeModifier(id)
+            }
+            SkillConfig.save()
+            context.syncConfig()
+        }
         context.sendFeedback(
             "time", "reset",
             skill.name
@@ -85,12 +85,14 @@ object ModifySkillCommand : BaseCommand("modify") {
     private fun resetRarity(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
         val id = skill.id
-        SkillConfig.instance.skillModifier
-            .computeIfAbsent(id.namespace) { mutableMapOf() }
-            .computeIfAbsent(id.path) { SkillModifier.EMPTY }
-            .rarity = null
-        SkillConfig.save()
-        context.syncConfig()
+        SkillConfig.instance.getModifier(id)?.run {
+            rarity = null
+            if (isEmpty) {
+                SkillConfig.instance.removeModifier(id)
+            }
+            SkillConfig.save()
+            context.syncConfig()
+        }
         context.sendFeedback(
             "rarity", "reset",
             skill.name
@@ -109,10 +111,7 @@ object ModifySkillCommand : BaseCommand("modify") {
             )
             0
         } else {
-            SkillConfig.instance.skillModifier
-                .computeIfAbsent(skill.id.namespace) { mutableMapOf() }
-                .computeIfAbsent(skill.id.path) { SkillModifier.EMPTY }
-                .rarity = rarity
+            SkillConfig.instance.getOrCreateModifier(skill.id).rarity = rarity
             SkillConfig.save()
             context.syncConfig()
             context.sendFeedback(
@@ -134,12 +133,15 @@ object ModifySkillCommand : BaseCommand("modify") {
 
     private fun resetCooldown(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
-        SkillConfig.instance.skillModifier
-            .computeIfAbsent(skill.id.namespace) { mutableMapOf() }
-            .computeIfAbsent(skill.id.path) { SkillModifier.EMPTY }
-            .cooldown = null
-        SkillConfig.save()
-        context.syncConfig()
+        val id = skill.id
+        SkillConfig.instance.getModifier(id)?.run {
+            cooldown = null
+            if (isEmpty) {
+                SkillConfig.instance.removeModifier(id)
+            }
+            SkillConfig.save()
+            context.syncConfig()
+        }
         context.sendFeedback(
             "cooldown", "reset",
             skill.name
@@ -150,10 +152,7 @@ object ModifySkillCommand : BaseCommand("modify") {
     private fun setCooldown(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
         val duration = IntegerArgumentType.getInteger(context, "duration") * 20
-        SkillConfig.instance.skillModifier
-            .computeIfAbsent(skill.id.namespace) { mutableMapOf() }
-            .computeIfAbsent(skill.id.path) { SkillModifier.EMPTY }
-            .cooldown = duration
+        SkillConfig.instance.getOrCreateModifier(skill.id).cooldown = duration
         SkillConfig.save()
         context.syncConfig()
         context.sendFeedback(

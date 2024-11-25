@@ -168,7 +168,7 @@ public abstract class LivingEntityMixin {
     public void advanced_skills_re$setHealth(float health, CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;
         health = MathHelper.clamp(health, 0.0F, this.getMaxHealth());
-        if (SeriousInjuryEffect.Companion.cancelSetHealth(entity, health)) {
+        if (SeriousInjuryEffect.Companion.onSetHealth(entity, health)) {
             ci.cancel();
         }
     }

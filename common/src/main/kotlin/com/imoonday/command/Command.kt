@@ -15,7 +15,7 @@ interface Command : CommandRegistrationEvent {
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
         registry: CommandRegistryAccess,
-        selection: RegistrationEnvironment
+        selection: RegistrationEnvironment,
     ) {
         dispatcher.register(literal(root).requires { it.hasPermissionLevel(2) }.then(buildBranch()))
     }
@@ -29,7 +29,7 @@ interface Command : CommandRegistrationEvent {
 
         fun CommandDispatcher<ServerCommandSource>.register(
             registry: CommandRegistryAccess,
-            selection: RegistrationEnvironment, vararg commands: Command
+            selection: RegistrationEnvironment, vararg commands: Command,
         ) = commands.forEach { it.register(this, registry, selection) }
     }
 }

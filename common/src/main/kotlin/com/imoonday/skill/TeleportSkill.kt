@@ -38,6 +38,7 @@ class TeleportSkill : Skill(
             )
             user.spawnParticles(
                 ParticleTypes.LARGE_SMOKE,
+                false,
                 prevPos.add(0.0, height / 2.0, 0.0),
                 10,
                 width / 2.0,

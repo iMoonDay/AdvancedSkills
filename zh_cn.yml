@@ -1,7 +1,7 @@
-advancedSkills:
-  itemGroup: 进阶技能
+advancedSkillsRe:
+  itemGroup: 进阶技能：重制版
   key:
-    category: 进阶技能
+    category: 进阶技能：重制版
     openGalleryScreen: 查看技能图鉴
     openListScreen: 查看技能列表
     openSlotScreen: 调整技能栏位置

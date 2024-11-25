@@ -42,6 +42,7 @@ class GroundWhackSkill : Skill(
                 }
             player.spawnParticles(
                 ParticleTypes.CLOUD,
+                false,
                 player.pos,
                 (100 * newHeight).toInt(),
                 newHeight,

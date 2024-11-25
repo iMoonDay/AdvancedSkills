@@ -37,27 +37,21 @@ abstract class Skill(
 ) : SkillTrigger {
 
     val invalid = invalid
-        get() = SkillConfig.instance.skillBlackList[id.namespace]?.contains(id.path) == true || field
+        get() = field || SkillConfig.instance.isInBlackList(id)
     val rarity = rarity
-        get() = SkillConfig.instance.skillModifier[id.namespace]
-            ?.get(id.path)
-            ?.rarity
-            ?: field
-    val formattedName: Text
+        get() = SkillConfig.instance.getModifier(id)?.rarity ?: field
+    val formattedName: MutableText
         get() = name.copy().formatted(rarity.formatting)
     val item: SkillItem?
         get() = Registries.ITEM[id] as? SkillItem
     val modelId
         get() = ModelIdentifier(Registries.ITEM.getId(item), "inventory")
     val cooldown: Int
-        get() = ((SkillConfig.instance.skillModifier[id.namespace]
-            ?.get(id.path)
-            ?.cooldown
-            ?: defaultCooldown) *
-            SkillConfig.instance.skillCooldownMultiplier.coerceIn(0.0, 1.0)
+        get() = ((SkillConfig.instance.getModifier(id)?.cooldown ?: defaultCooldown) *
+            SkillConfig.instance.skillCooldownMultiplier
             ).toInt()
 
-    constructor(
+    protected constructor(
         id: String,
         types: List<SkillType>,
         cooldown: Int = 0,
@@ -143,9 +137,13 @@ abstract class Skill(
             player.sendMessage(translate("useSkill", "silenced"), true)
             return
         }
-        if (player.isCooling(this) && (this !is LongPressTrigger || !player.isUsing())) {
+        if (player.isCooling() && (this !is LongPressTrigger || !player.isUsing())) {
             player.sendMessage(
-                translate("useSkill", "cooling", name.string, "${(player.getCooldown(this) / 20.0)}s"),
+                translate(
+                    "useSkill", "cooling",
+                    name.string,
+                    "${(player.getCooldown(this) / 20.0)}s"
+                ),
                 true
             )
         } else {
@@ -233,7 +231,7 @@ abstract class Skill(
         context: DrawContext,
         x: Int,
         y: Int,
-        size: Int = 16
+        size: Int = 16,
     ) = context.drawTexture(icon, x, y, 0f, 0f, size, size, size, size)
 
     open fun renderProgressBar(

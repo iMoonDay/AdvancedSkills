@@ -30,7 +30,7 @@ class AbsoluteDomainSkill : Skill(
             hardness < maxHardness && hardness >= 0 && it.y >= player.blockY
         }.forEach {
             val centerPos = it.toCenterPos()
-            player.spawnParticles(ParticleTypes.SMOKE, centerPos, 1, 0.0, 0.0, 0.0, 0.0)
+            player.spawnParticles(ParticleTypes.SMOKE, false, centerPos, 1, 0.0, 0.0, 0.0, 0.0)
             player.world.breakBlock(it, true, player)
         }
     }

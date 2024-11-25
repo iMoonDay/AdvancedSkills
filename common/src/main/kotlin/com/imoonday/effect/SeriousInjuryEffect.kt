@@ -46,7 +46,7 @@ class SeriousInjuryEffect : StatusEffect(
 
     companion object {
 
-        fun cancelSetHealth(entity: LivingEntity, health: Float): Boolean {
+        fun onSetHealth(entity: LivingEntity, health: Float): Boolean {
             val result = entity.isSeriousInjured && health > entity.health
             if (result) {
                 val isRemoving = entity.properties.contains(

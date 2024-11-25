@@ -27,8 +27,9 @@ class LaserEyeSkill : Skill(
         }
         var offset = 0.1
         while (offset <= maxDistance) {
-            user.spawnParticlesForced(
+            user.spawnParticles(
                 DustParticleEffect(particleColor, 1f),
+                true,
                 user.eyePos + user.rotationVector * offset,
                 1,
                 0.0,

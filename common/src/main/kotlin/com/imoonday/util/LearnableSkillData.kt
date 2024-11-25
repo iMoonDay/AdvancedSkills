@@ -27,6 +27,7 @@ class LearnableSkillData(
     }
 
     fun hasNext() = count > 0
+
     fun clear() {
         choice = SkillChoice.EMPTY
         refreshed = false
@@ -38,6 +39,7 @@ class LearnableSkillData(
     }
 
     fun get() = choice
+
     fun isEmpty() = choice.isEmpty()
 
     fun refresh(

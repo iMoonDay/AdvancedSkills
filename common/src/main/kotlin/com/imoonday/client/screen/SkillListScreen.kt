@@ -215,8 +215,7 @@ class SkillListScreen(
         context.drawText(
             textRenderer,
             translate(
-                "screen",
-                "list.level",
+                "screen", "list.level",
                 "${player.skillLevel % 100}${if (player.skillLevel > 100) " (+${player.skillLevel / 100})" else ""}"
             ),
             5, 5, 0xFFFFFF, false

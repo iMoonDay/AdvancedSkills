@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import net.minecraft.nbt.*
 import net.minecraft.server.*
+import net.minecraft.util.*
 import org.slf4j.*
 import java.io.*
 import java.nio.file.*
@@ -21,6 +22,12 @@ import kotlin.io.path.*
 class SkillConfig {
 
     var skillCooldownMultiplier: Double = 1.0
+        get() {
+            if (field < 0.0) {
+                field = 0.0
+            }
+            return field
+        }
         set(value) {
             field = value.coerceIn(0.0, 1.0)
             save()
@@ -40,6 +47,15 @@ class SkillConfig {
         "generic" to 1,
         "passive" to 2,
     )
+
+    fun getModifier(id: Identifier): SkillModifier? = skillModifier[id.namespace]?.get(id.path)
+
+    fun getOrCreateModifier(id: Identifier): SkillModifier =
+        skillModifier.getOrPut(id.namespace) { mutableMapOf() }.getOrPut(id.path) { SkillModifier.EMPTY }
+
+    fun removeModifier(id: Identifier): Boolean = skillModifier[id.namespace]?.remove(id.path) != null
+
+    fun isInBlackList(id: Identifier): Boolean = skillBlackList[id.namespace]?.contains(id.path) ?: false
 
     fun toJson(): String = JSON.encodeToString(serializer(), this)
 
