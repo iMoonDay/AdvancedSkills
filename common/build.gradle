@@ -11,5 +11,5 @@ dependencies {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/advanced_skills_re.accesswidener")
+    accessWidenerPath = file("src/main/resources/advskills_re.accesswidener")
 }

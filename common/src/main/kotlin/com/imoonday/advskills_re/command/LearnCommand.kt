@@ -1,0 +1,32 @@
+package com.imoonday.advskills_re.command
+
+import com.imoonday.advskills_re.util.*
+import com.mojang.brigadier.builder.*
+import com.mojang.brigadier.context.*
+import net.minecraft.command.*
+import net.minecraft.server.command.*
+import net.minecraft.server.network.*
+
+object LearnCommand : PlayerCommand("learn") {
+
+    override fun buildWithTarget(builder: RequiredArgumentBuilder<ServerCommandSource, EntitySelector>): ArgumentBuilder<ServerCommandSource, *> =
+        builder.then(
+            argument("skill", SkillArgumentType.skill())
+                .executesWithPlayer(::learn)
+        )
+
+    private fun learn(
+        context: CommandContext<ServerCommandSource>,
+        player: ServerPlayerEntity
+    ): Int {
+        val skill = SkillArgumentType.getSkill(context)
+        if (!player.learn(skill)) {
+            context.sendFeedback(
+                "learnSkill", "failed",
+                player.displayName.string,
+                skill.name.string
+            )
+        }
+        return 1
+    }
+}

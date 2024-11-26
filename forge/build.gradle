@@ -4,8 +4,8 @@ plugins {
 
 loom {
     forge {
-        mixinConfig "advanced_skills_re.mixins.json"
-        mixinConfig "advanced_skills_re_forge.mixins.json"
+        mixinConfig "advskills_re.mixins.json"
+        mixinConfig "advskills_re_forge.mixins.json"
         convertAccessWideners = true
 //        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
     }

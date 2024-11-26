@@ -1,0 +1,50 @@
+{
+  "heal": {
+    "subtitle": "subtitles.advskills_re.heal",
+    "sounds": [
+      "advskills_re:heal"
+    ]
+  },
+  "purify": {
+    "subtitle": "subtitles.advskills_re.purify",
+    "sounds": [
+      "advskills_re:purify"
+    ]
+  },
+  "notice": {
+    "subtitle": "subtitles.advskills_re.notice",
+    "sounds": [
+      "advskills_re:notice"
+    ]
+  },
+  "dash": {
+    "subtitle": "subtitles.advskills_re.dash",
+    "sounds": [
+      "advskills_re:dash"
+    ]
+  },
+  "disarm": {
+    "subtitle": "subtitles.advskills_re.disarm",
+    "sounds": [
+      "advskills_re:disarm"
+    ]
+  },
+  "piercing": {
+    "subtitle": "subtitles.advskills_re.piercing",
+    "sounds": [
+      "advskills_re:piercing"
+    ]
+  },
+  "fire": {
+    "subtitle": "subtitles.advskills_re.fire",
+    "sounds": [
+      "advskills_re:fire"
+    ]
+  },
+  "laser": {
+    "subtitle": "subtitles.advskills_re.laser",
+    "sounds": [
+      "advskills_re:laser"
+    ]
+  }
+}

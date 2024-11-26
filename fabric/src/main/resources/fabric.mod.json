@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "advanced_skills_re",
+  "id": "advskills_re",
   "version": "${version}",
   "name": "Advanced Skills: Remastered",
   "description": "A large number of skills give you a more enjoyable combat experience",
@@ -13,19 +13,19 @@
     "issues": "https://github.com/iMoonDay/AdvancedSkills/issues"
   },
   "license": "MIT",
-  "icon": "assets/advanced_skills_re/icon.png",
+  "icon": "assets/advskills_re/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.imoonday.advanced_skills_re.fabric.AdvancedSkillsFabric"
+      "com.imoonday.advskills_re.fabric.AdvancedSkillsFabric"
     ],
     "client": [
-      "com.imoonday.advanced_skills_re.fabric.client.AdvancedSkillsFabricClient"
+      "com.imoonday.advskills_re.fabric.client.AdvancedSkillsFabricClient"
     ]
   },
   "mixins": [
-    "advanced_skills_re_fabric.mixins.json",
-    "advanced_skills_re.mixins.json"
+    "advskills_re_fabric.mixins.json",
+    "advskills_re.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14",
@@ -33,5 +33,5 @@
     "java": ">=17",
     "fabric-api": "*"
   },
-  "accessWidener": "advanced_skills_re.accesswidener"
+  "accessWidener": "advskills_re.accesswidener"
 }

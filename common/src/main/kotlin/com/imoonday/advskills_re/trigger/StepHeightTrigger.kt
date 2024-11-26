@@ -1,0 +1,8 @@
+package com.imoonday.advskills_re.trigger
+
+import net.minecraft.entity.player.*
+
+interface StepHeightTrigger : SkillTrigger {
+
+    fun getStepHeight(player: PlayerEntity): Float?
+}

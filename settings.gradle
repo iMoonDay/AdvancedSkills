@@ -7,7 +7,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'advanced_skills_re'
+rootProject.name = 'advskills_re'
 
 include 'common'
 include 'fabric'

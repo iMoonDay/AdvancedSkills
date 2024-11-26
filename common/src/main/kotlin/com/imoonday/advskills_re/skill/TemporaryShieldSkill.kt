@@ -1,0 +1,24 @@
+package com.imoonday.advskills_re.skill
+
+import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.util.UseResult
+import net.minecraft.server.network.*
+
+class TemporaryShieldSkill : Skill(
+    id = "temporary_shield",
+    types = listOf(SkillType.DEFENSE),
+    cooldown = 30,
+    rarity = Rarity.LEGENDARY
+), AutoStopTrigger {
+
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
+
+    override val persistTime: Int = 20 * 10
+
+    override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
+        if (player.isUsing() && usedTime % 20 == 0) player.absorptionAmount =
+            (player.absorptionAmount + 1).coerceAtMost(10f)
+        super.serverTick(player, usedTime)
+    }
+}

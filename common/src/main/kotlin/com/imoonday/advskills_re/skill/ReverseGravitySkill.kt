@@ -1,0 +1,95 @@
+package com.imoonday.advskills_re.skill
+
+import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.util.UseResult
+import com.imoonday.advskills_re.util.clientPlayer
+import net.minecraft.client.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
+import net.minecraft.entity.player.*
+import net.minecraft.server.network.*
+import net.minecraft.util.math.*
+
+class ReverseGravitySkill : Skill(
+    id = "reverse_gravity",
+    types = listOf(SkillType.MOVEMENT),
+    cooldown = 30,
+    rarity = Rarity.EPIC,
+), AutoStopTrigger,
+    WorldRenderTrigger,
+    InvertMouseTrigger,
+    FlipUpsideDownTrigger,
+    EyeHeightTrigger,
+    StopTrigger,
+    ClientUseTrigger,
+    InvertInputTrigger,
+    CameraUpdateMovementTrigger {
+
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
+
+    override val persistTime: Int = 20 * 15
+
+    override fun onStop(player: ServerPlayerEntity) {
+        player.startCooling()
+        player.pitch = -player.pitch
+        super<AutoStopTrigger>.onStop(player)
+    }
+
+    override fun postStop(player: PlayerEntity) {
+        super.postStop(player)
+        player.calculateDimensions()
+    }
+
+    override fun tick(player: PlayerEntity, usedTime: Int) {
+        player.run {
+            if (isUsing()) {
+                if (getUsingData()?.getBoolean("first") != true) {
+                    velocity = velocity.withAxis(Direction.Axis.Y, 0.0)
+                    pitch = -pitch
+                    getUsingData()?.putBoolean("first", true)
+                }
+                if (!abilities.flying) {
+                    addVelocity(0.0, 0.15, 0.0)
+                    velocityDirty = true
+                }
+                fallDistance = 0f
+                if (isInSneakingPose && !isSneaking) {
+                    pose = EntityPose.STANDING
+                    refreshPositionAfterTeleport(pos.subtract(0.0, 0.3, 0.0))
+                }
+                calculateDimensions()
+                if (verticalCollision) setOnGround(true)
+            }
+        }
+        super.tick(player, usedTime)
+    }
+
+    override fun apply(matrixStack: MatrixStack, tickDelta: Float, client: MinecraftClient) {
+        super.apply(matrixStack, tickDelta, client)
+        if (client.player?.isUsing() == true) matrixStack.scale(-1f, -1f, 1f)
+    }
+
+    override fun shouldInvertMouse(): Boolean = clientPlayer?.isUsing() == true
+
+    override fun shouldInvertInput(): Boolean = clientPlayer?.isUsing() == true
+
+    override fun shouldFlipUpsideDown(player: PlayerEntity): Boolean = player.isUsing()
+
+    override fun getEyeHeight(
+        player: PlayerEntity,
+        original: Float,
+        pose: EntityPose,
+        dimensions: EntityDimensions,
+    ): Float = if (player.isUsing()) dimensions.height - original else original
+
+    override fun onStop(player: PlayerEntity) {
+        super<ClientUseTrigger>.onStop(player)
+        player.run {
+            calculateDimensions()
+            pitch = -pitch
+        }
+    }
+
+    override fun getDelta(original: Float): Float = 1f
+}

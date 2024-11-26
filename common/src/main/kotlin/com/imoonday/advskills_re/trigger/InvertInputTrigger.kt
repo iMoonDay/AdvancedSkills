@@ -1,0 +1,12 @@
+package com.imoonday.advskills_re.trigger
+
+import net.minecraft.entity.player.*
+
+interface InvertInputTrigger : SkillTrigger {
+
+    fun shouldInvertInput(): Boolean = false
+    fun shouldInvertHorizontalInput(): Boolean = shouldInvertInput()
+    fun shouldInvertVerticalInput(): Boolean = shouldInvertInput()
+    fun shouldInvertJump(player: PlayerEntity): Boolean = shouldInvertInput()
+    fun shouldInvertSneak(player: PlayerEntity): Boolean = shouldInvertInput()
+}

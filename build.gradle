@@ -2,10 +2,9 @@ plugins {
     id 'dev.architectury.loom' version '1.7-SNAPSHOT' apply false
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
-//    id 'me.fallenbreath.yamlang' version '1.3.0' apply false
+    id 'me.fallenbreath.yamlang' version '1.3.0' apply false
     id 'org.jetbrains.kotlin.jvm' version '2.0.20' apply false
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.0.20' apply false
-//    id "io.github.pacifistmc.forgix" version "1.2.9"
 }
 
 architectury {
@@ -21,7 +20,7 @@ subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
-//    apply plugin: 'me.fallenbreath.yamlang'
+    apply plugin: 'me.fallenbreath.yamlang'
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 //    apply plugin: 'io.github.pacifistmc.forgix'
@@ -66,43 +65,8 @@ subprojects {
         }
     }
 
-//    yamlang {
-//        targetSourceSets = [sourceSets.main]
-//        inputDir = 'assets/advanced_skills_re/lang'
-//    }
-
-//    buildscript {
-//        repositories {
-//            maven {
-//                url "https://plugins.gradle.org/m2/"
-//            }
-//        }
-//        dependencies {
-//            classpath "io.github.pacifistmc.forgix:Forgix:1.2.9"
-//        }
-//    }
-
-//    build.finalizedBy(mergeJars)
-//    assemble.finalizedBy(mergeJars)
+    yamlang {
+        targetSourceSets = [sourceSets.main]
+        inputDir = 'assets/advskills_re/lang'
+    }
 }
-
-//forgix {
-//    group = "com.imoonday.advanced_skills_re"
-//    mergedJarName = "${rootProject.archives_name}-universal-${rootProject.mod_version}.jar"
-//    outputDir = "build/libs"
-//
-//    forge {
-//        jarLocation = "build/libs/${rootProject.archives_name}-forge-${rootProject.mod_version}.jar"
-//
-//        mixin "advanced_skills_re.mixins.json"
-//        mixin "advanced_skills_re_forge.mixins.json"
-//
-//        additionalRelocate "com.imoonday.advanced_skills_re" "com.imoonday.advanced_skills_re.forge"
-//    }
-//
-//    fabric {
-//        jarLocation = "build/libs/${rootProject.archives_name}-fabric-${rootProject.mod_version}.jar"
-//
-//        additionalRelocate "com.imoonday.advanced_skills_re" "com.imoonday.advanced_skills_re.fabric"
-//    }
-//}
