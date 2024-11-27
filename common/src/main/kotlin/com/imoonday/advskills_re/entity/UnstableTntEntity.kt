@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.entity
 
-import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.init.*
 import net.minecraft.entity.*
 import net.minecraft.util.math.*

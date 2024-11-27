@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.mixin;
 
 import com.imoonday.advskills_re.client.ClientTriggerHandler;
-import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;

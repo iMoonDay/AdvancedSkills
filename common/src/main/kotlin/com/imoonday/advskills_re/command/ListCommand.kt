@@ -14,7 +14,7 @@ object ListCommand : PlayerCommand("list") {
 
     private fun list(
         context: CommandContext<ServerCommandSource>,
-        player: ServerPlayerEntity
+        player: ServerPlayerEntity,
     ): Int {
         val skills = player.learnedSkills
 

@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.trigger
 
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.entity.player.*
 
 interface TauntTrigger : SkillTrigger {
 

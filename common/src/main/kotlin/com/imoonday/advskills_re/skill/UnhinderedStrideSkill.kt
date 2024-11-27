@@ -7,7 +7,7 @@ import net.minecraft.server.network.*
 
 class UnhinderedStrideSkill : Skill(
     id = "unhindered_stride",
-    types = listOf(SkillType.ENHANCEMENT),
+    types = listOf(SkillType.ENHANCEMENT, SkillType.MOVEMENT),
     cooldown = 15,
     rarity = Rarity.SUPERB
 ), StepHeightTrigger, AutoStopTrigger {

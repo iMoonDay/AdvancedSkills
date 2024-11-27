@@ -39,7 +39,7 @@ object SlotCommand : PlayerCommand("slot") {
 
     private fun remove(
         context: CommandContext<ServerCommandSource>,
-        player: ServerPlayerEntity
+        player: ServerPlayerEntity,
     ): Int {
         val index = IntegerArgumentType.getInteger(context, "index")
         return player.skillContainer.removeSlot(index)?.run {

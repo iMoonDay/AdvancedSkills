@@ -8,6 +8,10 @@ import com.imoonday.advskills_re.util.*
 
 const val MOD_ID = "advskills_re"
 
+/**
+ * TODO
+ * 1.伪装术：伪装成脚底下的方块，持续30s
+ */
 object AdvancedSkills {
 
     @JvmStatic

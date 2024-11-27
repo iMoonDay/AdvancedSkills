@@ -1,18 +1,15 @@
 package com.imoonday.advskills_re.entity.render
 
-import com.imoonday.advskills_re.entity.EnchantedSwordEntity
-import com.imoonday.advskills_re.util.client
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRenderer
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.render.model.json.ModelTransformationMode
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.enchantment.Enchantments
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.RotationAxis
+import com.imoonday.advskills_re.entity.*
+import com.imoonday.advskills_re.util.*
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.render.model.json.*
+import net.minecraft.client.util.math.*
+import net.minecraft.enchantment.*
+import net.minecraft.item.*
+import net.minecraft.util.*
+import net.minecraft.util.math.*
 
 class EnchantedSwordEntityRenderer(context: EntityRendererFactory.Context) :
     EntityRenderer<EnchantedSwordEntity>(context) {

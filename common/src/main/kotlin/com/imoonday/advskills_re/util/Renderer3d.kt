@@ -109,7 +109,7 @@ object Renderer3d {
         mode: VertexFormat.DrawMode,
         format: VertexFormat,
         shader: Supplier<ShaderProgram?>,
-        runner: Consumer<BufferBuilder>
+        runner: Consumer<BufferBuilder>,
     ) {
         val t = Tessellator.getInstance()
         val bb = t.buffer
@@ -184,7 +184,7 @@ object Renderer3d {
      * @param start        The start coordinate
      * @param dimensions   The dimensions
      */
-    fun renderEdged(stack: MatrixStack, colorFill: Color, colorOutline: Color, start: Vec3d, dimensions: Vec3d?) {
+    fun renderEdged(stack: MatrixStack, colorFill: Color, colorOutline: Color, start: Vec3d, dimensions: Vec3d) {
         val matrix = stack.peek().positionMatrix
         val fill = getColor(colorFill)
         val outline = getColor(colorOutline)
@@ -196,48 +196,12 @@ object Renderer3d {
         val x2 = end.x.toFloat()
         val y2 = end.y.toFloat()
         val z2 = end.z.toFloat()
-        val redFill = fill[0]
-        val greenFill = fill[1]
-        val blueFill = fill[2]
-        val alphaFill = fill[3]
-        val redOutline = outline[0]
-        val greenOutline = outline[1]
-        val blueOutline = outline[2]
-        val alphaOutline = outline[3]
         useBuffer(
             VertexFormat.DrawMode.QUADS,
             VertexFormats.POSITION_COLOR,
             GameRenderer::getPositionColorProgram
         ) {
-            it.vertex(matrix, x1, y2, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x1, y2, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y2, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y2, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-
-            it.vertex(matrix, x1, y1, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y1, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y2, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x1, y2, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-
-            it.vertex(matrix, x2, y2, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y1, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y1, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y2, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-
-            it.vertex(matrix, x2, y2, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y1, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x1, y1, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x1, y2, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-
-            it.vertex(matrix, x1, y2, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x1, y1, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x1, y1, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x1, y2, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-
-            it.vertex(matrix, x1, y1, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y1, z1).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x2, y1, z2).color(redFill, greenFill, blueFill, alphaFill).next()
-            it.vertex(matrix, x1, y1, z2).color(redFill, greenFill, blueFill, alphaFill).next()
+            drawCube(it, matrix, x1, y1, z1, x2, y2, z2, fill)
         }
 
         useBuffer(
@@ -245,35 +209,363 @@ object Renderer3d {
             VertexFormats.POSITION_COLOR,
             GameRenderer::getPositionColorProgram
         ) {
-            it.vertex(matrix, x1, y1, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x1, y1, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x1, y1, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y1, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y1, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y1, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y1, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x1, y1, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
+            drawCubeOutline(it, matrix, x1, y1, z1, x2, y2, z2, outline)
+        }
+    }
 
-            it.vertex(matrix, x1, y2, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x1, y2, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x1, y2, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y2, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y2, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y2, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y2, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x1, y2, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
+    private fun drawCubeOutline(
+        builder: BufferBuilder,
+        matrix: Matrix4f,
+        x1: Float, y1: Float, z1: Float,
+        x2: Float, y2: Float, z2: Float,
+        color: FloatArray
+    ) {
+        val (red, green, blue, alpha) = color
 
-            it.vertex(matrix, x1, y1, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x1, y2, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
+        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
 
-            it.vertex(matrix, x2, y1, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y2, z1).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
+        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
 
-            it.vertex(matrix, x2, y1, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x2, y2, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
+        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
 
-            it.vertex(matrix, x1, y1, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
-            it.vertex(matrix, x1, y2, z2).color(redOutline, greenOutline, blueOutline, alphaOutline).next()
+        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+
+        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+
+        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+    }
+
+    private fun drawCubeOutline(
+        builder: BufferBuilder,
+        matrix: Matrix4f,
+        x1: Float, y1: Float, z1: Float,
+        x2: Float, y2: Float, z2: Float,
+        color: FloatArray,
+        facesToRender: Set<Direction> // 需要渲染的面
+    ) {
+        val (red, green, blue, alpha) = color
+
+        //X轴朝东(右)，Y轴朝上，Z轴朝南(后)
+        facesToRender.forEach { direction ->
+            when (direction) {
+                Direction.UP -> {
+                    // 渲染上面边缘
+                    if (Direction.WEST in facesToRender) {
+                        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+                    }
+
+                    if (Direction.EAST in facesToRender) {
+                        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+                    }
+
+                    if (Direction.NORTH in facesToRender) {
+                        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+                    }
+
+                    if (Direction.SOUTH in facesToRender) {
+                        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+                    }
+                }
+
+                Direction.DOWN -> {
+                    // 渲染下面边缘
+                    if (Direction.WEST in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+                    }
+
+                    if (Direction.EAST in facesToRender) {
+                        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+                    }
+
+                    if (Direction.NORTH in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+                    }
+
+                    if (Direction.SOUTH in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+                    }
+                }
+
+                Direction.NORTH -> {
+                    // 渲染北面边缘
+                    if (Direction.UP in facesToRender) {
+                        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.DOWN in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.WEST in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.EAST in facesToRender) {
+                        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+                    }
+                }
+
+                Direction.SOUTH -> {
+                    // 渲染南面边缘
+                    if (Direction.UP in facesToRender) {
+                        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.DOWN in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.WEST in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.EAST in facesToRender) {
+                        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+                    }
+                }
+
+                Direction.WEST -> {
+                    // 渲染西面边缘
+                    if (Direction.UP in facesToRender) {
+                        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.DOWN in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.NORTH in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.SOUTH in facesToRender) {
+                        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+                    }
+                }
+
+                Direction.EAST -> {
+                    // 渲染东面边缘
+                    if (Direction.UP in facesToRender) {
+                        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.DOWN in facesToRender) {
+                        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.NORTH in facesToRender) {
+                        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+                    }
+                    if (Direction.SOUTH in facesToRender) {
+                        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+                        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun drawCube(
+        builder: BufferBuilder,
+        matrix: Matrix4f,
+        x1: Float, y1: Float, z1: Float,
+        x2: Float, y2: Float, z2: Float,
+        color: FloatArray
+    ) {
+        val (red, green, blue, alpha) = color
+
+        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+
+        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+
+        builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+
+        builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+
+        builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+
+        builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+        builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+    }
+
+    private fun drawCube(
+        builder: BufferBuilder,
+        matrix: Matrix4f,
+        x1: Float, y1: Float, z1: Float,
+        x2: Float, y2: Float, z2: Float,
+        color: FloatArray,
+        facesToRender: Set<Direction> // 指定需要渲染的面
+    ) {
+        val (red, green, blue, alpha) = color
+
+        facesToRender.forEach { direction ->
+            when (direction) {
+                Direction.UP -> {
+                    // 上面
+                    builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+                }
+
+                Direction.DOWN -> {
+                    // 下面
+                    builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+                }
+
+                Direction.NORTH -> {
+                    // 前面
+                    builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+                }
+
+                Direction.SOUTH -> {
+                    // 后面
+                    builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+                }
+
+                Direction.WEST -> {
+                    // 左面
+                    builder.vertex(matrix, x1, y1, z1).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x1, y1, z2).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x1, y2, z2).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x1, y2, z1).color(red, green, blue, alpha).next()
+                }
+
+                Direction.EAST -> {
+                    // 右面
+                    builder.vertex(matrix, x2, y1, z1).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y1, z2).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y2, z2).color(red, green, blue, alpha).next()
+                    builder.vertex(matrix, x2, y2, z1).color(red, green, blue, alpha).next()
+                }
+            }
+        }
+    }
+
+    fun renderVisibleFaces(
+        stack: MatrixStack,
+        blocks: List<BlockRenderInfo>,
+        fill: Boolean = true
+    ) {
+        val matrix = stack.peek().positionMatrix
+
+        val blockWithFaces = mutableMapOf<BlockPos, MutableSet<Direction>>()
+        val map = blocks.associate { it.pos to it.colorOutline }
+        blocks.forEach { block ->
+            Direction.entries.forEach { direction ->
+                val pos = block.pos
+                val color = map[pos.offset(direction)]
+                if (color == null || block.colorOutline.run { red != color.red || green != color.green || blue != color.blue }) {
+                    blockWithFaces.getOrPut(pos) { mutableSetOf() }.add(direction)
+                }
+            }
+        }
+
+        if (fill) {
+            RenderSystem.disableCull()
+            useBuffer(
+                VertexFormat.DrawMode.QUADS,
+                VertexFormats.POSITION_COLOR,
+                GameRenderer::getPositionColorProgram
+            ) { buffer ->
+                blocks.forEach { block ->
+                    val faces = blockWithFaces[block.pos] ?: return@forEach
+                    val start = transformVec3d(block.start)
+                    val end = transformVec3d(block.end)
+                    drawCube(
+                        buffer,
+                        matrix,
+                        start.x.toFloat(),
+                        start.y.toFloat(),
+                        start.z.toFloat(),
+                        end.x.toFloat(),
+                        end.y.toFloat(),
+                        end.z.toFloat(),
+                        getColor(block.colorFill),
+                        faces
+                    )
+                }
+            }
+        }
+
+        useBuffer(
+            VertexFormat.DrawMode.DEBUG_LINES,
+            VertexFormats.POSITION_COLOR,
+            GameRenderer::getPositionColorProgram
+        ) { buffer ->
+            blocks.forEach { block ->
+                val faces = blockWithFaces[block.pos] ?: return@forEach
+                val start = transformVec3d(block.start)
+                val end = transformVec3d(block.end)
+                drawCubeOutline(
+                    buffer,
+                    matrix,
+                    start.x.toFloat(),
+                    start.y.toFloat(),
+                    start.z.toFloat(),
+                    end.x.toFloat(),
+                    end.y.toFloat(),
+                    end.z.toFloat(),
+                    getColor(block.colorOutline),
+                    faces
+                )
+            }
         }
     }
 
@@ -285,7 +577,7 @@ object Renderer3d {
         start: Vec3d,
         dimensions: Vec3d,
         color: Color,
-        action: RenderAction
+        action: RenderAction,
     ) {
         val red = color.red / 255f
         val green = color.green / 255f
@@ -385,7 +677,7 @@ object Renderer3d {
         p1: Vec3d,
         p2: Vec3d,
         p3: Vec3d,
-        p4: Vec3d
+        p4: Vec3d,
     ) {
         val red = color.red / 255f
         val green = color.green / 255f
@@ -431,7 +723,7 @@ object Renderer3d {
         redOverwrite: Int,
         greenOverwrite: Int,
         blueOverwrite: Int,
-        alphaOverwrite: Int
+        alphaOverwrite: Int,
     ): Color = Color(
         if (redOverwrite == -1) original.red else redOverwrite,
         if (greenOverwrite == -1) original.green else greenOverwrite,
@@ -453,7 +745,7 @@ object Renderer3d {
             green: Float,
             blue: Float,
             alpha: Float,
-            matrix: Matrix4f?
+            matrix: Matrix4f?,
         )
     }
 
@@ -463,7 +755,7 @@ object Renderer3d {
         val start: Vec3d,
         val dimensions: Vec3d,
         val created: Long,
-        val lifeTime: Long
+        val lifeTime: Long,
     ) {
 
         val lifeTimeLeft: Long
@@ -471,4 +763,12 @@ object Renderer3d {
         val isDead: Boolean
             get() = lifeTimeLeft == 0L
     }
+
+    data class BlockRenderInfo(
+        val pos: BlockPos,
+        val start: Vec3d,
+        val end: Vec3d,
+        val colorFill: Color,
+        val colorOutline: Color
+    )
 }

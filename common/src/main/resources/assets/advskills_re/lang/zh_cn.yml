@@ -54,7 +54,7 @@ advskills_re:
     reset: 已重置 %s 的稀有度
     invalid: '无效的稀有度: %s'
   time:
-    set: 已将 %s 的持续时间设置为 %d
+    set: 已将 %s 的持续时间设置为 %d 秒
     reset: 已重置 %s 的持续时间
   cooldownMultiplier:
     set: 全局技能冷却倍率已设置为 %d
@@ -324,7 +324,7 @@ advskills_re:
       description: 被攻击一定次数后，击退周围生物
     time_rewind:
       name: 时间倒流
-      description: 回溯坐标
+      description: 回溯坐标和血量，蓄力时死亡将立刻回溯
     living_detection:
       name: 活体检测
       description: 检测附近的移动中的生物
@@ -366,6 +366,9 @@ advskills_re:
     damage_absorption:
       name: 伤害吸收
       description: 一定时间内，吸收一次伤害，并根据其伤害量回复自身血量
+    disguise:
+      name: 伪装术
+      description: 伪装成脚下的方块，释放任意技能时失效
   skillType:
     attack: 攻击
     defense: 防御

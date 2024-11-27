@@ -21,7 +21,7 @@ object ModifySkillCommand : BaseCommand("modify") {
                         .then(
                             literal("set")
                                 .then(
-                                    argument("duration", IntegerArgumentType.integer(0))
+                                    argument("seconds", IntegerArgumentType.integer(0))
                                         .executes(::setCooldown)
                                 )
                         )
@@ -44,7 +44,7 @@ object ModifySkillCommand : BaseCommand("modify") {
                         .then(
                             literal("set")
                                 .then(
-                                    argument("time", IntegerArgumentType.integer(0))
+                                    argument("seconds", IntegerArgumentType.integer(0))
                                         .executes(::setTime)
                                 )
                         )
@@ -54,14 +54,14 @@ object ModifySkillCommand : BaseCommand("modify") {
 
     private fun setTime(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
-        val time = IntegerArgumentType.getInteger(context, "time")
-        SkillConfig.instance.getOrCreateModifier(skill.id).time = time
+        val seconds = IntegerArgumentType.getInteger(context, "seconds")
+        SkillConfig.instance.getOrCreateModifier(skill.id).time = seconds * 20
         SkillConfig.save()
         context.syncConfig()
         context.sendFeedback(
-            "time", "set",
+            "time.set",
             skill.name,
-            time
+            seconds
         )
         return 1
     }
@@ -78,7 +78,7 @@ object ModifySkillCommand : BaseCommand("modify") {
             context.syncConfig()
         }
         context.sendFeedback(
-            "time", "reset",
+            "time.reset",
             skill.name
         )
         return 1
@@ -96,7 +96,7 @@ object ModifySkillCommand : BaseCommand("modify") {
             context.syncConfig()
         }
         context.sendFeedback(
-            "rarity", "reset",
+            "rarity.reset",
             skill.name
         )
         return 1
@@ -108,7 +108,7 @@ object ModifySkillCommand : BaseCommand("modify") {
         val rarity = Skill.Rarity.fromId(rarityStr)
         return if (rarity == null) {
             context.sendError(
-                "rarity", "invalid",
+                "rarity.invalid",
                 rarityStr
             )
             0
@@ -117,7 +117,7 @@ object ModifySkillCommand : BaseCommand("modify") {
             SkillConfig.save()
             context.syncConfig()
             context.sendFeedback(
-                "rarity", "set",
+                "rarity.set",
                 skill.name,
                 rarity.displayName
             )
@@ -145,7 +145,7 @@ object ModifySkillCommand : BaseCommand("modify") {
             context.syncConfig()
         }
         context.sendFeedback(
-            "cooldown", "reset",
+            "cooldown.reset",
             skill.name
         )
         return 1
@@ -153,14 +153,14 @@ object ModifySkillCommand : BaseCommand("modify") {
 
     private fun setCooldown(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
-        val duration = IntegerArgumentType.getInteger(context, "duration") * 20
-        SkillConfig.instance.getOrCreateModifier(skill.id).cooldown = duration
+        val seconds = IntegerArgumentType.getInteger(context, "seconds")
+        SkillConfig.instance.getOrCreateModifier(skill.id).cooldown = seconds * 20
         SkillConfig.save()
         context.syncConfig()
         context.sendFeedback(
-            "cooldown", "set",
+            "cooldown.set",
             skill.name,
-            duration
+            seconds
         )
         return 1
     }

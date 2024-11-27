@@ -248,5 +248,8 @@ object Skills {
     @JvmField
     val DAMAGE_ABSORPTION = DamageAbsorptionSkill().register()
 
+    @JvmField
+    val DISGUISE = DisguiseSkill().register()
+
     fun init() = Unit
 }

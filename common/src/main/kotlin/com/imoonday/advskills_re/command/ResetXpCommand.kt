@@ -23,12 +23,12 @@ object ResetXpCommand : XpCommand("reset") {
         }
         if (targets.size == 1) {
             context.sendFeedback(
-                "resetXp", "single",
+                "resetXp.single",
                 targets.first().displayName.string
             )
         } else {
             context.sendFeedback(
-                "resetXp", "multiple",
+                "resetXp.multiple",
                 targets.size
             )
         }

@@ -17,12 +17,12 @@ object ForgetCommand : PlayerCommand("forget") {
 
     private fun forget(
         context: CommandContext<ServerCommandSource>,
-        player: ServerPlayerEntity
+        player: ServerPlayerEntity,
     ): Int {
         val skill = SkillArgumentType.getSkill(context)
         if (!player.forget(skill)) {
             context.sendFeedback(
-                "forgetSkill", "failed",
+                "forgetSkill.failed",
                 player.displayName.string,
                 skill.name.string
             )

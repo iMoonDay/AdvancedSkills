@@ -21,7 +21,7 @@ class LiquidShieldSkill : Skill(
 
     override val persistTime: Int = 20 * 15
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user,this)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 
     override fun clientTick(player: PlayerEntity, usedTime: Int) {
         if (player.isUsing()

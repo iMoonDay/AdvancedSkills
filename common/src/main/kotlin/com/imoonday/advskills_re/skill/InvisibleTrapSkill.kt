@@ -17,7 +17,8 @@ class InvisibleTrapSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         val world = user.world
         val blockPos = user.blockPos
-        if (ModBlocks.INVISIBLE_TRAP.get().canPlaceAt(world.getBlockState(blockPos), world, blockPos) && world.setBlockState(
+        if (ModBlocks.INVISIBLE_TRAP.get()
+                .canPlaceAt(world.getBlockState(blockPos), world, blockPos) && world.setBlockState(
                 blockPos,
                 ModBlocks.INVISIBLE_TRAP.get().defaultState.with(
                     InvisibleTrapBlock.WATERLOGGED,

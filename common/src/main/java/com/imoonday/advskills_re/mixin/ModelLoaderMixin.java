@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.mixin;
 
-import com.imoonday.advskills_re.trigger.TargetRenderTrigger;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;

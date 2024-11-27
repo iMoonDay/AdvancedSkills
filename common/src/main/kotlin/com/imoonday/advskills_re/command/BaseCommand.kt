@@ -37,16 +37,14 @@ abstract class BaseCommand(
         CommandManager.argument(name, type)
 
     protected fun CommandContext<ServerCommandSource>.sendFeedback(
-        name: String,
-        key: String? = null,
+        key: String,
         vararg args: Any,
-    ) = source.sendFeedback({ translate("$name.$key", *args) }, true)
+    ) = source.sendFeedback({ translate(key, *args) }, true)
 
     protected fun CommandContext<ServerCommandSource>.sendError(
-        name: String,
-        key: String? = null,
+        key: String,
         vararg args: Any,
-    ) = source.sendError(translate("$name.$key", *args))
+    ) = source.sendError(translate(key, *args))
 
     protected fun CommandContext<ServerCommandSource>.sendMessage(message: Text) = source.sendMessage(message)
 

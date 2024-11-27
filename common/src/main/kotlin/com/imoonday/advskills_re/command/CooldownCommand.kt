@@ -38,8 +38,7 @@ object CooldownCommand : BaseCommand("cooldown") {
         SkillConfig.instance.skillCooldownMultiplier = multiplier
         context.syncConfig()
         context.sendFeedback(
-            "cooldownMultiplier",
-            "set",
+            "cooldownMultiplier.set",
             SkillConfig.instance.skillCooldownMultiplier
         )
         return 1

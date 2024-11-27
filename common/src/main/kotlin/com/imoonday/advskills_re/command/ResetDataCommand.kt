@@ -14,11 +14,11 @@ object ResetDataCommand : PlayerCommand("reset") {
 
     private fun reset(
         context: CommandContext<ServerCommandSource>,
-        player: ServerPlayerEntity
+        player: ServerPlayerEntity,
     ): Int {
         player.resetData()
         context.sendFeedback(
-            "reset", null,
+            "reset",
             player.displayName.string
         )
         return 1

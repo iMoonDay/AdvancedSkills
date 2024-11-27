@@ -42,7 +42,7 @@ class PrimaryConfinementSkill : LongPressSkill(
             }
             return UseResult.pass(message("failed"))
         }
-        return UseResult.pass(message( "empty"))
+        return UseResult.pass(message("empty"))
     }
 
     override fun getCrosshair(): Crosshair {

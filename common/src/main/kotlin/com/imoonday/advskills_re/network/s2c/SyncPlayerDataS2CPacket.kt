@@ -10,7 +10,7 @@ import net.minecraft.network.*
 
 class SyncPlayerDataS2CPacket(
     val playerId: Int,
-    val playerData: NbtCompound
+    val playerData: NbtCompound,
 ) : NetworkPacket {
 
     constructor(buf: PacketByteBuf) : this(buf.readInt(), buf.readNbt()!!)

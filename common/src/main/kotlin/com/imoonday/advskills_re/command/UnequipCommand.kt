@@ -20,13 +20,13 @@ object UnequipCommand : PlayerCommand("unequip") {
 
     private fun unequip(
         context: CommandContext<ServerCommandSource>,
-        player: ServerPlayerEntity
+        player: ServerPlayerEntity,
     ): Int {
         val slot = IntegerArgumentType.getInteger(context, "slot")
         val original = player.getSkill(slot)
         return if (player.equip(Skill.EMPTY, slot)) {
             context.sendFeedback(
-                "unequipSkill", "success",
+                "unequipSkill.success",
                 player.displayName.string,
                 original.name.string,
                 slot
@@ -34,7 +34,7 @@ object UnequipCommand : PlayerCommand("unequip") {
             1
         } else {
             context.sendFeedback(
-                "unequipSkill", "failed",
+                "unequipSkill.failed",
                 player.displayName.string,
                 slot
             )

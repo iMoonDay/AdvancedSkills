@@ -13,7 +13,7 @@ class UngroundedArrowEntity(entityType: EntityType<out UngroundedArrowEntity>, w
         x: Double,
         y: Double,
         z: Double,
-        owner: Entity
+        owner: Entity,
     ) : this(ModEntities.UNGROUNDED_ARROW.get(), world) {
         this.setPosition(x, y, z)
         this.owner = owner

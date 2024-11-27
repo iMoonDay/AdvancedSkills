@@ -29,13 +29,13 @@ object AddXpCommand : XpCommand("add") {
         }
         if (targets.size == 1) {
             context.sendFeedback(
-                "skillExp", "give.single",
+                "skillExp.give.single",
                 amount,
                 targets.first().displayName.string
             )
         } else {
             context.sendFeedback(
-                "skillExp", "give.multiple",
+                "skillExp.give.multiple",
                 amount,
                 targets.size
             )
@@ -52,13 +52,13 @@ object AddXpCommand : XpCommand("add") {
         }
         if (targets.size == 1) {
             context.sendFeedback(
-                "skillLevel", "give.single",
+                "skillLevel.give.single",
                 amount,
                 targets.first().displayName.string
             )
         } else {
             context.sendFeedback(
-                "skillLevel", "give.multiple",
+                "skillLevel.give.multiple",
                 amount,
                 targets.size
             )

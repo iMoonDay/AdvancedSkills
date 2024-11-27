@@ -17,12 +17,12 @@ object LearnCommand : PlayerCommand("learn") {
 
     private fun learn(
         context: CommandContext<ServerCommandSource>,
-        player: ServerPlayerEntity
+        player: ServerPlayerEntity,
     ): Int {
         val skill = SkillArgumentType.getSkill(context)
         if (!player.learn(skill)) {
             context.sendFeedback(
-                "learnSkill", "failed",
+                "learnSkill.failed",
                 player.displayName.string,
                 skill.name.string
             )

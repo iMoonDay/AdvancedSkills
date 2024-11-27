@@ -125,7 +125,7 @@ object ModKeyBindings {
         interval: () -> Int, // 二次触发的间隔时间（毫秒）
         firstTriggerCallback: (MinecraftClient, KeyBinding) -> Boolean,
         secondTriggerCallback: (MinecraftClient, KeyBinding) -> Unit,
-        releaseCallback: (MinecraftClient, KeyBinding, pressTime: Long) -> Unit
+        releaseCallback: (MinecraftClient, KeyBinding, pressTime: Long) -> Unit,
     ): KeyBinding {
         val key = KeyBinding(
             "advskills_re.key.$name",

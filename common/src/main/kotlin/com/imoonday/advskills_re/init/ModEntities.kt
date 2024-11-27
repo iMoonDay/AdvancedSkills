@@ -13,7 +13,7 @@ import java.util.function.*
 
 object ModEntities {
 
-//    private val livingAttributeRegistry: MutableList<() -> Unit> = mutableListOf()
+    private val livingAttributeRegistry: MutableList<() -> Unit> = mutableListOf()
 
     @JvmField
     val ENTITIES: DeferredRegister<EntityType<*>> = DeferredRegister.create(MOD_ID, RegistryKeys.ENTITY_TYPE)
@@ -135,13 +135,13 @@ object ModEntities {
         attributeContainerSupplier: Supplier<DefaultAttributeContainer.Builder>,
     ): RegistrySupplier<EntityType<T>> {
         val supplier = register(name)
-        EntityAttributeRegistry.register(supplier, attributeContainerSupplier)
-//        livingAttributeRegistry += { EntityAttributeRegistry.register(supplier, attributeContainerSupplier) }
+//        EntityAttributeRegistry.register(supplier, attributeContainerSupplier)
+        livingAttributeRegistry += { EntityAttributeRegistry.register(supplier, attributeContainerSupplier) }
         return supplier
     }
 
     fun init() {
         ENTITIES.register()
-//        livingAttributeRegistry.forEach { it() }
+        livingAttributeRegistry.forEach { it() }
     }
 }

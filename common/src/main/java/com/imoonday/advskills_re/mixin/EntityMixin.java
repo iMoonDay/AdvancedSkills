@@ -7,6 +7,9 @@ import com.imoonday.advskills_re.init.ModEffectsKt;
 import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
@@ -111,7 +114,7 @@ public abstract class EntityMixin implements Propertied {
     @Inject(method = "isInvisible", at = @At("HEAD"), cancellable = true)
     private void advskills_re$isInvisible(CallbackInfoReturnable<Boolean> cir) {
         if ((Entity) (Object) this instanceof PlayerEntity player) {
-            if (SkillTriggerHandler.INSTANCE.isInvisible(player)) {
+            if (SkillTriggerHandler.INSTANCE.isInvisible(player) || SkillTriggerHandler.INSTANCE.getDisguisingTarget(player) != null) {
                 cir.setReturnValue(true);
             }
         }
@@ -120,7 +123,7 @@ public abstract class EntityMixin implements Propertied {
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
     private void advskills_re$isInvisibleTo(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
         if ((Entity) (Object) this instanceof PlayerEntity entity) {
-            if (!SkillTriggerHandler.INSTANCE.isInvisibleTo(entity, player)) {
+            if (!SkillTriggerHandler.INSTANCE.isInvisibleTo(entity, player) || SkillTriggerHandler.INSTANCE.getDisguisingTarget(player) != null) {
                 cir.setReturnValue(false);
             }
         }

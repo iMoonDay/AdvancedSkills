@@ -91,7 +91,7 @@ class GrapplingHookSkill : LongPressSkill(
         headYaw: Float,
         headPitch: Float,
         renderer: FeatureRendererContext<T, M>,
-        context: EntityRendererFactory.Context
+        context: EntityRendererFactory.Context,
     ) = renderHook(player, matrices, tickDelta, provider)
 
     private fun renderHook(

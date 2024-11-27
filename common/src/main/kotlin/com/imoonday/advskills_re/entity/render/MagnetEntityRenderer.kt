@@ -1,18 +1,14 @@
 package com.imoonday.advskills_re.entity.render
 
 import com.imoonday.advskills_re.client.*
-import com.imoonday.advskills_re.entity.MagnetEntity
-import com.imoonday.advskills_re.init.ModEntities
-import com.imoonday.advskills_re.util.id
-import net.minecraft.client.model.ModelPart
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRenderer
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.RotationAxis
+import com.imoonday.advskills_re.entity.*
+import com.imoonday.advskills_re.util.*
+import net.minecraft.client.model.*
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.util.math.*
+import net.minecraft.util.*
+import net.minecraft.util.math.*
 
 class MagnetEntityRenderer(val context: EntityRendererFactory.Context) :
     EntityRenderer<MagnetEntity>(context) {

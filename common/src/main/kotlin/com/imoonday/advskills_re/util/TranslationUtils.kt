@@ -9,4 +9,4 @@ fun translate(key: String, vararg args: Any): MutableText =
 fun translateSkill(id: String, key: String, vararg args: Any): MutableText = translate("skill.$id.$key", *args)
 
 fun translateActive(active: Boolean, name: String): MutableText =
-    translate("useSkill", if (active) "active" else "inactive", name)
+    translate("useSkill.${if (active) "active" else "inactive"}", name)

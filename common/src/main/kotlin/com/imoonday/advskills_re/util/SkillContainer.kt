@@ -93,7 +93,7 @@ data class SkillContainer(
         slots.values.sortedByDescending { it.index }.find(predicate)
 
     fun getLastSlot(
-        vararg predicates: (SkillSlot) -> Boolean = emptyArray()
+        vararg predicates: (SkillSlot) -> Boolean = emptyArray(),
     ): SkillSlot? =
         slots.values.sortedByDescending { it.index }.run {
             for (it in predicates) {

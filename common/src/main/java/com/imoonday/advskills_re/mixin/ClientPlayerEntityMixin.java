@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.mixin;
 
-import com.imoonday.advskills_re.api.PlayerDataContainer;
 import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;

@@ -4,7 +4,6 @@ import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.SkillType
 import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.getUsingData
 import com.imoonday.advskills_re.util.sendToServer
 import net.minecraft.entity.*
 import net.minecraft.network.packet.s2c.play.*

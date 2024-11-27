@@ -47,8 +47,8 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
     }
 
     override fun tick() {
-        if (age > 20 * 60 * 5) {
-            kill()
+        if (!world.isClient && age > 20 * 60 * 5) {
+            discard()
             return
         }
         if (moveTime-- > 0) {

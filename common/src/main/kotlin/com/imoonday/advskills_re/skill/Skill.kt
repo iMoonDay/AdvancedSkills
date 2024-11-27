@@ -146,6 +146,9 @@ abstract class Skill(
                 true
             )
         } else {
+            player.getTriggers<UseInterruptTrigger>()
+                .filter { it != this && it.shouldInterrupt(player) }
+                .forEach { it.interrupt(player) }
             val result = (this as? LongPressTrigger)?.use(player, keyState) ?: use(player)
             handleResult(player, result)
         }
@@ -210,7 +213,7 @@ abstract class Skill(
             flashed = true
             val persistTime = getPersistTimeModified()
             val leftUseTime = persistTime - player.getUsedTime(this)
-            if (persistTime > 20 * 5 && leftUseTime <= persistTime / 5) {
+            if (persistTime > 20 * 5 && leftUseTime <= (persistTime / 5).coerceAtMost(20 * 10)) {
                 val alpha = 0.5 * sin(2 * PI / 20 * (leftUseTime - persistTime / 5)) + 0.5
                 RenderSystem.enableBlend()
                 context.setShaderColor(1.0f, 1.0f, 1.0f, alpha.toFloat())
@@ -244,7 +247,7 @@ abstract class Skill(
             && (player.isUsing() || this !is UsingProgressTrigger)
         ) {
             val progress = getProgress(player).coerceIn(0.0, 1.0)
-            val centerX = x + (width * progress).toInt()
+            val centerX = x + 1 + ((width - 1) * progress).toInt()
             context.fill(x, y, centerX, y + height, 0xFF00BFFF.toInt())
             context.fill(centerX, y, x + width, y + height, Color.GRAY.rgb)
         }

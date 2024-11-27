@@ -22,13 +22,13 @@ object EquipCommand : PlayerCommand("equip") {
 
     private fun equip(
         context: CommandContext<ServerCommandSource>,
-        player: ServerPlayerEntity
+        player: ServerPlayerEntity,
     ): Int {
         val skill = SkillArgumentType.getSkill(context)
         val slot = IntegerArgumentType.getInteger(context, "slot")
         return if (player.equip(skill, slot)) {
             context.sendFeedback(
-                "equipSkill", "success",
+                "equipSkill.success",
                 player.displayName.string,
                 skill.name.string,
                 slot
@@ -36,7 +36,7 @@ object EquipCommand : PlayerCommand("equip") {
             1
         } else {
             context.sendFeedback(
-                "equipSkill", "failed",
+                "equipSkill.failed",
                 player.displayName.string,
                 skill.name.string,
                 slot

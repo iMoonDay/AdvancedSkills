@@ -54,7 +54,7 @@ advskills_re:
     reset: Rarity of %s has been reset
     invalid: 'Invalid rarity: %s'
   time:
-    set: Time of %s has been set to %s
+    set: Time of %s has been set to %s seconds
     reset: Time of %s has been reset
   cooldownMultiplier:
     set: Global skill cooldown multiplier has been set to %d
@@ -324,7 +324,7 @@ advskills_re:
       description: After being attacked a certain number of times, repel surrounding creatures
     time_rewind:
       name: Time Rewind
-      description: Backtracking coordinates
+      description: Backtrack position and health. If you die while charging, you will immediately rewind
     living_detection:
       name: Living Detection
       description: Detect nearby moving creatures
@@ -366,6 +366,9 @@ advskills_re:
     damage_absorption:
       name: Damage Absorption
       description: Within a certain period of time, absorb one damage and restore your own health according to the amount of damage
+    disguise:
+      name: Disguise
+      description: Disguised as a block under your feet and end when using any skill
   skillType:
     attack: Attack
     defense: Defense

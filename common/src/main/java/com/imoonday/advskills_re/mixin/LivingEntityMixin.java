@@ -159,11 +159,6 @@ public abstract class LivingEntityMixin {
         }
     }
 
-    @Redirect(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isDead()Z", ordinal = 1))
-    private boolean advskills_re$beforeEntityKilled(LivingEntity livingEntity, DamageSource source, float amount) {
-        return isDead() && (!(livingEntity instanceof ServerPlayerEntity player) || AllowDeathEvent.EVENT.invoker().allowDeath(player, source, amount));
-    }
-
     @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true)
     public void advskills_re$setHealth(float health, CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;

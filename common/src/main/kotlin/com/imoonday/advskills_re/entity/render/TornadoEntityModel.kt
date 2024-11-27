@@ -1,10 +1,10 @@
 package com.imoonday.advskills_re.entity.render
 
-import com.imoonday.advskills_re.entity.TornadoEntity
+import com.imoonday.advskills_re.entity.*
 import net.minecraft.client.model.*
-import net.minecraft.client.render.VertexConsumer
-import net.minecraft.client.render.entity.model.EntityModel
-import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.util.math.*
 
 class TornadoEntityModel(root: ModelPart) : EntityModel<TornadoEntity>() {
 

@@ -16,6 +16,6 @@ interface EntityRenderTrigger : SkillTrigger {
         tickDelta: Float,
         matrices: MatrixStack,
         vertexConsumers: VertexConsumerProvider,
-        light: Int
+        light: Int,
     ) = Unit
 }

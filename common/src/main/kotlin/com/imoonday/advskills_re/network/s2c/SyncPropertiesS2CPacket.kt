@@ -10,7 +10,7 @@ import net.minecraft.network.*
 
 class SyncPropertiesS2CPacket(
     val entityId: Int,
-    val properties: NbtCompound
+    val properties: NbtCompound,
 ) : NetworkPacket {
 
     constructor(buf: PacketByteBuf) : this(buf.readInt(), buf.readNbt()!!)

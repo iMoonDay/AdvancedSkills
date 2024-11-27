@@ -1,23 +1,17 @@
 package com.imoonday.advskills_re.entity.render
 
-import com.imoonday.advskills_re.entity.HookEntity
-import com.imoonday.advskills_re.util.toBlockPos
-import net.minecraft.client.render.LightmapTextureManager
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.EntityRenderer
-import net.minecraft.client.render.entity.EntityRendererFactory
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
-import net.minecraft.world.LightType
+import com.imoonday.advskills_re.entity.*
+import com.imoonday.advskills_re.util.*
+import net.minecraft.client.render.*
+import net.minecraft.client.render.entity.*
+import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
+import net.minecraft.util.*
+import net.minecraft.util.math.*
+import net.minecraft.world.*
 import org.joml.Matrix4f
-import kotlin.math.cos
-import kotlin.math.sin
+import java.lang.Math
+import kotlin.math.*
 
 class HookEntityRenderer(context: EntityRendererFactory.Context) : EntityRenderer<HookEntity>(context) {
 

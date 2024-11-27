@@ -15,7 +15,6 @@ import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.registry.tag.*
 import net.minecraft.server.world.*
-import net.minecraft.sound.SoundEvents
 import net.minecraft.util.*
 import net.minecraft.util.math.*
 import net.minecraft.world.*

@@ -23,7 +23,6 @@ subprojects {
     apply plugin: 'me.fallenbreath.yamlang'
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
-//    apply plugin: 'io.github.pacifistmc.forgix'
 
     base {
         archivesName = "$rootProject.archives_name-$project.name"

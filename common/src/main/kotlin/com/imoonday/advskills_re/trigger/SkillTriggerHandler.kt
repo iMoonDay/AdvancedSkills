@@ -220,4 +220,10 @@ object SkillTriggerHandler {
         player.getTriggers<TauntTrigger>()
             .map { it.isTaunting(player) }
             .any { it }
+
+    fun getDisguisingTarget(player: PlayerEntity): DisguiseTrigger.DisguiseRenderer? =
+        player.getTriggers<DisguiseTrigger>()
+            .filter { it.isDisguising(player) }
+            .map { it.getDisguiseRenderer(player) }
+            .firstOrNull()
 }

@@ -85,7 +85,7 @@ class SkillLearningScreen(
 
     inner class SkillBox(
         private val skillGetter: () -> Skill, private val chooseAction: () -> Unit,
-        x: Int, y: Int, width: Int, height: Int
+        x: Int, y: Int, width: Int, height: Int,
     ) : ClickableWidget(x, y, width, height, skillGetter().name) {
 
         var skill: Skill = skillGetter()

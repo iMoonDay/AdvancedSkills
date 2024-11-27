@@ -11,7 +11,7 @@ import net.minecraft.server.network.*
 
 class TauntSkill : Skill(
     id = "taunt",
-    types = listOf(SkillType.ENHANCEMENT),
+    types = listOf(SkillType.FUNCTION, SkillType.DEFENSE),
     cooldown = 30,
     rarity = Rarity.SUPERB,
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {
@@ -19,6 +19,7 @@ class TauntSkill : Skill(
     override val persistTime: Int = 20 * 15
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
+
     override fun onDamaged(
         amount: Float,
         source: DamageSource,

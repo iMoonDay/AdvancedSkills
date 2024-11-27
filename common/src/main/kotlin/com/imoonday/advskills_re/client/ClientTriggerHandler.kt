@@ -51,7 +51,7 @@ object ClientTriggerHandler {
         tickDelta: Float,
         matrices: MatrixStack,
         vertexConsumers: VertexConsumerProvider,
-        light: Int
+        light: Int,
     ) {
         client.player?.run {
             getTriggers<EntityRenderTrigger>()

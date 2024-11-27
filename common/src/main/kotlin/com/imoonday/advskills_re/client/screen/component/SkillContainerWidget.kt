@@ -15,7 +15,7 @@ class SkillContainerWidget(
     height: Int,
     itemHeight: Int,
     private val skillGetter: () -> Collection<Skill>,
-    private val skillRenderer: SkillRenderer
+    private val skillRenderer: SkillRenderer,
 ) : AlwaysSelectedEntryListWidget<SkillLine>(
     client, width, height, y, y + height, itemHeight,
 ) {
@@ -90,7 +90,7 @@ class SkillContainerWidget(
             mouseX: Int,
             mouseY: Int,
             hovered: Boolean,
-            tickDelta: Float
+            tickDelta: Float,
         ) = skillRenderer.render(
             context,
             this.index,
@@ -127,7 +127,7 @@ class SkillContainerWidget(
             mouseY: Int,
             hovered: Boolean,
             focused: Boolean,
-            tickDelta: Float
+            tickDelta: Float,
         )
     }
 }

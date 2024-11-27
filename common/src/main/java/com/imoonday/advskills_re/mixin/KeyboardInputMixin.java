@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.mixin;
 
 import com.imoonday.advskills_re.client.ClientTriggerHandler;
-import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
 import kotlin.Pair;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;

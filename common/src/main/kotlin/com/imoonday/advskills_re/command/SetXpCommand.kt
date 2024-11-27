@@ -28,13 +28,13 @@ object SetXpCommand : XpCommand("set") {
         }
         if (targets.size == 1) {
             context.sendFeedback(
-                "skillExp", "set.single",
+                "skillExp.set.single",
                 amount,
                 targets.first().displayName.string
             )
         } else {
             context.sendFeedback(
-                "skillExp", "set.multiple",
+                "skillExp.set.multiple",
                 amount,
                 targets.size
             )
@@ -51,13 +51,13 @@ object SetXpCommand : XpCommand("set") {
         }
         if (targets.size == 1) {
             context.sendFeedback(
-                "skillLevel", "set.single",
+                "skillLevel.set.single",
                 amount,
                 targets.first().displayName.string
             )
         } else {
             context.sendFeedback(
-                "skillLevel", "set.multiple",
+                "skillLevel.set.multiple",
                 amount,
                 targets.size
             )
