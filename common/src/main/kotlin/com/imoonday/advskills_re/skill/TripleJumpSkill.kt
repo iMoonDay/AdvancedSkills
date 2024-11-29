@@ -2,7 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.util.SkillType
 import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.sendToServer
+import com.imoonday.advskills_re.util.sendPacket
 import com.imoonday.advskills_re.util.spawnParticles
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
@@ -21,7 +21,7 @@ class TripleJumpSkill : Skill(
             jump()
             velocityDirty = true
             velocity = velocity.multiply(1.0, 1.7, 1.0)
-            sendToServer(EntityVelocityUpdateS2CPacket(this))
+            sendPacket(EntityVelocityUpdateS2CPacket(this))
             user.spawnParticles(
                 ParticleTypes.CLOUD,
                 false,

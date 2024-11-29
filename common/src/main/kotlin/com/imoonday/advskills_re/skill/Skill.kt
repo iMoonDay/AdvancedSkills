@@ -2,26 +2,19 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.init.ModItems.ITEMS
 import com.imoonday.advskills_re.item.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
-import com.mojang.blaze3d.systems.*
-import com.mojang.logging.*
-import net.minecraft.client.gui.*
-import net.minecraft.client.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.registry.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.text.*
 import net.minecraft.util.*
-import org.slf4j.*
-import java.awt.*
+import net.minecraft.world.*
 import java.util.*
 import java.util.function.*
-import kotlin.math.*
 
 abstract class Skill(
     val id: Identifier,
@@ -30,35 +23,49 @@ abstract class Skill(
     val icon: Identifier = id("unknown.png"),
     val types: List<SkillType> = emptyList(),
     val defaultCooldown: Int = 0,
-    rarity: Rarity,
+    private val rarity: Rarity,
     val sound: Supplier<SoundEvent>? = null,
-    invalid: Boolean = false,
+    private val invalid: Boolean = false,
 ) : SkillTrigger {
 
-    val invalid = invalid
-        get() = field || SkillConfig.instance.isInBlackList(id)
-    val rarity = rarity
-        get() = SkillConfig.instance.getModifier(id)?.rarity ?: field
-    val formattedName: MutableText
-        get() = name.copy().formatted(rarity.formatting)
+    fun isInvalid(world: World? = null): Boolean =
+        invalid || (world?.skillConfig ?: SkillConfig.instance).isInBlackList(id)
+
+    fun getRarity(world: World? = null): Rarity =
+        (world?.skillConfig ?: SkillConfig.instance).getModifier(id)?.rarity ?: rarity
+
+    fun getFormattedName(world: World? = null): MutableText = name.copy().formatted(getRarity(world).formatting)
+
+    fun getNameWithHoverEvent(world: World? = null): MutableText = getFormattedName(world).styled { style ->
+        (item?.run {
+            style.withHoverEvent(
+                HoverEvent(
+                    HoverEvent.Action.SHOW_ITEM,
+                    HoverEvent.ItemStackContent(defaultStack)
+                )
+            )
+        } ?: style)
+    }
+
     val item: SkillItem?
         get() = Registries.ITEM[id] as? SkillItem
-    val modelId
-        get() = ModelIdentifier(Registries.ITEM.getId(item), "inventory")
-    val cooldown: Int
-        get() = ((SkillConfig.instance.getModifier(id)?.cooldown ?: defaultCooldown) *
-            SkillConfig.instance.skillCooldownMultiplier
-            ).toInt()
-    val cooldownSeconds: MutableText
-        get() = if (cooldown <= 0) {
-            translate("cooldown.none")
-        } else {
-            val cooldown = (cooldown / 20.0).toString()
-            translate(
-                "cooldown.seconds",
-                if (cooldown.endsWith(".0")) cooldown.substring(0, cooldown.length - 2) else cooldown
-            )
-        }
+
+    fun getCooldown(world: World? = null): Int {
+        val config = (world?.skillConfig ?: SkillConfig.instance)
+        val cooldown = config.getModifier(id)?.cooldown ?: defaultCooldown
+        val multiplier = config.skillCooldownMultiplier
+        return (cooldown * multiplier).toInt()
+    }
+
+    fun getCooldownSeconds(world: World? = null): MutableText = if (getCooldown(world) <= 0) {
+        translate("cooldown.none")
+    } else {
+        val cooldown = (getCooldown(world) / 20.0).toString()
+        translate(
+            "cooldown.seconds",
+            if (cooldown.endsWith(".0")) cooldown.substring(0, cooldown.length - 2) else cooldown
+        )
+    }
 
     protected constructor(
         id: String,
@@ -78,29 +85,32 @@ abstract class Skill(
         false
     )
 
-    fun isEmpty(): Boolean = this == EMPTY
+    fun isEmpty(): Boolean = this === Skills.EMPTY || this is EmptySkill
+
     fun createUuid(content: String): UUID = UUID.nameUUIDFromBytes("$id-$content".toByteArray())
-    open fun getItemTooltips(displayName: Boolean = false): List<Text> = mutableListOf<Text>().apply {
-        if (displayName) {
-            add(name.copy().formatted(Formatting.WHITE))
-        }
-        add(
-            translate(
-                "screen.gallery.info.description",
-                description.string
-            ).formatted(Formatting.GRAY)
-        )
-        add(translate(
-            "screen.gallery.info.type",
-            types.joinToString(" ") { it.displayName.string }
-        ).formatted(Formatting.GRAY))
-        add(
-            translate("screen.gallery.info.cooldown", cooldownSeconds).formatted(
-                Formatting.GRAY
+
+    open fun getItemTooltips(world: World? = null, displayName: Boolean = false): List<Text> =
+        mutableListOf<Text>().apply {
+            if (displayName) {
+                add(name.copy().formatted(Formatting.WHITE))
+            }
+            add(
+                translate(
+                    "screen.gallery.info.description",
+                    description.string
+                ).formatted(Formatting.GRAY)
             )
-        )
-        add(translate("screen.gallery.info.rarity", rarity.displayName.string).formatted(Formatting.GRAY))
-    }
+            add(translate(
+                "screen.gallery.info.type",
+                types.joinToString(" ") { it.displayName.string }
+            ).formatted(Formatting.GRAY))
+            add(
+                translate("screen.gallery.info.cooldown", getCooldownSeconds()).formatted(
+                    Formatting.GRAY
+                )
+            )
+            add(translate("screen.gallery.info.rarity", getRarity(world).displayName.string).formatted(Formatting.GRAY))
+        }
 
     abstract fun use(user: ServerPlayerEntity): UseResult
 
@@ -130,7 +140,7 @@ abstract class Skill(
         player: ServerPlayerEntity,
         keyState: UseSkillC2SRequest.KeyState,
     ) {
-        if (invalid) return
+        if (isInvalid(player.world)) return
         if ((this !is LongPressTrigger || !player.isUsing()) && keyState == UseSkillC2SRequest.KeyState.RELEASE) return
         if (player.isSilenced) {
             player.sendMessage(translate("useSkill.silenced"), true)
@@ -140,7 +150,7 @@ abstract class Skill(
             player.sendMessage(
                 translate(
                     "useSkill.cooling",
-                    name.string,
+                    name,
                     "${(player.getCooldown(this) / 20.0)}s"
                 ),
                 true
@@ -164,122 +174,24 @@ abstract class Skill(
             serverPlayerEntity.sendMessage(result.message ?: this.name, true)
         } else {
             val message =
-                result.message ?: translate("useSkill.failed", name.string)
+                result.message ?: translate("useSkill.failed", name)
             if (message != Text.empty())
                 serverPlayerEntity.sendMessage(message, true)
         }
         if (result.cooling) {
             serverPlayerEntity.startCooling()
-            (this as? SynchronousCoolingTrigger)?.getOtherSkills()
+            (this as? SynchronousCoolingTrigger)?.getOtherSkills(serverPlayerEntity)
                 ?.forEach(serverPlayerEntity::startCooling)
         }
     }
 
     override fun getAsSkill(): Skill = this
+
     open fun isDangerous(player: ServerPlayerEntity): Boolean = false
-    fun register(): Skill {
-        if (this in skills) {
-            LOGGER.warn("Skill $id is already registered")
-            return this
-        }
-        if (!invalid) ITEMS.register(id.path) { SkillItem(this) }
-        skills.add(this)
-        return this
-    }
 
     fun failedMessage() = translateSkill(id.path, "failed")
+
     fun message(key: String, vararg args: Any) = translateSkill(id.path, key, *args)
-    open fun render(
-        context: DrawContext,
-        x: Int,
-        y: Int,
-        player: PlayerEntity,
-    ) {
-        val endY = y + 16
-        renderIcon(context, x, y, player)
-        renderProgressBar(context, x, endY - 1, 16, 1, player)
-        renderCooldownOverlay(context, x, endY, 16, 16, player)
-    }
-
-    open fun renderIcon(
-        context: DrawContext,
-        x: Int,
-        y: Int,
-        player: PlayerEntity?,
-    ) {
-        context.fill(x, y, x + 16, y + 16, Color.LIGHT_GRAY.alpha(0.5).rgb)
-        var flashed = false
-        if (this is AutoStopTrigger && shouldFlashIcon() && player != null) {
-            flashed = true
-            val persistTime = getPersistTimeModified()
-            val leftUseTime = persistTime - player.getUsedTime(this)
-            if (persistTime > 20 * 5 && leftUseTime <= (persistTime / 5).coerceAtMost(20 * 10)) {
-                val alpha = 0.5 * sin(2 * PI / 20 * (leftUseTime - persistTime / 5)) + 0.5
-                RenderSystem.enableBlend()
-                context.setShaderColor(1.0f, 1.0f, 1.0f, alpha.toFloat())
-            }
-        }
-        if (!isEmpty()) renderIcon(context, x, y)
-        if (flashed) {
-            context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
-            RenderSystem.disableBlend()
-        }
-        if (player?.isSilenced == true) context.fill(x, y, x + 16, y + 16, Color.RED.alpha(0.25).rgb)
-    }
-
-    fun renderIcon(
-        context: DrawContext,
-        x: Int,
-        y: Int,
-        size: Int = 16,
-    ) = context.drawTexture(icon, x, y, 0f, 0f, size, size, size, size)
-
-    open fun renderProgressBar(
-        context: DrawContext,
-        x: Int,
-        y: Int,
-        width: Int,
-        height: Int,
-        player: PlayerEntity,
-    ) {
-        if (invalid) return
-        if (this is ProgressTrigger && shouldDisplay(player)
-            && (player.isUsing() || this !is UsingProgressTrigger)
-        ) {
-            val progress = getProgress(player).coerceIn(0.0, 1.0)
-            val centerX = x + 1 + ((width - 1) * progress).toInt()
-            context.fill(x, y, centerX, y + height, 0xFF00BFFF.toInt())
-            context.fill(centerX, y, x + width, y + height, Color.GRAY.rgb)
-        }
-    }
-
-    open fun renderCooldownOverlay(
-        context: DrawContext,
-        startX: Int,
-        endY: Int,
-        width: Int,
-        maxHeight: Int,
-        player: PlayerEntity,
-    ) {
-        if (!player.isCooling()) return
-        val cooldown = player.getCooldown(this)
-        val maxCooldown = this.cooldown
-        val progress = (cooldown.toDouble() / maxCooldown).coerceIn(0.0, 1.0)
-        val startY = (endY - progress * maxHeight).toInt()
-        context.fill(startX, startY, startX + width, endY, Color.BLACK.alpha(0.25).rgb)
-        if (cooldown < 20 * 4) {
-            val time = if (cooldown <= 20) String.format("%.1f", cooldown / 20.0) else (cooldown / 20).toString()
-            val textRenderer = client!!.textRenderer
-            context.matrices.push()
-            context.matrices.translate(
-                startX + (width - textRenderer.getWidth(time)) / 2.0 + 0.5,
-                endY - width / 2.0,
-                0.0
-            )
-            context.drawText(textRenderer, time, 0, 0, 0xFFFFFF, false)
-            context.matrices.pop()
-        }
-    }
 
     enum class Rarity(
         val level: Int,
@@ -312,39 +224,5 @@ abstract class Skill(
                 fromId(string) ?: string.toIntOrNull()?.let { fromLevel(it) }
             }
         }
-    }
-
-    companion object {
-
-        private val LOGGER: Logger = LogUtils.getLogger()
-        private val skills = mutableSetOf<Skill>()
-        val triggers: MutableMap<Class<out SkillTrigger>, List<SkillTrigger>> = mutableMapOf()
-
-        @JvmField
-        val EMPTY = EmptySkill().register()
-        fun getSkills() = skills.toList()
-        fun getValidSkills() = skills.filterNot { it.invalid }
-        fun fromId(id: Identifier?) = skills.find { it.id == id } ?: EMPTY
-        fun fromId(id: String?) = skills.find { it.id == id?.toIdentifier() } ?: EMPTY
-        fun fromIdNullable(id: Identifier?) = skills.find { it.id == id }
-        fun fromIdNullable(id: String?) = skills.find { it.id == Identifier.tryParse(id) }
-
-        @Suppress("UNCHECKED_CAST")
-        inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> {
-            val triggers: List<T> = (triggers[T::class.java] ?: getSkills().filterIsInstance<T>().also {
-                triggers[T::class.java] = it
-            }) as List<T>
-            return triggers.filter(predicate)
-        }
-
-        fun getLearnableSkills(
-            except: Collection<Skill> = emptyList(),
-            filter: (Skill) -> Boolean = { true },
-        ): List<Skill> = getValidSkills()
-            .filterNot { it in except }
-            .filter(filter)
-
-        fun random(except: Collection<Skill> = emptyList(), filter: (Skill) -> Boolean = { true }): Skill =
-            getLearnableSkills(except, filter).randomOrNull() ?: EMPTY
     }
 }

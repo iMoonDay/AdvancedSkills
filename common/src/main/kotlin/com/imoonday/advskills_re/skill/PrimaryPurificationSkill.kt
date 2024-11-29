@@ -22,7 +22,7 @@ class PrimaryPurificationSkill : Skill(
         ?.let {
             val duration = it.duration
             it.setDuration(it.mapDuration { (it - min(it * 0.2, 15 * 20.0)).toInt() })
-            user.sendToServer(EntityStatusEffectS2CPacket(user.id, it))
+            user.sendPacket(EntityStatusEffectS2CPacket(user.id, it))
             val amount = (duration - it.duration) / 20.0
             return UseResult.success(
                 message(

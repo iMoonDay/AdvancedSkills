@@ -20,7 +20,7 @@ class DyingCounterattackSkill : Skill(
     rarity = Rarity.EPIC,
 ), DeathTrigger, PersistentTrigger, AttackTrigger, TickTrigger, UnequipTrigger, HeartTypeTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean {
         if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || player.isUsing() || player.isCooling()) return true
@@ -36,8 +36,9 @@ class DyingCounterattackSkill : Skill(
         player: ServerPlayerEntity,
         target: LivingEntity,
     ): Float {
-        if (!player.isUsing()) return amount
-        if (amount > 0) player.heal(amount / 10)
+        if (player.isUsing() && amount > 0) {
+            player.heal(amount / 10)
+        }
         return amount
     }
 

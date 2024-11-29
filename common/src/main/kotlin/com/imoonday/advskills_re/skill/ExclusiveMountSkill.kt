@@ -28,11 +28,12 @@ class ExclusiveMountSkill : Skill(
             headYaw = user.headYaw
         }
         if (user.world.isSpaceEmpty(newHorse, newHorse.boundingBox.offset(user.pos.subtract(newHorse.pos)))) {
-            if (user.properties.containsUuid("horseUuid")) {
-                (user.world as ServerWorld).getEntity(user.properties.getUuid("horseUuid"))?.discard()
+            val properties = user.properties
+            if (properties.containsUuid("horseUuid")) {
+                (user.world as ServerWorld).getEntity(properties.getUuid("horseUuid"))?.discard()
             }
-            user.properties.putUuid("horseUuid", newHorse.uuid)
-            user.propertyComponent.sync()
+            properties.putUuid("horseUuid", newHorse.uuid)
+            user.syncProperties()
             newHorse.requestTeleport(user.x, user.y, user.z)
             user.world.spawnEntity(newHorse)
             newHorse.putPlayerOnBack(user)

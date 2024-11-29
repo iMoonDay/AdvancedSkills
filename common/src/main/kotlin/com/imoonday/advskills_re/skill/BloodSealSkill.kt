@@ -6,6 +6,7 @@ import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.effect.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import net.minecraft.util.*
 import net.minecraft.util.hit.*
@@ -59,8 +60,8 @@ class BloodSealSkill : LongPressSkill(
 
     override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 
-    override fun getCrosshair(): Crosshair {
-        clientPlayer?.run {
+    override fun getCrosshair(player: PlayerEntity): Crosshair {
+        player.run {
             if (!isUsing()) return Crosshairs.NONE
             if (raycastLivingEntity(5.0)?.type == HitResult.Type.ENTITY) return Crosshairs.CROSS
         }

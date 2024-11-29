@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.client.screen
 
+import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.gui.*
@@ -78,7 +79,7 @@ class SkillLearningScreen(
 
     private fun updateButtons() {
         refreshButton.active = player.canFreshChoice()
-        learnButton.active = selectedBox != null && !selectedBox!!.skill.invalid
+        learnButton.active = selectedBox != null && !selectedBox!!.skill.isInvalid(player.world)
     }
 
     override fun close() = client!!.setScreen(parent())
@@ -103,19 +104,19 @@ class SkillLearningScreen(
             } else {
                 context.renderDarkPanel(x, y, width, height)
             }
-            if (skill.invalid) return
+            if (skill.isInvalid(player.world)) return
             val gap = 5
             val x = x + 8
             var y = y + gap
 
-            skill.renderIcon(context, this.x + (width - 32) / 2, y, 32)
+            SkillRenderer.renderIcon(skill, context, this.x + (width - 32) / 2, y, 32)
             y += 32 + 3
             val textBottomY = this.y + height - gap
             context.enableScissor(x, y, x + width - 15, textBottomY)
             y -= scrollAmount
             context.drawScrollableText(
                 textRenderer,
-                skill.formattedName,
+                skill.getFormattedName(player.world),
                 x, y,
                 x + width - 15, y + textRenderer.fontHeight,
                 0xFFFFFF, false
@@ -124,7 +125,7 @@ class SkillLearningScreen(
 
             context.drawScrollableText(
                 textRenderer,
-                skill.cooldownSeconds,
+                skill.getCooldownSeconds(),
                 x, y,
                 x + width - 15, y + textRenderer.fontHeight,
                 0x81C784, false

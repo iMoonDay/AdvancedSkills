@@ -8,6 +8,4 @@ import net.minecraft.server.network.*
 interface AttackTrigger : SkillTrigger {
 
     fun onAttack(amount: Float, source: DamageSource, player: ServerPlayerEntity, target: LivingEntity): Float = amount
-
-    fun postSweepAttack(player: PlayerEntity, target: LivingEntity) = Unit
 }

@@ -19,7 +19,7 @@ object ModItemGroups {
         ITEM_GROUPS.register()
         ModItems.ITEMS.forEach { CreativeTabRegistry.append(GROUP, it) }
 //        CreativeTabRegistry.append(GROUP, *ModItems.FRUITS.toTypedArray())
-//        CreativeTabRegistry.append(GROUP, *Skill.getValidSkills().mapNotNull { it.item }.toTypedArray())
+//        CreativeTabRegistry.append(GROUP, *Skills.getValidSkills().mapNotNull { it.item }.toTypedArray())
     }
 
     private fun register(name: String, icon: () -> ItemStack): RegistrySupplier<ItemGroup> =

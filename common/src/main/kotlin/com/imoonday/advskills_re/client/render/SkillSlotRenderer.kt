@@ -3,21 +3,20 @@ package com.imoonday.advskills_re.client.render
 import com.imoonday.advskills_re.client.screen.*
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.util.*
-import net.minecraft.client.*
 import net.minecraft.client.gui.*
 import java.awt.*
 
 object SkillSlotRenderer {
 
-    fun render(client: MinecraftClient, context: DrawContext) {
-        val player = client.player ?: return
+    fun render(context: DrawContext) {
+        val player = clientPlayer ?: return
         if (player.isSpectator) return
         val layout = getValidLayout(player.skillContainer.slotSize)
         if (layout.isEmpty()) return
         renderBackground(context, layout)
         player.skillContainer.getAllSlots().forEach {
             val (x, y) = calculateXY(context, layout, it.index) ?: return@forEach
-            it.skill.render(context, x, y, player)
+            SkillRenderer.render(it.skill, context, x, y, player)
             if (it.index == SkillWheelScreen.quickCastSlot) {
                 context.drawBorder(x - 1, y - 1, 18, 18, 0xFF00FF00.toInt())
             }

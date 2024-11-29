@@ -20,7 +20,7 @@ class SkillFruitItem(val rarity: Skill.Rarity, settings: Settings) : Item(settin
     )
 
     override fun finishUsing(stack: ItemStack, world: World, user: LivingEntity): ItemStack {
-        (user as? ServerPlayerEntity)?.learnRandomly { it.rarity.level <= rarity.level }
+        (user as? ServerPlayerEntity)?.learnRandomly { it.getRarity(world).level <= rarity.level }
         stack.decrement(1)
         return stack
     }

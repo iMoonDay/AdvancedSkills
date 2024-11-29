@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.mixin;
 
-import com.imoonday.advskills_re.trigger.DisguiseTrigger;
+import com.imoonday.advskills_re.client.render.SkillRendererHandler;
 import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -18,16 +18,12 @@ public class PlayerEntityRendererMixin {
 
     @Inject(method = "render(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
     private void render(AbstractClientPlayerEntity player, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-        DisguiseTrigger.DisguiseRenderer renderer = SkillTriggerHandler.INSTANCE.getDisguisingTarget(player);
-        boolean rendered = false;
-        if (renderer != null) {
-            rendered = renderer.render(matrixStack, vertexConsumerProvider, i, g);
-        }
-        if (rendered || SkillTriggerHandler.INSTANCE.isInvisible(player)) {
+        boolean rendered = SkillRendererHandler.INSTANCE.renderPlayerEntity(player, f, g, matrixStack, vertexConsumerProvider, i);
+        if (rendered || SkillTriggerHandler.isInvisible(player)) {
             ci.cancel();
         } else {
             ClientPlayerEntity clientPlayer = MinecraftClient.getInstance().player;
-            if (clientPlayer != null && clientPlayer != player && SkillTriggerHandler.INSTANCE.isInvisibleTo(player, clientPlayer)) {
+            if (clientPlayer != null && clientPlayer != player && SkillTriggerHandler.isInvisibleTo(player, clientPlayer)) {
                 ci.cancel();
             }
         }

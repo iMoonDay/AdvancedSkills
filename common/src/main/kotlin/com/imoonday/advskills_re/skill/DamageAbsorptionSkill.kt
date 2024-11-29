@@ -36,19 +36,4 @@ class DamageAbsorptionSkill : Skill(
         player.stopUsing()
         return true
     }
-
-    override fun <T : PlayerEntity, M : EntityModel<T>> render(
-        matrices: MatrixStack,
-        provider: VertexConsumerProvider,
-        light: Int,
-        player: T,
-        limbAngle: Float,
-        limbDistance: Float,
-        tickDelta: Float,
-        animationProgress: Float,
-        headYaw: Float,
-        headPitch: Float,
-        renderer: FeatureRendererContext<T, M>,
-        context: EntityRendererFactory.Context,
-    ) = renderSkillAround(player, tickDelta, matrices, context, provider)
 }

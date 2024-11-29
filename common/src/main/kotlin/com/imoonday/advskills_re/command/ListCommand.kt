@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.*
 import net.minecraft.command.*
 import net.minecraft.server.command.*
 import net.minecraft.server.network.*
+import net.minecraft.text.*
 
 object ListCommand : PlayerCommand("list") {
 
@@ -18,11 +19,17 @@ object ListCommand : PlayerCommand("list") {
     ): Int {
         val skills = player.learnedSkills
 
+        val size = skills.size
         if (skills.isNotEmpty()) {
-            context.sendMessage(
-                skills.joinToString(", ") { it.name.string }.toText()
-            )
+            var text = Text.empty()
+            skills.forEachIndexed { i, skill ->
+                text = text.append(skill.getNameWithHoverEvent(context.source.world))
+                if (i != size - 1) {
+                    text = text.append(", ")
+                }
+            }
+            context.sendMessage(text)
         }
-        return skills.size
+        return size
     }
 }

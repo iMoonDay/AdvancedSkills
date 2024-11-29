@@ -8,16 +8,16 @@ import java.util.function.*
 
 abstract class PassiveSkill(
     id: String,
-    types: List<SkillType> = listOf(SkillType.PASSIVE),
+    extraTypes: List<SkillType> = emptyList(),
     cooldown: Int = 0,
     rarity: Rarity,
     sound: Supplier<SoundEvent>? = null,
     val toggleable: Boolean = false,
-) : Skill(id, types, cooldown, rarity, sound),
+) : Skill(id, (setOf(SkillType.PASSIVE) + extraTypes).toList(), cooldown, rarity, sound),
     EquipTrigger, AttributeTrigger, RespawnTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = if (toggleable)
-        UseResult.consume(translateActive(user.toggleUsing(), name.string)) else UseResult.passive(name.string)
+        UseResult.consume(translateActive(user.toggleUsing(), name)) else UseResult.passive(name)
 
     override fun postEquipped(player: ServerPlayerEntity, slot: SkillSlot) = player.addAttributes()
 

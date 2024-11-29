@@ -45,8 +45,8 @@ class PrimaryConfinementSkill : LongPressSkill(
         return UseResult.pass(message("empty"))
     }
 
-    override fun getCrosshair(): Crosshair {
-        clientPlayer?.run {
+    override fun getCrosshair(player: PlayerEntity): Crosshair {
+        player.run {
             if (!isUsing()) return Crosshairs.NONE
             if (raycastLivingEntity(5.0)?.type == HitResult.Type.ENTITY) return Crosshairs.CROSS
         }

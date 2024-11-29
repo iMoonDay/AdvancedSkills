@@ -15,7 +15,7 @@ class LearnSkillS2CPacket(
 ) : NetworkPacket {
 
     constructor(buf: PacketByteBuf) : this(
-        Skill.fromId(buf.readIdentifier()),
+        Skills.fromId(buf.readIdentifier()),
         buf.readBoolean()
     )
 

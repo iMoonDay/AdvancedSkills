@@ -5,7 +5,6 @@ import com.imoonday.advskills_re.util.SkillType
 
 class NightVisionSkill : PassiveSkill(
     id = "night_vision",
-    types = listOf(SkillType.PASSIVE),
     rarity = Rarity.SUPERB,
     toggleable = true
 ), PersistentTrigger, NightVisionTrigger

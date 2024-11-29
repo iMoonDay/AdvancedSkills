@@ -20,7 +20,8 @@ class TimeRewindSkill : LongPressSkill(
     override fun getMaxPressTime(): Int = 20 * 5
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
-        player.properties.getCompound("backups").run {
+        val properties = player.properties
+        properties.getCompound("backups").run {
             keys.mapNotNull { it.toIntOrNull() }
                 .minByOrNull { (player.age - pressedTime - it).absoluteValue }
                 ?.let { age ->
@@ -35,7 +36,8 @@ class TimeRewindSkill : LongPressSkill(
                             player.health = getFloat("Health") * player.maxHealth
                         }
                         player.fallDistance = 0f
-                        player.properties.remove("backups")
+                        properties.remove("backups")
+                        player.syncProperties()
                         player.stopUsing()
                     }
                 }
@@ -45,9 +47,10 @@ class TimeRewindSkill : LongPressSkill(
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (player.isReady()) {
-            player.properties.put(
+            val properties = player.properties
+            properties.put(
                 "backups",
-                player.properties.getCompound("backups").apply {
+                properties.getCompound("backups").apply {
                     put(
                         player.age.toString(),
                         NbtUtils.writeEntityPositionToTag(
@@ -56,6 +59,7 @@ class TimeRewindSkill : LongPressSkill(
                     )
                     keys.filter { (it.toIntOrNull() ?: 0) < player.age - 20 * 5 }.forEach { remove(it) }
                 })
+            player.syncProperties()
         }
         super.serverTick(player, usedTime)
     }

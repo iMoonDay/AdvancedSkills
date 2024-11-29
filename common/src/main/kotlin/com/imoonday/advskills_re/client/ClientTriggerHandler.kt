@@ -1,62 +1,65 @@
 package com.imoonday.advskills_re.client
 
+import com.imoonday.advskills_re.network.*
+import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
-import net.minecraft.client.*
 import net.minecraft.client.gui.hud.InGameHud.*
-import net.minecraft.client.render.*
-import net.minecraft.client.util.math.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
+import net.minecraft.nbt.*
 
 object ClientTriggerHandler {
 
-    fun isGlowing(entity: Entity): Boolean =
-        clientPlayer?.getTriggers<GlowingTrigger>()
-            ?.map { it.isGlowing(entity) }
+    @JvmStatic
+    fun isGlowing(entity: Entity): Boolean {
+        val player = clientPlayer
+        return player?.getTriggers<GlowingTrigger>()
+            ?.map { it.isGlowing(entity, player) }
             ?.any { it } ?: false
-
-    fun worldRender(matrixStack: MatrixStack, tickDelta: Float, client: MinecraftClient) {
-        client.player?.getTriggers<WorldRenderTrigger>()
-            ?.forEach { it.apply(matrixStack, tickDelta, client) }
     }
 
-    fun shouldInvertMouse(): Pair<Boolean, Boolean> =
-        clientPlayer?.getTriggers<InvertMouseTrigger>()?.run {
-            map { it.shouldInvertMouseX() }.any { it } to map { it.shouldInvertMouseY() }.any { it }
+    @JvmStatic
+    fun shouldInvertMouse(): Pair<Boolean, Boolean> {
+        val player = clientPlayer
+        return player?.getTriggers<InvertMouseTrigger>()?.run {
+            map { it.shouldInvertMouseX(player) }.any { it } to map { it.shouldInvertMouseY(player) }.any { it }
         } ?: (false to false)
+    }
 
-    fun shouldInvertInput(): Pair<Boolean, Boolean> =
-        clientPlayer?.getTriggers<InvertInputTrigger>()?.run {
-            map { it.shouldInvertHorizontalInput() }.any { it } to map { it.shouldInvertVerticalInput() }.any { it }
+    @JvmStatic
+    fun shouldInvertInput(): Pair<Boolean, Boolean> {
+        val player = clientPlayer
+        return player?.getTriggers<InvertInputTrigger>()?.run {
+            map { it.shouldInvertHorizontalInput(player) }.any { it } to map { it.shouldInvertVerticalInput(player) }.any { it }
         } ?: (false to false)
+    }
 
+    @JvmStatic
     fun getCameraMovement(original: Float): Float {
         var movement = original
-        clientPlayer?.getTriggers<CameraUpdateMovementTrigger>()
-            ?.forEach { movement = it.getDelta(movement) }
+        val player = clientPlayer
+        player?.getTriggers<CameraUpdateMovementTrigger>()
+            ?.forEach { movement = it.getDelta(movement, player) }
         return movement
     }
 
+    @JvmStatic
     fun getHeartType(player: PlayerEntity): HeartType? =
         player.getTriggers<HeartTypeTrigger>()
             .mapNotNull { it.getHeartType(player) }
             .maxByOrNull { it.second }?.first
 
-    fun renderAfterEntity(
-        client: MinecraftClient,
-        camera: Camera,
-        entity: Entity,
-        yaw: Float,
-        tickDelta: Float,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
-        light: Int,
-    ) {
-        client.player?.run {
-            getTriggers<EntityRenderTrigger>()
-                .filter { it.shouldRender(this, entity) }
-                .forEach { it.render(camera, entity, yaw, tickDelta, matrices, vertexConsumers, light) }
-        }
-    }
+    @JvmStatic
+    fun sendPlayerData(player: PlayerEntity) =
+        player.getTriggers<SendPlayerDataTrigger>()
+            .filter { it.getSendTime().shouldSendOnTick(player, it.getAsSkill()) }
+            .forEach {
+                Channels.SEND_PLAYER_DATA_C2S.sendToServer(
+                    SendPlayerDataC2SPacket(
+                        it.getAsSkill(),
+                        it.write(player, NbtCompound())
+                    )
+                )
+            }
 }

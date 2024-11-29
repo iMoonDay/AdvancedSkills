@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.nbt.*
+import net.minecraft.world.*
 
 data class SkillChoice(
     val first: Skill,
@@ -9,9 +10,9 @@ data class SkillChoice(
     val third: Skill,
 ) {
 
-    fun isEmpty() = first.invalid && second.invalid && third.invalid
+    fun isEmpty(world: World? = null) = first.isInvalid(world) && second.isInvalid(world) && third.isInvalid(world)
 
-    fun hasEmpty() = first.invalid || second.invalid || third.invalid
+    fun hasEmpty(world: World? = null) = first.isInvalid(world) || second.isInvalid(world) || third.isInvalid(world)
 
     val skills = listOf(first, second, third)
 
@@ -21,15 +22,16 @@ data class SkillChoice(
 
     fun withThird(skill: Skill): SkillChoice = SkillChoice(first, second, skill)
 
-    fun replaceWith(predicate: (Skill) -> Boolean, generator: (Set<Skill>) -> Skill): SkillChoice {
+    fun replaceWith(world: World?, predicate: (Skill) -> Boolean, generator: (Set<Skill>) -> Skill): SkillChoice {
         var choice = this
-        if (predicate(first)) choice = choice.withFirst(generator(choice.getNoEmpty(first)))
-        if (predicate(second)) choice = choice.withSecond(generator(choice.getNoEmpty(second)))
-        if (predicate(third)) choice = choice.withThird(generator(choice.getNoEmpty(third)))
+        if (predicate(first)) choice = choice.withFirst(generator(choice.getNoEmpty(world, first)))
+        if (predicate(second)) choice = choice.withSecond(generator(choice.getNoEmpty(world, second)))
+        if (predicate(third)) choice = choice.withThird(generator(choice.getNoEmpty(world, third)))
         return choice
     }
 
-    fun getNoEmpty(except: Skill? = null) = skills.filterNot { it == except || it.invalid }.toSet()
+    fun getNoEmpty(world: World? = null, except: Skill? = null) =
+        skills.filterNot { it == except || it.isInvalid(world) }.toSet()
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
         putString("1", first.id.toString())
@@ -58,27 +60,34 @@ data class SkillChoice(
     companion object {
 
         @JvmField
-        val EMPTY = SkillChoice(Skill.EMPTY, Skill.EMPTY, Skill.EMPTY)
+        val EMPTY = SkillChoice(Skills.EMPTY, Skills.EMPTY, Skills.EMPTY)
 
         fun fromNbt(nbt: NbtCompound): SkillChoice = SkillChoice(
-            Skill.fromId(nbt.getString("1")),
-            Skill.fromId(nbt.getString("2")),
-            Skill.fromId(nbt.getString("3")),
+            Skills.fromId(nbt.getString("1")),
+            Skills.fromId(nbt.getString("2")),
+            Skills.fromId(nbt.getString("3")),
         )
 
-        fun canGenerate(except: Collection<Skill> = emptyList(), filter: (Skill) -> Boolean = { true }) =
-            Skill.getLearnableSkills(except, filter).isNotEmpty()
+        fun canGenerate(
+            world: World? = null,
+            except: Collection<Skill> = emptyList(),
+            filter: (Skill) -> Boolean = { true }
+        ) = Skills.getLearnableSkills(world, except, filter).isNotEmpty()
 
-        fun generate(except: Collection<Skill> = emptyList(), filter: (Skill) -> Boolean = { true }): SkillChoice =
-            Skill.getLearnableSkills(except, filter)
+        fun generate(
+            world: World? = null,
+            except: Collection<Skill> = emptyList(),
+            filter: (Skill) -> Boolean = { true }
+        ): SkillChoice =
+            Skills.getLearnableSkills(world, except, filter)
                 .shuffled()
                 .take(3)
                 .takeUnless { it.isEmpty() }
                 ?.let {
                     SkillChoice(
-                        it.getOrElse(0) { Skill.EMPTY },
-                        it.getOrElse(1) { Skill.EMPTY },
-                        it.getOrElse(2) { Skill.EMPTY },
+                        it.getOrElse(0) { Skills.EMPTY },
+                        it.getOrElse(1) { Skills.EMPTY },
+                        it.getOrElse(2) { Skills.EMPTY },
                     )
                 } ?: EMPTY
     }

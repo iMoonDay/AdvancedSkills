@@ -24,11 +24,11 @@ object UnequipCommand : PlayerCommand("unequip") {
     ): Int {
         val slot = IntegerArgumentType.getInteger(context, "slot")
         val original = player.getSkill(slot)
-        return if (player.equip(Skill.EMPTY, slot)) {
+        return if (player.equip(Skills.EMPTY, slot)) {
             context.sendFeedback(
                 "unequipSkill.success",
                 player.displayName.string,
-                original.name.string,
+                original.name,
                 slot
             )
             1

@@ -4,19 +4,20 @@ import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
+import net.minecraft.world.*
 
 interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
 
     val persistTime: Int
 
-    fun getPersistTimeModified(): Int {
+    fun getPersistTimeModified(world: World? = null): Int {
         val id = getAsSkill().id
-        return SkillConfig.instance.getModifier(id)?.time ?: persistTime
+        return (world?.skillConfig ?: SkillConfig.instance).getModifier(id)?.time ?: persistTime
     }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
-        if (usedTime >= getPersistTimeModified()) {
+        if (usedTime >= getPersistTimeModified(player.world)) {
             onStop(player)
             player.stopUsing()
         }
@@ -25,7 +26,7 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
     fun onStop(player: ServerPlayerEntity) = Unit
 
     override fun getProgress(player: PlayerEntity): Double {
-        val time = getPersistTimeModified()
+        val time = getPersistTimeModified(player.world)
         return (time - player.getUsedTime()) / time.toDouble()
     }
 

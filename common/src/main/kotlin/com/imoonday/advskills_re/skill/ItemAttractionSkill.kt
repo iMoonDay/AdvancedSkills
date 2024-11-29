@@ -47,9 +47,7 @@ class ItemAttractionSkill : LongPressSkill(
         super.tick(player, usedTime)
     }
 
-    override fun isGlowing(entity: Entity): Boolean {
-        val player = clientPlayer ?: return false
-        return (player.isUsing() && entity is ItemEntity && !entity.cannotPickup()
+    override fun isGlowing(entity: Entity, player: PlayerEntity): Boolean =
+        (player.isUsing() && entity is ItemEntity && !entity.cannotPickup()
             && player.boundingBox.expand(15.0).contains(entity.pos))
-    }
 }

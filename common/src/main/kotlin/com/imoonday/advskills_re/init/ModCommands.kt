@@ -25,7 +25,10 @@ object ModCommands {
                 SetXpCommand,
                 QueryXpCommand,
                 ResetXpCommand,
-                CooldownCommand
+                CooldownCommand,
+                XpMultiplierCommand,
+                BlackListCommand,
+                DefaultSlotsCommand
             )
         }
     }

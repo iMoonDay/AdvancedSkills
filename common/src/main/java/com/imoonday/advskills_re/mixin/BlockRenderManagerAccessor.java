@@ -15,7 +15,4 @@ public interface BlockRenderManagerAccessor {
 
     @Accessor
     BlockModelRenderer getBlockModelRenderer();
-
-    @Accessor
-    BuiltinModelItemRenderer getBuiltinModelItemRenderer();
 }

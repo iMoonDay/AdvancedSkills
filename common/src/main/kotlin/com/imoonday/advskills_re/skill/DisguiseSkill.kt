@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
+import net.minecraft.block.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
@@ -10,7 +11,7 @@ class DisguiseSkill : Skill(
     id = "disguise",
     types = listOf(SkillType.FUNCTION),
     cooldown = 20,
-    rarity = Rarity.SUPERB
+    rarity = Rarity.EPIC
 ), DisguiseTrigger, UseInterruptTrigger, AutoStopTrigger {
 
     override val persistTime: Int = 20 * 30
@@ -27,25 +28,18 @@ class DisguiseSkill : Skill(
         player.startCooling()
     }
 
-    override fun getDisguiseRenderer(
-        player: PlayerEntity,
-    ): DisguiseTrigger.DisguiseRenderer? {
-        var pos = player.blockPos.offset(Direction.DOWN)
-        if (player.world.isAir(pos)) {
+    override fun isDisguising(player: PlayerEntity): Boolean = player.isUsing() && getDisguisePos(player) != null
+
+    fun getDisguisePos(player: PlayerEntity): BlockPos? {
+        var pos = player.steppingPos
+        val world = player.world
+        if (world.isAir(pos) || world.getBlockState(pos).block is FluidBlock) {
             pos = pos.offset(Direction.DOWN)
         }
-        if (player.world.isAir(pos)) {
-            return null
+        if (world.isAir(pos) || world.getBlockState(pos).block is FluidBlock) {
+            pos = player.blockPos.down(2)
         }
-        return DisguiseTrigger.DisguiseRenderer { matrixStack, provider, light, tickDelta ->
-            DisguiseTrigger.renderBlockUnderPlayer(
-                player,
-                pos,
-                matrixStack,
-                provider,
-                light,
-                tickDelta
-            )
-        }
+        if (world.isAir(pos) || world.getBlockState(pos).block is FluidBlock) return null
+        return pos
     }
 }

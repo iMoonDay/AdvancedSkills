@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.mixin;
 
+import com.imoonday.advskills_re.client.ClientTriggerHandler;
 import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -16,13 +17,13 @@ public class ClientPlayerEntityMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     private void advskills_re$tick(CallbackInfo ci) {
         ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
-        SkillTriggerHandler.INSTANCE.sendPlayerData(player);
+        ClientTriggerHandler.sendPlayerData(player);
     }
 
     @ModifyArg(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;"), index = 1)
     private double advskills_re$tickMovement(double y) {
         if ((Entity) (Object) this instanceof PlayerEntity player) {
-            if (SkillTriggerHandler.INSTANCE.shouldInvertJump(player) && y > 0 || SkillTriggerHandler.INSTANCE.shouldInvertSneak(player) && y < 0) {
+            if (SkillTriggerHandler.shouldInvertJump(player) && y > 0 || SkillTriggerHandler.shouldInvertSneak(player) && y < 0) {
                 return -y;
             }
         }

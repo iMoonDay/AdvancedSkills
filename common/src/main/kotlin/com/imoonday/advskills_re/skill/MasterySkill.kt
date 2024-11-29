@@ -11,6 +11,6 @@ class MasterySkill : Skill(
     rarity = Rarity.LEGENDARY
 ), CooldownTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
     override fun getCooldown(original: Int): Int = (original * 0.8).toInt()
 }

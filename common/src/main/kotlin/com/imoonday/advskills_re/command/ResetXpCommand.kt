@@ -20,6 +20,7 @@ object ResetXpCommand : XpCommand("reset") {
         for (entity in targets) {
             entity.skillExp = 0
             entity.skillLevel = 0
+            entity.levelData.cycle = 0
         }
         if (targets.size == 1) {
             context.sendFeedback(

@@ -3,10 +3,11 @@ package com.imoonday.advskills_re.util
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.nbt.*
+import net.minecraft.world.*
 
-data class SkillContainer(
-    private val skills: MutableMap<Skill, SkillData> = mutableMapOf(),
-    private val slots: MutableMap<Int, SkillSlot> = createDefaultSlots(),
+class SkillContainer private constructor(
+    private val skills: MutableMap<Skill, SkillData>,
+    private val slots: MutableMap<Int, SkillSlot>,
     var selectedSlotIndex: Int = 1,
 ) {
 
@@ -26,11 +27,16 @@ data class SkillContainer(
         }
     }
 
-    fun getAllSkills(predicate: (Skill, SkillData) -> Boolean = { _, _ -> true }) =
-        skills.filterNot { it.key.invalid }.filter { predicate(it.key, it.value) }.keys
+    fun getAllSkills(world: World? = null, predicate: (Skill, SkillData) -> Boolean = { _, _ -> true }) =
+        skills.filterNot { it.key.isInvalid(world) }.filter { predicate(it.key, it.value) }.keys
 
-    fun learn(skill: Skill, data: SkillData = SkillData(), resultCallback: (Boolean) -> Unit = {}): Boolean =
-        if (skills.containsKey(skill) || skill.invalid) {
+    fun learn(
+        world: World? = null,
+        skill: Skill,
+        data: SkillData = SkillData(),
+        resultCallback: (Boolean) -> Unit = {}
+    ): Boolean =
+        if (skills.containsKey(skill) || skill.isInvalid(world)) {
             resultCallback(false)
             false
         } else {
@@ -39,8 +45,8 @@ data class SkillContainer(
             true
         }
 
-    fun learnAll(callback: (skill: Skill) -> Unit = {}) {
-        Skill.getLearnableSkills(skills.keys).forEach {
+    fun learnAll(world: World? = null, callback: (skill: Skill) -> Unit = {}) {
+        Skills.getLearnableSkills(world, skills.keys).forEach {
             skills[it] = SkillData()
             callback(it)
         }
@@ -146,9 +152,9 @@ data class SkillContainer(
         return null
     }
 
-    fun resetSlots() {
+    fun resetSlots(world: World) {
         slots.clear()
-        slots.putAll(createDefaultSlots())
+        slots.putAll(createDefaultSlots(world))
     }
 
     private fun checkContinuous() {
@@ -177,46 +183,54 @@ data class SkillContainer(
     companion object {
 
         const val MAX_SLOT_SIZE = 10
+
+        @JvmStatic
+        val DEFAULT_SLOTS = mapOf(
+            "active" to 3,
+            "generic" to 1,
+            "passive" to 2,
+        )
+
+        fun create(world: World? = null) = SkillContainer(mutableMapOf(), createDefaultSlots(world))
+
         fun fromNbt(tag: NbtCompound): SkillContainer {
             val skills = tag.getCompound("skills").keys.mapNotNull {
-                val skill = Skill.fromIdNullable(it) ?: return@mapNotNull null
+                val skill = Skills.fromIdNullable(it) ?: return@mapNotNull null
                 val data = SkillData.fromNbt(tag.getCompound("skills").getCompound(it))
                 Pair(skill, data)
-            }
-                .associate { it }
-                .toMutableMap()
+            }.associate { it }.toMutableMap()
             val slots = if (tag.contains("slots", NbtElement.LIST_TYPE.toInt())) tag.getList(
                 "slots",
                 NbtElement.COMPOUND_TYPE.toInt()
-            )
-                .filterIsInstance<NbtCompound>()
+            ).filterIsInstance<NbtCompound>()
                 .map { SkillSlot.fromNbt(it) }
                 .associateBy { it.index }
                 .toMutableMap() else createDefaultSlots()
             return SkillContainer(skills, slots)
         }
 
-        fun createDefaultSlots(): MutableMap<Int, SkillSlot> = mutableMapOf<Int, SkillSlot>().apply {
-            var index = 1
-            val slots = SkillConfig.instance.defaultSkillSlots
-            slots["active"]?.takeIf { it > 0 }?.let {
-                repeat(it) {
-                    put(index, SkillSlot.Active(index))
-                    index++
+        fun createDefaultSlots(world: World? = null): MutableMap<Int, SkillSlot> =
+            mutableMapOf<Int, SkillSlot>().apply {
+                var index = 1
+                val slots = (world?.skillConfig ?: SkillConfig.instance).defaultSkillSlots
+                slots["active"]?.takeIf { it > 0 }?.let {
+                    repeat(it) {
+                        put(index, SkillSlot.Active(index))
+                        index++
+                    }
+                }
+                slots["generic"]?.takeIf { it > 0 }?.let {
+                    repeat(it) {
+                        put(index, SkillSlot.Generic(index))
+                        index++
+                    }
+                }
+                slots["passive"]?.takeIf { it > 0 }?.let {
+                    repeat(it) {
+                        put(index, SkillSlot.Passive(index))
+                        index++
+                    }
                 }
             }
-            slots["generic"]?.takeIf { it > 0 }?.let {
-                repeat(it) {
-                    put(index, SkillSlot.Generic(index))
-                    index++
-                }
-            }
-            slots["passive"]?.takeIf { it > 0 }?.let {
-                repeat(it) {
-                    put(index, SkillSlot.Passive(index))
-                    index++
-                }
-            }
-        }
     }
 }

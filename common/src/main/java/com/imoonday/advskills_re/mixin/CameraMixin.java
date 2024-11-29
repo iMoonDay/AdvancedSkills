@@ -14,6 +14,6 @@ public class CameraMixin {
 
     @ModifyConstant(method = "updateEyeHeight", constant = @Constant(floatValue = 0.5f))
     private float advskills_re$updateEyeHeight(float constant) {
-        return ClientTriggerHandler.INSTANCE.getCameraMovement(constant);
+        return ClientTriggerHandler.getCameraMovement(constant);
     }
 }

@@ -22,6 +22,7 @@ class ChargedSweepSkill : LongPressSkill(
 ), AttributeTrigger, UsingRenderTrigger {
 
     override fun getMaxPressTime(): Int = 20 * 3
+
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Charged Sweep Charging"),
@@ -44,8 +45,8 @@ class ChargedSweepSkill : LongPressSkill(
         player.stopUsing()
         player.world.getNonSpectatingEntities(
             LivingEntity::class.java, player.boundingBox.expand(5.0)
-        ).filter {
-            (it.boundingBox.maxY >= player.boundingBox.minY
+        ).filter { it !== player
+                && (it.boundingBox.maxY >= player.boundingBox.minY
                 && it.boundingBox.maxY <= player.boundingBox.maxY
                 || it.boundingBox.minY <= player.boundingBox.maxY
                 && it.boundingBox.minY >= player.boundingBox.minY)

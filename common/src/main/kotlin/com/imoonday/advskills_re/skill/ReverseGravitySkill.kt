@@ -3,9 +3,6 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.SkillType
 import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.clientPlayer
-import net.minecraft.client.*
-import net.minecraft.client.util.math.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
@@ -17,7 +14,6 @@ class ReverseGravitySkill : Skill(
     cooldown = 30,
     rarity = Rarity.EPIC,
 ), AutoStopTrigger,
-    WorldRenderTrigger,
     InvertMouseTrigger,
     FlipUpsideDownTrigger,
     EyeHeightTrigger,
@@ -44,10 +40,11 @@ class ReverseGravitySkill : Skill(
     override fun tick(player: PlayerEntity, usedTime: Int) {
         player.run {
             if (isUsing()) {
-                if (getUsingData()?.getBoolean("first") != true) {
+                val usingData = getUsingData()
+                if (usingData?.getBoolean("first") != true) {
                     velocity = velocity.withAxis(Direction.Axis.Y, 0.0)
                     pitch = -pitch
-                    getUsingData()?.putBoolean("first", true)
+                    usingData?.putBoolean("first", true)
                 }
                 if (!abilities.flying) {
                     addVelocity(0.0, 0.15, 0.0)
@@ -65,14 +62,9 @@ class ReverseGravitySkill : Skill(
         super.tick(player, usedTime)
     }
 
-    override fun apply(matrixStack: MatrixStack, tickDelta: Float, client: MinecraftClient) {
-        super.apply(matrixStack, tickDelta, client)
-        if (client.player?.isUsing() == true) matrixStack.scale(-1f, -1f, 1f)
-    }
+    override fun shouldInvertMouse(player: PlayerEntity): Boolean = player.isUsing()
 
-    override fun shouldInvertMouse(): Boolean = clientPlayer?.isUsing() == true
-
-    override fun shouldInvertInput(): Boolean = clientPlayer?.isUsing() == true
+    override fun shouldInvertInput(player: PlayerEntity): Boolean = player.isUsing()
 
     override fun shouldFlipUpsideDown(player: PlayerEntity): Boolean = player.isUsing()
 
@@ -91,5 +83,5 @@ class ReverseGravitySkill : Skill(
         }
     }
 
-    override fun getDelta(original: Float): Float = 1f
+    override fun getDelta(original: Float, player: PlayerEntity): Float = 1f
 }

@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.client.screen
 
+import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.screen.component.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
@@ -29,7 +30,7 @@ class SkillGalleryScreen(
             (width * 0.55).toInt(),
             height - 30,
             34,
-            { Skill.getValidSkills() }
+            { Skills.getValidSkills(client?.world) }
         ) { context, index, skill, x, y, width, height, _, _, hovered, focused, _ ->
             val selected = selectedSkill == skill
             if (selected || focused || hovered) {
@@ -48,10 +49,10 @@ class SkillGalleryScreen(
             )
 
             currentX += textRenderer.getWidth(indexText) + gap
-            skill.renderIcon(context, currentX, y + (height - 16) / 2)
+            SkillRenderer.renderIcon(skill, context, currentX, y + (height - 16) / 2)
 
             currentX += 16 + gap
-            val name = skill.formattedName
+            val name = skill.getFormattedName(client?.world)
             context.drawText(
                 textRenderer,
                 name,
@@ -62,7 +63,7 @@ class SkillGalleryScreen(
             )
             context.drawText(
                 textRenderer,
-                skill.rarity.displayName.copy()
+                skill.getRarity(client?.world).displayName.copy()
                     .append(" | ")
                     .append(skill.types.joinToString(" ") { it.displayName.string }),
                 currentX,
@@ -112,7 +113,7 @@ class SkillGalleryScreen(
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if (button == 1 && parent != null) {
+        if (button == 1) {
             close()
             return true
         }
@@ -139,10 +140,10 @@ class SkillGalleryScreen(
             val xOffset = x + 8
             var yOffset = y + gap
             // 1. 渲染技能图标（居中）
-            skill.renderIcon(context, x + width / 2 - 16, yOffset, 32)
+            SkillRenderer.renderIcon(skill, context, x + width / 2 - 16, yOffset, 32)
             yOffset += 32 + gap
             // 2. 渲染技能名称（居中，亮白色）
-            val nameText = skill.formattedName
+            val nameText = skill.getFormattedName(client?.world)
             context.drawText(
                 textRenderer,
                 nameText,
@@ -178,7 +179,7 @@ class SkillGalleryScreen(
             // 5. 渲染技能冷却时间（绿色，左对齐）
             context.drawText(
                 textRenderer,
-                translate("screen.gallery.info.cooldown", skill.cooldownSeconds),
+                translate("screen.gallery.info.cooldown", skill.getCooldownSeconds()),
                 xOffset,
                 yOffset,
                 0x81C784, // 浅绿色
@@ -189,7 +190,7 @@ class SkillGalleryScreen(
 
             context.drawText(
                 textRenderer,
-                translate("screen.gallery.info.rarity", skill.rarity.displayName).formatted(skill.rarity.formatting),
+                translate("screen.gallery.info.rarity", skill.getRarity(client?.world).displayName).formatted(skill.getRarity().formatting),
                 xOffset,
                 yOffset,
                 0xFFFFFF,

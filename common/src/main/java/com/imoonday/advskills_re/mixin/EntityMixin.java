@@ -7,9 +7,6 @@ import com.imoonday.advskills_re.init.ModEffectsKt;
 import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
@@ -78,7 +75,7 @@ public abstract class EntityMixin implements Propertied {
     @Inject(method = "getStepHeight", at = @At("HEAD"), cancellable = true)
     private void advskills_re$getStepHeight(CallbackInfoReturnable<Float> cir) {
         if ((Entity) (Object) this instanceof PlayerEntity player) {
-            Float height = SkillTriggerHandler.INSTANCE.getStepHeight(player);
+            Float height = SkillTriggerHandler.getStepHeight(player);
             if (height != null && height > this.stepHeight) {
                 cir.setReturnValue(height);
             }
@@ -88,7 +85,7 @@ public abstract class EntityMixin implements Propertied {
     @Inject(method = "updateMovementInFluid", at = @At("HEAD"), cancellable = true)
     private void advskills_re$updateMovementInFluid(TagKey<Fluid> tag, double speed, CallbackInfoReturnable<Boolean> cir) {
         if ((Entity) (Object) this instanceof PlayerEntity player) {
-            if (SkillTriggerHandler.INSTANCE.ignoreFluid(player, tag)) {
+            if (SkillTriggerHandler.ignoreFluid(player, tag)) {
                 cir.setReturnValue(false);
             }
         }
@@ -97,7 +94,7 @@ public abstract class EntityMixin implements Propertied {
     @Inject(method = "isSubmergedIn", at = @At("HEAD"), cancellable = true)
     private void advskills_re$isSubmergedIn(TagKey<Fluid> tag, CallbackInfoReturnable<Boolean> cir) {
         if ((Entity) (Object) this instanceof PlayerEntity player) {
-            if (SkillTriggerHandler.INSTANCE.ignoreFluid(player, tag)) {
+            if (SkillTriggerHandler.ignoreFluid(player, tag)) {
                 cir.setReturnValue(false);
             }
         }
@@ -106,7 +103,7 @@ public abstract class EntityMixin implements Propertied {
     @ModifyVariable(method = "updateMovementInFluid", at = @At("HEAD"), argsOnly = true, index = 2)
     private double advskills_re$modifySpeed(double value, TagKey<Fluid> tag, double speed) {
         if ((Entity) (Object) this instanceof PlayerEntity player) {
-            return SkillTriggerHandler.INSTANCE.getMovementInFluid(player, tag, value);
+            return SkillTriggerHandler.getMovementInFluid(player, tag, value);
         }
         return speed;
     }
@@ -114,7 +111,7 @@ public abstract class EntityMixin implements Propertied {
     @Inject(method = "isInvisible", at = @At("HEAD"), cancellable = true)
     private void advskills_re$isInvisible(CallbackInfoReturnable<Boolean> cir) {
         if ((Entity) (Object) this instanceof PlayerEntity player) {
-            if (SkillTriggerHandler.INSTANCE.isInvisible(player) || SkillTriggerHandler.INSTANCE.getDisguisingTarget(player) != null) {
+            if (SkillTriggerHandler.isInvisible(player) || SkillTriggerHandler.isDisguising(player)) {
                 cir.setReturnValue(true);
             }
         }
@@ -123,7 +120,7 @@ public abstract class EntityMixin implements Propertied {
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
     private void advskills_re$isInvisibleTo(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
         if ((Entity) (Object) this instanceof PlayerEntity entity) {
-            if (!SkillTriggerHandler.INSTANCE.isInvisibleTo(entity, player) || SkillTriggerHandler.INSTANCE.getDisguisingTarget(player) != null) {
+            if (!SkillTriggerHandler.isInvisibleTo(entity, player) || SkillTriggerHandler.isDisguising(player)) {
                 cir.setReturnValue(false);
             }
         }
@@ -132,7 +129,7 @@ public abstract class EntityMixin implements Propertied {
     @Inject(method = "isGlowing", at = @At("HEAD"), cancellable = true)
     private void advskills_re$isGlowing(CallbackInfoReturnable<Boolean> cir) {
         Entity entity = (Entity) (Object) this;
-        if (entity.getWorld().isClient && ClientTriggerHandler.INSTANCE.isGlowing(entity)) {
+        if (entity.getWorld().isClient && ClientTriggerHandler.isGlowing(entity)) {
             cir.setReturnValue(true);
         }
     }

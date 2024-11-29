@@ -12,7 +12,7 @@ class SelfRepairSkill : Skill(
     cooldown = 10,
 ), AutoTrigger, AutoStopTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override val persistTime: Int = 20 * 10
 

@@ -26,7 +26,7 @@ class DangerPerceptionSkill : Skill(
     rarity = Rarity.SUPERB,
 ), AutoStopTrigger, AttributeTrigger, DamageTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override val persistTime: Int = 20 * 2
 

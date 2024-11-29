@@ -128,10 +128,11 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
     override fun tick() {
         if (!world.isClient) {
             owner?.let {
-                if (!it.properties.containsUuid("horseUuid")) {
-                    it.properties.putUuid("horseUuid", uuid)
-                    it.propertyComponent.sync()
-                } else if (it.properties.getUuid("horseUuid") != uuid) {
+                val properties = it.properties
+                if (!properties.containsUuid("horseUuid")) {
+                    properties.putUuid("horseUuid", uuid)
+                    it.syncProperties()
+                } else if (properties.getUuid("horseUuid") != uuid) {
                     discard()
                     return
                 }

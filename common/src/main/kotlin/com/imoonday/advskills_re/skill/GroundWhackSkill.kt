@@ -21,8 +21,8 @@ class GroundWhackSkill : Skill(
         user.run {
             if (abilities.flying) abilities.flying = false
             velocity = Vec3d(0.0, min(velocity.y, -1.0), 0.0)
-            sendToServer(EntityVelocityUpdateS2CPacket(this))
-            sendToServer(PlayerAbilitiesS2CPacket(abilities))
+            sendPacket(EntityVelocityUpdateS2CPacket(this))
+            sendPacket(PlayerAbilitiesS2CPacket(abilities))
             startUsing()
         }
         return UseResult.success()

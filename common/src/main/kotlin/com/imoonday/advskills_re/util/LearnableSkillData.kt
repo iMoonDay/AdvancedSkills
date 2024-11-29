@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.nbt.*
+import net.minecraft.world.*
 
 class LearnableSkillData(
     private var choice: SkillChoice = SkillChoice.EMPTY,
@@ -16,10 +17,10 @@ class LearnableSkillData(
     val third
         get() = choice.third
 
-    fun next(except: Collection<Skill> = emptyList(), filter: (Skill) -> Boolean = { true }) {
+    fun next(world: World?, except: Collection<Skill> = emptyList(), filter: (Skill) -> Boolean = { true }) {
         if (hasNext()) {
             count--
-            choice = SkillChoice.generate(except, filter)
+            choice = SkillChoice.generate(world, except, filter)
         } else {
             choice = SkillChoice.EMPTY
         }
@@ -43,23 +44,28 @@ class LearnableSkillData(
     fun isEmpty() = choice.isEmpty()
 
     fun refresh(
+        world: World?,
         force: Boolean = false,
         except: Collection<Skill> = emptyList(),
         filter: (Skill) -> Boolean = { true },
     ) {
-        if (refreshed && !force || choice.isEmpty() || !SkillChoice.canGenerate(except, filter)) return
+        if (refreshed && !force || choice.isEmpty() || !SkillChoice.canGenerate(world, except, filter)) return
         refreshed = true
-        choice = SkillChoice.generate(except, filter)
+        choice = SkillChoice.generate(world, except, filter)
     }
 
-    fun correct(except: Collection<Skill> = emptyList(), filter: (Skill) -> Boolean = { true }): Boolean {
+    fun correct(
+        world: World?,
+        except: Collection<Skill> = emptyList(),
+        filter: (Skill) -> Boolean = { true }
+    ): Boolean {
         var modified = false
         if (count < 0) {
             count = 0
             modified = true
         }
         if (choice.isEmpty() && hasNext()) {
-            next(except, filter)
+            next(world, except, filter)
             modified = true
         }
         return modified

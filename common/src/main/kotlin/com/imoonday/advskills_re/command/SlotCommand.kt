@@ -32,7 +32,7 @@ object SlotCommand : PlayerCommand("slot") {
         ).then(literal("reset").executesWithPlayer { _, player -> reset(player) })
 
     private fun reset(player: ServerPlayerEntity): Int {
-        player.skillContainer.resetSlots()
+        player.skillContainer.resetSlots(player.world)
         player.syncData()
         return 1
     }

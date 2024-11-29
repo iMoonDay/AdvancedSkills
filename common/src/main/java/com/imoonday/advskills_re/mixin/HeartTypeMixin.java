@@ -13,7 +13,7 @@ public class HeartTypeMixin {
 
     @Inject(method = "fromPlayerState", at = @At("RETURN"), cancellable = true)
     private static void advskills_re$fromPlayerState(PlayerEntity player, CallbackInfoReturnable<InGameHud.HeartType> cir) {
-        InGameHud.HeartType type = ClientTriggerHandler.INSTANCE.getHeartType(player);
+        InGameHud.HeartType type = ClientTriggerHandler.getHeartType(player);
         if (type != null) {
             cir.setReturnValue(type);
         }

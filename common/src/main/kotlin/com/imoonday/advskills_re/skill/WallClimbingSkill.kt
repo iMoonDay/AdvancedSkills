@@ -12,15 +12,15 @@ import net.minecraft.server.network.*
 
 class WallClimbingSkill : PassiveSkill(
     id = "wall_climbing",
-    types = listOf(SkillType.PASSIVE, SkillType.MOVEMENT),
+    extraTypes = listOf(SkillType.MOVEMENT),
     cooldown = 15,
     rarity = Rarity.RARE,
 ), ClimbingTrigger, AutoStopTrigger, AutoTrigger, SendPlayerDataTrigger {
 
-    override fun isClimbing(player: PlayerEntity): Boolean =
-        player.isUsing() && player.shouldClimb()
+    override fun isClimbing(player: PlayerEntity): Boolean = player.isUsing() && player.shouldClimb()
 
     override val persistTime: Int = 20 * 15
+
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
         player.startCooling()
@@ -50,14 +50,17 @@ class WallClimbingSkill : PassiveSkill(
         }
     }
 
-    override fun write(player: PlayerEntity, data: NbtCompound): NbtCompound =
-        data.apply { putBoolean(HORIZONTAL_COLLISION_KEY, player.horizontalCollision) }
+    override fun write(player: PlayerEntity, data: NbtCompound): NbtCompound {
+        data.putBoolean(HORIZONTAL_COLLISION_KEY, player.horizontalCollision)
+        return data
+    }
 
     override fun apply(player: ServerPlayerEntity, data: NbtCompound) {
         player.properties.putBoolean(HORIZONTAL_COLLISION_KEY, data.getBoolean(HORIZONTAL_COLLISION_KEY))
     }
 
-    override fun getSendTime(): SendTime = SendTime.ALWAYS
+    override fun getSendTime(): SendTime = SendTime.EQUIPPED
+
     private fun PlayerEntity.shouldClimb(): Boolean =
         (horizontalCollision || properties.getBoolean(HORIZONTAL_COLLISION_KEY)) && !abilities.flying
 

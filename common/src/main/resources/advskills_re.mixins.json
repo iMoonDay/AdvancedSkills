@@ -19,12 +19,12 @@
     "MouseMixin",
     "PlayerEntityRendererMixin",
     "ScreenAccessor",
-    "WorldRendererAccessor"
+    "WorldRendererAccessor",
+    "BlockRenderManagerAccessor"
   ],
   "mixins": [
     "ArgumentTypesMixin",
     "BlazeEntity$ShootFireballGoalMixin",
-    "BlockRenderManagerAccessor",
     "CreeperEntityMixin",
     "CreeperIgniteGoalMixin",
     "CrossbowAttackGoalMixin",
@@ -32,10 +32,12 @@
     "EndermanEntity$TeleportTowardsPlayerGoalMixin",
     "EndermanEntityMixin",
     "EntityMixin",
+    "EntityTrackerAccessor",
     "FluidBlockMixin",
     "GhastEntity$ShootFireballGoalMixin",
     "GuardianEntity$FireBeamGoalMixin",
     "ItemStackMixin",
+    "LivingEntityAccessor",
     "LivingEntityMixin",
     "MeleeAttackGoalMixin",
     "PlayerEntityMixin",
@@ -44,6 +46,7 @@
     "ServerWorldMixin",
     "ShulkerEntity$ShootBulletGoalMixin",
     "StatusEffectInstanceAccessor",
+    "ThreadedAnvilChunkStorageAccessor",
     "WardenEntityMixin"
   ],
   "injectors": {

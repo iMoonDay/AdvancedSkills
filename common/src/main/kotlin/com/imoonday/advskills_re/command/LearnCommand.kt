@@ -11,7 +11,7 @@ object LearnCommand : PlayerCommand("learn") {
 
     override fun buildWithTarget(builder: RequiredArgumentBuilder<ServerCommandSource, EntitySelector>): ArgumentBuilder<ServerCommandSource, *> =
         builder.then(
-            argument("skill", SkillArgumentType.skill())
+            argument("skill", SkillArgumentType.validSkill())
                 .executesWithPlayer(::learn)
         )
 
@@ -24,7 +24,7 @@ object LearnCommand : PlayerCommand("learn") {
             context.sendFeedback(
                 "learnSkill.failed",
                 player.displayName.string,
-                skill.name.string
+                skill.name
             )
         }
         return 1

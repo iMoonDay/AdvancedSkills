@@ -17,11 +17,11 @@ public class ItemStackMixin {
 
     @Inject(method = "postMine", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
     private void advskills_re$postMine(World world, BlockState state, BlockPos pos, PlayerEntity miner, CallbackInfo ci) {
-        SkillTriggerHandler.INSTANCE.postMine(world, state, pos, miner, (ItemStack) (Object) this);
+        SkillTriggerHandler.postMine(world, state, pos, miner, (ItemStack) (Object) this);
     }
 
     @Inject(method = "postHit", at = @At(value = "INVOKE", target = "net/minecraft/entity/player/PlayerEntity.incrementStat (Lnet/minecraft/stat/Stat;)V"))
     private void advskills_re$postHit(LivingEntity target, PlayerEntity attacker, CallbackInfo ci) {
-        SkillTriggerHandler.INSTANCE.postHit(target, attacker, (ItemStack) (Object) this);
+        SkillTriggerHandler.postHit(target, attacker, (ItemStack) (Object) this);
     }
 }

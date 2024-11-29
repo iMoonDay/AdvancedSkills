@@ -29,7 +29,7 @@ public class DamageTrackerMixin {
             } else if (source.getSource() instanceof LivingEntity entity) {
                 attacker = entity;
             }
-            SkillTriggerHandler.INSTANCE.postDamaged(amount, source, player, attacker);
+            SkillTriggerHandler.postDamaged(amount, source, player, attacker);
             PlayerUtilsKt.onDamage(player);
         }
     }

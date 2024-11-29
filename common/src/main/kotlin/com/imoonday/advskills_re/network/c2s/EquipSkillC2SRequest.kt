@@ -15,7 +15,7 @@ class EquipSkillC2SRequest(
 
     constructor(buf: PacketByteBuf) : this(
         buf.readInt(),
-        Skill.fromId(buf.readIdentifier())
+        Skills.fromId(buf.readIdentifier())
     )
 
     override fun encode(buf: PacketByteBuf) {
@@ -25,7 +25,7 @@ class EquipSkillC2SRequest(
 
     override fun apply(context: PacketContext) {
         val player = context.player as? ServerPlayerEntity ?: return
-        if (player.equip(skill, slot) && !skill.invalid) {
+        if (player.equip(skill, slot) && !skill.isInvalid(player.world)) {
             player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC)
         }
     }

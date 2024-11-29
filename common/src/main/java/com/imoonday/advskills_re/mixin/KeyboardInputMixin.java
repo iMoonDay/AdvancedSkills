@@ -14,7 +14,7 @@ public class KeyboardInputMixin extends Input {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/KeyboardInput;getMovementMultiplier(ZZ)F", ordinal = 0))
     private void advskills_re$tick(CallbackInfo ci) {
-        Pair<Boolean, Boolean> invertInput = ClientTriggerHandler.INSTANCE.shouldInvertInput();
+        Pair<Boolean, Boolean> invertInput = ClientTriggerHandler.shouldInvertInput();
         if (invertInput.getFirst()) {
             boolean temp = this.pressingLeft;
             this.pressingLeft = this.pressingRight;

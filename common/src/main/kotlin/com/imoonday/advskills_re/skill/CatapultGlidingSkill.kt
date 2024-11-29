@@ -3,7 +3,7 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.SkillType
 import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.sendToServer
+import com.imoonday.advskills_re.util.sendPacket
 import net.minecraft.entity.*
 import net.minecraft.item.*
 import net.minecraft.network.packet.s2c.play.*
@@ -39,7 +39,7 @@ class CatapultGlidingSkill : LongPressSkill(
         player.velocity =
             player.rotationVector.normalize().multiply(1.5 * progress, 0.0, 1.5 * progress)
                 .withAxis(Direction.Axis.Y, 3.0 * progress)
-        player.sendToServer(EntityVelocityUpdateS2CPacket(player))
+        player.sendPacket(EntityVelocityUpdateS2CPacket(player))
         return UseResult.success()
     }
 

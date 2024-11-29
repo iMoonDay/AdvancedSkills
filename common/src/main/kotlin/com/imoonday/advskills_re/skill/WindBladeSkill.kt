@@ -16,7 +16,7 @@ class WindBladeSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 10,
     rarity = Rarity.RARE,
-), AttackTrigger, PersistentTrigger, DeathTrigger {
+), PostAttackTrigger, PersistentTrigger, DeathTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(false)
 

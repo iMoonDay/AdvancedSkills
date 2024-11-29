@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
@@ -37,6 +36,7 @@ object EventHandler {
             newPlayer.copyDataFrom(oldPlayer)
             newPlayer.properties.copyFrom(oldPlayer.properties)
             newPlayer.syncData(false)
+            newPlayer.syncProperties()
         }
         AllowDeathEvent.EVENT.register { player, source, amount ->
             player.getTriggers<DeathTrigger>()
@@ -63,13 +63,13 @@ object EventHandler {
             if (player.isDisarmed) CompoundEventResult.interruptFalse(stack)
             else CompoundEventResult.pass()
         }
-        val lootTables = listOf(
-            Blocks.OAK_LEAVES.lootTableId,
-            Blocks.DARK_OAK_LEAVES.lootTableId,
-            LootTables.FISHING_TREASURE_GAMEPLAY,
-            LootTables.ANCIENT_CITY_CHEST,
-            LootTables.BURIED_TREASURE_CHEST,
-            LootTables.END_CITY_TREASURE_CHEST
+        val lootTables = mapOf(
+            Blocks.OAK_LEAVES.lootTableId to 0.005f,
+            Blocks.DARK_OAK_LEAVES.lootTableId to 0.005f,
+            LootTables.FISHING_TREASURE_GAMEPLAY to 0.1f,
+            LootTables.ANCIENT_CITY_CHEST to 0.25f,
+            LootTables.BURIED_TREASURE_CHEST to 0.25f,
+            LootTables.END_CITY_TREASURE_CHEST to 0.25f
         )
         val pool = {
             LootPool.builder()
@@ -81,18 +81,17 @@ object EventHandler {
                 .with(ItemEntry.builder(ModItems.LEGENDARY_SKILL_FRUIT.get()).weight(4))
                 .with(ItemEntry.builder(ModItems.MYTHIC_SKILL_FRUIT.get()).weight(2))
                 .with(ItemEntry.builder(ModItems.UNIQUE_SKILL_FRUIT.get()).weight(1))
-                .conditionally(RandomChanceLootCondition.builder(0.005f))
         }
         LootEvent.MODIFY_LOOT_TABLE.register { _, identifier, context, builtin ->
-            if (identifier in lootTables && builtin) {
-                context.addPool(pool().build())
+            if (identifier in lootTables.keys && builtin) {
+                context.addPool(
+                    pool().conditionally(RandomChanceLootCondition.builder(lootTables[identifier]!!))
+                        .build()
+                )
             }
         }
         PlayerEvent.PLAYER_JOIN.register {
-            Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(SkillConfig.instance.toTag(NbtCompound())))
-        }
-        LifecycleEvent.SERVER_STARTED.register {
-            SkillConfig.initWatchService(it)
+            Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(it.server.skillConfig.toTag(NbtCompound())))
         }
     }
 }

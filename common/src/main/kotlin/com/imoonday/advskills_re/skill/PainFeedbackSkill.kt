@@ -1,54 +1,22 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.trigger.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
-import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
 class PainFeedbackSkill : PassiveSkill(
     id = "pain_feedback",
+    cooldown = 3,
     rarity = Rarity.SUPERB,
-), PostDamagedTrigger, ProgressTrigger, TickTrigger {
-
-    override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
-        super.serverTick(player, usedTime)
-        if (player.properties.containsUuid("lastAttacker")) {
-            val lastAttacker = player.properties.getUuid("lastAttacker")
-            val attacker = player.serverWorld.getEntity(lastAttacker)
-            if (attacker == null || !attacker.isAlive || attacker.isRemoved) {
-                player.reset()
-            }
-        }
-    }
+), PostDamagedTrigger {
 
     override fun postDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
         super.postDamaged(amount, source, player, attacker)
-        if (attacker == null) return
-        if (!player.properties.containsUuid("lastAttacker")) player.properties.putUuid("lastAttacker", attacker.uuid)
-        val lastAttacker = player.properties.getUuid("lastAttacker")
-        if (attacker.uuid == lastAttacker) {
-            player.properties.putFloat("totalDamaged", player.properties.getFloat("totalDamaged") + amount)
-        } else {
-            player.properties.putFloat("totalDamaged", amount)
-            player.properties.putUuid("lastAttacker", attacker.uuid)
-        }
-        val damage = player.properties.getFloat("totalDamaged")
-        if (damage >= 10f) {
-            player.reset()
-            attacker.damage(player.damageSources.thorns(player), damage * 0.25f)
+        if (attacker == null || player.isCooling()) return
+        if (amount > 0f && player.random.nextFloat() < 0.25f) {
+            attacker.damage(player.damageSources.thorns(player), amount * 0.25f)
+            player.startCooling()
         }
     }
-
-    private fun ServerPlayerEntity.reset() {
-        properties.remove("totalDamaged")
-        properties.remove("lastAttacker")
-    }
-
-    override fun shouldDisplay(player: PlayerEntity): Boolean =
-        player.properties.containsUuid("lastAttacker") && player.properties.getFloat("totalDamaged") > 0
-
-    override fun getProgress(player: PlayerEntity): Double =
-        (player.properties.getFloat("totalDamaged") / 10.0).coerceIn(0.0, 1.0)
 }

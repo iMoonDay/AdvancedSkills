@@ -5,6 +5,7 @@ import com.imoonday.advskills_re.component.PlayerDataComponent;
 import com.imoonday.advskills_re.entity.Servant;
 import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
 import com.imoonday.advskills_re.util.PlayerUtilsKt;
+import com.imoonday.advskills_re.util.SkillConfigStateKt;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -48,6 +49,10 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
     public void advskills_re$addExperience(int experience, CallbackInfo ci) {
         if (experience > 0) {
             PlayerEntity player = (PlayerEntity) (Object) this;
+            double multiplier = SkillConfigStateKt.getSkillConfig(player.getWorld()).getSkillXpMultiplier();
+            if (multiplier != 1.0) {
+                experience = (int) (experience * multiplier);
+            }
             PlayerUtilsKt.setSkillExp(player, PlayerUtilsKt.getSkillExp(player) + experience);
         }
     }
@@ -61,18 +66,18 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
     @Inject(method = "tick", at = @At("TAIL"))
     private void advskills_re$tick(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
-        SkillTriggerHandler.INSTANCE.playerTick(player);
+        SkillTriggerHandler.playerTick(player);
     }
 
     @Inject(method = "getActiveEyeHeight", at = @At("RETURN"), cancellable = true)
     private void advskills_re$getActiveEyeHeight(EntityPose pose, EntityDimensions dimensions, CallbackInfoReturnable<Float> cir) {
-        cir.setReturnValue(SkillTriggerHandler.INSTANCE.getEyeHeight((PlayerEntity) (Object) this, cir.getReturnValue(), pose, dimensions));
+        cir.setReturnValue(SkillTriggerHandler.getEyeHeight((PlayerEntity) (Object) this, cir.getReturnValue(), pose, dimensions));
     }
 
     @Inject(method = "adjustMovementForSneaking", at = @At("HEAD"), cancellable = true)
     private void advskills_re$adjustMovementForSneaking(Vec3d movement, MovementType type, CallbackInfoReturnable<Vec3d> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
-        if (SkillTriggerHandler.INSTANCE.shouldInvertSneak(player)) {
+        if (SkillTriggerHandler.shouldInvertSneak(player)) {
             if (!player.getAbilities().flying && movement.y >= 0.0 && (type == MovementType.SELF || type == MovementType.PLAYER) && this.clipAtLedge() && this.method_30263()) {
                 double d = movement.x;
                 double e = movement.z;
@@ -119,7 +124,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
     @Inject(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;spawnSweepAttackParticles()V", shift = At.Shift.AFTER))
     private void advskills_re$attack(Entity target, CallbackInfo ci) {
         if (target instanceof LivingEntity entity) {
-            SkillTriggerHandler.INSTANCE.postSweepAttack((PlayerEntity) (Object) this, entity);
+            SkillTriggerHandler.postSweepAttack((PlayerEntity) (Object) this, entity);
         }
     }
 

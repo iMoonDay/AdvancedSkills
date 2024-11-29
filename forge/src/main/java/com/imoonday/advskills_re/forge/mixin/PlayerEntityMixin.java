@@ -21,7 +21,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Override
     public boolean canSwimInFluidType(FluidType type) {
         PlayerEntity player = (PlayerEntity) (Object) this;
-        if (type == ForgeMod.WATER_TYPE.get() && SkillTriggerHandler.INSTANCE.ignoreFluid(player, FluidTags.WATER)) {
+        if (type == ForgeMod.WATER_TYPE.get() && SkillTriggerHandler.ignoreFluid(player, FluidTags.WATER)) {
             return false;
         }
         return super.canSwimInFluidType(type);

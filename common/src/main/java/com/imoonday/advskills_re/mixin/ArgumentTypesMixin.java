@@ -4,7 +4,6 @@ import com.imoonday.advskills_re.util.SkillArgumentType;
 import com.mojang.brigadier.arguments.ArgumentType;
 import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.command.argument.serialize.ArgumentSerializer;
-import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.registry.Registry;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +26,7 @@ public class ArgumentTypesMixin {
 
     @Inject(method = "register(Lnet/minecraft/registry/Registry;)Lnet/minecraft/command/argument/serialize/ArgumentSerializer;", at = @At("HEAD"))
     private static void register(Registry<ArgumentSerializer<?, ?>> registry, CallbackInfoReturnable<ArgumentSerializer<?, ?>> cir) {
-        advskills_re$register(registry, "skill", SkillArgumentType.class, ConstantArgumentSerializer.of(SkillArgumentType.Companion::skill));
+        advskills_re$register(registry, "skill", SkillArgumentType.class, new SkillArgumentType.Serializer());
     }
 
     @Unique

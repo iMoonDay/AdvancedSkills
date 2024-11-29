@@ -3,7 +3,7 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.SkillType
 import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.sendToServer
+import com.imoonday.advskills_re.util.sendPacket
 import com.imoonday.advskills_re.util.spawnParticles
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
@@ -23,7 +23,7 @@ class HorizontalDashSkill : Skill(
             velocityDirty = true
             stopFallFlying()
             velocity = rotationVector.withAxis(Direction.Axis.Y, velocity.y).normalize().multiply(1.5)
-            sendToServer(EntityVelocityUpdateS2CPacket(this))
+            sendPacket(EntityVelocityUpdateS2CPacket(this))
             spawnParticles(
                 ParticleTypes.CLOUD,
                 false,

@@ -79,7 +79,7 @@ class MultipleLaserSkill : LongPressSkill(
     }
 
     private fun calculateCooldown(world: World?, pressedTime: Int) =
-        (pressedTime.toFloat() / getMaxPressTime() * cooldown).toInt()
+        (pressedTime.toFloat() / getMaxPressTime() * getCooldown(world)).toInt()
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(calculateCooldown(player.world, player.getUsedTime()))

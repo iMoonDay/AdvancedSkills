@@ -20,7 +20,7 @@ class ResuscitationSkill : Skill(
 
     override val persistTime: Int = 20 * 2
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean {
         if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || player.isCooling()) return true

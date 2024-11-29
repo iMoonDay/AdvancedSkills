@@ -27,7 +27,7 @@ class AdvancedPurificationSkill : Skill(
         ?.let {
             val duration = it.duration
             it.setDuration(it.mapDuration { it - 30 * 20 })
-            user.sendToServer(EntityStatusEffectS2CPacket(user.id, it))
+            user.sendPacket(EntityStatusEffectS2CPacket(user.id, it))
             val amount = (duration - it.duration) / 20.0
             return UseResult.success(
                 Skills.PRIMARY_PURIFICATION.message(

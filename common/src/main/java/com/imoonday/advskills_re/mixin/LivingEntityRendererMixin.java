@@ -14,7 +14,7 @@ public class LivingEntityRendererMixin {
 
     @Inject(method = "shouldFlipUpsideDown", at = @At("HEAD"), cancellable = true)
     private static void advskills_re$shouldFlipUpsideDown(LivingEntity entity, CallbackInfoReturnable<Boolean> cir) {
-        if (entity instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.shouldFlipUpsideDown(player)) {
+        if (entity instanceof PlayerEntity player && SkillTriggerHandler.shouldFlipUpsideDown(player)) {
             cir.setReturnValue(true);
         }
     }

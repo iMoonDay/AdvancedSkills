@@ -37,33 +37,4 @@ class PrimaryFreezeSkill : Skill(
     }
 
     override fun isInSpecialState(player: PlayerEntity): Boolean = player.isForceFrozen
-
-    override fun renderSpecialState(context: DrawContext) {
-        super.renderSpecialState(context)
-        this.renderOverlay(context)
-    }
-
-    private fun renderOverlay(context: DrawContext) {
-        RenderSystem.disableDepthTest()
-        RenderSystem.depthMask(false)
-        context.drawTexture(
-            FROZEN_OVERLAY,
-            0,
-            0,
-            -90,
-            0.0f,
-            0.0f,
-            context.scaledWindowWidth,
-            context.scaledWindowHeight,
-            context.scaledWindowWidth,
-            context.scaledWindowHeight
-        )
-        RenderSystem.depthMask(true)
-        RenderSystem.enableDepthTest()
-    }
-
-    companion object {
-
-        private val FROZEN_OVERLAY: Identifier = Identifier("textures/misc/powder_snow_outline.png")
-    }
 }

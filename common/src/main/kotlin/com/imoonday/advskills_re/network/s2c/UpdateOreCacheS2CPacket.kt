@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.network.s2c
 
+import com.imoonday.advskills_re.client.render.renderer.*
 import com.imoonday.advskills_re.network.*
-import com.imoonday.advskills_re.skill.*
 import dev.architectury.networking.*
 import net.minecraft.network.*
 import net.minecraft.util.math.*
@@ -18,5 +18,5 @@ class UpdateOreCacheS2CPacket(
     override fun encode(buf: PacketByteBuf) =
         buf.writeMap(colorMap, PacketByteBuf::writeBlockPos) { buf1, color -> buf1.writeInt(color.rgb) }
 
-    override fun apply(context: NetworkManager.PacketContext) = OrePerceptionSkill.updateOreCache(colorMap)
+    override fun apply(context: NetworkManager.PacketContext) = OrePerceptionSkillRenderer.updateOreCache(colorMap)
 }

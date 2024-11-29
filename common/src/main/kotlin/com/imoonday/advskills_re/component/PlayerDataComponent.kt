@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.client.screen.*
 import com.imoonday.advskills_re.network.*
+import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -10,21 +11,13 @@ import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 import net.minecraft.server.world.*
 
-interface DataComponent : Component {
-
-    var container: SkillContainer
-    var level: SkillLevelData
-    var learnable: LearnableSkillData
-
-    fun reset()
-}
-
-class PlayerDataComponent(private val player: PlayerEntity) : DataComponent {
+class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerEntity> {
 
     var dirty: Boolean = false
-    override var container: SkillContainer = SkillContainer()
-    override var level: SkillLevelData = SkillLevelData()
-    override var learnable: LearnableSkillData = LearnableSkillData()
+    override var synced: Boolean = false
+    var container: SkillContainer = SkillContainer.create(entity.world)
+    var level: SkillLevelData = SkillLevelData()
+    var learnable: LearnableSkillData = LearnableSkillData()
 
     override fun readFromNbt(tag: NbtCompound) {
         container = SkillContainer.fromNbt(tag.getCompound("container"))
@@ -40,52 +33,65 @@ class PlayerDataComponent(private val player: PlayerEntity) : DataComponent {
 
     override fun tick() {
         container.forEachData { it.tick() }
-        container.getAllSlots { it.skill.invalid && !it.isEmpty() }.forEach {
-            val name = it.skill.name.string
+        container.getAllSlots { it.skill.isInvalid(entity.world) && !it.isEmpty() }.forEach {
+            val name = it.skill.name
             it.unequip()
-            if (!player.world.isClient) {
-                player.sendMessage(translate("unequipSkill.banned", name))
+            if (!entity.world.isClient) {
+                entity.sendMessage(translate("unequipSkill.banned", name))
+            } else {
+                entity.updateScreen()
             }
-            player.updateScreen()
         }
-        if (player is ServerPlayerEntity && (dirty || learnable.correct(player.learnedSkills))) {
+        if (entity is ServerPlayerEntity && (dirty || learnable.correct(entity.world, entity.learnedSkills))) {
             sync()
             dirty = false
         }
     }
 
+    override fun requestSync() {
+        Channels.REQUEST_SYNC_COMPONENT_C2S.sendToServer(
+            RequestSyncComponentC2SRequest(
+                entity.id,
+                RequestSyncComponentC2SRequest.ComponentType.PLAYER_DATA,
+                RequestSyncComponentC2SRequest.Receiver.SENDER
+            )
+        )
+    }
+
     override fun applySyncNbt(tag: NbtCompound) {
-        val oldSkills = container.getAllSkills { _, data -> data.using }
+        val oldSkills = container.getAllSkills(entity.world) { _, data -> data.using }
         val hasChoice = learnable.hasNext()
         super.applySyncNbt(tag)
-        val newSkills = container.getAllSkills { _, data -> data.using }
+        val newSkills = container.getAllSkills(entity.world) { _, data -> data.using }
         newSkills.subtract(oldSkills)
             .filterIsInstance<ClientUseTrigger>()
-            .forEach { it.onUse(player) }
+            .forEach { it.onUse(entity) }
         oldSkills.subtract(newSkills)
             .filterIsInstance<ClientUseTrigger>()
-            .forEach { it.onStop(player) }
+            .forEach { it.onStop(entity) }
         if (!hasChoice && learnable.hasNext()) {
             SkillLearningScreen.new = true
         }
-        player.updateScreen()
+        if (entity.world.isClient) {
+            entity.updateScreen()
+        }
     }
 
     override fun sync() {
-        (player.world as? ServerWorld)?.let {
-            Channels.SYNC_PLAYER_DATA_S2C.sendToPlayers(
-                it.players,
-                SyncPlayerDataS2CPacket(player.id, toNbt())
+        (entity.world as? ServerWorld)?.let {
+            RequestSyncComponentC2SRequest.Receiver.NEARBY_PLAYERS.send(
+                Channels.SYNC_PLAYER_DATA_S2C,
+                SyncPlayerDataS2CPacket(entity.id, toNbt()),
+                null,
+                entity
             )
         }
     }
 
-    override fun reset() {
-        if (!player.world.isClient) {
-            container = SkillContainer()
-            level = SkillLevelData()
-            learnable = LearnableSkillData()
-            player.syncData()
-        }
+    fun reset() {
+        container = SkillContainer.create(entity.world)
+        level = SkillLevelData()
+        learnable = LearnableSkillData()
+        sync()
     }
 }

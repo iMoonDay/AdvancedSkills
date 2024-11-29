@@ -35,11 +35,12 @@ class SeriousInjuryEffect : StatusEffect(
 
     override fun onRemoved(entity: LivingEntity, attributes: AttributeContainer, amplifier: Int) {
         super.onRemoved(entity, attributes, amplifier)
-//        entity.properties.remove("sealedHealth")
-        if (entity.properties.contains("sealedHealing")) {
-            val sealedHealing = entity.properties.getFloat("sealedHealing")
-            entity.properties.remove("sealedHealing")
-            entity.properties.putBoolean("removingSeriousInjury", true)
+        val properties = entity.properties
+        if (properties.contains("sealedHealing")) {
+            val sealedHealing = properties.getFloat("sealedHealing")
+            properties.remove("sealedHealing")
+            properties.putBoolean("removingSeriousInjury", true)
+            entity.syncProperties()
             entity.heal(sealedHealing)
         }
     }
@@ -49,18 +50,21 @@ class SeriousInjuryEffect : StatusEffect(
         fun onSetHealth(entity: LivingEntity, health: Float): Boolean {
             val result = entity.isSeriousInjured && health > entity.health
             if (result) {
-                val isRemoving = entity.properties.contains(
+                val properties = entity.properties
+                val isRemoving = properties.contains(
                     "removingSeriousInjury",
                     NbtElement.BYTE_TYPE.toInt()
-                ) && entity.properties.getBoolean("removingSeriousInjury")
+                ) && properties.getBoolean("removingSeriousInjury")
                 if (isRemoving) {
-                    entity.properties.remove("removingSeriousInjury")
+                    properties.remove("removingSeriousInjury")
+                    entity.syncProperties()
                     return false
                 }
-                entity.properties.putFloat(
+                properties.putFloat(
                     "sealedHealing",
-                    entity.properties.getFloat("sealedHealing") + (health - entity.health)
+                    properties.getFloat("sealedHealing") + (health - entity.health)
                 )
+                entity.syncProperties()
             }
             return result
         }

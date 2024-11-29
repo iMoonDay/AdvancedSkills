@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.util
 import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
+import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.trigger.*
 import net.minecraft.client.*
 import net.minecraft.client.network.*
@@ -12,6 +13,7 @@ import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.network.listener.*
 import net.minecraft.network.packet.*
+import net.minecraft.registry.*
 import org.lwjgl.glfw.*
 
 object ClientUtils {
@@ -63,9 +65,12 @@ fun ClientPlayerEntity.requestUse(
             keyState,
             NbtCompound().apply {
                 (getSkill(index) as? SendPlayerDataTrigger)
-                    ?.takeIf { it.getSendTime() == SendTime.USE }
+                    ?.takeIf { it.getSendTime().isOnUse }
                     ?.write(this@requestUse, this)
             }
         )
     )
 }
+
+val Skill.modelId
+    get() = ModelIdentifier(Registries.ITEM.getId(item), "inventory")

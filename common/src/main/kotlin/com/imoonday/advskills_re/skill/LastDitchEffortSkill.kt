@@ -34,7 +34,7 @@ class LastDitchEffortSkill : Skill(
         super<AttributeTrigger>.postUnequipped(player, slot)
     }
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override fun onAttack(
         amount: Float,

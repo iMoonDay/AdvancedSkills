@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.client.screen
 
+import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.screen.component.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
@@ -141,15 +142,15 @@ class SkillListScreen(
         val gap = 5
         var currentX = x + gap * 2
 
-        skill.renderIcon(context, currentX, y + (height - 16) / 2)
+        SkillRenderer.renderIcon(skill, context, currentX, y + (height - 16) / 2)
 
         currentX += 16 + gap
-        val name = skill.formattedName
+        val name = skill.getFormattedName(player.world)
         val titleY = y + height / 2 - textRenderer.fontHeight - 1
         context.drawText(textRenderer, name, currentX, titleY, 0xFFFFFF, false)
         context.drawText(
             textRenderer,
-            Text.literal("(").append(skill.cooldownSeconds).append(")"),
+            Text.literal("(").append(skill.getCooldownSeconds()).append(")"),
             currentX + textRenderer.getWidth(name) + gap,
             titleY,
             0xBDBDBD,
@@ -215,17 +216,19 @@ class SkillListScreen(
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(context)
         super.render(context, mouseX, mouseY, delta)
+        val level = player.skillLevel
+        val cycle = player.levelData.cycle
         context.drawText(
             textRenderer,
             translate(
                 "screen.list.level",
-                "${player.skillLevel % 100}${if (player.skillLevel > 100) " (+${player.skillLevel / 100})" else ""}"
+                "$level${if (cycle > 0) " (+$cycle)" else ""}"
             ),
             5, 5, 0xFFFFFF, false
         )
         context.drawText(
             textRenderer,
-            translate("screen.list.exp", player.skillExp),
+            translate("screen.list.exp", player.skillExp, PlayerUtils.getNextLevelExp(level)),
             5, 5 + textRenderer.fontHeight + 3, 0xFFFFFF, false
         )
         if (skillScroll.children().isEmpty()) {
@@ -239,6 +242,16 @@ class SkillListScreen(
                 false
             )
         }
+        val requiredLevels = PlayerUtils.getLevelRequiredForLearningSkill(level)
+        val text = translate("screen.list.requiredLevel", requiredLevels)
+        context.drawText(
+            textRenderer,
+            text,
+            learnButton.x - 5 - textRenderer.getWidth(text),
+            learnButton.y + (learnButton.height - textRenderer.fontHeight) / 2 + 1,
+            11184810,
+            false
+        )
     }
 
     override fun update() = updateScreen()
@@ -264,6 +277,14 @@ class SkillListScreen(
         }
     }
 
+    override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+        if (client!!.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+            close()
+            return true
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers)
+    }
+
     inner class EquippedSkillSlot(
         private val slot: Int, x: Int, y: Int, width: Int, height: Int,
     ) : ClickableWidget(x, y, width, height, Text.empty()) {
@@ -278,8 +299,8 @@ class SkillListScreen(
         private var lastClickTime: Long = 0
 
         override fun onClick(mouseX: Double, mouseY: Double) {
-            if (!skill.invalid && System.currentTimeMillis() - lastClickTime < 250L) {
-                player.equip(Skill.EMPTY, slot)
+            if (!skill.isInvalid(player.world) && System.currentTimeMillis() - lastClickTime < 250L) {
+                player.equip(Skills.EMPTY, slot)
             }
             lastClickTime = System.currentTimeMillis()
             selectedSlot = if (selectedSlot != slot) slot else null
@@ -301,12 +322,12 @@ class SkillListScreen(
                 )
             }
             val skill = skill
-            if (!skill.invalid) {
-                skill.renderIcon(context, x + 8, y + (height - 16) / 2)
+            if (!skill.isInvalid(player.world)) {
+                SkillRenderer.renderIcon(skill, context, x + 8, y + (height - 16) / 2)
                 val topY = y + (height - textRenderer.fontHeight) / 2 + 1
                 context.drawScrollableText(
                     textRenderer,
-                    skill.formattedName,
+                    skill.getFormattedName(player.world),
                     x + 24 + 3,
                     topY,
                     x + width - 16,

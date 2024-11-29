@@ -15,7 +15,7 @@ class SkillContainerWidget(
     height: Int,
     itemHeight: Int,
     private val skillGetter: () -> Collection<Skill>,
-    private val skillRenderer: SkillRenderer,
+    private val skillRenderer: ISkillRenderer,
 ) : AlwaysSelectedEntryListWidget<SkillLine>(
     client, width, height, y, y + height, itemHeight,
 ) {
@@ -113,7 +113,7 @@ class SkillContainerWidget(
         override fun getNarration(): Text = skill.name
     }
 
-    fun interface SkillRenderer {
+    fun interface ISkillRenderer {
 
         fun render(
             context: DrawContext,

@@ -2,16 +2,13 @@ package com.imoonday.advskills_re.trigger
 
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.gui.*
+import net.minecraft.entity.player.*
 
 interface CrosshairTrigger : SkillTrigger {
 
-    fun render(context: DrawContext) {
-        if (shouldRender()) getCrosshair().draw(context)
-    }
+    fun shouldRenderCrosshair(player: PlayerEntity): Boolean = getCrosshair(player) != Crosshairs.NONE
 
-    fun shouldRender(): Boolean = getCrosshair() != Crosshairs.NONE
+    fun getCrosshair(player: PlayerEntity): Crosshair = Crosshairs.NONE
 
-    fun getCrosshair(): Crosshair = Crosshairs.NONE
-
-    fun getPriority(): Int = getCrosshair().priority
+    fun getPriority(player: PlayerEntity): Int = getCrosshair(player).priority
 }

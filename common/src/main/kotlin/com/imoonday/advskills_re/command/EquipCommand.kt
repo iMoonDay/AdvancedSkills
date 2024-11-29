@@ -13,7 +13,7 @@ object EquipCommand : PlayerCommand("equip") {
 
     override fun buildWithTarget(builder: RequiredArgumentBuilder<ServerCommandSource, EntitySelector>): ArgumentBuilder<ServerCommandSource, *> =
         builder.then(
-            argument("skill", SkillArgumentType.skill())
+            argument("skill", SkillArgumentType.validSkill())
                 .then(
                     argument("slot", IntegerArgumentType.integer(1, MAX_SLOT_SIZE))
                         .executesWithPlayer(::equip)
@@ -30,7 +30,7 @@ object EquipCommand : PlayerCommand("equip") {
             context.sendFeedback(
                 "equipSkill.success",
                 player.displayName.string,
-                skill.name.string,
+                skill.name,
                 slot
             )
             1
@@ -38,7 +38,7 @@ object EquipCommand : PlayerCommand("equip") {
             context.sendFeedback(
                 "equipSkill.failed",
                 player.displayName.string,
-                skill.name.string,
+                skill.name,
                 slot
             )
             0

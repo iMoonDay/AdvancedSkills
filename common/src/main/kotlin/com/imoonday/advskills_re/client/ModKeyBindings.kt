@@ -44,7 +44,10 @@ object ModKeyBindings {
         "quickCast",
         GLFW.GLFW_KEY_R,
         { ClientConfig.instance.quickCastWheelHoldTime },
-        firstTriggerCallback = { _, _ -> SkillWheelScreen.quickCastSlot != null },
+        firstTriggerCallback = { client, _ ->
+            val slot = SkillWheelScreen.quickCastSlot
+            slot != null && client.player?.getSkill(slot)?.isEmpty() != true
+        },
         secondTriggerCallback = { client, _ ->
             if (!isUsingQuickCast) {
                 isUsingQuickCast = true

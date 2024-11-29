@@ -20,8 +20,6 @@ import com.imoonday.advskills_re.init.ModEntities.UNGROUNDED_ARROW
 import com.imoonday.advskills_re.init.ModEntities.UNSTABLE_TNT
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
-import com.imoonday.advskills_re.skill.*
-import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import dev.architectury.event.events.client.*
 import dev.architectury.registry.client.level.entity.*
@@ -78,35 +76,42 @@ object ClientRegistry {
 
     private fun registerClientEvents() {
         ClientGuiEvent.RENDER_HUD.register { context, _ ->
-            clientPlayer?.run {
-                Skill.getTriggers<SpecialStateRenderTrigger> { it.isInSpecialState(this) }
-                    .forEach { it.renderSpecialState(context) }
-            }
-            SkillSlotRenderer.render(client!!, context)
-            Skill.getTriggers<HudRenderTrigger>().forEach { it.render(context) }
-            Skill.getTriggers<CrosshairTrigger> { it.shouldRender() && it.getPriority() < 0 }
-                .minByOrNull(CrosshairTrigger::getPriority)
-                ?.render(context)
-            Skill.getTriggers<CrosshairTrigger> { it.shouldRender() && it.getPriority() >= 0 }
-                .maxByOrNull(CrosshairTrigger::getPriority)
-                ?.render(context)
+            SkillRendererHandler.renderOverlay(context)
+            SkillSlotRenderer.render(context)
+            SkillRendererHandler.renderHud(context)
+            SkillRendererHandler.renderCrosshair(context)
         }
         LivingEntityFeatureRenderEvent.EVENT.register { _, renderer, helper, context ->
             helper.register(StatusEffectLayer(renderer, context))
             helper.register(IceLayer(renderer, context))
-            if (renderer is PlayerEntityRenderer) Skill.getTriggers<FeatureRendererTrigger>()
-                .forEach { helper.register(SkillLayer(renderer, context, it)) }
-            if (renderer is LivingEntityRenderer) Skill.getTriggers<TargetRenderTrigger>()
-                .forEach { helper.register(TargetLayer(renderer, context, it)) }
+            if (renderer is PlayerEntityRenderer) {
+                SkillRendererHandler.forEachPlayerFeatureRenderer { skill, featureRenderer ->
+                    helper.register(SkillLayer(skill, renderer, context, featureRenderer))
+                }
+            }
+            if (renderer is LivingEntityRenderer) {
+                SkillRendererHandler.forEachLivingFeatureRenderer { skill, featureRenderer ->
+                    helper.register(LivingLayer(skill, renderer, context, featureRenderer))
+                }
+            }
         }
-        WorldRenderEvents.AFTER_ENTITIES.register { context ->
-            Skill.getTriggers<WorldRendererTrigger>().forEach { it.renderAfterEntities(context) }
-        }
-        WorldRenderEvents.LAST.register { context ->
-            Skill.getTriggers<WorldRendererTrigger>().forEach { it.renderLast(context) }
-        }
+        WorldRenderEvents.AFTER_ENTITIES.register(SkillRendererHandler::renderAfterEntities)
+        WorldRenderEvents.LAST.register(SkillRendererHandler::renderLast)
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register {
-            Channels.REQUEST_SYNC_DATA_C2S.sendToServer(RequestSyncDataC2SRequest())
+            Channels.REQUEST_SYNC_COMPONENT_C2S.sendToServer(
+                RequestSyncComponentC2SRequest(
+                    it.id,
+                    RequestSyncComponentC2SRequest.ComponentType.PLAYER_DATA,
+                    RequestSyncComponentC2SRequest.Receiver.ALL_PLAYERS
+                )
+            )
+            Channels.REQUEST_SYNC_COMPONENT_C2S.sendToServer(
+                RequestSyncComponentC2SRequest(
+                    it.id,
+                    RequestSyncComponentC2SRequest.ComponentType.ENTITY_PROPERTIES,
+                    RequestSyncComponentC2SRequest.Receiver.ALL_PLAYERS
+                )
+            )
         }
     }
 }

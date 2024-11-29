@@ -28,7 +28,7 @@ class TornadoEntity(type: EntityType<out ProjectileEntity>, world: World) :
         }
         move(MovementType.SELF, velocity)
         world.getNonSpectatingEntities(LivingEntity::class.java, boundingBox.expand(1.0)).forEach {
-            if (it != owner) it.addVelocity(velocity)
+            if (it !== owner) it.addVelocity(velocity)
         }
         val posSet = boundingBox.expand(1.0).blockPosSet
         posSet.filter { world.getBlockState(it).block.hardness == 0f }

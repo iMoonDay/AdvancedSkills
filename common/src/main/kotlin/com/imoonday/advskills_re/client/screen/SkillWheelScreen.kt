@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.*
+import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.gui.*
@@ -41,7 +42,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
             val (x, y) = positions[i]
             val startX = centerX + x - 8
             val startY = centerY + y - 8
-            player.getSkill(i + 1).renderIcon(context, startX, startY, player)
+            SkillRenderer.renderIcon(player.getSkill(i + 1), context, startX, startY, player)
             if (selectingSlot == i + 1) {
                 context.drawBorder(
                     startX - 1,
@@ -69,7 +70,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
                     Color.GRAY.alpha(0.4).rgb
                 )
             }
-            it.let { player.getSkill(it) }.takeIf { !it.invalid }?.run {
+            it.let { player.getSkill(it) }.takeIf { !it.isInvalid(player.world) }?.run {
                 var y = centerY + 60
                 textRenderer.textHandler.wrapLines(description, (context.scaledWindowWidth * 0.65).toInt(), Style.EMPTY)
                     .forEach {
@@ -150,7 +151,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
 
             2 -> {
                 selectingSlot?.let { index ->
-                    clientPlayer?.getSkill(index)?.takeUnless { it.invalid }?.let {
+                    clientPlayer?.getSkill(index)?.takeUnless { it.isInvalid(client?.world) }?.let {
                         client!!.setScreen(SkillGalleryScreen(it))
                     }
                 } ?: run {

@@ -3,24 +3,17 @@ package com.imoonday.advskills_re.component
 import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.effect.*
 import com.imoonday.advskills_re.network.*
+import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.network.s2c.*
 import net.minecraft.entity.*
 import net.minecraft.nbt.*
 import net.minecraft.server.world.*
 
-interface PropertyComponent : Component {
-
-    var properties: NbtCompound
-}
-
-class EntityPropertyComponent(private val entity: Entity) : PropertyComponent {
+class EntityPropertyComponent(override val entity: Entity) : Component<Entity> {
 
     var dirty = false
-    override var properties: NbtCompound = NbtCompound()
-        set(value) {
-            field = value
-            entity.propertyComponent.sync()
-        }
+    override var synced = false
+    var properties: NbtCompound = NbtCompound()
 
     override fun readFromNbt(tag: NbtCompound) {
         properties = tag.getCompound("properties")
@@ -31,25 +24,45 @@ class EntityPropertyComponent(private val entity: Entity) : PropertyComponent {
     }
 
     override fun serverTick() {
-        if (entity is LivingEntity) {
-            properties.put("syncEffects", NbtList().apply {
-                addAll(
-                    entity.statusEffects.map { it.effectType }
-                        .filterIsInstance<SyncClientEffect>()
-                        .map { NbtString.of(it.syncId) })
-            })
-        }
         if (dirty) {
             sync()
             dirty = false
         }
     }
 
+    fun onEffectsChanged() {
+        if (entity is LivingEntity) {
+            val effects = entity.statusEffects
+                .map { it.effectType }
+                .filterIsInstance<SyncClientEffect>()
+            if (effects.isNotEmpty()) {
+                properties.put("syncEffects", NbtList().apply {
+                    addAll(effects.map { NbtString.of(it.syncId) })
+                })
+            } else {
+                properties.remove("syncEffects")
+            }
+            dirty = true
+        }
+    }
+
+    override fun requestSync() {
+        Channels.REQUEST_SYNC_COMPONENT_C2S.sendToServer(
+            RequestSyncComponentC2SRequest(
+                entity.id,
+                RequestSyncComponentC2SRequest.ComponentType.ENTITY_PROPERTIES,
+                RequestSyncComponentC2SRequest.Receiver.SENDER
+            )
+        )
+    }
+
     override fun sync() {
         (entity.world as? ServerWorld)?.let {
-            Channels.SYNC_PROPERTIES_S2C.sendToPlayers(
-                it.players,
-                SyncPropertiesS2CPacket(entity.id, toNbt())
+            RequestSyncComponentC2SRequest.Receiver.NEARBY_PLAYERS.send(
+                Channels.SYNC_PROPERTIES_S2C,
+                SyncPropertiesS2CPacket(entity.id, toNbt()),
+                null,
+                entity
             )
         }
     }
@@ -58,10 +71,12 @@ class EntityPropertyComponent(private val entity: Entity) : PropertyComponent {
 val Entity.propertyComponent: EntityPropertyComponent
     get() = (this as Propertied).propertyComponent
 var Entity.properties: NbtCompound
-    get() = propertyComponent.run {
-        dirty = true
-        properties
-    }
+    get() = propertyComponent.properties
     set(value) {
-        this.propertyComponent.properties = value
+        propertyComponent.properties = value
+        syncProperties()
     }
+
+fun Entity.syncProperties() {
+    if (!world.isClient) propertyComponent.dirty = true
+}

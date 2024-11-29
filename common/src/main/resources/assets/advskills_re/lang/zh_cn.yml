@@ -59,6 +59,25 @@ advskills_re:
   cooldownMultiplier:
     set: 全局技能冷却倍率已设置为 %d
     value: 当前全局技能冷却倍率为 %d
+  xpMultiplier:
+    set: 经验获取倍率已设置为 %d
+    value: 当前经验获取倍率为 %d
+  blacklist:
+    add: '%s 已添加到黑名单'
+    remove: '%s 已从黑名单中删除'
+    query: '黑名单: %s'
+    not_found: '%s 不在黑名单中'
+    empty: 黑名单为空
+  defaultSlots:
+    generic:
+      query: '通用技能栏: %d个'
+      set: 已将默认通用技能栏设置为 %d 个
+    active:
+      query: '主动技能栏: %d个'
+      set: 已将默认主动技能栏设置为 %d 个
+    passive:
+      query: '被动技能栏: %d个'
+      set: 已将默认被动技能栏设置为 %d 个
   resetXp:
     single: 已重置 %s 的技能经验
     multiple: 已重置 %d 名玩家的技能经验
@@ -315,13 +334,13 @@ advskills_re:
       description: 缓慢增加额外血量上限,上限10
     pain_feedback:
       name: 痛苦反馈
-      description: 当同一个生物连续对自己造成一定量的伤害时，立即反弹之前该生物对自己造成的所有伤害的25%
+      description: 受伤时反弹25%伤害
     thunder_fury:
       name: 雷霆之怒
       description: 召唤一道闪电
     counterblast:
       name: 蓄势爆发
-      description: 被攻击一定次数后，击退周围生物
+      description: 被攻击时有一定概率击退周围生物，次数越多，概率越高
     time_rewind:
       name: 时间倒流
       description: 回溯坐标和血量，蓄力时死亡将立刻回溯
@@ -369,6 +388,9 @@ advskills_re:
     disguise:
       name: 伪装术
       description: 伪装成脚下的方块，释放任意技能时失效
+    wall_jump:
+      name: 蹬墙跳
+      description: 可以在墙上跳跃
   skillType:
     attack: 攻击
     defense: 防御
@@ -402,7 +424,7 @@ advskills_re:
       suggestion: "有新的技能建议?点击前往github提交issue或PR!"
     list:
       level: '等级：%s'
-      exp: '经验：%d'
+      exp: '经验：%d / %d'
       empty: 暂未学习技能
       button:
         tooltip: 仅在创造模式下显示
@@ -411,6 +433,7 @@ advskills_re:
         resetCooldown: 重置冷却
         inventory: 背包
         learn: 学习
+      requiredLevel: '下次学习所需等级: %d'
     slot:
       title: 左键拖动移动，右键重置
       compact: 紧凑技能显示

@@ -59,6 +59,25 @@ advskills_re:
   cooldownMultiplier:
     set: Global skill cooldown multiplier has been set to %d
     value: Global skill cooldown multiplier is %d
+  xpMultiplier:
+    set: Experience gain multiplier has been set to %d
+    value: Experience gain multiplier is %d
+  blacklist:
+      add: '%s has been added to the blacklist'
+      remove: '%s has been removed from the blacklist'
+      query: 'Blacklist: %s'
+      not_found: '%s is not in the blacklist'
+      empty: The blacklist is empty
+  defaultSlots:
+    generic:
+      query: 'Generic Slots: %d'
+      set: Default generic slots has been set to %d
+    active:
+      query: 'Active Slots: %d'
+      set: Default active slots has been set to %d
+    passive:
+      query: 'Passive Slots: %d'
+      set: Default passive slots has been set to %d
   resetXp:
     single: "%s's skill xp has been reset"
     multiple: Skill xp has been reset for %d players
@@ -315,13 +334,13 @@ advskills_re:
       description: Slowly increase the absorption amount, the upper limit is 10
     pain_feedback:
       name: Pain Feedback
-      description: When the same creature continuously causes a certain amount of damage to you, 25% of the damage previously caused by the creature to you will be immediately reflected
+      description: Reflects 25% damage when damaged
     thunder_fury:
       name: Thunder Fury
       description: Summon a lightning bolt
     counterblast:
       name: Counterblast
-      description: After being attacked a certain number of times, repel surrounding creatures
+      description: When attacked, there is a chance to knock back nearby mobs, and the more times you go, the higher the chance
     time_rewind:
       name: Time Rewind
       description: Backtrack position and health. If you die while charging, you will immediately rewind
@@ -369,6 +388,9 @@ advskills_re:
     disguise:
       name: Disguise
       description: Disguised as a block under your feet and end when using any skill
+    wall_jump:
+      name: Wall Jump
+      description: Can jump while on a wall
   skillType:
     attack: Attack
     defense: Defense
@@ -411,6 +433,7 @@ advskills_re:
         resetCooldown: Reset Cooldown
         inventory: Inventory
         learn: Learn
+      requiredLevel: 'Next level to learn: %d'
     slot:
       title: Left drag to move, right click to reset
       compact: Compact skill display

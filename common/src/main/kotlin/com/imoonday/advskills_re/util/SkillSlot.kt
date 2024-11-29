@@ -7,7 +7,7 @@ import net.minecraft.text.*
 
 sealed class SkillSlot(
     val index: Int,
-    skill: Skill = Skill.EMPTY,
+    skill: Skill = Skills.EMPTY,
 ) {
 
     var skill = skill
@@ -42,7 +42,7 @@ sealed class SkillSlot(
             callback(false)
             false
         } else {
-            skill = Skill.EMPTY
+            skill = Skills.EMPTY
             callback(true)
             true
         }
@@ -52,7 +52,7 @@ sealed class SkillSlot(
             unequip(callback)
         } else false
 
-    class Generic(index: Int, skill: Skill = Skill.EMPTY) : SkillSlot(index, skill) {
+    class Generic(index: Int, skill: Skill = Skills.EMPTY) : SkillSlot(index, skill) {
 
         override val type: String = "generic"
         override val v: Int = 0
@@ -62,7 +62,7 @@ sealed class SkillSlot(
         override fun copyWithIndex(index: Int): Generic = Generic(index, skill)
     }
 
-    class Active(index: Int, skill: Skill = Skill.EMPTY) : SkillSlot(index, skill) {
+    class Active(index: Int, skill: Skill = Skills.EMPTY) : SkillSlot(index, skill) {
 
         override val type: String = "active"
         override val v: Int = 9
@@ -72,7 +72,7 @@ sealed class SkillSlot(
         override fun copyWithIndex(index: Int): Active = Active(index, skill)
     }
 
-    class Passive(index: Int, skill: Skill = Skill.EMPTY) : SkillSlot(index, skill) {
+    class Passive(index: Int, skill: Skill = Skills.EMPTY) : SkillSlot(index, skill) {
 
         override val type: String = "passive"
         override val v: Int = 9 * 2
@@ -90,7 +90,7 @@ sealed class SkillSlot(
         fun fromNbt(tag: NbtCompound): SkillSlot {
             val index = tag.getInt("index")
             val type = tag.getString("type")
-            val skill = Skill.fromId(tag.getString("skill"))
+            val skill = Skills.fromId(tag.getString("skill"))
             return when (type) {
                 "active" -> Active(index, skill)
                 "passive" -> Passive(index, skill)

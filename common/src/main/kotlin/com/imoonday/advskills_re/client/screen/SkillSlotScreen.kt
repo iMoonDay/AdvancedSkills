@@ -13,9 +13,7 @@ class SkillSlotScreen : Screen(translate("screen.slot.title")) {
         renderBackground(context)
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 8, 16777215)
         super.render(context, mouseX, mouseY, delta)
-        client?.let {
-            SkillSlotRenderer.render(it, context)
-        }
+        SkillSlotRenderer.render(context)
     }
 
     override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {

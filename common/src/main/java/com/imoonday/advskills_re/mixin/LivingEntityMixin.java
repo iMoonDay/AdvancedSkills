@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.mixin;
 
-import com.imoonday.advskills_re.api.AllowDeathEvent;
 import com.imoonday.advskills_re.effect.SeriousInjuryEffect;
 import com.imoonday.advskills_re.init.ModEffectsKt;
 import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
@@ -21,14 +20,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin {
+public abstract class LivingEntityMixin extends EntityMixin {
 
     @Shadow
     private Optional<BlockPos> climbingPos;
@@ -58,10 +56,10 @@ public abstract class LivingEntityMixin {
             float newAmount = original;
             LivingEntity target = (LivingEntity) (Object) this;
             if (target instanceof ServerPlayerEntity player) {
-                newAmount = SkillTriggerHandler.INSTANCE.onDamaged(newAmount, source, player, attacker);
+                newAmount = SkillTriggerHandler.onDamaged(newAmount, source, player, attacker);
             }
             if (attacker instanceof ServerPlayerEntity player) {
-                newAmount = SkillTriggerHandler.INSTANCE.onAttack(newAmount, source, player, target);
+                newAmount = SkillTriggerHandler.onAttack(newAmount, source, player, target);
             }
             cir.setReturnValue(newAmount);
         }
@@ -72,14 +70,30 @@ public abstract class LivingEntityMixin {
         LivingEntity entity = (LivingEntity) (Object) this;
         int original = cir.getReturnValue();
         if (original > 0.0f && entity instanceof ServerPlayerEntity player) {
-            cir.setReturnValue(SkillTriggerHandler.INSTANCE.onFall(original, player, fallDistance, damageMultiplier));
+            cir.setReturnValue(SkillTriggerHandler.onFall(original, player, fallDistance, damageMultiplier));
+        }
+    }
+
+    @Inject(method = "damage", at = @At("RETURN"))
+    private void advskills_re$damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        LivingEntity target = (LivingEntity) (Object) this;
+        if (cir.getReturnValue()) {
+            ServerPlayerEntity player = null;
+            if (source.getAttacker() instanceof ServerPlayerEntity entity) {
+                player = entity;
+            } else if (source.getSource() instanceof ServerPlayerEntity entity) {
+                player = entity;
+            }
+            if (player != null) {
+                SkillTriggerHandler.postAttack(source, player, target);
+            }
         }
     }
 
     @Inject(method = "isClimbing", at = @At("RETURN"), cancellable = true)
     private void advskills_re$isClimbing(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (entity instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.allowClimbing(player)) {
+        if (entity instanceof PlayerEntity player && SkillTriggerHandler.allowClimbing(player)) {
             this.climbingPos = Optional.of(entity.getBlockPos());
             cir.setReturnValue(true);
         }
@@ -112,7 +126,7 @@ public abstract class LivingEntityMixin {
     @Inject(method = "hasStatusEffect", at = @At("RETURN"), cancellable = true)
     public void advskills_re$hasStatusEffect(StatusEffect effect, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (!cir.getReturnValue() && effect == StatusEffects.NIGHT_VISION && entity instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.hasNightVision(player)) {
+        if (!cir.getReturnValue() && effect == StatusEffects.NIGHT_VISION && entity instanceof PlayerEntity player && SkillTriggerHandler.hasNightVision(player)) {
             cir.setReturnValue(true);
         }
     }
@@ -120,7 +134,7 @@ public abstract class LivingEntityMixin {
     @Inject(method = "canWalkOnFluid", at = @At("HEAD"), cancellable = true)
     public void advskills_re$canWalkOnFluid(FluidState fluidState, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (entity instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.allowWalkOnFluid(player, fluidState)) {
+        if (entity instanceof PlayerEntity player && SkillTriggerHandler.allowWalkOnFluid(player, fluidState)) {
             cir.setReturnValue(true);
         }
     }
@@ -128,7 +142,7 @@ public abstract class LivingEntityMixin {
     @Inject(method = "canBreatheInWater", at = @At("HEAD"), cancellable = true)
     public void advskills_re$canBreatheInWater(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (entity instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.canBreatheInWater(player)) {
+        if (entity instanceof PlayerEntity player && SkillTriggerHandler.canBreatheInWater(player)) {
             cir.setReturnValue(true);
         }
     }
@@ -138,7 +152,7 @@ public abstract class LivingEntityMixin {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity instanceof PlayerEntity player) {
             ItemStack itemStack = this.getStackInHand(hand);
-            float multiplier = SkillTriggerHandler.INSTANCE.getItemMaxUseTimeMultiplier(player, itemStack);
+            float multiplier = SkillTriggerHandler.getItemMaxUseTimeMultiplier(player, itemStack);
             this.itemUseTimeLeft = (int) (this.itemUseTimeLeft * multiplier);
         }
     }
@@ -146,7 +160,7 @@ public abstract class LivingEntityMixin {
     @Inject(method = "canHaveStatusEffect", at = @At("HEAD"), cancellable = true)
     public void advskills_re$canHaveStatusEffect(StatusEffectInstance effect, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (entity instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.cannotHaveStatusEffect(player, effect)) {
+        if (entity instanceof PlayerEntity player && SkillTriggerHandler.cannotHaveStatusEffect(player, effect)) {
             cir.setReturnValue(false);
         }
     }
@@ -154,7 +168,7 @@ public abstract class LivingEntityMixin {
     @Inject(method = "getJumpVelocity", at = @At("RETURN"), cancellable = true)
     private void advskills_re$getJumpVelocity(CallbackInfoReturnable<Float> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (entity instanceof PlayerEntity player && SkillTriggerHandler.INSTANCE.shouldInvertJump(player)) {
+        if (entity instanceof PlayerEntity player && SkillTriggerHandler.shouldInvertJump(player)) {
             cir.setReturnValue(-cir.getReturnValue());
         }
     }
@@ -166,5 +180,10 @@ public abstract class LivingEntityMixin {
         if (SeriousInjuryEffect.Companion.onSetHealth(entity, health)) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "tickStatusEffects", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;updateGlowing()V", shift = At.Shift.AFTER))
+    public void advskills_re$tickStatusEffects(CallbackInfo ci) {
+        getPropertyComponent().onEffectsChanged();
     }
 }

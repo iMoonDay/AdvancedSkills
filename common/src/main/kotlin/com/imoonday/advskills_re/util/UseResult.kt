@@ -27,10 +27,11 @@ class UseResult(
         fun of(success: Boolean, successMessage: Text? = null, failMessage: Text? = null) =
             if (success) success(successMessage) else fail(failMessage)
 
-        fun passive(name: String) = fail(translate("useSkill.passive", name))
+        fun passive(name: Text) = fail(translate("useSkill.passive", name))
+
         fun startUsing(user: PlayerEntity, skill: Skill, data: NbtCompound? = null, failedMessage: Text? = null) = of(
             user.startUsing(skill, data), null,
-            failedMessage ?: translateActive(true, skill.name.string)
+            failedMessage ?: translateActive(true, skill.name)
         )
 
         fun toggleUsing(
@@ -40,7 +41,7 @@ class UseResult(
         ): UseResult {
             val active = user.toggleUsing(skill, data)
             if (!active) user.startCooling(skill)
-            return consume(translateActive(active, skill.name.string))
+            return consume(translateActive(active, skill.name))
         }
     }
 }

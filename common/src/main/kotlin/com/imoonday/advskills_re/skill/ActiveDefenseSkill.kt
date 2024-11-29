@@ -5,11 +5,6 @@ import com.imoonday.advskills_re.util.SkillSlot
 import com.imoonday.advskills_re.util.SkillType
 import com.imoonday.advskills_re.util.UseResult
 import com.imoonday.advskills_re.util.isUsing
-import net.minecraft.client.render.*
-import net.minecraft.client.render.entity.*
-import net.minecraft.client.render.entity.feature.*
-import net.minecraft.client.render.entity.model.*
-import net.minecraft.client.util.math.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.damage.*
@@ -58,21 +53,6 @@ class ActiveDefenseSkill : LongPressSkill(
         attacker: LivingEntity?,
     ): Float = if (!player.isUsing()) amount else amount * 0.8f
 
-    override fun <T : PlayerEntity, M : EntityModel<T>> render(
-        matrices: MatrixStack,
-        provider: VertexConsumerProvider,
-        light: Int,
-        player: T,
-        limbAngle: Float,
-        limbDistance: Float,
-        tickDelta: Float,
-        animationProgress: Float,
-        headYaw: Float,
-        headPitch: Float,
-        renderer: FeatureRendererContext<T, M>,
-        context: EntityRendererFactory.Context,
-    ) = renderSkillAround(player, tickDelta, matrices, context, provider)
-
-    override fun shouldRender(player: PlayerEntity): Boolean =
-        player.isUsing() && !player.isUsing(Skills.ABSOLUTE_DEFENSE)
+    override fun shouldRenderFeature(target: PlayerEntity, player: PlayerEntity): Boolean =
+        super.shouldRenderFeature(target, player) && !target.isUsing(Skills.ABSOLUTE_DEFENSE)
 }

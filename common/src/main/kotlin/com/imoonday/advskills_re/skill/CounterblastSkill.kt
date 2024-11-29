@@ -2,31 +2,39 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.playSound
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.player.*
+import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
 class CounterblastSkill : PassiveSkill(
     id = "counterblast",
     rarity = Rarity.SUPERB,
-), PostDamagedTrigger, ProgressTrigger {
+), PostAttackedTrigger, ProgressTrigger {
 
-    override fun postDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
-        super.postDamaged(amount, source, player, attacker)
+    override fun postAttacked(source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
+        super.postAttacked(source, player, attacker)
         if (attacker != null) {
-            player.properties.putInt("damagedTimes", player.properties.getInt("damagedTimes") + 1)
-            if (player.properties.getInt("damagedTimes") >= 5) {
-                player.properties.remove("damagedTimes")
+            val properties = player.properties
+            properties.putInt("damagedTimes", properties.getInt("damagedTimes").coerceAtLeast(0) + 1)
+            val times = properties.getInt("damagedTimes")
+            if (times > 0 && player.random.nextFloat() < 0.2f * times) {
+                properties.remove("damagedTimes")
                 player.world.getNonSpectatingEntities(
                     LivingEntity::class.java,
                     player.boundingBox.expand(5.0)
-                ).filterIsInstance<LivingEntity>()
-                    .forEach { it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(2.0)) }
+                ).filterNot { it === player }
+                    .forEach {
+                        it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(2.0))
+                        it.velocityDirty = true
+                        (it as? ServerPlayerEntity)?.sendPacket(EntityVelocityUpdateS2CPacket(it))
+                    }
                 player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
             }
+            player.syncProperties()
         }
     }
 

@@ -13,7 +13,7 @@ class SelfHealingSkill : Skill(
     rarity = Rarity.RARE
 ), AutoTrigger, AutoStopTrigger, DamageTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name.string)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override val persistTime: Int = 20 * 10
 

@@ -11,7 +11,7 @@ object ForgetCommand : PlayerCommand("forget") {
 
     override fun buildWithTarget(builder: RequiredArgumentBuilder<ServerCommandSource, EntitySelector>): ArgumentBuilder<ServerCommandSource, *> =
         builder.then(
-            argument("skill", SkillArgumentType.skill())
+            argument("skill", SkillArgumentType.validSkill())
                 .executesWithPlayer(::forget)
         )
 
@@ -24,7 +24,7 @@ object ForgetCommand : PlayerCommand("forget") {
             context.sendFeedback(
                 "forgetSkill.failed",
                 player.displayName.string,
-                skill.name.string
+                skill.name
             )
         }
         return 1

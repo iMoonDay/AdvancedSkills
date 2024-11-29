@@ -31,7 +31,7 @@ class UseSkillC2SRequest(
         if (SkillSlot.isValidIndex(player, slot) && !player.isSpectator) {
             val skill = player.getSkill(slot)
             (skill as? SendPlayerDataTrigger)
-                ?.takeIf { it.getSendTime() == SendTime.USE }
+                ?.takeIf { it.getSendTime().isOnUse }
                 ?.apply(player, data)
             context.queue { skill.tryUse(player, keyState) }
         }

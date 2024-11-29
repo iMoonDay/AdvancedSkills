@@ -1,109 +1,86 @@
 package com.imoonday.advskills_re.config
 
-import com.imoonday.advskills_re.*
-import com.imoonday.advskills_re.network.*
-import com.imoonday.advskills_re.network.s2c.*
-import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
-import com.mojang.logging.*
-import dev.architectury.platform.*
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
 import net.minecraft.nbt.*
-import net.minecraft.server.*
 import net.minecraft.util.*
-import org.slf4j.*
-import java.io.*
-import java.nio.file.*
-import kotlin.concurrent.*
-import kotlin.io.path.*
 
-@Serializable
 class SkillConfig {
 
     var skillCooldownMultiplier: Double = 1.0
-        get() {
-            if (field < 0.0) {
-                field = 0.0
-            }
-            return field
-        }
-        set(value) {
-            field = value.coerceAtLeast(0.0)
-            save()
-        }
-    var skillModifier: MutableMap<String, MutableMap<String, SkillModifier>> = mutableMapOf(
-        MOD_ID to mutableMapOf(
-            "example" to SkillModifier(20, Skill.Rarity.COMMON, 20)
-        )
-    )
-    var skillBlackList: MutableMap<String, MutableList<String>> = mutableMapOf(
-        MOD_ID to mutableListOf(
-            "example"
-        )
-    )
-    var defaultSkillSlots: MutableMap<String, Int> = mutableMapOf(
-        "active" to 3,
-        "generic" to 1,
-        "passive" to 2,
-    )
+    var skillXpMultiplier: Double = 1.0
+    var skillModifier: MutableMap<String, SkillModifier> = mutableMapOf()
+    var skillBlackList: MutableSet<String> = mutableSetOf()
+    var defaultSkillSlots: MutableMap<String, Int> = SkillContainer.DEFAULT_SLOTS.toMutableMap()
 
-    fun getModifier(id: Identifier): SkillModifier? = skillModifier[id.namespace]?.get(id.path)
+    fun getModifier(id: Identifier): SkillModifier? = skillModifier[id.toString()]
 
     fun getOrCreateModifier(id: Identifier): SkillModifier =
-        skillModifier.getOrPut(id.namespace) { mutableMapOf() }.getOrPut(id.path) { SkillModifier.EMPTY }
+        skillModifier.getOrPut(id.toString()) { SkillModifier.EMPTY }
 
-    fun removeModifier(id: Identifier): Boolean = skillModifier[id.namespace]?.remove(id.path) != null
+    fun removeModifier(id: Identifier): Boolean = skillModifier.remove(id.toString()) != null
 
-    fun isInBlackList(id: Identifier): Boolean = skillBlackList[id.namespace]?.contains(id.path) ?: false
+    fun isInBlackList(id: Identifier): Boolean = skillBlackList.contains(id.toString())
 
-    fun toJson(): String = JSON.encodeToString(serializer(), this)
+    fun addBlackList(id: Identifier) {
+        skillBlackList.add(id.toString())
+    }
+
+    fun removeBlackList(id: Identifier): Boolean = skillBlackList.remove(id.toString())
+
+    fun getDefaultSkillSlots(slot: String): Int = defaultSkillSlots[slot] ?: 0
+
+    fun setDefaultSkillSlot(slot: String, count: Int) {
+        defaultSkillSlots[slot] = count
+    }
+
+    fun setDefaultActiveSkillSlot(count: Int) {
+        defaultSkillSlots["active"] = count
+    }
+
+    fun setDefaultGenericSkillSlot(count: Int) {
+        defaultSkillSlots["generic"] = count
+    }
+
+    fun setDefaultPassiveSkillSlot(count: Int) {
+        defaultSkillSlots["passive"] = count
+    }
 
     fun fromTag(tag: NbtCompound) {
         skillModifier.clear()
         skillBlackList.clear()
         defaultSkillSlots.clear()
+
         val skillModifierTag = tag.getCompound("skillModifier")
-        for (namespace in skillModifierTag.keys) {
-            val mapTag = skillModifierTag.getCompound(namespace)
-            val map = mutableMapOf<String, SkillModifier>()
-            for (path in mapTag.keys) {
-                val modifierTag = mapTag.getCompound(path)
-                map[path] = SkillModifier.fromNbt(modifierTag)
-            }
-            skillModifier[namespace] = map
+        for (id in skillModifierTag.keys) {
+            val modifierTag = skillModifierTag.getCompound(id)
+            skillModifier[id] = SkillModifier.fromNbt(modifierTag)
         }
-        val skillBlackListTag = tag.getCompound("skillBlackList")
-        for (namespace in skillBlackListTag.keys) {
-            val listTag = skillBlackListTag.getList(namespace, NbtElement.STRING_TYPE.toInt())
-            val list = mutableListOf<String>()
-            repeat(listTag.size) {
-                list.add(listTag.getString(it))
-            }
-            skillBlackList[namespace] = list
+
+        val skillBlackListTag = tag.getList("skillBlackList", NbtElement.STRING_TYPE.toInt())
+        skillBlackListTag.forEach {
+            skillBlackList.add(it.asString())
         }
+
         val defaultSkillSlotsTag = tag.getCompound("defaultSkillSlots")
         for (namespace in defaultSkillSlotsTag.keys) {
             defaultSkillSlots[namespace] = defaultSkillSlotsTag.getInt(namespace)
         }
+
+        skillCooldownMultiplier = tag.getDouble("skillCooldownMultiplier")
+
+        skillXpMultiplier = tag.getDouble("skillXpMultiplier")
     }
 
     fun toTag(tag: NbtCompound): NbtCompound {
         return tag.apply {
             put("skillModifier", NbtCompound().apply {
-                for ((namespace, map) in skillModifier) {
-                    put(namespace, NbtCompound().apply {
-                        for ((path, modifier) in map) {
-                            put(path, modifier.toNbt())
-                        }
-                    })
+                for ((id, modifier) in skillModifier) {
+                    put(id, modifier.toNbt())
                 }
             })
-            put("skillBlackList", NbtCompound().apply {
-                for ((namespace, list) in skillBlackList) {
-                    put(namespace, NbtList().apply {
-                        addAll(list.map { NbtString.of(it) })
-                    })
+            put("skillBlackList", NbtList().apply {
+                skillBlackList.forEach {
+                    add(NbtString.of(it))
                 }
             })
             put("defaultSkillSlots", NbtCompound().apply {
@@ -111,89 +88,13 @@ class SkillConfig {
                     putInt(slot, count)
                 }
             })
+            putDouble("skillCooldownMultiplier", skillCooldownMultiplier)
+            putDouble("skillXpMultiplier", skillXpMultiplier)
         }
     }
 
     companion object {
 
-        private val LOGGER: Logger = LogUtils.getLogger()
-        private val JSON = Json {
-            prettyPrint = true
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        }
-        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID.json").toFile()
         var instance = SkillConfig()
-        private var loading = false
-        private var saving = false
-
-        fun load() {
-            if (loading) return
-            loading = true
-            LOGGER.info("Loading $MOD_ID configuration file")
-            try {
-                val file = file
-                if (!file.exists()) {
-                    save()
-                } else {
-                    var text = file.readText(Charsets.UTF_8)
-                    var times = 0
-                    while (text.isEmpty() && times++ < 10) {
-                        Thread.sleep(100)
-                        text = file.readText(Charsets.UTF_8)
-                    }
-                    instance = fromJson(text)
-                }
-            } catch (e: Exception) {
-                LOGGER.error(
-                    "Read $MOD_ID configuration failed. Try to save the current configuration", e
-                )
-                save()
-            } finally {
-                loading = false
-            }
-        }
-
-        fun save() {
-            if (saving) return
-            saving = true
-            try {
-                file.writeText(instance.toJson(), Charsets.UTF_8)
-            } catch (e: Exception) {
-                LOGGER.error("Couldn't save $MOD_ID configuration file", e)
-            } finally {
-                saving = false
-            }
-        }
-
-        fun fromJson(json: String): SkillConfig = JSON.decodeFromString(serializer(), json)
-
-        fun initWatchService(server: MinecraftServer) {
-            val service = FileSystems.getDefault().newWatchService()
-            file.parentFile.toPath().register(service, StandardWatchEventKinds.ENTRY_MODIFY)
-            val fileName = file.name
-            var lastEventTime = System.currentTimeMillis()
-
-            thread(start = true, name = "Skill Config Watch Service") {
-                while (true) {
-                    val key = service.take()
-                    if (key.pollEvents().any {
-                            (it.context() as Path).fileName.name == fileName && it.kind() == StandardWatchEventKinds.ENTRY_MODIFY
-                        }
-                        && System.currentTimeMillis() - lastEventTime > 1000
-                        && !saving && !loading
-                    ) {
-                        load()
-                        val tag = instance.toTag(NbtCompound())
-                        Channels.SYNC_CONFIG_S2C.sendToPlayers(
-                            server.playerManager.playerList,
-                            SyncConfigS2CPacket(tag)
-                        )
-                        lastEventTime = System.currentTimeMillis()
-                    }
-                    if (!key.reset()) break
-                }
-            }
-        }
     }
 }
