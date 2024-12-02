@@ -40,19 +40,7 @@ class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>,
         update(owner)
     }
 
-    override fun spawnParticles() {
-        (world as? ServerWorld)?.spawnParticles(
-            DustParticleEffect(Companion.particleColor, 1f),
-            x,
-            y,
-            z,
-            (range * range * 100).toInt(),
-            range - 1,
-            range - 1,
-            range - 1,
-            0.0
-        )
-    }
+    override fun getExplosionParticle(): ParticleEffect = DustParticleEffect(particleColor, 1f)
 
     override fun playSound() =
         world.playSound(null, blockPos, SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.VOICE)

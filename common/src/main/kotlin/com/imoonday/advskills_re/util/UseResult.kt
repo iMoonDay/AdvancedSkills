@@ -31,17 +31,18 @@ class UseResult(
 
         fun startUsing(user: PlayerEntity, skill: Skill, data: NbtCompound? = null, failedMessage: Text? = null) = of(
             user.startUsing(skill, data), null,
-            failedMessage ?: translateActive(true, skill.name)
+            failedMessage ?: translateActive(true, skill)
         )
 
         fun toggleUsing(
             user: PlayerEntity,
             skill: Skill,
             data: NbtCompound? = null,
+            onStart: (() -> Unit)? = null,
         ): UseResult {
             val active = user.toggleUsing(skill, data)
-            if (!active) user.startCooling(skill)
-            return consume(translateActive(active, skill.name))
+            if (active) onStart?.invoke()
+            return consume(translateActive(active, skill))
         }
     }
 }

@@ -38,7 +38,7 @@ object EventHandler {
         }
         PlayerEvent.PLAYER_CLONE.register { oldPlayer, newPlayer, _ ->
             newPlayer.copyDataFrom(oldPlayer)
-            newPlayer.properties.copyFrom(oldPlayer.properties)
+            newPlayer.properties.replaceAll(oldPlayer.properties)
             newPlayer.syncData(false)
             newPlayer.syncProperties()
         }

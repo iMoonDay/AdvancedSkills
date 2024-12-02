@@ -35,7 +35,7 @@ interface SkillAboveHeadRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill,
         matrices.push()
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180f))
         matrices.translate(-0.5, 0.65, -0.5)
-        val model = context.modelManager.getModel(skill.modelId)
+        val model = context.modelManager.getModel(skill.getRenderModel(player, clientPlayer))
         context.itemRenderer.renderBakedItemQuads(
             matrices,
             provider.getBuffer(TexturedRenderLayers.getEntityTranslucentCull()),

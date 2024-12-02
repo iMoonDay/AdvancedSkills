@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.entity
 
 import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.util.*
 import net.minecraft.command.argument.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -88,7 +89,7 @@ class EnchantedSwordEntity(type: EntityType<out EnchantedSwordEntity>, world: Wo
                 kill()
                 return
             }
-            velocity = it.pos.add(0.0, it.height / 2.0, 0.0).subtract(pos).normalize().multiply(0.5)
+            velocity = it.centerPos.subtract(pos).normalize().multiply(0.5)
             velocityDirty = true
             lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, it.eyePos)
         }

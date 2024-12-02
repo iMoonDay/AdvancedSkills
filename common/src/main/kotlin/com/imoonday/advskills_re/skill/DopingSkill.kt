@@ -1,8 +1,10 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.attribute.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import kotlin.math.*
 
@@ -12,6 +14,8 @@ class DopingSkill : Skill(
     cooldown = 3,
     rarity = Rarity.MYTHIC,
 ), AttributeTrigger, AutoStopTrigger, UsingRenderTrigger {
+
+    override val persistTime: Int = 10 * 20
 
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
@@ -27,10 +31,16 @@ class DopingSkill : Skill(
         if (!result.success) return result
         user.addAttributes()
         user.health = max(user.health - 5f, 1f)
+        user.playSound(ModSounds.DASH.get())
         return result
     }
 
-    override val persistTime: Int = 10 * 20
+    override fun tick(player: PlayerEntity, usedTime: Int) {
+        super.tick(player, usedTime)
+        if (player.isUsing() && !player.isSprinting) {
+            player.isSprinting = true
+        }
+    }
 
     override fun onStop(player: ServerPlayerEntity) {
         player.removeAttributes()

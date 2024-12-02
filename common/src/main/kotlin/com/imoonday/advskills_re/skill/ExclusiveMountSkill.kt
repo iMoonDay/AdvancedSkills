@@ -2,10 +2,8 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
+import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
-import net.minecraft.server.world.*
 import net.minecraft.sound.*
 
 class ExclusiveMountSkill : Skill(
@@ -30,7 +28,7 @@ class ExclusiveMountSkill : Skill(
         if (user.world.isSpaceEmpty(newHorse, newHorse.boundingBox.offset(user.pos.subtract(newHorse.pos)))) {
             val properties = user.properties
             if (properties.containsUuid("horseUuid")) {
-                (user.world as ServerWorld).getEntity(properties.getUuid("horseUuid"))?.discard()
+                user.serverWorld.getEntity(properties.getUuid("horseUuid"))?.discard()
             }
             properties.putUuid("horseUuid", newHorse.uuid)
             user.syncProperties()

@@ -12,20 +12,21 @@ class WaterWalkerSkill : Skill(
     id = "water_walker",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 15,
-    rarity = Rarity.SUPERB,
-    sound = SoundEvents::BLOCK_WATER_AMBIENT
-), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger {
+    rarity = Rarity.SUPERB
+), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = 15 * 20
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {
+        user.playSound(SoundEvents.BLOCK_WATER_AMBIENT)
+    }
 
     override fun canWalkOnFluid(player: PlayerEntity, state: FluidState): Boolean =
         player.isUsing() && state.isOf(Fluids.WATER) && player.getFluidHeight(FluidTags.WATER) < 0.02
 
     override fun onStop(player: ServerPlayerEntity) {
-        player.startCooling()
         super.onStop(player)
+        player.startCooling()
     }
 
     override fun ignoreFluid(player: PlayerEntity, tag: TagKey<Fluid>): Boolean {

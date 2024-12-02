@@ -17,7 +17,7 @@ class ActiveDefenseSkill : LongPressSkill(
     types = listOf(SkillType.DEFENSE),
     cooldown = 10,
     rarity = Rarity.SUPERB,
-), DamageTrigger, AttributeTrigger, FeatureRendererTrigger {
+), DamageTrigger, AttributeTrigger, UsingRenderTrigger {
 
     override fun getMaxPressTime(): Int = 10 * 10
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
@@ -55,5 +55,5 @@ class ActiveDefenseSkill : LongPressSkill(
     ): Float = if (!player.isUsing()) amount else amount * 0.8f
 
     override fun shouldRenderFeature(target: PlayerEntity, player: PlayerEntity): Boolean =
-        super.shouldRenderFeature(target, player) && !target.isUsing(Skills.ABSOLUTE_DEFENSE)
+        target.isUsing() && !target.isUsing(Skills.ABSOLUTE_DEFENSE)
 }

@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import java.util.function.*
@@ -18,5 +19,5 @@ abstract class LongPressSkill(
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) = Unit
 
-    override fun shouldFlashIcon(): Boolean = false
+    override fun shouldFlashIcon(player: PlayerEntity): Boolean = false
 }

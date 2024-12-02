@@ -33,7 +33,7 @@ class WallClimbingSkill : PassiveSkill(
         super<AutoStopTrigger>.tick(player, usedTime)
         if (player.isUsing()) {
             val horizontalCollision =
-                player.horizontalCollision || player.properties.getBoolean(HORIZONTAL_COLLISION_KEY)
+                player.horizontalCollision || player.getPersistentData().getBoolean(HORIZONTAL_COLLISION_KEY)
             val data = player.getData(this)
             val oldSpeed = data?.usingSpeed
             if (!horizontalCollision) {
@@ -54,14 +54,10 @@ class WallClimbingSkill : PassiveSkill(
     override fun write(player: PlayerEntity, data: NbtCompound): NbtCompound =
         data.apply { putBoolean(HORIZONTAL_COLLISION_KEY, player.horizontalCollision) }
 
-    override fun apply(player: ServerPlayerEntity, data: NbtCompound) {
-        player.properties.putBoolean(HORIZONTAL_COLLISION_KEY, data.getBoolean(HORIZONTAL_COLLISION_KEY))
-    }
-
     override fun getSendTime(): SendTime = SendTime.EQUIPPED
 
     private fun PlayerEntity.shouldClimb(): Boolean =
-        (horizontalCollision || properties.getBoolean(HORIZONTAL_COLLISION_KEY)) && !abilities.flying
+        (horizontalCollision || getPersistentData().getBoolean(HORIZONTAL_COLLISION_KEY)) && !abilities.flying
 
     companion object {
 

@@ -7,7 +7,8 @@ data class SkillData(
     var using: Boolean = false,
     var usedTime: Int = 0,
     var usingSpeed: Int = 1,
-    var data: NbtCompound = NbtCompound(),
+    val activeData: NbtCompound = NbtCompound(),
+    val persistentData: NbtCompound = NbtCompound()
 ) {
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
@@ -15,7 +16,8 @@ data class SkillData(
         putBoolean("using", using)
         putInt("usedTime", usedTime)
         putInt("usingSpeed", usingSpeed)
-        put("data", data)
+        put("activeData", activeData)
+        put("persistentData", persistentData)
     }
 
     fun copy(data: SkillData) {
@@ -23,7 +25,8 @@ data class SkillData(
         this.using = data.using
         this.usedTime = data.usedTime
         this.usingSpeed = data.usingSpeed
-        this.data = data.data.copy()
+        this.activeData.replaceAll(data.activeData)
+        this.persistentData.replaceAll(data.persistentData)
     }
 
     fun tick() {
@@ -44,7 +47,8 @@ data class SkillData(
             nbt.getBoolean("using"),
             nbt.getInt("usedTime"),
             if (nbt.contains("usingSpeed")) nbt.getInt("usingSpeed") else 1,
-            nbt.getCompound("data")
+            nbt.getCompound("activeData"),
+            nbt.getCompound("persistentData")
         )
     }
 }

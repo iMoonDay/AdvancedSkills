@@ -48,7 +48,7 @@ interface SkillAroundRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill, T 
             matrices.translate(-0.5, -0.65, -0.5)
 
             matrices.translate(0f, 0f, -0.75f)
-            val model: BakedModel = context.modelManager.getModel(skill.modelId)
+            val model: BakedModel = context.modelManager.getModel(skill.getRenderModel(player, clientPlayer))
             for (dir in Direction.entries) {
                 context.itemRenderer.renderBakedItemQuads(
                     matrices,
@@ -67,7 +67,7 @@ interface SkillAroundRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill, T 
 
     companion object {
 
-        fun <T> create(): SkillAroundRenderer<T> where T : Skill, T : FeatureRendererTrigger =
+        fun <T> create(): SkillAroundRenderer<T> where T : Skill, T : UsingRenderTrigger =
             object : SkillAroundRenderer<T> {}
     }
 }

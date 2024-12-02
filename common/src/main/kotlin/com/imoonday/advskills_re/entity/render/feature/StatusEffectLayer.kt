@@ -13,9 +13,6 @@ import net.minecraft.item.*
 import net.minecraft.registry.*
 import net.minecraft.util.math.*
 
-/**
- * from Twilight Forest
- */
 class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
     renderer: FeatureRendererContext<T, M>,
     private val context: EntityRendererFactory.Context,
@@ -47,6 +44,11 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
         delta -= 10
         if (entity.isConfined) {
             renderEffects(matrices, vertexConsumers, entity, delta, confinementModelId, horizonOffset, 4)
+            horizonOffset += 0.5f
+        }
+        delta -= 10
+        if (entity.isWeakened) {
+            renderEffects(matrices, vertexConsumers, entity, delta, weakenedModelId, horizonOffset, 4)
         }
     }
 
@@ -63,18 +65,15 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
         val rotateAngleY = age / -20.0f
 
         stack.pop()
+        val model = context.modelManager.getModel(modelIdentifier)
+        val scale = (entity.width * 1.2f).coerceAtMost(1.0f)
         for (c in 0 until count) {
             stack.push()
-
             stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotateAngleY * (180f / Math.PI.toFloat()) + (c * (360f / count))))
-            val scale = (entity.width * 1.2f).coerceAtMost(1.0f)
-
             stack.translate(-0.5, (entity.height - scale) * 0.5, -0.5)
-
             stack.translate(0f, 0f, (entity.width).coerceAtLeast(0.75f) + horizonOffset)
-
             stack.scale(scale, scale, scale)
-            val model = context.modelManager.getModel(modelIdentifier)
+
             for (dir in Direction.entries) {
                 context.itemRenderer.renderBakedItemQuads(
                     stack,
@@ -97,5 +96,6 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
         val silenceModelId = Skills.PRIMARY_SILENCE.modelId
         val disarmModelId = Skills.DISARM.modelId
         val confinementModelId = ModelIdentifier(Registries.ITEM.getId(Items.BARRIER), "inventory")
+        val weakenedModelId = Skills.ARMOR_SHATTERER.modelId
     }
 }

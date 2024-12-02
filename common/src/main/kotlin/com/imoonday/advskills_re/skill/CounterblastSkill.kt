@@ -1,12 +1,12 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.player.*
 import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
@@ -18,11 +18,11 @@ class CounterblastSkill : PassiveSkill(
     override fun postAttacked(source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
         super.postAttacked(source, player, attacker)
         if (attacker != null) {
-            val properties = player.properties
-            properties.putInt("damagedTimes", properties.getInt("damagedTimes").coerceAtLeast(0) + 1)
-            val times = properties.getInt("damagedTimes")
+            val data = player.getPersistentData()
+            data.putInt("damagedTimes", data.getInt("damagedTimes").coerceAtLeast(0) + 1)
+            val times = data.getInt("damagedTimes")
             if (times > 0 && player.random.nextFloat() < 0.2f * times) {
-                properties.remove("damagedTimes")
+                data.remove("damagedTimes")
                 player.world.getNonSpectatingEntities(
                     LivingEntity::class.java,
                     player.boundingBox.expand(5.0)
@@ -33,12 +33,16 @@ class CounterblastSkill : PassiveSkill(
                         (it as? ServerPlayerEntity)?.sendPacket(EntityVelocityUpdateS2CPacket(it))
                     }
                 player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
+                player.spawnParticles(
+                    ParticleTypes.CLOUD,
+                    false, player.pos, 250,
+                    5.0, 1.0, 5.0, 0.1
+                )
             }
-            player.syncProperties()
         }
     }
 
-    override fun shouldDisplay(player: PlayerEntity): Boolean = player.properties.contains("damagedTimes")
+    override fun shouldDisplay(player: PlayerEntity): Boolean = player.getPersistentData().contains("damagedTimes")
 
-    override fun getProgress(player: PlayerEntity): Double = player.properties.getInt("damagedTimes") / 5.0
+    override fun getProgress(player: PlayerEntity): Double = player.getPersistentData().getInt("damagedTimes") / 5.0
 }

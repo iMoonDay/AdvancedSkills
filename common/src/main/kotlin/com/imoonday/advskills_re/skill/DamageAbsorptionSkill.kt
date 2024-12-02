@@ -12,7 +12,7 @@ class DamageAbsorptionSkill : Skill(
     types = listOf(SkillType.DEFENSE, SkillType.RESTORATION),
     cooldown = 60,
     rarity = Rarity.LEGENDARY
-), DamageTrigger, AutoStopTrigger, FeatureRendererTrigger {
+), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = 15 * 20
 

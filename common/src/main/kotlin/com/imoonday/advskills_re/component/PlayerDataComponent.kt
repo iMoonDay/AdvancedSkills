@@ -98,6 +98,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
         container = SkillContainer()
         level = SkillLevelData()
         learnable = LearnableSkillData()
+        synced = false
         sync()
     }
 }

@@ -34,12 +34,18 @@ class SkillInventoryScreen(
     var selectingSlot: Slot? = null
     private val tabs: MutableList<Tab> = mutableListOf()
     private val equippedSlots: MutableList<EquippedSlot> = mutableListOf()
+    private var skillFilter: SkillFilter = SkillFilter.NONE
+    private var rarityFilter: RarityFilter = RarityFilter.NONE
     private lateinit var slotGrid: SlotGrid
     private val displaySkills
         get() = player.learnedSkills
+            .asSequence()
             .filterNot(player::hasEquipped)
             .filter { (selectedTab?.type ?: return@filter true) in it.types }
+            .filter(skillFilter)
+            .filter(rarityFilter)
             .sortedWith(ClientConfig.get().skillSorter)
+            .toList()
     var bgWidth: Int = width
     var bgHeight: Int = height
     val bgX: Int
@@ -91,7 +97,9 @@ class SkillInventoryScreen(
                 }
         }
         val config = ClientConfig.get()
-        ButtonIconWidget(bgX - 16, bgY + 5, 16, 16, sortTexture)
+        var y = bgY + 5
+        ExpandableIconButtonWidget(bgX - 16, y, 16, 16, sortTexture)
+            .setTextSupplier(textRenderer) { config.skillSorter.displayName }
             .addClickAction(0) { updateSorter(config, it, true) }
             .addClickAction(1) { updateSorter(config, it, false) }
             .setScrollAction { widget, amount ->
@@ -104,6 +112,82 @@ class SkillInventoryScreen(
                 } else null
             }.apply { tooltip = createSorterTooltip() }
             .also(::addDrawableChild)
+
+        y += 16 + 5
+        ExpandableIconButtonWidget(bgX - 16, y, 16, 16, filterTexture)
+            .setTextSupplier(textRenderer) { skillFilter.displayName }
+            .addClickAction(0) { updateFilter(it, true) }
+            .addClickAction(1) { updateFilter(it, false) }
+            .setScrollAction { widget, amount ->
+                if (amount > 0) {
+                    updateFilter(widget, false)
+                    true
+                } else if (amount < 0) {
+                    updateFilter(widget, true)
+                    true
+                } else null
+            }.apply { tooltip = createFilterTooltip() }
+            .also(::addDrawableChild)
+
+        y += 16 + 5
+        ExpandableIconButtonWidget(bgX - 16, y, 16, 16, rarityFilterTexture)
+            .setTextSupplier(textRenderer) { rarityFilter.displayName }
+            .addClickAction(0) { updateRarityFilter(it, true) }
+            .addClickAction(1) { updateRarityFilter(it, false) }
+            .setScrollAction { widget, amount ->
+                if (amount > 0) {
+                    updateRarityFilter(widget, false)
+                    true
+                } else if (amount < 0) {
+                    updateRarityFilter(widget, true)
+                    true
+                } else null
+            }.apply { tooltip = createRarityFilterTooltip() }
+            .also(::addDrawableChild)
+    }
+
+    private fun updateRarityFilter(
+        widget: ButtonIconWidget,
+        next: Boolean
+    ) {
+        rarityFilter = rarityFilter.run { if (next) next() else previous() }
+        widget.tooltip = createRarityFilterTooltip()
+        update()
+    }
+
+    private fun createRarityFilterTooltip(): Tooltip {
+        val rarity = rarityFilter
+        return Tooltip.of(
+            RarityFilter.entries.toText(
+                formatter = {
+                    it.displayName.copy()
+                        .formatted(if (rarity == it) Formatting.GREEN else Formatting.GRAY)
+                },
+                separator = "\n".toText()
+            )
+        )
+    }
+
+    private fun updateFilter(
+        widget: ButtonIconWidget,
+        next: Boolean
+    ) {
+        skillFilter = skillFilter.run { if (next) next() else previous() }
+        widget.tooltip = createFilterTooltip()
+        update()
+    }
+
+    private fun createFilterTooltip(): Tooltip {
+        val filter = skillFilter
+        return Tooltip.of(
+            SkillFilter.entries.toText(
+                formatter = {
+                    it.displayName.copy()
+                        .formatted(if (filter == it) Formatting.GREEN else Formatting.GRAY)
+                },
+                separator = "\n".toText()
+            )
+        )
     }
 
     private fun updateSorter(
@@ -563,6 +647,8 @@ class SkillInventoryScreen(
         private val tabTexture = Identifier("textures/gui/container/creative_inventory/tabs.png")
         private val slotTexture = id("slot.png")
         private val sortTexture = id("sort.png")
+        private val filterTexture = id("filter.png")
+        private val rarityFilterTexture = id("rarity_filter.png")
         private const val SLOT_SIZE = 24
     }
 }

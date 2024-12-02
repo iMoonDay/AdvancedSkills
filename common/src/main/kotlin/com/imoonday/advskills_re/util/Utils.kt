@@ -5,6 +5,7 @@ import com.imoonday.advskills_re.mixin.*
 import dev.architectury.event.*
 import net.minecraft.entity.*
 import net.minecraft.entity.effect.*
+import net.minecraft.nbt.*
 import net.minecraft.text.*
 import net.minecraft.util.*
 import net.minecraft.util.math.*
@@ -133,3 +134,13 @@ fun <T> Collection<T>.toText(
 
     return text.append(suffix)
 }
+
+fun NbtCompound.clear() = keys.toSet().forEach(::remove)
+
+fun NbtCompound.replaceAll(nbt: NbtCompound?) {
+    clear()
+    nbt?.let { copyFrom(it) }
+}
+
+val Entity.centerPos: Vec3d
+    get() = Vec3d(pos.x, pos.y + height / 2, pos.z)

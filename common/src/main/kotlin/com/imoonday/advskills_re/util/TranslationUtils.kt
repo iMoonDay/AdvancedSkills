@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.*
+import com.imoonday.advskills_re.skill.*
 import net.minecraft.text.*
 
 fun translate(key: String, vararg args: Any): MutableText =
@@ -8,5 +9,5 @@ fun translate(key: String, vararg args: Any): MutableText =
 
 fun translateSkill(id: String, key: String, vararg args: Any): MutableText = translate("skill.$id.$key", *args)
 
-fun translateActive(active: Boolean, name: Text): MutableText =
-    translate("useSkill.${if (active) "active" else "inactive"}", name)
+fun translateActive(active: Boolean, skill: Skill): MutableText =
+    translate("useSkill.${if (active) "active" else "inactive"}", skill.name)

@@ -11,6 +11,7 @@ import net.minecraft.entity.mob.*
 import net.minecraft.entity.passive.*
 import net.minecraft.entity.projectile.*
 import net.minecraft.entity.projectile.thrown.*
+import net.minecraft.particle.*
 import net.minecraft.potion.*
 import net.minecraft.server.network.*
 
@@ -19,7 +20,7 @@ class DangerPerceptionSkill : Skill(
     types = listOf(SkillType.PASSIVE),
     cooldown = 12,
     rarity = Rarity.SUPERB,
-), AutoStopTrigger, AttributeTrigger, DamageTrigger {
+), AutoStopTrigger, AttributeTrigger, DamageTrigger, UsingRenderTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
@@ -40,12 +41,16 @@ class DangerPerceptionSkill : Skill(
     }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
-        if (!player.isCreative && !player.isSpectator && (player.isUsing() || !player.isCooling())) {
+        if (!player.isCreative && !player.isSpectator && !player.abilities.invulnerable && (player.isUsing() || !player.isCooling())) {
             val hasDanger = player.world
                 .getOtherEntities(player, player.boundingBox.expand(3.0)) { dangerTest(player, it) }
                 .isNotEmpty()
             if (hasDanger) {
-                if (player.isUsing()) player.resetUsedTime(this) else start(player)
+                if (player.isUsing()) {
+                    player.resetUsedTime(this)
+                } else {
+                    start(player)
+                }
             }
         }
         super.serverTick(player, usedTime)
@@ -82,6 +87,11 @@ class DangerPerceptionSkill : Skill(
         player.startUsing()
         player.startCooling()
         player.addAttributes()
+        player.spawnParticles(
+            ParticleTypes.CLOUD,
+            false, player.pos, 15,
+            0.0, 0.0, 0.0, 0.1
+        )
     }
 
     object DangerTestEvents {

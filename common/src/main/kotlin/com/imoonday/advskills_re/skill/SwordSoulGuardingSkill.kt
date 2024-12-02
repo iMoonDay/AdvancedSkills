@@ -13,7 +13,7 @@ class SwordSoulGuardingSkill : Skill(
     types = listOf(SkillType.SUMMON, SkillType.ATTACK),
     cooldown = 30,
     rarity = Rarity.LEGENDARY,
-), PostAttackTrigger, PostAttackedTrigger, AutoStopTrigger, FeatureRendererTrigger {
+), PostAttackTrigger, PostAttackedTrigger, AutoStopTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = 20 * 20
 

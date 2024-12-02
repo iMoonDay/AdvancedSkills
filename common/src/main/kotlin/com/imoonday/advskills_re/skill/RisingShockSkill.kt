@@ -36,8 +36,10 @@ class RisingShockSkill : Skill(
     override val persistTime: Int = 8
 
     override fun onStop(player: ServerPlayerEntity) {
-        player.getUsingData()?.let {
-            player.setNoGravity(it.getBoolean("noGravity"))
+        player.getActiveData().let {
+            if (it.contains("noGravity")) {
+                player.setNoGravity(it.getBoolean("noGravity"))
+            }
         }
         super.onStop(player)
     }

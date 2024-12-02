@@ -4,6 +4,7 @@ import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.effect.*
 import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.text.*
 import kotlin.math.*
@@ -24,6 +25,11 @@ class PrimaryPurificationSkill : Skill(
             it.setDuration(it.mapDuration { (it - min(it * 0.2, 15 * 20.0)).toInt() })
             user.sendPacket(EntityStatusEffectS2CPacket(user.id, it))
             val amount = (duration - it.duration) / 20.0
+            user.spawnParticles(
+                ParticleTypes.GLOW,
+                false, user.centerPos, (amount.toInt() * 10).coerceAtLeast(1),
+                0.5, 0.5, 0.5, 0.1
+            )
             return UseResult.success(
                 message(
                     "success",

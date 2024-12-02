@@ -5,7 +5,7 @@ import net.minecraft.client.gui.*
 import net.minecraft.client.gui.widget.*
 import net.minecraft.util.*
 
-class ButtonIconWidget : IconWidget {
+open class ButtonIconWidget : IconWidget {
 
     private val actions: MutableMap<Int, (ButtonIconWidget) -> Unit> = mutableMapOf()
     private var scrollAction: ((ButtonIconWidget, Double) -> Boolean?)? = null

@@ -5,6 +5,7 @@ import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.effect.*
 import net.minecraft.entity.player.*
+import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.network.*
 
 class NegativeResistanceSkill : Skill(
@@ -12,7 +13,7 @@ class NegativeResistanceSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 30,
     rarity = Rarity.SUPERB,
-), AutoStopTrigger, StatusEffectTrigger {
+), AutoStopTrigger, StatusEffectTrigger, UsingRenderTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
@@ -22,6 +23,11 @@ class NegativeResistanceSkill : Skill(
         if (player.isUsing() && !effect.effectType.isBeneficial) {
             (player as? ServerPlayerEntity)?.let {
                 it.playSound(ModSounds.PURIFY.get())
+                it.spawnParticles(
+                    ParticleTypes.GLOW_SQUID_INK,
+                    false, it.centerPos, 10,
+                    0.5, 0.5, 0.5, 0.1
+                )
                 it.stopUsing()
             }
             true

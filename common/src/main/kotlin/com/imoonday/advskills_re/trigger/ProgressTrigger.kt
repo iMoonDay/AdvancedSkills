@@ -6,5 +6,5 @@ interface ProgressTrigger : SkillTrigger {
 
     fun shouldDisplay(player: PlayerEntity): Boolean = false
     fun getProgress(player: PlayerEntity): Double
-    fun shouldFlashIcon(): Boolean = true
+    fun shouldFlashIcon(player: PlayerEntity): Boolean = player.isUsing()
 }

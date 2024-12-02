@@ -13,7 +13,7 @@ class GrapplingHookSkill : LongPressSkill(
     types = listOf(SkillType.MOVEMENT),
     cooldown = 15,
     rarity = Rarity.EPIC
-), FeatureRendererTrigger, WorldRendererTrigger, CrosshairTrigger {
+), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger {
 
     override fun getMaxPressTime(): Int = 3 * 20
 
@@ -41,29 +41,27 @@ class GrapplingHookSkill : LongPressSkill(
         if (player.isUsing()) {
             player.fallDistance = 0f
             player.stopFallFlying()
-            player.getUsingData()?.let {
-                NbtUtils.readVec3d(it)?.run {
-                    val pos = player.pos
-                    val distance = distanceTo(pos)
-                    if (player.blockPos.down() == toBlockPos()
-                        || player.calculateAngle(this) > PI / 4.5
-                    ) {
-                        if (!player.world.isClient) {
-                            player.stopUsing()
-                            player.startCooling()
-                        }
-                        return@let
+            NbtUtils.readVec3d(player.getActiveData())?.run {
+                val pos = player.pos
+                val distance = distanceTo(pos)
+                if (player.blockPos.down() == toBlockPos()
+                    || player.calculateAngle(this) > PI / 4.5
+                ) {
+                    if (!player.world.isClient) {
+                        player.stopUsing()
+                        player.startCooling()
                     }
-                    val rotation = player.rotationVector
-                    val newVelocity = add(
-                        rotation.x,
-                        player.height.toDouble() / 2.0 + rotation.y,
-                        rotation.z
-                    ).subtract(pos).normalize()
-                        .multiply((distance / maxDistance) + 1)
-                    player.velocityDirty = true
-                    player.addVelocity((newVelocity - player.velocity).multiply(0.5))
+                    return@run
                 }
+                val rotation = player.rotationVector
+                val newVelocity = add(
+                    rotation.x,
+                    player.height.toDouble() / 2.0 + rotation.y,
+                    rotation.z
+                ).subtract(pos).normalize()
+                    .multiply((distance / maxDistance) + 1)
+                player.velocityDirty = true
+                player.addVelocity((newVelocity - player.velocity).multiply(0.5))
             }
         }
         super.tick(player, usedTime)

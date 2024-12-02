@@ -43,8 +43,9 @@ class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>(), IPla
         provider: VertexConsumerProvider,
         thirdPerson: Boolean = true,
     ) {
-        if (!player.isUsing(skill) || player.getUsingData(skill) == null) return
-        val pos = NbtUtils.readVec3d(player.getUsingData(skill)) ?: return
+        if (!player.isUsing(skill)) return
+        val data = player.getActiveData(skill) ?: return
+        val pos = NbtUtils.readVec3d(data) ?: return
 
         if (thirdPerson) matrices.pop()
         matrices.push()

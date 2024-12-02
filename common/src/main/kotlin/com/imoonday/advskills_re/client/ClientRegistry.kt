@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.client.render.*
+import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.entity.render.*
 import com.imoonday.advskills_re.entity.render.feature.*
 import com.imoonday.advskills_re.init.ModEntities.CLONE_PLAYER
@@ -18,6 +19,7 @@ import com.imoonday.advskills_re.init.ModEntities.SPECIAL_TAME_HORSE
 import com.imoonday.advskills_re.init.ModEntities.TORNADO
 import com.imoonday.advskills_re.init.ModEntities.UNGROUNDED_ARROW
 import com.imoonday.advskills_re.init.ModEntities.UNSTABLE_TNT
+import com.imoonday.advskills_re.init.ModEntities.WEAKENED_ENERGY_BALL
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.util.*
@@ -72,6 +74,7 @@ object ClientRegistry {
         EntityRendererRegistry.register(CLONE_PLAYER, ::ClonePlayerEntityRenderer)
         EntityRendererRegistry.register(MAGNET, ::MagnetEntityRenderer)
         EntityRendererRegistry.register(UNGROUNDED_ARROW, ::ArrowEntityRenderer)
+        EntityRendererRegistry.register(WEAKENED_ENERGY_BALL, ::WeakenedEnergyBallEntityRenderer)
     }
 
     private fun registerClientEvents() {

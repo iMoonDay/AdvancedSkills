@@ -36,12 +36,12 @@ object SkillRenderer {
     ) {
         context.fill(x, y, x + 16, y + 16, Color.LIGHT_GRAY.alpha(0.5).rgb)
         var flashed = false
-        if (skill is AutoStopTrigger && skill.shouldFlashIcon() && player != null) {
+        if (player != null && skill is AutoStopTrigger && skill.shouldFlashIcon(player)) {
             flashed = true
             val persistTime = skill.getPersistTimeModified()
             val leftUseTime = persistTime - player.getUsedTime(skill)
-            if (persistTime > 5 * 20 && leftUseTime <= (persistTime / 5).coerceAtMost(10 * 20)) {
-                val alpha = 0.5 * sin(2 * PI / ((leftUseTime - persistTime / 5) * 20)) + 0.5
+            if (persistTime > 5 * 20 && leftUseTime < (persistTime / 5).coerceAtMost(10 * 20)) {
+                val alpha = 0.5 * sin(2 * PI / 20 * (leftUseTime - persistTime / 5)) + 0.5
                 RenderSystem.enableBlend()
                 context.setShaderColor(1.0f, 1.0f, 1.0f, alpha.toFloat())
             }

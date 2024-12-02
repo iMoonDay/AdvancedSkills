@@ -10,7 +10,9 @@ interface SendPlayerDataTrigger : SkillTrigger {
 
     fun write(player: PlayerEntity, data: NbtCompound): NbtCompound
 
-    fun apply(player: ServerPlayerEntity, data: NbtCompound)
+    fun apply(player: ServerPlayerEntity, data: NbtCompound) {
+        player.getPersistentData().copyFrom(data)
+    }
 
     fun getSendTime(): SendTime = SendTime.USE
 }

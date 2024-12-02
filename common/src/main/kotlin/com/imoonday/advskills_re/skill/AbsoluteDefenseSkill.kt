@@ -12,7 +12,7 @@ class AbsoluteDefenseSkill : Skill(
     types = listOf(SkillType.DEFENSE),
     cooldown = 30,
     rarity = Rarity.SUPERB
-), DamageTrigger, AutoStopTrigger, FeatureRendererTrigger {
+), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
 
     override val persistTime = 30 * 20
 

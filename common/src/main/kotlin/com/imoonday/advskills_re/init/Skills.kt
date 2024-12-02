@@ -272,6 +272,15 @@ object Skills {
     @JvmField
     val RETURN = register(ReturnSkill())
 
+    @JvmField
+    val PORTABLE_CHEST = register(PortableChestSkill())
+
+    @JvmField
+    val LAVA_WALKER = register(LavaWalkerSkill())
+
+    @JvmField
+    val ARMOR_SHATTERER = register(ArmorShattererSkill())
+
     fun init() = Unit
 
     fun <T : Skill> register(skill: T): T {
@@ -282,6 +291,11 @@ object Skills {
         if (!skill.isEmpty()) ITEMS.register(skill.id.path) { SkillItem(skill) }
         skills[skill.id] = skill
         return skill
+    }
+
+    fun compareIndex(skill1: Skill, skill2: Skill): Int {
+        val skillValues = skills.values
+        return skillValues.indexOf(skill1).compareTo(skillValues.indexOf(skill2))
     }
 
     fun getSkills(): List<Skill> = skills.values.filterNot { it.isEmpty() }

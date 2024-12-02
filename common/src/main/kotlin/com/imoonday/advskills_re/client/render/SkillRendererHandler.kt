@@ -4,6 +4,7 @@ import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.client.render.renderer.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.trigger.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.network.*
 import net.minecraft.client.render.*
@@ -24,18 +25,18 @@ object SkillRendererHandler {
 
     @JvmStatic
     @Suppress("UNCHECKED_CAST")
-    fun <T : Skill> registerRenderer(skill: T, renderer: IRenderer<T>) {
-        if (renderer is IOverlayRenderer) overlayRenderers[skill] = renderer as IOverlayRenderer<Skill>
-        if (renderer is IHudRenderer) hudRenderers[skill] = renderer as IHudRenderer<Skill>
-        if (renderer is ICrosshairRenderer) crosshairRenderers[skill] = renderer as ICrosshairRenderer<Skill>
-        if (renderer is IEntityRenderer) entityRenderers[skill] = renderer as IEntityRenderer<Skill>
-        if (renderer is IPlayerEntityRenderer) playerEntityRenderers[skill] = renderer as IPlayerEntityRenderer<Skill>
-        if (renderer is IFeatureRenderer) featureRenderers[skill] = renderer as IFeatureRenderer<Skill>
-        if (renderer is ILivingFeatureRenderer) livingFeatureRenderers[skill] =
+    fun <T : Skill> T.registerRenderer(renderer: IRenderer<T>) {
+        if (renderer is IOverlayRenderer) overlayRenderers[this] = renderer as IOverlayRenderer<Skill>
+        if (renderer is IHudRenderer) hudRenderers[this] = renderer as IHudRenderer<Skill>
+        if (renderer is ICrosshairRenderer) crosshairRenderers[this] = renderer as ICrosshairRenderer<Skill>
+        if (renderer is IEntityRenderer) entityRenderers[this] = renderer as IEntityRenderer<Skill>
+        if (renderer is IPlayerEntityRenderer) playerEntityRenderers[this] = renderer as IPlayerEntityRenderer<Skill>
+        if (renderer is IFeatureRenderer) featureRenderers[this] = renderer as IFeatureRenderer<Skill>
+        if (renderer is ILivingFeatureRenderer) livingFeatureRenderers[this] =
             renderer as ILivingFeatureRenderer<Skill>
-        if (renderer is IPlayerFeatureRenderer) playerFeatureRenderers[skill] =
+        if (renderer is IPlayerFeatureRenderer) playerFeatureRenderers[this] =
             renderer as IPlayerFeatureRenderer<Skill>
-        if (renderer is IWorldRenderer) worldRenderers[skill] = renderer as IWorldRenderer<Skill>
+        if (renderer is IWorldRenderer) worldRenderers[this] = renderer as IWorldRenderer<Skill>
     }
 
     fun renderOverlay(drawContext: DrawContext) = overlayRenderers.forEach { it.value.render(it.key, drawContext) }
@@ -98,22 +99,39 @@ object SkillRendererHandler {
     }
 
     fun register() {
-        registerRenderer(Skills.PRIMARY_FREEZE, PrimaryFreezeSkillRenderer())
-        registerRenderer(Skills.DISGUISE, DisguiseSkillRenderer())
-        registerRenderer(Skills.BLOOD_SEAL, BloodSealSkillRenderer())
-        registerRenderer(Skills.GRAPPLING_HOOK, GrapplingHookSkillRenderer())
-        registerRenderer(Skills.PRIMARY_CONFINEMENT, PrimaryConfinementSkillRenderer())
-        registerRenderer(Skills.CHARGED_SWEEP, SkillAboveHeadRenderer.create())
-        registerRenderer(Skills.DOPING, SkillAboveHeadRenderer.create())
-        registerRenderer(Skills.ITEM_ATTRACTION, SkillAboveHeadRenderer.create())
-        registerRenderer(Skills.METEOR_SHOWER, SkillAboveHeadRenderer.create())
-        registerRenderer(Skills.TAUNT, SkillAboveHeadRenderer.create())
-        registerRenderer(Skills.TIME_REWIND, SkillAboveHeadRenderer.create())
-        registerRenderer(Skills.ABSOLUTE_DEFENSE, SkillAroundRenderer.create())
-        registerRenderer(Skills.ACTIVE_DEFENSE, SkillAroundRenderer.create())
-        registerRenderer(Skills.DAMAGE_ABSORPTION, SkillAroundRenderer.create())
-        registerRenderer(Skills.ORE_PERCEPTION, OrePerceptionSkillRenderer())
-        registerRenderer(Skills.INSIGHTFUL_EYE, InsightfulEyeSkillRenderer())
-        registerRenderer(Skills.SWORD_SOUL_GUARDING, SwordSoulGuardingSkillRenderer())
+        Skills.CHARGED_SWEEP.registerSkillAboveHeadRenderer()
+        Skills.DOPING.registerSkillAboveHeadRenderer()
+        Skills.ITEM_ATTRACTION.registerSkillAboveHeadRenderer()
+        Skills.METEOR_SHOWER.registerSkillAboveHeadRenderer()
+        Skills.TAUNT.registerSkillAboveHeadRenderer()
+        Skills.TIME_REWIND.registerSkillAboveHeadRenderer()
+        Skills.WATER_WALKER.registerSkillAboveHeadRenderer()
+        Skills.WIND_BLADE.registerSkillAboveHeadRenderer()
+        Skills.RETURN.registerSkillAboveHeadRenderer()
+        Skills.LAVA_WALKER.registerSkillAboveHeadRenderer()
+
+        Skills.ABSOLUTE_DEFENSE.registerSkillAroundRenderer()
+        Skills.ACTIVE_DEFENSE.registerSkillAroundRenderer()
+        Skills.DAMAGE_ABSORPTION.registerSkillAroundRenderer()
+        Skills.MICRO_REFLECTION.registerSkillAroundRenderer()
+        Skills.RAPID_REFLECTION.registerSkillAroundRenderer()
+        Skills.EXTREME_REFLECTION.registerSkillAroundRenderer()
+        Skills.PERFECT_REFLECTION.registerSkillAroundRenderer()
+        Skills.NEGATIVE_RESISTANCE.registerSkillAroundRenderer()
+
+        Skills.PRIMARY_FREEZE.registerRenderer(PrimaryFreezeSkillRenderer())
+        Skills.DISGUISE.registerRenderer(DisguiseSkillRenderer())
+        Skills.BLOOD_SEAL.registerRenderer(BloodSealSkillRenderer())
+        Skills.GRAPPLING_HOOK.registerRenderer(GrapplingHookSkillRenderer())
+        Skills.PRIMARY_CONFINEMENT.registerRenderer(PrimaryConfinementSkillRenderer())
+        Skills.ORE_PERCEPTION.registerRenderer(OrePerceptionSkillRenderer())
+        Skills.INSIGHTFUL_EYE.registerRenderer(InsightfulEyeSkillRenderer())
+        Skills.SWORD_SOUL_GUARDING.registerRenderer(SwordSoulGuardingSkillRenderer())
     }
+
+    private fun <T> T.registerSkillAboveHeadRenderer() where T : Skill, T : UsingRenderTrigger =
+        this.registerRenderer(SkillAboveHeadRenderer.create())
+
+    private fun <T> T.registerSkillAroundRenderer() where T : Skill, T : UsingRenderTrigger =
+        this.registerRenderer(SkillAroundRenderer.create())
 }

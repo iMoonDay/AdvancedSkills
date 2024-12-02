@@ -52,7 +52,7 @@ class MultipleLaserSkill : LongPressSkill(
         super.clientTick(player, usedTime)
         if (!player.isUsing()) return
         if (usedTime % 2 != 0) return
-        val start = player.pos.add(0.0, player.height.toDouble() / 2.0, 0.0)
+        val start = player.centerPos
         val length = player.raycastVisualBlock(64.0).pos.distanceTo(start)
         val color = Vector3f(0f, 1f, 0f)
         var offset = 0.1

@@ -110,16 +110,6 @@ advskills_re:
     active: 反弹未结束
     early: 早了 %d 秒
     late: 晚了 %d 秒
-  sort:
-    default: 无排序
-    id: 按 ID 排序
-    id_reverse: 按 ID 排序 (倒序)
-    name: 按 名称 排序
-    name_reverse: 按 名称 排序 (倒序)
-    rarity: 按 稀有度 排序
-    rarity_reverse: 按 稀有度 排序 (倒序)
-    cooldown: 按 冷却时间 排序
-    cooldown_reverse: 按 冷却时间 排序 (倒序)
   skill:
     empty:
       name: 空
@@ -408,6 +398,15 @@ advskills_re:
       name: 回城
       description: 原地不动蓄力，然后回到出生点
       failed: 中断回城
+    portable_chest:
+      name: 随身箱
+      description: 可以随时随地打开末影箱
+    lava_walker:
+      name: 岩浆行者
+      description: 你可以在岩浆上行走，并免疫岩浆块
+    armor_shatterer:
+      name: 破甲者
+      description: 发射一个以80%概率给予周围生物易伤效果的能量球，使其受到的伤害增加
   skillType:
     attack: 攻击
     defense: 防御
@@ -429,6 +428,25 @@ advskills_re:
     legendary: 传奇
     mythic: 神话
     unique: 唯一
+  skillSort:
+    default: 默认
+    id: ID ↑
+    id_reverse: ID ↓
+    name: 名称 ↑
+    name_reverse: 名称 ↓
+    rarity: 稀有度 ↑
+    rarity_reverse: 稀有度 ↓
+    cooldown: 冷却时间 ↑
+    cooldown_reverse: 冷却时间 ↓
+    update_time: 更新时间 ↑
+    update_time_reverse: 更新时间 ↓
+  skillFilter:
+    none: 全部
+    no_cooling: 无冷却
+    long_press: 长按
+    active: 主动释放
+  rarityFilter:
+    none: 全部
   screen:
     gallery:
       title: 技能图鉴
@@ -478,6 +496,7 @@ effect:
     freeze: 冻结
     confinement: 禁锢
     serious_injury: 重伤
+    weakened: 易伤
 entity:
   advskills_re:
     silence_energy_ball: 沉默能量球
@@ -494,6 +513,7 @@ entity:
     clone_player: 玩家
     magnet: 磁石
     ungrounded_arrow: 不可接地的箭
+    weakened_energy_ball: 易伤能量球
 block:
   advskills_re:
     invisible_trap: 隐形陷阱

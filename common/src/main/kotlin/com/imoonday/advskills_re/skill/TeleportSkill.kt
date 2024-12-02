@@ -22,7 +22,7 @@ class TeleportSkill : Skill(
                 return UseResult.fail(message("collide"))
             }
             val velocity = velocity
-            val prevPos = pos
+            val prevPos = centerPos
             requestTeleportOffset(offset.x, offset.y, offset.z)
             this.velocity = velocity
             sendPacket(EntityVelocityUpdateS2CPacket(this))
@@ -39,7 +39,7 @@ class TeleportSkill : Skill(
             user.spawnParticles(
                 ParticleTypes.LARGE_SMOKE,
                 false,
-                prevPos.add(0.0, height / 2.0, 0.0),
+                prevPos,
                 10,
                 width / 2.0,
                 height / 2.0,

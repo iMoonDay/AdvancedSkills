@@ -1,8 +1,11 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
+import net.minecraft.client.util.*
 import net.minecraft.entity.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
@@ -17,7 +20,7 @@ abstract class ReflectionSkill(
     types = types,
     cooldown = cooldown,
     rarity = rarity
-), DamageTrigger, ReflectionTrigger {
+), DamageTrigger, ReflectionTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = duration
 
@@ -40,4 +43,7 @@ abstract class ReflectionSkill(
             )
         }
     }
+
+    override fun getRenderModel(target: PlayerEntity, player: PlayerEntity): ModelIdentifier =
+        Skills.ABSOLUTE_DEFENSE.modelId
 }

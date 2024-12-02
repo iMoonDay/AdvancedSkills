@@ -18,4 +18,9 @@ class UnhinderedStrideSkill : Skill(
 
     override fun getStepHeight(player: PlayerEntity): Float? =
         if (player.isUsing()) player.world.height.toFloat() else null
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
+    }
 }

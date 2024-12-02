@@ -79,7 +79,7 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
 
     protected open fun spawnParticles() {
         (world as? ServerWorld)?.spawnParticles(
-            ParticleTypes.EFFECT,
+            getExplosionParticle(),
             x,
             y,
             z,
@@ -90,6 +90,8 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
             0.0
         )
     }
+
+    protected open fun getExplosionParticle(): ParticleEffect = ParticleTypes.EFFECT
 
     open fun canApply(effect: StatusEffectInstance, chance: Float, target: LivingEntity): Boolean = false
 

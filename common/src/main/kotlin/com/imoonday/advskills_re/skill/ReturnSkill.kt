@@ -1,10 +1,10 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
-import net.minecraft.util.math.*
 
 //TODO 服务器跨维度传送坐标异常
 class ReturnSkill : LongPressSkill(
@@ -13,7 +13,7 @@ class ReturnSkill : LongPressSkill(
     cooldown = 0,
     rarity = Rarity.SUPERB,
     sound = ModSounds.RETURN
-) {
+), UsingRenderTrigger {
 
     override fun onPress(player: ServerPlayerEntity): UseResult {
         player.startUsing {
@@ -27,12 +27,7 @@ class ReturnSkill : LongPressSkill(
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (player.isUsing()) {
-            var usePos: Vec3d? = null
-            player.getUsingData()?.let { data ->
-                NbtUtils.readEntityPositionFromTag(data)?.let { pos ->
-                    usePos = pos
-                }
-            }
+            val usePos = NbtUtils.readEntityPositionFromTag(player.getActiveData())
             if (usePos != player.pos) {
                 player.stopUsing()
                 player.sendMessage(failedMessage(), true)

@@ -43,6 +43,7 @@
     "MeleeAttackGoalMixin",
     "PlayerEntityMixin",
     "ProjectileAttackGoalMixin",
+    "ScreenHandlerAccessor",
     "ServerPlayerEntityMixin",
     "ServerWorldMixin",
     "ShulkerEntity$ShootBulletGoalMixin",

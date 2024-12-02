@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.util
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.text.*
 import java.text.*
@@ -71,13 +72,27 @@ enum class SkillSorter : Comparator<Skill> {
             if (o1 == null || o2 == null) return 0
             return o2.cooldown.compareTo(o1.cooldown)
         }
+    },
+    UPDATE_TIME {
+
+        override fun compare(o1: Skill?, o2: Skill?): Int {
+            if (o1 == null || o2 == null) return 0
+            return Skills.compareIndex(o1, o2)
+        }
+    },
+    UPDATE_TIME_REVERSE {
+
+        override fun compare(o1: Skill?, o2: Skill?): Int {
+            if (o1 == null || o2 == null) return 0
+            return Skills.compareIndex(o2, o1)
+        }
     };
 
-    val displayName: Text = translate("sort.${name.lowercase()}")
+    val displayName: Text = translate("skillSort.${name.lowercase()}")
 
-    fun next(): SkillSorter = SkillSorter.entries[(ordinal + 1) % entries.size]
+    fun next(): SkillSorter = entries[(ordinal + 1) % entries.size]
 
-    fun previous(): SkillSorter = SkillSorter.entries[(ordinal + entries.size - 1) % entries.size]
+    fun previous(): SkillSorter = entries[(ordinal + entries.size - 1) % entries.size]
 
     protected fun isChinese(str: String): Boolean =
         client?.languageManager?.language?.let { it == "zh_cn" } ?: containsChinese(str)

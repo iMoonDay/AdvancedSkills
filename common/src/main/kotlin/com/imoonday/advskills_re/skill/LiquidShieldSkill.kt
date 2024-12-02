@@ -14,12 +14,13 @@ class LiquidShieldSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 60,
     rarity = Rarity.SUPERB,
-    sound = SoundEvents::BLOCK_WATER_AMBIENT
 ), TickTrigger, AutoStopTrigger, FluidMovementTrigger, BreatheInWaterTrigger {
 
     override val persistTime: Int = 15 * 20
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {
+        user.playSound(SoundEvents.BLOCK_WATER_AMBIENT)
+    }
 
     override fun clientTick(player: PlayerEntity, usedTime: Int) {
         if (player.isUsing()

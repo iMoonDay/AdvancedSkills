@@ -1,16 +1,13 @@
 package com.imoonday.advskills_re.util
 
-import com.imoonday.advskills_re.mixin.*
 import com.mojang.blaze3d.systems.*
-import net.minecraft.block.*
 import net.minecraft.client.*
 import net.minecraft.client.gl.*
 import net.minecraft.client.render.*
-import net.minecraft.client.render.block.*
+import net.minecraft.client.texture.*
 import net.minecraft.client.util.math.*
-import net.minecraft.entity.player.*
+import net.minecraft.util.*
 import net.minecraft.util.math.*
-import net.minecraft.world.*
 import org.jetbrains.annotations.*
 import org.joml.*
 import org.lwjgl.opengl.*
@@ -124,6 +121,28 @@ object Renderer3d {
         runner.accept(bb)
 
         setupRender()
+        RenderSystem.setShader(shader)
+        BufferRenderer.drawWithGlobalProgram(bb.end())
+        endRender()
+    }
+
+    private fun useBufferWithTexture(
+        texture: Identifier?,
+        mode: VertexFormat.DrawMode,
+        format: VertexFormat,
+        shader: Supplier<ShaderProgram?>,
+        runner: Consumer<BufferBuilder>,
+    ) {
+        val t = Tessellator.getInstance()
+        val bb = t.buffer
+
+        bb.begin(mode, format)
+
+        runner.accept(bb)
+
+        setupRender()
+        RenderSystem.disableCull()
+        texture?.let { RenderSystem.setShaderTexture(0, it) }
         RenderSystem.setShader(shader)
         BufferRenderer.drawWithGlobalProgram(bb.end())
         endRender()
@@ -735,6 +754,58 @@ object Renderer3d {
         if (blueOverwrite == -1) original.blue else blueOverwrite,
         if (alphaOverwrite == -1) original.alpha else alphaOverwrite
     )
+
+    fun renderSprite(
+        stack: MatrixStack,
+        sprite: Sprite,
+        leftTop: Vec3d,
+        leftBottom: Vec3d,
+        rightBottom: Vec3d,
+        rightTop: Vec3d
+    ) = renderTexturedQuad(
+        stack,
+        sprite.atlasId,
+        leftTop,
+        leftBottom,
+        rightBottom,
+        rightTop,
+        sprite.minU,
+        sprite.minV,
+        sprite.maxU,
+        sprite.maxV
+    )
+
+    fun renderTexturedQuad(
+        stack: MatrixStack,
+        texture: Identifier,
+        leftTop: Vec3d, leftBottom: Vec3d, rightBottom: Vec3d, rightTop: Vec3d,
+        u1: Float, v1: Float, u2: Float, v2: Float,
+    ) {
+        val matrix = stack.peek().positionMatrix
+
+        useBufferWithTexture(
+            texture,
+            VertexFormat.DrawMode.QUADS,
+            VertexFormats.POSITION_TEXTURE,
+            GameRenderer::getPositionTexProgram
+        ) { buffer ->
+            buffer.vertex(matrix, leftTop.x.toFloat(), leftTop.y.toFloat(), leftTop.z.toFloat())
+                .texture(u1, v1)
+                .next()
+
+            buffer.vertex(matrix, leftBottom.x.toFloat(), leftBottom.y.toFloat(), leftBottom.z.toFloat())
+                .texture(u1, v2)
+                .next()
+
+            buffer.vertex(matrix, rightBottom.x.toFloat(), rightBottom.y.toFloat(), rightBottom.z.toFloat())
+                .texture(u2, v2)
+                .next()
+
+            buffer.vertex(matrix, rightTop.x.toFloat(), rightTop.y.toFloat(), rightTop.z.toFloat())
+                .texture(u2, v1)
+                .next()
+        }
+    }
 
     internal fun interface RenderAction {
 

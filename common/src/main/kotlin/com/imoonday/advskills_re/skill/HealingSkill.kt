@@ -4,6 +4,7 @@ import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
+import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import java.util.function.*
@@ -19,6 +20,11 @@ abstract class HealingSkill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.heal(amount)
+        user.spawnParticles(
+            ParticleTypes.HEART,
+            false, user.centerPos, amount.toInt(),
+            0.5, 0.5, 0.5, 0.1
+        )
         return UseResult.success()
     }
 

@@ -127,6 +127,14 @@ object ModEntities {
             .trackingTickInterval(20)
             .register("ungrounded_arrow")
 
+    @JvmField
+    val WEAKENED_ENERGY_BALL: RegistrySupplier<EntityType<WeakenedEnergyBallEntity>> =
+        EntityType.Builder.create(::WeakenedEnergyBallEntity, SpawnGroup.MISC)
+            .setDimensions(1.0f, 1.0f)
+            .maxTrackingRange(4)
+            .trackingTickInterval(10)
+            .register("weakened_energy_ball")
+
     fun <T : Entity> EntityType.Builder<T>.register(name: String): RegistrySupplier<EntityType<T>> =
         ENTITIES.register(name) { this.build(name) }
 

@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.trigger.*
@@ -19,7 +18,7 @@ class WallJumpSkill : PassiveSkill(
     sound = ModSounds.DASH
 ), AutoTrigger, SendPlayerDataTrigger, UsingProgressTrigger, FallTrigger {
 
-    override fun shouldStart(player: ServerPlayerEntity): Boolean = player.properties.getBoolean("jumped")
+    override fun shouldStart(player: ServerPlayerEntity): Boolean = player.getPersistentData().getBoolean("jumped")
 
     override fun shouldStop(player: ServerPlayerEntity): Boolean = player.isOnGround
 
@@ -33,7 +32,7 @@ class WallJumpSkill : PassiveSkill(
             if (colliding) {
                 jump(player)
                 player.playSkillSound()
-                player.properties.putBoolean("wallJumped", true)
+                player.getPersistentData().putBoolean("wallJumped", true)
             } else {
                 player.sendPacket(EntityPositionS2CPacket(player))
                 player.sendPacket(EntityVelocityUpdateS2CPacket(player))
@@ -49,9 +48,9 @@ class WallJumpSkill : PassiveSkill(
     }
 
     override fun onFall(amount: Int, player: ServerPlayerEntity, fallDistance: Float, damageMultiplier: Float): Int {
-        val properties = player.properties
-        return if (properties.getBoolean("wallJumped")) {
-            properties.remove("wallJumped")
+        val data = player.getPersistentData()
+        return if (data.getBoolean("wallJumped")) {
+            data.remove("wallJumped")
             amount / 2
         } else {
             amount
@@ -70,9 +69,6 @@ class WallJumpSkill : PassiveSkill(
         }
         return data
     }
-
-    override fun apply(player: ServerPlayerEntity, data: NbtCompound) =
-        player.properties.putBoolean("jumped", data.getBoolean("jumped"))
 
     override fun getSendTime(): SendTime = SendTime.EQUIPPED
 

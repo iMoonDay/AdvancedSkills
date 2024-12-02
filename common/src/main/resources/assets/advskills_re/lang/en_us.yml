@@ -110,16 +110,6 @@ advskills_re:
     active: Reflection is not finished
     early: '%ds early!'
     late: '%ds late!'
-  sort:
-    default: No Sorting
-    id: Sort by ID
-    id_reverse: Sort by ID (Reverse)
-    name: Sort by Name
-    name_reverse: Sort by Name (Reverse)
-    rarity: Sort by Rarity
-    rarity_reverse: Sort by Rarity (Reverse)
-    cooldown: Sort by Cooldown
-    cooldown_reverse: Sort by Cooldown (Reverse)
   skill:
     empty:
       name: Empty
@@ -408,6 +398,15 @@ advskills_re:
       name: Return
       description: Stay where you are, charge up, and then return to your spawn point
       failed: Return interrupted
+    portable_chest:
+      name: Portable Chest
+      description: Access your Ender Chest from anywhere, anytime
+    lava_walker:
+      name: Lava Walker
+      description: You can walk on lava and are immune to magma blocks
+    armor_shatterer:
+      name: Armor Shatterer
+      description: Fires an energy ball with an 80% probability of making surrounding entities weakened, increasing the damage they receive
   skillType:
     attack: Attack
     defense: Defense
@@ -429,6 +428,25 @@ advskills_re:
     legendary: Legendary
     mythic: Mythic
     unique: Unique
+  skillSort:
+    default: Default
+    id: ID ↑
+    id_reverse: ID ↓
+    name: Name ↑
+    name_reverse: Name ↓
+    rarity: Rarity ↑
+    rarity_reverse: Rarity ↓
+    cooldown: Cooldown ↑
+    cooldown_reverse: Cooldown ↓
+    update_time: Update Time ↑
+    update_time_reverse: Update Time ↓
+  skillFilter:
+    none: All
+    no_cooling: No Cooling
+    long_press: Long Press
+    active: Active
+  rarityFilter:
+    none: All
   screen:
     gallery:
       title: Skill Atlas
@@ -478,6 +496,7 @@ effect:
     freeze: Freeze
     confinement: Confinement
     serious_injury: Serious Injury
+    weakened: Weakened
 entity:
   advskills_re:
     silence_energy_ball: Silence Energy Ball
@@ -494,6 +513,7 @@ entity:
     clone_player: Player
     magnet: Magnet
     ungrounded_arrow: Ungrounded Arrow
+    weakened_energy_ball: Weakened Energy Ball
 block:
   advskills_re:
     invisible_trap: Invisible Trap

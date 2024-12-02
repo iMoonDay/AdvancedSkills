@@ -382,7 +382,7 @@ fun PlayerEntity.startUsing(skill: Skill, data: NbtCompound? = null): Boolean {
     getData(skill)?.apply {
         using = true
         usedTime = 0
-        data?.let { this.data.copyFrom(it) }
+        this.activeData.replaceAll(data)
     }
     syncData()
     return true
@@ -392,7 +392,7 @@ fun PlayerEntity.stopUsing(skill: Skill): Boolean {
     if (skill !in usingSkills) return false
     getData(skill)?.apply {
         using = false
-        data = NbtCompound()
+        activeData.clear()
         SkillTriggerHandler.postStop(this@stopUsing)
     }
     syncData()
@@ -419,7 +419,16 @@ fun PlayerEntity.resetUsedTime(skill: Skill) {
     syncData()
 }
 
-fun PlayerEntity.getUsingData(skill: Skill): NbtCompound? = getData(skill)?.data
+fun PlayerEntity.getActiveData(skill: Skill): NbtCompound? = getData(skill)?.activeData
+
+fun PlayerEntity.getPersistentData(skill: Skill): NbtCompound? = getData(skill)?.persistentData
+
+fun PlayerEntity.clearPersistentData(skill: Skill) {
+    modifySkillData(skill) {
+        it.persistentData.clear()
+        true
+    }
+}
 
 fun PlayerEntity.getData(skill: Skill): SkillData? = skillContainer.getData(skill)
 
@@ -551,13 +560,3 @@ fun ServerPlayerEntity.spawnParticles(
 }
 
 fun ServerPlayerEntity.playSound(sound: SoundEvent) = world.playSound(null, blockPos, sound, SoundCategory.PLAYERS)
-
-fun ServerPlayerEntity.addTask(task: LoopTask): Int = (this as LoopTaskContainer).addTask(task)
-
-fun ServerPlayerEntity.removeTask(id: Int) = (this as LoopTaskContainer).removeTask(id)
-
-fun ServerPlayerEntity.getTask(id: Int): LoopTask? = (this as LoopTaskContainer).getTask(id)
-
-fun ServerPlayerEntity.clearTasks() = (this as LoopTaskContainer).clearTasks()
-
-fun ServerPlayerEntity.getTasks(): List<LoopTask> = (this as LoopTaskContainer).tasks

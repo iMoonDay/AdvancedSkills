@@ -61,7 +61,13 @@ public abstract class LivingEntityMixin extends EntityMixin {
             if (attacker instanceof ServerPlayerEntity player) {
                 newAmount = SkillTriggerHandler.onAttack(newAmount, source, player, target);
             }
-             cir.setReturnValue(newAmount);
+            if (ModEffectsKt.isWeakened(target)) {
+                float multiplier = ModEffectsKt.getWeakenedLevel(target) * 0.25f;
+                if (multiplier > 0.0f) {
+                    newAmount *= 1 + multiplier;
+                }
+            }
+            cir.setReturnValue(newAmount);
         }
     }
 

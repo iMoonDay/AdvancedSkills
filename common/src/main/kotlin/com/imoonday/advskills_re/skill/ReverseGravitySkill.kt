@@ -26,9 +26,9 @@ class ReverseGravitySkill : Skill(
     override val persistTime: Int = 15 * 20
 
     override fun onStop(player: ServerPlayerEntity) {
+        super<AutoStopTrigger>.onStop(player)
         player.startCooling()
         player.pitch = -player.pitch
-        super<AutoStopTrigger>.onStop(player)
     }
 
     override fun postStop(player: PlayerEntity) {
@@ -39,11 +39,11 @@ class ReverseGravitySkill : Skill(
     override fun tick(player: PlayerEntity, usedTime: Int) {
         player.run {
             if (isUsing()) {
-                val usingData = getUsingData()
-                if (usingData?.getBoolean("first") != true) {
+                val data = getActiveData()
+                if (!data.getBoolean("first")) {
                     velocity = velocity.withAxis(Direction.Axis.Y, 0.0)
                     pitch = -pitch
-                    usingData?.putBoolean("first", true)
+                    data.putBoolean("first", true)
                 }
                 if (!abilities.flying) {
                     addVelocity(0.0, 0.15, 0.0)
