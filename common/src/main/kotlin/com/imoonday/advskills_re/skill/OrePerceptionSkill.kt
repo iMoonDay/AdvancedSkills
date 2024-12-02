@@ -21,12 +21,14 @@ class OrePerceptionSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).also { updateOres(user) }
 
-    override val persistTime: Int = 20 * 10
+    override val persistTime: Int = 10 * 20
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (player.isUsing() && usedTime % 5 == 0) {
-            updateOres(player)
+            player.server.execute {
+                updateOres(player)
+            }
         }
     }
 

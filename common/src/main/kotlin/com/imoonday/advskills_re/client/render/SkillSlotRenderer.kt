@@ -27,10 +27,11 @@ object SkillSlotRenderer {
         context: DrawContext,
         layout: Array<IntArray>,
     ) {
+        val config = ClientConfig.get()
         val x =
-            context.scaledWindowWidth - 18 * layout.maxOf { it.size } - ClientConfig.instance.uiOffsetX - 2
+            context.scaledWindowWidth - 18 * layout.maxOf { it.size } - config.uiOffsetX - 2
         val y =
-            context.scaledWindowHeight / 2 - ((layout.size / 2.0) * 18).toInt() + ClientConfig.instance.uiOffsetY - 2
+            context.scaledWindowHeight / 2 - ((layout.size / 2.0) * 18).toInt() + config.uiOffsetY - 2
         context.fill(
             x,
             y,
@@ -46,15 +47,16 @@ object SkillSlotRenderer {
         index: Int,
     ): Pair<Int, Int>? {
         val (x, y) = findPosition(layout, index) ?: return null
+        val config = ClientConfig.get()
         val startX =
-            context.scaledWindowWidth - 18 * (layout.maxOf { it.size } - x + 1) - ClientConfig.instance.uiOffsetX
+            context.scaledWindowWidth - 18 * (layout.maxOf { it.size } - x + 1) - config.uiOffsetX
         val startY =
-            context.scaledWindowHeight / 2 + ((y - 1 - layout.size / 2.0) * 18).toInt() + ClientConfig.instance.uiOffsetY
+            context.scaledWindowHeight / 2 + ((y - 1 - layout.size / 2.0) * 18).toInt() + config.uiOffsetY
         return Pair(startX, startY)
     }
 
     fun getValidLayout(maxIndex: Int): Array<IntArray> =
-        ClientConfig.instance.layout
+        ClientConfig.get().layout
             .map { row ->
                 row.map { if (it !in 0..maxIndex) 0 else it }.toIntArray()
             }

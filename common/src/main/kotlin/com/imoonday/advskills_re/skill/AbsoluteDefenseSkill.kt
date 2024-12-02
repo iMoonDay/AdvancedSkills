@@ -1,17 +1,9 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.playSound
-import net.minecraft.client.render.*
-import net.minecraft.client.render.entity.*
-import net.minecraft.client.render.entity.feature.*
-import net.minecraft.client.render.entity.model.*
-import net.minecraft.client.util.math.*
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
-import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
@@ -22,7 +14,7 @@ class AbsoluteDefenseSkill : Skill(
     rarity = Rarity.SUPERB
 ), DamageTrigger, AutoStopTrigger, FeatureRendererTrigger {
 
-    override val persistTime = 20 * 30
+    override val persistTime = 30 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 

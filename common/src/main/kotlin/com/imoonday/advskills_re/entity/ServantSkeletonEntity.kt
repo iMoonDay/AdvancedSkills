@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.entity
 
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.trigger.*
 import net.minecraft.entity.*
 import net.minecraft.entity.ai.goal.*
@@ -25,7 +24,7 @@ class ServantSkeletonEntity(
 
     constructor(world: World, owner: PlayerEntity) : this(ModEntities.SERVANT_SKELETON.get(), world) {
         ownerUuid = owner.uuid
-        customName = Skills.UNDEAD_SUMMONING.message("customName", owner.displayName.string)
+        customName = Skills.UNDEAD_SUMMONING.message("customName", owner.displayName)
         equipStack(EquipmentSlot.MAINHAND, ItemStack(Items.BOW))
         refreshPositionAndAngles(owner.x, owner.y, owner.z, owner.yaw, owner.pitch)
     }
@@ -89,7 +88,7 @@ class ServantSkeletonEntity(
     }
 
     override fun tick() {
-        if (!world.isClient && (ownerUuid == null || age > 20 * 60)) {
+        if (!world.isClient && (ownerUuid == null || age > 60 * 20)) {
             kill()
         }
         super.tick()

@@ -21,14 +21,14 @@ object ListCommand : PlayerCommand("list") {
 
         val size = skills.size
         if (skills.isNotEmpty()) {
-            var text = Text.empty()
-            skills.forEachIndexed { i, skill ->
-                text = text.append(skill.getNameWithHoverEvent(context.source.world))
-                if (i != size - 1) {
-                    text = text.append(", ")
-                }
-            }
+            val text = skills.toText(
+                formatter = { it.hoverableName },
+                prefix = "[".toText(),
+                suffix = "]".toText()
+            )
             context.sendMessage(text)
+        } else {
+            context.sendMessage(translate("screen.list.empty"))
         }
         return size
     }

@@ -2,8 +2,8 @@ package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.client.screen.*
 import com.imoonday.advskills_re.config.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.c2s.*
-import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import dev.architectury.event.events.client.*
 import dev.architectury.registry.client.keymappings.*
@@ -21,11 +21,10 @@ object ModKeyBindings {
     @JvmField
     val OPEN_LIST_SCREEN = register("openListScreen", GLFW.GLFW_KEY_K, false) { client, _ ->
         val player = client.player!!
-        val listScreen = SkillListScreen(player)
         client.setScreen(
             if (!player.learnableData.isEmpty() && SkillLearningScreen.new)
-                SkillLearningScreen(player) { listScreen }
-            else listScreen
+                SkillLearningScreen(player) { SkillListScreen(player) }
+            else SkillListScreen(player)
         )
     }
 
@@ -43,13 +42,13 @@ object ModKeyBindings {
     val QUICK_CAST = registerWithDoubleTrigger(
         "quickCast",
         GLFW.GLFW_KEY_R,
-        { ClientConfig.instance.quickCastWheelHoldTime },
+        { ClientConfig.get().quickCastWheelHoldTime },
         firstTriggerCallback = { client, _ ->
             val slot = SkillWheelScreen.quickCastSlot
             slot != null && client.player?.getSkill(slot)?.isEmpty() != true
         },
         secondTriggerCallback = { client, _ ->
-            if (!isUsingQuickCast) {
+            if (!isUsingQuickCast && client.currentScreen == null) {
                 isUsingQuickCast = true
                 client.setScreen(SkillWheelScreen())
             }

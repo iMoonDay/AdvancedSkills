@@ -2,16 +2,20 @@ package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.trigger.*
 import dev.architectury.event.*
 import dev.architectury.event.events.common.*
 import net.minecraft.block.*
+import net.minecraft.enchantment.*
 import net.minecraft.loot.*
 import net.minecraft.loot.condition.*
 import net.minecraft.loot.entry.*
+import net.minecraft.loot.function.*
 import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 
@@ -39,20 +43,17 @@ object EventHandler {
             newPlayer.syncProperties()
         }
         AllowDeathEvent.EVENT.register { player, source, amount ->
-            player.getTriggers<DeathTrigger>()
-                .all { it.allowDeath(player, source, amount) }
+            player.allTriggers<DeathTrigger> { it.allowDeath(player, source, amount) }
         }
         EntityEvent.LIVING_DEATH.register { entity, source ->
             if (entity is ServerPlayerEntity) {
-                entity.getTriggers<DeathTrigger>()
-                    .forEach { it.onDeath(entity, source) }
+                entity.forEachTrigger<DeathTrigger> { it.onDeath(entity, source) }
             }
             EventResult.pass()
         }
         PlayerEvent.PLAYER_RESPAWN.register { player, _ ->
             player.usingSkills.forEach { player.stopUsing(it) }
-            player.getTriggers<RespawnTrigger>()
-                .forEach { it.afterRespawn(player) }
+            player.forEachTrigger<RespawnTrigger> { it.afterRespawn(player) }
         }
         PlayerEvent.ATTACK_ENTITY.register { player, _, _, _, _ ->
             if (player.isDisarmed) EventResult.interruptFalse()
@@ -63,35 +64,60 @@ object EventHandler {
             if (player.isDisarmed) CompoundEventResult.interruptFalse(stack)
             else CompoundEventResult.pass()
         }
-        val lootTables = mapOf(
+        registerLootTables()
+        PlayerEvent.PLAYER_JOIN.register {
+            Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(SkillConfig.get().save(NbtCompound())))
+        }
+        LifecycleEvent.SERVER_STARTED.register {
+            SkillConfig.get().connectToServer(it)
+        }
+        LifecycleEvent.SERVER_STOPPING.register {
+            SkillConfig.get().markDirty()
+        }
+        LifecycleEvent.SERVER_STOPPED.register {
+            SkillConfig.get().disconnect()
+        }
+    }
+
+    private fun registerLootTables() {
+        val blockLootTables = mapOf(
             Blocks.OAK_LEAVES.lootTableId to 0.005f,
-            Blocks.DARK_OAK_LEAVES.lootTableId to 0.005f,
-            LootTables.FISHING_TREASURE_GAMEPLAY to 0.1f,
+            Blocks.DARK_OAK_LEAVES.lootTableId to 0.005f
+        )
+        val fishingLootTables = listOf(
+            LootTables.FISHING_TREASURE_GAMEPLAY
+        )
+        val chestLootTables = mapOf(
             LootTables.ANCIENT_CITY_CHEST to 0.25f,
             LootTables.BURIED_TREASURE_CHEST to 0.25f,
-            LootTables.END_CITY_TREASURE_CHEST to 0.25f
+            LootTables.END_CITY_TREASURE_CHEST to 0.25f,
+            LootTables.SPAWN_BONUS_CHEST to 1f
         )
-        val pool = {
-            LootPool.builder()
-                .with(ItemEntry.builder(ModItems.COMMON_SKILL_FRUIT.get()).weight(256))
-                .with(ItemEntry.builder(ModItems.UNCOMMON_SKILL_FRUIT.get()).weight(128))
-                .with(ItemEntry.builder(ModItems.RARE_SKILL_FRUIT.get()).weight(32))
-                .with(ItemEntry.builder(ModItems.SUPERB_SKILL_FRUIT.get()).weight(16))
-                .with(ItemEntry.builder(ModItems.EPIC_SKILL_FRUIT.get()).weight(8))
-                .with(ItemEntry.builder(ModItems.LEGENDARY_SKILL_FRUIT.get()).weight(4))
-                .with(ItemEntry.builder(ModItems.MYTHIC_SKILL_FRUIT.get()).weight(2))
-                .with(ItemEntry.builder(ModItems.UNIQUE_SKILL_FRUIT.get()).weight(1))
-        }
-        LootEvent.MODIFY_LOOT_TABLE.register { _, identifier, context, builtin ->
-            if (identifier in lootTables.keys && builtin) {
-                context.addPool(
-                    pool().conditionally(RandomChanceLootCondition.builder(lootTables[identifier]!!))
-                        .build()
-                )
+        val builder = {
+            var builder = LootPool.builder()
+            ModItems.FRUITS.forEach {
+                val item = it.get()
+                builder = builder.with(ItemEntry.builder(item).weight(item.rarity.weight))
             }
+            builder
         }
-        PlayerEvent.PLAYER_JOIN.register {
-            Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(it.server.skillConfig.toTag(NbtCompound())))
+        LootEvent.MODIFY_LOOT_TABLE.register { _, id, context, builtin ->
+            if (builtin) {
+                when {
+                    blockLootTables.containsKey(id) -> context.addPool(
+                        builder().apply(ApplyBonusLootFunction.uniformBonusCount(Enchantments.FORTUNE))
+                            .conditionally(SurvivesExplosionLootCondition.builder())
+                            .conditionally(BlockLootTableGeneratorAccessor.getWithoutSilkTouchNorShearsBuilder())
+                            .conditionally(RandomChanceLootCondition.builder(blockLootTables[id]!!))
+                    )
+
+                    fishingLootTables.contains(id) -> context.addPool(builder())
+
+                    chestLootTables.containsKey(id) -> context.addPool(
+                        builder().conditionally(RandomChanceLootCondition.builder(chestLootTables[id]!!))
+                    )
+                }
+            }
         }
     }
 }

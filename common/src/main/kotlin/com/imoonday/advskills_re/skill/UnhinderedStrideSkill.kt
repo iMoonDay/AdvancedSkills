@@ -12,7 +12,7 @@ class UnhinderedStrideSkill : Skill(
     rarity = Rarity.SUPERB
 ), StepHeightTrigger, AutoStopTrigger {
 
-    override val persistTime: Int = 20 * 10
+    override val persistTime: Int = 10 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 

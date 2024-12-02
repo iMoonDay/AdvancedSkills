@@ -1,9 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.toBlockPos
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.fluid.*
 import net.minecraft.registry.tag.*
@@ -18,7 +16,7 @@ class WaterWalkerSkill : Skill(
     sound = SoundEvents::BLOCK_WATER_AMBIENT
 ), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger {
 
-    override val persistTime: Int = 20 * 15
+    override val persistTime: Int = 15 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 

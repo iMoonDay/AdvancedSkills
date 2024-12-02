@@ -20,6 +20,12 @@ data class SkillLevelData(
         this.cycle = data.cycle
     }
 
+    fun reset() {
+        this.experience = 0
+        this.level = 0
+        this.cycle = 0
+    }
+
     companion object {
 
         fun fromNbt(nbt: NbtCompound): SkillLevelData = SkillLevelData(

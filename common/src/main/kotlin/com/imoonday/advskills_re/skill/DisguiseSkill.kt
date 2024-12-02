@@ -14,7 +14,7 @@ class DisguiseSkill : Skill(
     rarity = Rarity.EPIC
 ), DisguiseTrigger, UseInterruptTrigger, AutoStopTrigger {
 
-    override val persistTime: Int = 20 * 30
+    override val persistTime: Int = 30 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 

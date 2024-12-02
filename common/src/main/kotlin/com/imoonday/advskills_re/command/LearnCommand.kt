@@ -23,7 +23,7 @@ object LearnCommand : PlayerCommand("learn") {
         if (!player.learn(skill)) {
             context.sendFeedback(
                 "learnSkill.failed",
-                player.displayName.string,
+                player.displayName,
                 skill.name
             )
         }

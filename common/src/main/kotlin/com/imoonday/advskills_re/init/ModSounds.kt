@@ -35,6 +35,9 @@ object ModSounds {
     @JvmStatic
     val LASER = register("laser")
 
+    @JvmStatic
+    val RETURN = register("return")
+
     fun init() = SOUNDS.register()
 
     fun register(name: String): RegistrySupplier<SoundEvent> = SOUNDS.register(name) { SoundEvent.of(id(name)) }

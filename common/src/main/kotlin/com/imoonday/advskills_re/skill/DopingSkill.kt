@@ -1,9 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillSlot
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.server.network.*
 import kotlin.math.*
@@ -32,7 +30,7 @@ class DopingSkill : Skill(
         return result
     }
 
-    override val persistTime: Int = 20 * 10
+    override val persistTime: Int = 10 * 20
 
     override fun onStop(player: ServerPlayerEntity) {
         player.removeAttributes()

@@ -1,10 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.blockPosSet
-import com.imoonday.advskills_re.util.spawnParticles
+import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
@@ -20,7 +17,7 @@ class AbsoluteDomainSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override val persistTime: Int = 20 * 3
+    override val persistTime: Int = 3 * 20
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)

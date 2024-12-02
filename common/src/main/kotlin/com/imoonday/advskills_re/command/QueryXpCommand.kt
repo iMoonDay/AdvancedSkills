@@ -21,7 +21,7 @@ object QueryXpCommand : XpCommand("query") {
         val target = getPlayer(context)
         val exp = target.skillExp
 
-        context.sendMessage(translate("skillExp.query", target.displayName.string, exp))
+        context.sendMessage(translate("skillExp.query", target.displayName, exp))
         return 1
     }
 
@@ -29,7 +29,7 @@ object QueryXpCommand : XpCommand("query") {
         val target = getPlayer(context)
         val level = target.skillLevel
 
-        context.sendMessage(translate("skillLevel.query", target.displayName.string, level))
+        context.sendMessage(translate("skillLevel.query", target.displayName, level))
         return 1
     }
 

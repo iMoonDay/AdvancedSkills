@@ -27,7 +27,7 @@ class PrimaryPurificationSkill : Skill(
             return UseResult.success(
                 message(
                     "success",
-                    Text.translatable(it.translationKey).string,
+                    Text.translatable(it.translationKey),
                     amount
                 )
             )

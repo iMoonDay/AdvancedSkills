@@ -1,24 +1,21 @@
 package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.config.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
+import com.mojang.logging.*
 import net.minecraft.nbt.*
-import net.minecraft.world.*
+import org.slf4j.*
 
-class SkillContainer private constructor(
-    private val skills: MutableMap<Skill, SkillData>,
-    private val slots: MutableMap<Int, SkillSlot>,
-    var selectedSlotIndex: Int = 1,
+class SkillContainer(
+    private val skills: LinkedHashMap<Skill, SkillData> = linkedMapOf(),
+    private val slots: MutableMap<Int, SkillSlot> = createDefaultSlots(),
 ) {
 
     val skillSize: Int
         get() = skills.size
     val slotSize: Int
         get() = slots.size
-    val selectedSlot: SkillSlot?
-        get() = slots[selectedSlotIndex]
-    val selectedSkill: Skill?
-        get() = selectedSlot?.skill
 
     init {
         checkContinuous()
@@ -27,16 +24,15 @@ class SkillContainer private constructor(
         }
     }
 
-    fun getAllSkills(world: World? = null, predicate: (Skill, SkillData) -> Boolean = { _, _ -> true }) =
-        skills.filterNot { it.key.isInvalid(world) }.filter { predicate(it.key, it.value) }.keys
+    fun getAllSkills(predicate: (Skill, SkillData) -> Boolean = { _, _ -> true }): Set<Skill> =
+        skills.filterNot { it.key.invalid }.filter { predicate(it.key, it.value) }.keys
 
     fun learn(
-        world: World? = null,
         skill: Skill,
         data: SkillData = SkillData(),
         resultCallback: (Boolean) -> Unit = {}
     ): Boolean =
-        if (skills.containsKey(skill) || skill.isInvalid(world)) {
+        if (skills.containsKey(skill) || skill.invalid) {
             resultCallback(false)
             false
         } else {
@@ -45,8 +41,8 @@ class SkillContainer private constructor(
             true
         }
 
-    fun learnAll(world: World? = null, callback: (skill: Skill) -> Unit = {}) {
-        Skills.getLearnableSkills(world, skills.keys).forEach {
+    fun learnAll(callback: (skill: Skill) -> Unit = {}) {
+        Skills.getLearnableSkills(skills.keys).forEach {
             skills[it] = SkillData()
             callback(it)
         }
@@ -152,9 +148,9 @@ class SkillContainer private constructor(
         return null
     }
 
-    fun resetSlots(world: World) {
+    fun resetSlots() {
         slots.clear()
-        slots.putAll(createDefaultSlots(world))
+        slots.putAll(createDefaultSlots())
     }
 
     private fun checkContinuous() {
@@ -172,9 +168,11 @@ class SkillContainer private constructor(
     }
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
-        put("skills", NbtCompound().apply {
+        put("skills", NbtList().apply {
             skills.map { (skill, data) ->
-                put(skill.id.toString(), data.toNbt())
+                add(data.toNbt().apply {
+                    putString("id", skill.id.toString())
+                })
             }
         })
         put("slots", slots.values.map { it.toNbt() }.toNbtCompoundList())
@@ -182,6 +180,7 @@ class SkillContainer private constructor(
 
     companion object {
 
+        private val LOGGER: Logger = LogUtils.getLogger()
         const val MAX_SLOT_SIZE = 10
 
         @JvmStatic
@@ -191,14 +190,19 @@ class SkillContainer private constructor(
             "passive" to 2,
         )
 
-        fun create(world: World? = null) = SkillContainer(mutableMapOf(), createDefaultSlots(world))
-
         fun fromNbt(tag: NbtCompound): SkillContainer {
-            val skills = tag.getCompound("skills").keys.mapNotNull {
-                val skill = Skills.fromIdNullable(it) ?: return@mapNotNull null
-                val data = SkillData.fromNbt(tag.getCompound("skills").getCompound(it))
-                Pair(skill, data)
-            }.associate { it }.toMutableMap()
+            val skills = linkedMapOf<Skill, SkillData>()
+            if (tag.contains("skills", NbtElement.LIST_TYPE.toInt())) {
+                tag.getList("skills", NbtElement.COMPOUND_TYPE.toInt()).forEach {
+                    it as NbtCompound
+                    val id = it.getString("id")
+                    Skills.fromIdNullable(id)?.let { skill ->
+                        skills[skill] = SkillData.fromNbt(it)
+                    } ?: run {
+                        LOGGER.warn("Found invalid skill id $id while reading skills from NBT")
+                    }
+                }
+            }
             val slots = if (tag.contains("slots", NbtElement.LIST_TYPE.toInt())) tag.getList(
                 "slots",
                 NbtElement.COMPOUND_TYPE.toInt()
@@ -209,10 +213,10 @@ class SkillContainer private constructor(
             return SkillContainer(skills, slots)
         }
 
-        fun createDefaultSlots(world: World? = null): MutableMap<Int, SkillSlot> =
+        fun createDefaultSlots(): MutableMap<Int, SkillSlot> =
             mutableMapOf<Int, SkillSlot>().apply {
                 var index = 1
-                val slots = (world?.skillConfig ?: SkillConfig.instance).defaultSkillSlots
+                val slots = SkillConfig.get().defaultSkillSlots
                 slots["active"]?.takeIf { it > 0 }?.let {
                     repeat(it) {
                         put(index, SkillSlot.Active(index))

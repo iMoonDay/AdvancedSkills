@@ -16,7 +16,7 @@ class SuperShadowCloneSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         spawnClones(user, 8)
-        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, 20 * 5, 0, true, false, true))
+        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, 5 * 20, 0, true, false, true))
         return UseResult.success()
     }
 
@@ -45,7 +45,7 @@ class SuperShadowCloneSkill : Skill(
     private fun createCloneEntity(player: ServerPlayerEntity, horizontalRotation: Vec3d): ClonePlayerEntity {
         return ClonePlayerEntity(player.world, player).apply {
             moveVelocity = horizontalRotation * (player.velocity.length() * 2.0).coerceAtMost(1.0)
-            moveTime = 20 * 5
+            moveTime = 5 * 20
             if (player.velocity.y > 0) {
                 jumpControl.setActive()
                 setJumping(true)

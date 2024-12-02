@@ -44,5 +44,5 @@ object Channels {
         T::class.java,
         { packet, buf -> packet.encode(buf) },
         decoder
-    ) { packet, ctx -> packet.apply(ctx.get()) }
+    ) { packet, ctx -> ctx.get().run { queue { packet.apply(this) } } }
 }

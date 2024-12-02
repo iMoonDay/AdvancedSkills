@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.entity
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
 import net.minecraft.entity.*
@@ -27,7 +26,7 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
         equipHorseArmor(owner, Items.DIAMOND_HORSE_ARMOR.defaultStack)
         setEquipmentDropChance(EquipmentSlot.CHEST, 0.0f)
         updateSaddle()
-        customName = Skills.EXCLUSIVE_MOUNT.message("customName", owner.displayName.string)
+        customName = Skills.EXCLUSIVE_MOUNT.message("customName", owner.displayName)
     }
 
     override fun method_48926(): EntityView = world
@@ -63,7 +62,7 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
                         blockPos.x,
                         blockPos.y,
                         blockPos.z,
-                        attacker.displayName.string
+                        attacker.displayName
                     )
                 }
             )

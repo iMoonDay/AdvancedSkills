@@ -1,18 +1,11 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
-import net.minecraft.client.render.*
-import net.minecraft.client.util.math.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 import net.minecraft.util.hit.*
-import net.minecraft.util.math.*
-import net.minecraft.world.*
-import org.joml.Matrix4f
-import java.lang.Math
 import kotlin.math.*
 
 class GrapplingHookSkill : LongPressSkill(
@@ -22,7 +15,7 @@ class GrapplingHookSkill : LongPressSkill(
     rarity = Rarity.EPIC
 ), FeatureRendererTrigger, WorldRendererTrigger, CrosshairTrigger {
 
-    override fun getMaxPressTime(): Int = 20 * 3
+    override fun getMaxPressTime(): Int = 3 * 20
 
     private val maxDistance = 30.0
 

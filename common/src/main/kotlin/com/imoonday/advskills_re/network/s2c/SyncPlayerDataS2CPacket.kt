@@ -21,8 +21,7 @@ class SyncPlayerDataS2CPacket(
     }
 
     override fun apply(context: NetworkManager.PacketContext) {
-        if (context.env == EnvType.CLIENT) {
-            (clientPlayer?.world?.getEntityById(playerId) as? PlayerEntity)?.data?.applySyncNbt(playerData)
-        }
+        if (context.env != EnvType.CLIENT) return
+        (clientPlayer?.world?.getEntityById(playerId) as? PlayerEntity)?.data?.applySyncNbt(playerData)
     }
 }

@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.command
 
-import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.*
 import com.imoonday.advskills_re.util.SkillContainer.Companion.MAX_SLOT_SIZE
 import com.mojang.brigadier.arguments.*
@@ -27,7 +27,7 @@ object UnequipCommand : PlayerCommand("unequip") {
         return if (player.equip(Skills.EMPTY, slot)) {
             context.sendFeedback(
                 "unequipSkill.success",
-                player.displayName.string,
+                player.displayName,
                 original.name,
                 slot
             )
@@ -35,7 +35,7 @@ object UnequipCommand : PlayerCommand("unequip") {
         } else {
             context.sendFeedback(
                 "unequipSkill.failed",
-                player.displayName.string,
+                player.displayName,
                 slot
             )
             0

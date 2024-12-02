@@ -9,7 +9,7 @@ class SlownessEnergyBallEntity(entityType: EntityType<out SlownessEnergyBallEnti
     EffectEnergyBallEntity(entityType, world) {
 
     override var effects = mutableMapOf(
-        StatusEffectInstance(StatusEffects.SLOWNESS, 20 * 8, 1) to 0.5f,
+        StatusEffectInstance(StatusEffects.SLOWNESS, 8 * 20, 1) to 0.5f,
     )
     override var range: Double = 5.0
 

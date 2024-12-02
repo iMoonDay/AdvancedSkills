@@ -1,19 +1,18 @@
-package com.imoonday.advskills_re.skill
+package com.imoonday.advskills_re.init
 
 import com.imoonday.advskills_re.init.ModItems.ITEMS
 import com.imoonday.advskills_re.item.*
+import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import net.minecraft.util.*
-import net.minecraft.world.*
 import org.slf4j.*
 
 object Skills {
 
-    private val logger: Logger = LogUtils.getLogger()
-    private val skills = mutableSetOf<Skill>()
-    val triggers: MutableMap<Class<out SkillTrigger>, List<SkillTrigger>> = mutableMapOf()
+    private val LOGGER: Logger = LogUtils.getLogger()
+    private val skills = linkedMapOf<Identifier, Skill>()
 
     @JvmField
     val EMPTY = register(EmptySkill())
@@ -270,54 +269,45 @@ object Skills {
     @JvmField
     val WALL_JUMP = register(WallJumpSkill())
 
+    @JvmField
+    val RETURN = register(ReturnSkill())
+
     fun init() = Unit
 
     fun <T : Skill> register(skill: T): T {
-        if (skill in skills) {
-            logger.warn("Skill ${skill.id} is already registered")
+        if (skill.id in skills.keys || skill in skills.values) {
+            LOGGER.warn("Skill ${skill.id} is already registered")
             return skill
         }
-        if (!skill.isEmpty()) {
-            ITEMS.register(skill.id.path) { SkillItem(skill) }
-            println("Registered skill item for ${skill.id}")
-        }
-        skills.add(skill)
+        if (!skill.isEmpty()) ITEMS.register(skill.id.path) { SkillItem(skill) }
+        skills[skill.id] = skill
         return skill
     }
 
-    fun getSkills() = skills.toList()
+    fun getSkills(): List<Skill> = skills.values.filterNot { it.isEmpty() }
 
-    fun getSkillsNotEmpty() = skills.filterNot { it.isEmpty() }
+    fun getValidSkills(): List<Skill> = skills.values.filterNot { it.invalid }
 
-    fun getValidSkills(world: World? = null) = skills.filterNot { it.isInvalid(world) }
+    fun fromId(id: Identifier): Skill = skills.getOrDefault(id, EMPTY)
 
-    fun fromId(id: Identifier?) = skills.find { it.id == id } ?: EMPTY
+    fun fromId(id: String): Skill = id.toIdentifier()?.let { fromId(it) } ?: EMPTY
 
-    fun fromId(id: String?) = skills.find { it.id == id?.toIdentifier() } ?: EMPTY
+    fun fromIdNullable(id: Identifier?): Skill? = skills[id]
 
-    fun fromIdNullable(id: Identifier?) = skills.find { it.id == id }
+    fun fromIdNullable(id: String?): Skill? = fromIdNullable(id?.toIdentifier())
 
-    fun fromIdNullable(id: String?) = skills.find { it.id == Identifier.tryParse(id) }
-
-    inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> {
-        val triggers = (triggers[T::class.java]?.filterIsInstance<T>() ?: getSkills().filterIsInstance<T>().also {
-            triggers[T::class.java] = it
-        })
-        return triggers.filter(predicate)
-    }
+    inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> =
+        getSkills().filterIsInstance<T>().filter(predicate)
 
     fun getLearnableSkills(
-        world: World? = null,
         except: Collection<Skill> = emptyList(),
         filter: (Skill) -> Boolean = { true },
-    ): List<Skill> = getValidSkills(world)
+    ): List<Skill> = getValidSkills()
         .filterNot { it in except }
         .filter(filter)
 
     fun random(
-        world: World? = null,
         except: Collection<Skill> = emptyList(),
         filter: (Skill) -> Boolean = { true }
-    ): Skill =
-        getLearnableSkills(world, except, filter).randomOrNull() ?: EMPTY
+    ): Skill = getLearnableSkills(except, filter).randomByWeight(Skill::weight, EMPTY)
 }

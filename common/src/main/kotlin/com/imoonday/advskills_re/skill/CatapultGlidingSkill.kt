@@ -1,9 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.sendPacket
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.item.*
 import net.minecraft.network.packet.s2c.play.*
@@ -18,7 +16,7 @@ class CatapultGlidingSkill : LongPressSkill(
     sound = ModSounds.DASH
 ) {
 
-    override fun getMaxPressTime(): Int = 20 * 3
+    override fun getMaxPressTime(): Int = 3 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult =
         if (!canUse(user)) failedResult() else if (user.isFallFlying) fallFlyingResult() else super.use(user)

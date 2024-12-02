@@ -23,7 +23,7 @@ class ChargedDashSkill : LongPressSkill(
         )
     )
 
-    override fun getMaxPressTime(): Int = 20 * 3
+    override fun getMaxPressTime(): Int = 3 * 20
 
     override fun onPress(player: ServerPlayerEntity): UseResult {
         player.addAttributes()

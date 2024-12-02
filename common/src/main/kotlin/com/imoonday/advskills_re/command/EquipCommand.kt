@@ -29,7 +29,7 @@ object EquipCommand : PlayerCommand("equip") {
         return if (player.equip(skill, slot)) {
             context.sendFeedback(
                 "equipSkill.success",
-                player.displayName.string,
+                player.displayName,
                 skill.name,
                 slot
             )
@@ -37,7 +37,7 @@ object EquipCommand : PlayerCommand("equip") {
         } else {
             context.sendFeedback(
                 "equipSkill.failed",
-                player.displayName.string,
+                player.displayName,
                 skill.name,
                 slot
             )

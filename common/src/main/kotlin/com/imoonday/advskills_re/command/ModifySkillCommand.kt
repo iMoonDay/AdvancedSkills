@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.command
 
+import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
@@ -49,12 +50,12 @@ object ModifySkillCommand : BaseCommand("modify") {
                         )
                         .then(literal("reset").executes(::resetTime))
                 )
-        )
+        ).then(literal("reset").executes(::resetAll))
 
     private fun setTime(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
         val seconds = IntegerArgumentType.getInteger(context, "seconds")
-        context.skillConfig.getOrCreateModifier(skill.id).time = seconds * 20
+        SkillConfig.get().getOrCreateModifier(skill.id).time = seconds * 20
         context.syncConfig()
         context.sendFeedback(
             "time.set",
@@ -67,7 +68,7 @@ object ModifySkillCommand : BaseCommand("modify") {
     private fun resetTime(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
         val id = skill.id
-        val config = context.skillConfig
+        val config = SkillConfig.get()
         config.getModifier(id)?.run {
             time = null
             if (isEmpty) {
@@ -85,7 +86,7 @@ object ModifySkillCommand : BaseCommand("modify") {
     private fun resetRarity(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
         val id = skill.id
-        val config = context.skillConfig
+        val config = SkillConfig.get()
         config.getModifier(id)?.run {
             rarity = null
             if (isEmpty) {
@@ -111,7 +112,7 @@ object ModifySkillCommand : BaseCommand("modify") {
             )
             0
         } else {
-            context.skillConfig.getOrCreateModifier(skill.id).rarity = rarity
+            SkillConfig.get().getOrCreateModifier(skill.id).rarity = rarity
             context.syncConfig()
             context.sendFeedback(
                 "rarity.set",
@@ -133,7 +134,7 @@ object ModifySkillCommand : BaseCommand("modify") {
     private fun resetCooldown(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
         val id = skill.id
-        val config = context.skillConfig
+        val config = SkillConfig.get()
         config.getModifier(id)?.run {
             cooldown = null
             if (isEmpty) {
@@ -151,13 +152,21 @@ object ModifySkillCommand : BaseCommand("modify") {
     private fun setCooldown(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
         val seconds = IntegerArgumentType.getInteger(context, "seconds")
-        context.skillConfig.getOrCreateModifier(skill.id).cooldown = seconds * 20
+        SkillConfig.get().getOrCreateModifier(skill.id).cooldown = seconds * 20
         context.syncConfig()
         context.sendFeedback(
             "cooldown.set",
             skill.name,
             seconds
         )
+        return 1
+    }
+
+    private fun resetAll(context: CommandContext<ServerCommandSource>): Int {
+        val config = SkillConfig.get()
+        config.skillModifier.clear()
+        context.syncConfig()
+        context.sendFeedback("resetModifiers")
         return 1
     }
 

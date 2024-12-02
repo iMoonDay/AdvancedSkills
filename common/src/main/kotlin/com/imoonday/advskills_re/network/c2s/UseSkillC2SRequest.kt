@@ -33,7 +33,7 @@ class UseSkillC2SRequest(
             (skill as? SendPlayerDataTrigger)
                 ?.takeIf { it.getSendTime().isOnUse }
                 ?.apply(player, data)
-            context.queue { skill.tryUse(player, keyState) }
+            skill.tryUse(player, keyState)
         }
     }
 

@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.screen.component.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import com.imoonday.advskills_re.util.SkillSlot.Companion.indexTexture
@@ -20,6 +21,7 @@ class SkillListScreen(
     val player: PlayerEntity,
 ) : Screen(Text.empty()), AutoSyncedScreen {
 
+    private var showCreativeButtons = false
     var selectedSkill: Skill? = null
     var selectedSlot: Int? = null
     private val selectedSlotSkill: Skill?
@@ -32,9 +34,10 @@ class SkillListScreen(
 
     override fun init() {
         super.init()
+        showCreativeButtons = player.isCreative && player.hasPermissionLevel(4)
         addSkillScroll()
         addSkillSlots()
-        if (player.isCreative && player.hasPermissionLevel(4)) {
+        if (showCreativeButtons) {
             val learnAllButton = createButton(
                 5, height - 25,
                 translate("screen.list.button.learnAll"),
@@ -81,8 +84,8 @@ class SkillListScreen(
     private fun addSkillScroll() {
         skillScroll = SkillContainerWidget(
             client!!, 0, 30,
-            width / 2, height - 60, 40,
-            player::learnedSkills,
+            width / 2, getBottomY(), 40,
+            { player.learnedSkills },
             ::renderSkillLine
         ).apply { onClick = ::handleSelectionButton }.also(::addDrawableChild)
     }
@@ -145,12 +148,12 @@ class SkillListScreen(
         SkillRenderer.renderIcon(skill, context, currentX, y + (height - 16) / 2)
 
         currentX += 16 + gap
-        val name = skill.getFormattedName(player.world)
+        val name = skill.formattedName
         val titleY = y + height / 2 - textRenderer.fontHeight - 1
         context.drawText(textRenderer, name, currentX, titleY, 0xFFFFFF, false)
         context.drawText(
             textRenderer,
-            Text.literal("(").append(skill.getCooldownSeconds()).append(")"),
+            "(".toText().append(skill.cooldownText).append(")"),
             currentX + textRenderer.getWidth(name) + gap,
             titleY,
             0xBDBDBD,
@@ -193,7 +196,7 @@ class SkillListScreen(
         val totalColumns = (container.slotSize / 2 + if (container.slotSize % 2 == 0) 0 else 1).coerceAtLeast(1)
         val totalRows = if (container.slotSize > 1) 2 else 1
         val centerX = width / 2
-        val bottomY = height - 60
+        val bottomY = getBottomY()
         val slotWidth = (centerX * 0.47).toInt()
         val slotHeight = (bottomY * 0.17).toInt()
         val horizontalSpacing = (centerX - totalRows * slotWidth) / (totalRows + 1)
@@ -213,11 +216,13 @@ class SkillListScreen(
         }
     }
 
+    private fun getBottomY() = height - if (showCreativeButtons) 60 else 35
+
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(context)
         super.render(context, mouseX, mouseY, delta)
         val level = player.skillLevel
-        val cycle = player.levelData.cycle
+        val cycle = player.skillCycle
         context.drawText(
             textRenderer,
             translate(
@@ -242,16 +247,22 @@ class SkillListScreen(
                 false
             )
         }
-        val requiredLevels = PlayerUtils.getLevelRequiredForLearningSkill(level)
-        val text = translate("screen.list.requiredLevel", requiredLevels)
-        context.drawText(
-            textRenderer,
-            text,
-            learnButton.x - 5 - textRenderer.getWidth(text),
-            learnButton.y + (learnButton.height - textRenderer.fontHeight) / 2 + 1,
-            11184810,
-            false
-        )
+        if (!learnButton.active) {
+            val text = if (Skills.getLearnableSkills(player.learnedSkills).isEmpty()) {
+                translate("screen.list.learnedAll")
+            } else {
+                val requiredLevels = PlayerUtils.getLevelRequiredForLearningSkill(level)
+                translate("screen.list.requiredLevel", requiredLevels)
+            }
+            context.drawText(
+                textRenderer,
+                text,
+                learnButton.x - 5 - textRenderer.getWidth(text),
+                learnButton.y + (learnButton.height - textRenderer.fontHeight) / 2 + 1,
+                11184810,
+                false
+            )
+        }
     }
 
     override fun update() = updateScreen()
@@ -299,7 +310,7 @@ class SkillListScreen(
         private var lastClickTime: Long = 0
 
         override fun onClick(mouseX: Double, mouseY: Double) {
-            if (!skill.isInvalid(player.world) && System.currentTimeMillis() - lastClickTime < 250L) {
+            if (!skill.invalid && System.currentTimeMillis() - lastClickTime < 250L) {
                 player.equip(Skills.EMPTY, slot)
             }
             lastClickTime = System.currentTimeMillis()
@@ -322,12 +333,12 @@ class SkillListScreen(
                 )
             }
             val skill = skill
-            if (!skill.isInvalid(player.world)) {
+            if (!skill.invalid) {
                 SkillRenderer.renderIcon(skill, context, x + 8, y + (height - 16) / 2)
                 val topY = y + (height - textRenderer.fontHeight) / 2 + 1
                 context.drawScrollableText(
                     textRenderer,
-                    skill.getFormattedName(player.world),
+                    skill.formattedName,
                     x + 24 + 3,
                     topY,
                     x + width - 16,

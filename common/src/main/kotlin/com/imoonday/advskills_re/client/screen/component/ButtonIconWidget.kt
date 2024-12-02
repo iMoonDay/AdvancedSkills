@@ -7,7 +7,8 @@ import net.minecraft.util.*
 
 class ButtonIconWidget : IconWidget {
 
-    protected val actions: MutableMap<Int, (ButtonIconWidget) -> Unit> = mutableMapOf()
+    private val actions: MutableMap<Int, (ButtonIconWidget) -> Unit> = mutableMapOf()
+    private var scrollAction: ((ButtonIconWidget, Double) -> Boolean?)? = null
     val hoveredTexture: Identifier?
     var textureU: Float = 0f
     var textureV: Float = 0f
@@ -112,6 +113,19 @@ class ButtonIconWidget : IconWidget {
         }
         return false
     }
+
+    fun setScrollAction(action: (widget: ButtonIconWidget, amount: Double) -> Boolean?): ButtonIconWidget {
+        this.scrollAction = action
+        return this
+    }
+
+    fun clearScrollAction(): ButtonIconWidget {
+        this.scrollAction = null
+        return this
+    }
+
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean =
+        this.scrollAction?.invoke(this, amount) ?: super.mouseScrolled(mouseX, mouseY, amount)
 
     override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         val i = this.getWidth()

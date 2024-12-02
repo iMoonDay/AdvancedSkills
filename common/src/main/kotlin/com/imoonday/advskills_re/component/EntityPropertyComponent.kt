@@ -16,7 +16,9 @@ class EntityPropertyComponent(override val entity: Entity) : Component<Entity> {
     var properties: NbtCompound = NbtCompound()
 
     override fun readFromNbt(tag: NbtCompound) {
-        properties = tag.getCompound("properties")
+        if (tag.contains("properties")) {
+            properties = tag.getCompound("properties")
+        }
     }
 
     override fun writeToNbt(tag: NbtCompound) {

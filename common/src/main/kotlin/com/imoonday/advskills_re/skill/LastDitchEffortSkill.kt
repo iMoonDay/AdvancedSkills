@@ -2,9 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillSlot
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.damage.*
@@ -18,7 +16,7 @@ class LastDitchEffortSkill : Skill(
     sound = ModSounds.HEAL
 ), DamageTrigger, AutoStopTrigger, AttackTrigger, AttributeTrigger, AutoTrigger, DeathTrigger {
 
-    override val persistTime: Int = 20 * 15
+    override val persistTime: Int = 15 * 20
 
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(

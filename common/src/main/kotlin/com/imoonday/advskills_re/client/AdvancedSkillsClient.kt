@@ -8,8 +8,7 @@ object AdvancedSkillsClient {
 
     @JvmStatic
     fun initClient() {
-        ClientConfig.load()
-        ClientConfig.initWatchService()
+        ClientConfig.get().load()
         ModKeyBindings.init()
         SkillRendererHandler.register()
         SkillModifierHandler.register()

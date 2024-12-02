@@ -12,7 +12,6 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.text.*
 import net.minecraft.util.*
-import net.minecraft.world.*
 import java.util.*
 import java.util.function.*
 
@@ -22,51 +21,61 @@ abstract class Skill(
     val description: Text,
     val icon: Identifier = id("unknown.png"),
     val types: List<SkillType> = emptyList(),
-    val defaultCooldown: Int = 0,
-    private val rarity: Rarity,
+    cooldown: Int = 0,
+    rarity: Rarity,
     val sound: Supplier<SoundEvent>? = null,
-    private val invalid: Boolean = false,
+    invalid: Boolean = false,
 ) : SkillTrigger {
 
-    fun isInvalid(world: World? = null): Boolean =
-        invalid || (world?.skillConfig ?: SkillConfig.instance).isInBlackList(id)
+    val invalid: Boolean = invalid
+        get() = field || SkillConfig.get().isInBlackList(id)
 
-    fun getRarity(world: World? = null): Rarity =
-        (world?.skillConfig ?: SkillConfig.instance).getModifier(id)?.rarity ?: rarity
+    val rarity: Rarity = rarity
+        get() = SkillConfig.get().getModifier(id)?.rarity ?: field
 
-    fun getFormattedName(world: World? = null): MutableText = name.copy().formatted(getRarity(world).formatting)
+    open val weight: Int
+        get() = rarity.weight
 
-    fun getNameWithHoverEvent(world: World? = null): MutableText = getFormattedName(world).styled { style ->
-        (item?.run {
-            style.withHoverEvent(
-                HoverEvent(
-                    HoverEvent.Action.SHOW_ITEM,
-                    HoverEvent.ItemStackContent(defaultStack)
+    val formattedName: MutableText
+        get() = name.copy().formatted(rarity.formatting)
+
+    val hoverableName: MutableText
+        get() = item?.run {
+            formattedName.styled {
+                it.withHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_ITEM,
+                        HoverEvent.ItemStackContent(defaultStack)
+                    )
                 )
-            )
-        } ?: style)
-    }
+            }
+        } ?: formattedName
 
     val item: SkillItem?
         get() = Registries.ITEM[id] as? SkillItem
 
-    fun getCooldown(world: World? = null): Int {
-        val config = (world?.skillConfig ?: SkillConfig.instance)
-        val cooldown = config.getModifier(id)?.cooldown ?: defaultCooldown
-        val multiplier = config.skillCooldownMultiplier
-        return (cooldown * multiplier).toInt()
-    }
+    val cooldown: Int = cooldown
+        get() {
+            val config = SkillConfig.get()
+            val cooldown = config.getModifier(id)?.cooldown ?: field
+            val multiplier = config.skillCooldownMultiplier
+            return (cooldown * multiplier).toInt()
+        }
 
-    fun getCooldownSeconds(world: World? = null): MutableText = if (getCooldown(world) <= 0) {
-        translate("cooldown.none")
-    } else {
-        val cooldown = (getCooldown(world) / 20.0).toString()
-        translate(
-            "cooldown.seconds",
-            if (cooldown.endsWith(".0")) cooldown.substring(0, cooldown.length - 2) else cooldown
-        )
-    }
+    val cooldownText: MutableText
+        get() = if (cooldown <= 0) {
+            translate("cooldown.none")
+        } else {
+            val text = (cooldown / 20.0).toString()
+            translate(
+                "cooldown.seconds",
+                if (text.endsWith(".0")) text.substring(0, text.length - 2) else text
+            )
+        }
 
+    /**
+     * @param cooldown cooldown in seconds
+     */
     protected constructor(
         id: String,
         types: List<SkillType>,
@@ -89,38 +98,35 @@ abstract class Skill(
 
     fun createUuid(content: String): UUID = UUID.nameUUIDFromBytes("$id-$content".toByteArray())
 
-    open fun getItemTooltips(world: World? = null, displayName: Boolean = false): List<Text> =
+    open fun getItemTooltips(displayName: Boolean = false, displayId: Boolean = false): List<Text> =
         mutableListOf<Text>().apply {
             if (displayName) {
-                add(name.copy().formatted(Formatting.WHITE))
+                add(formattedName)
             }
-            add(
-                translate(
-                    "screen.gallery.info.description",
-                    description.string
-                ).formatted(Formatting.GRAY)
-            )
+            add(description.copy().formatted(Formatting.GRAY))
+            add(Text.empty())
             add(translate(
                 "screen.gallery.info.type",
                 types.joinToString(" ") { it.displayName.string }
-            ).formatted(Formatting.GRAY))
-            add(
-                translate("screen.gallery.info.cooldown", getCooldownSeconds()).formatted(
-                    Formatting.GRAY
-                )
-            )
-            add(translate("screen.gallery.info.rarity", getRarity(world).displayName.string).formatted(Formatting.GRAY))
+            ).styled { it.withColor(0x4FC3F7) })
+            add(translate("screen.gallery.info.cooldown", cooldownText).styled { it.withColor(0x81C784) })
+            add(translate("screen.gallery.info.rarity", rarity.displayName).formatted(rarity.formatting))
+            if (displayId) {
+                add(id.toString().toText().formatted(Formatting.DARK_GRAY))
+            }
         }
 
     abstract fun use(user: ServerPlayerEntity): UseResult
 
-    open fun PlayerEntity.playSkillSound() {
+    open fun PlayerEntity.playSkillSound(exceptSelf: Boolean = false) {
         sound?.let {
             world.playSound(
-                null,
+                if (exceptSelf) this else null,
                 blockPos,
                 it.get(),
                 SoundCategory.PLAYERS,
+                random.nextFloat() * 0.2f + 0.9f,
+                random.nextFloat() * 0.2f + 0.9f
             )
         }
     }
@@ -140,7 +146,7 @@ abstract class Skill(
         player: ServerPlayerEntity,
         keyState: UseSkillC2SRequest.KeyState,
     ) {
-        if (isInvalid(player.world)) return
+        if (invalid) return
         if ((this !is LongPressTrigger || !player.isUsing()) && keyState == UseSkillC2SRequest.KeyState.RELEASE) return
         if (player.isSilenced) {
             player.sendMessage(translate("useSkill.silenced"), true)
@@ -151,18 +157,17 @@ abstract class Skill(
                 translate(
                     "useSkill.cooling",
                     name,
-                    "${(player.getCooldown(this) / 20.0)}s"
+                    translate("cooldown.seconds", player.getCooldown(this) / 20.0)
                 ),
                 true
             )
         } else {
-            player.getTriggers<UseInterruptTrigger>()
-                .filter { it != this && it.shouldInterrupt(player) }
-                .forEach { it.interrupt(player) }
+            player.forEachTrigger<UseInterruptTrigger>(
+                { it != this && it.shouldInterrupt(player) }
+            ) { it.interrupt(player) }
             val result = (this as? LongPressTrigger)?.use(player, keyState) ?: use(player)
             handleResult(player, result)
         }
-        return
     }
 
     fun handleResult(
@@ -195,22 +200,27 @@ abstract class Skill(
 
     enum class Rarity(
         val level: Int,
+        val weight: Int,
         val id: String,
+        val roman: String,
         val formatting: Formatting,
     ) {
 
-        USELESS(0, "useless", Formatting.GRAY),
-        COMMON(1, "common", Formatting.WHITE),
-        UNCOMMON(2, "uncommon", Formatting.GREEN),
-        RARE(3, "rare", Formatting.AQUA),
-        SUPERB(4, "superb", Formatting.GOLD),
-        EPIC(5, "epic", Formatting.RED),
-        LEGENDARY(6, "legendary", Formatting.LIGHT_PURPLE),
-        MYTHIC(7, "mythic", Formatting.DARK_PURPLE),
-        UNIQUE(8, "unique", Formatting.DARK_RED);
+        USELESS(0, 0, "useless", "N", Formatting.GRAY),
+        COMMON(1, 8, "common", "I", Formatting.WHITE),
+        UNCOMMON(2, 7, "uncommon", "II", Formatting.GREEN),
+        RARE(3, 6, "rare", "III", Formatting.AQUA),
+        SUPERB(4, 5, "superb", "IV", Formatting.GOLD),
+        EPIC(5, 4, "epic", "V", Formatting.RED),
+        LEGENDARY(6, 3, "legendary", "VI", Formatting.LIGHT_PURPLE),
+        MYTHIC(7, 2, "mythic", "VII", Formatting.DARK_PURPLE),
+        UNIQUE(8, 1, "unique", "VIII", Formatting.DARK_RED);
 
         val displayName: Text
             get() = translate("skillRarity.$id")
+
+        val color: Int
+            get() = formatting.colorValue!!
 
         companion object {
 

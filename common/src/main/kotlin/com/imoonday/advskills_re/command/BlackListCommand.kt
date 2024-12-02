@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.command
 
-import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.config.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.*
@@ -23,18 +24,19 @@ object BlackListCommand : BaseCommand("blacklist") {
             literal("remove")
                 .then(
                     argument("id", StringArgumentType.string())
-                        .suggests { context, builder1 ->
-                            CommandSource.suggestMatching(context.skillConfig.skillBlackList.map {
+                        .suggests { _, builder1 ->
+                            CommandSource.suggestMatching(SkillConfig.get().skillBlackList.map {
                                 it.replace(":", ".")
                             }, builder1)
                         }.executes(::removeSkill)
                 )
         ).then(literal("list").executes(::queryBlackList))
+            .then(literal("clear").executes(::clearBlackList))
     }
 
     private fun addSkill(context: CommandContext<ServerCommandSource>): Int {
         val skill = SkillArgumentType.getSkill(context)
-        context.skillConfig.addBlackList(skill.id)
+        SkillConfig.get().addBlackList(skill.id)
         context.syncConfig()
         context.sendFeedback("blacklist.add", skill.name)
         return 1
@@ -42,8 +44,8 @@ object BlackListCommand : BaseCommand("blacklist") {
 
     private fun removeSkill(context: CommandContext<ServerCommandSource>): Int {
         val idStr = StringArgumentType.getString(context, "id").replace(".", ":")
-        val id = Identifier.tryParse(idStr)
-        return if (id != null && context.skillConfig.removeBlackList(id)) {
+        val id = idStr.toIdentifier()
+        return if (id != null && SkillConfig.get().removeBlackList(id)) {
             context.syncConfig()
             context.sendFeedback("blacklist.remove", Skills.fromIdNullable(id)?.name ?: idStr)
             1
@@ -54,25 +56,24 @@ object BlackListCommand : BaseCommand("blacklist") {
     }
 
     private fun queryBlackList(context: CommandContext<ServerCommandSource>): Int {
-        val blackList = context.skillConfig.skillBlackList
+        val blackList = SkillConfig.get().skillBlackList
         if (blackList.isEmpty()) {
             context.sendFeedback("blacklist.empty")
             return 0
         }
-        var listText = Text.empty()
-        val size = blackList.size
-        blackList.forEachIndexed { index, id ->
-            val skill = Skills.fromId(id)
-            if (!skill.isEmpty()) {
-                listText = listText.append(skill.getNameWithHoverEvent(context.source.world))
-                if (index < size - 1) {
-                    listText = listText.append(", ")
-                }
-            } else if (index == size - 1) {
-                listText.siblings.removeLast()
-            }
-        }
+        val listText = blackList.toText(
+            formatter = { id -> Skills.fromId(id).takeUnless { it.isEmpty() }?.hoverableName },
+            prefix = "[".toText(),
+            suffix = "]".toText()
+        )
         context.sendMessage(translate("blacklist.query", listText))
-        return size
+        return blackList.size
+    }
+
+    private fun clearBlackList(context: CommandContext<ServerCommandSource>): Int {
+        SkillConfig.get().skillBlackList.clear()
+        context.syncConfig()
+        context.sendFeedback("blacklist.clear")
+        return 1
     }
 }

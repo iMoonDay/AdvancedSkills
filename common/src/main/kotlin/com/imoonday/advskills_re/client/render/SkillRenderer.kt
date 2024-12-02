@@ -38,10 +38,10 @@ object SkillRenderer {
         var flashed = false
         if (skill is AutoStopTrigger && skill.shouldFlashIcon() && player != null) {
             flashed = true
-            val persistTime = skill.getPersistTimeModified(player.world)
+            val persistTime = skill.getPersistTimeModified()
             val leftUseTime = persistTime - player.getUsedTime(skill)
-            if (persistTime > 20 * 5 && leftUseTime <= (persistTime / 5).coerceAtMost(20 * 10)) {
-                val alpha = 0.5 * sin(2 * PI / 20 * (leftUseTime - persistTime / 5)) + 0.5
+            if (persistTime > 5 * 20 && leftUseTime <= (persistTime / 5).coerceAtMost(10 * 20)) {
+                val alpha = 0.5 * sin(2 * PI / ((leftUseTime - persistTime / 5) * 20)) + 0.5
                 RenderSystem.enableBlend()
                 context.setShaderColor(1.0f, 1.0f, 1.0f, alpha.toFloat())
             }
@@ -73,7 +73,7 @@ object SkillRenderer {
         height: Int,
         player: PlayerEntity,
     ) {
-        if (skill.isInvalid(player.world)) return
+        if (skill.invalid) return
         if (skill is ProgressTrigger && skill.shouldDisplay(player)
             && (player.isUsing(skill) || skill !is UsingProgressTrigger)
         ) {
@@ -96,11 +96,11 @@ object SkillRenderer {
     ) {
         if (!player.isCooling(skill)) return
         val cooldown = player.getCooldown(skill)
-        val maxCooldown = skill.getCooldown(player.world)
+        val maxCooldown = skill.cooldown
         val progress = (cooldown.toDouble() / maxCooldown).coerceIn(0.0, 1.0)
         val startY = (endY - progress * maxHeight).toInt()
         context.fill(startX, startY, startX + width, endY, Color.BLACK.alpha(0.25).rgb)
-        if (cooldown < 20 * 4) {
+        if (cooldown < 4 * 20) {
             val time = if (cooldown <= 20) String.format("%.1f", cooldown / 20.0) else (cooldown / 20).toString()
             val textRenderer = client!!.textRenderer
             context.matrices.push()

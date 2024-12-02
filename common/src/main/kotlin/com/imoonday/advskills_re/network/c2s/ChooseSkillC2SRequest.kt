@@ -17,7 +17,7 @@ class ChooseSkillC2SRequest(
     }
 
     override fun apply(context: NetworkManager.PacketContext) {
-        if (context.player !is ServerPlayerEntity) return
-        context.player.choose(id)
+        val player = context.player as? ServerPlayerEntity ?: return
+        player.choose(id)
     }
 }

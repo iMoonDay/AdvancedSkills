@@ -14,7 +14,7 @@ class ItemAttractionSkill : LongPressSkill(
     rarity = Rarity.SUPERB,
 ), UsingRenderTrigger, GlowingTrigger {
 
-    override fun getMaxPressTime(): Int = 20 * 10
+    override fun getMaxPressTime(): Int = 10 * 20
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopUsing()

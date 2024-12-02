@@ -1,8 +1,8 @@
 package com.imoonday.advskills_re.util
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.nbt.*
-import net.minecraft.world.*
 
 data class SkillChoice(
     val first: Skill,
@@ -10,9 +10,11 @@ data class SkillChoice(
     val third: Skill,
 ) {
 
-    fun isEmpty(world: World? = null) = first.isInvalid(world) && second.isInvalid(world) && third.isInvalid(world)
+    fun isEmpty() = this === EMPTY || first.invalid && second.invalid && third.invalid
 
-    fun hasEmpty(world: World? = null) = first.isInvalid(world) || second.isInvalid(world) || third.isInvalid(world)
+    fun hasEmpty() = this === EMPTY || first.invalid || second.invalid || third.invalid
+
+    fun hasDuplicates() = !isEmpty() && skills.distinct().size < skills.size
 
     val skills = listOf(first, second, third)
 
@@ -22,16 +24,14 @@ data class SkillChoice(
 
     fun withThird(skill: Skill): SkillChoice = SkillChoice(first, second, skill)
 
-    fun replaceWith(world: World?, predicate: (Skill) -> Boolean, generator: (Set<Skill>) -> Skill): SkillChoice {
+    fun replaceWith(filter: (Skill) -> Boolean, generator: (except: MutableSet<Skill>) -> Skill): SkillChoice {
         var choice = this
-        if (predicate(first)) choice = choice.withFirst(generator(choice.getNoEmpty(world, first)))
-        if (predicate(second)) choice = choice.withSecond(generator(choice.getNoEmpty(world, second)))
-        if (predicate(third)) choice = choice.withThird(generator(choice.getNoEmpty(world, third)))
+        val except = skills.toMutableSet()
+        if (filter(first)) choice = choice.withFirst(generator(except))
+        if (filter(second)) choice = choice.withSecond(generator(except))
+        if (filter(third)) choice = choice.withThird(generator(except))
         return choice
     }
-
-    fun getNoEmpty(world: World? = null, except: Skill? = null) =
-        skills.filterNot { it == except || it.isInvalid(world) }.toSet()
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
         putString("1", first.id.toString())
@@ -57,6 +57,16 @@ data class SkillChoice(
         return result
     }
 
+    fun removeDuplicates(): SkillChoice {
+        if (!hasDuplicates()) return this
+        val distinctSkills = skills.distinct()
+        return when (distinctSkills.size) {
+            1 -> SkillChoice(distinctSkills[0], Skills.EMPTY, Skills.EMPTY)
+            2 -> SkillChoice(distinctSkills[0], distinctSkills[1], Skills.EMPTY)
+            else -> this
+        }
+    }
+
     companion object {
 
         @JvmField
@@ -69,26 +79,15 @@ data class SkillChoice(
         )
 
         fun canGenerate(
-            world: World? = null,
             except: Collection<Skill> = emptyList(),
             filter: (Skill) -> Boolean = { true }
-        ) = Skills.getLearnableSkills(world, except, filter).isNotEmpty()
+        ) = Skills.getLearnableSkills(except, filter).isNotEmpty()
 
         fun generate(
-            world: World? = null,
             except: Collection<Skill> = emptyList(),
             filter: (Skill) -> Boolean = { true }
-        ): SkillChoice =
-            Skills.getLearnableSkills(world, except, filter)
-                .shuffled()
-                .take(3)
-                .takeUnless { it.isEmpty() }
-                ?.let {
-                    SkillChoice(
-                        it.getOrElse(0) { Skills.EMPTY },
-                        it.getOrElse(1) { Skills.EMPTY },
-                        it.getOrElse(2) { Skills.EMPTY },
-                    )
-                } ?: EMPTY
+        ): SkillChoice = Skills.getLearnableSkills(except, filter)
+            .randomByWeight(Skill::weight, 3, Skills.EMPTY)
+            .let { SkillChoice(it[0], it[1], it[2]) }
     }
 }

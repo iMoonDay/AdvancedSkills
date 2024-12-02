@@ -16,13 +16,13 @@ class DuplicationSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         user.world.spawnEntity(ClonePlayerEntity(user.world, user).apply {
             moveVelocity = user.horizontalRotationVector * (user.velocity.length() * 2.0).coerceAtMost(1.0)
-            moveTime = 20 * 3
+            moveTime = 3 * 20
             if (user.velocity.y > 0) {
                 jumpControl.setActive()
                 setJumping(true)
             }
         })
-        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, 20 * 3, 0, true, false, true))
+        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, 3 * 20, 0, true, false, true))
         return UseResult.success()
     }
 }

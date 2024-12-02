@@ -9,10 +9,10 @@ import net.minecraft.util.*
 
 private val texture = id("toasts.png")
 
-class SkillToast(val skill: Skill, private val timeout: Long = 5000) : Toast {
+class SkillToast(val skill: Skill, private val timeout: Long = 3000) : Toast {
 
     override fun draw(context: DrawContext, manager: ToastManager, startTime: Long): Toast.Visibility {
-        context.drawTexture(texture, 0, 0, 0f, (skill.getRarity(manager.client.world).level - 1).coerceAtLeast(0) * 32f, 160, 32, 256, 256)
+        context.drawTexture(texture, 0, 0, 0f, (skill.rarity.level - 1).coerceAtLeast(0) * 32f, 160, 32, 256, 256)
         SkillRenderer.renderIcon(skill, context, 8, 8)
         val textRenderer = manager.client.textRenderer
         context.drawText(
@@ -24,7 +24,7 @@ class SkillToast(val skill: Skill, private val timeout: Long = 5000) : Toast {
             false
         )
         context.drawText(textRenderer, skill.name.copy().formatted(Formatting.WHITE), 30, 18, 0xFFFFFF, false)
-        return if (startTime < timeout) Toast.Visibility.SHOW else Toast.Visibility.HIDE
+        return if (startTime < timeout * manager.notificationDisplayTimeMultiplier) Toast.Visibility.SHOW else Toast.Visibility.HIDE
     }
 }
 

@@ -1,9 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.playSound
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.effect.*
@@ -18,7 +16,7 @@ class ResuscitationSkill : Skill(
     rarity = Rarity.LEGENDARY
 ), DeathTrigger, AutoStopTrigger, DamageTrigger {
 
-    override val persistTime: Int = 20 * 2
+    override val persistTime: Int = 2 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
@@ -28,7 +26,7 @@ class ResuscitationSkill : Skill(
         player.startUsing()
         player.startCooling()
         player.playSound(SoundEvents.ITEM_TOTEM_USE)
-        player.addStatusEffect(StatusEffectInstance(StatusEffects.REGENERATION, 20 * 30))
+        player.addStatusEffect(StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20))
         return false
     }
 

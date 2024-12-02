@@ -54,7 +54,7 @@ val LivingEntity.isSeriousInjured: Boolean
 
 private fun hasStatusEffect(entity: LivingEntity, effect: Supplier<out StatusEffect>): Boolean {
     val statusEffect = effect.get()
-    return if (statusEffect is SyncClientEffect) statusEffect.syncId in entity.propertyComponent.properties.getList(
+    return if (statusEffect is SyncClientEffect) statusEffect.syncId in entity.properties.getList(
         "syncEffects",
         NbtElement.STRING_TYPE.toInt()
     ).map(NbtElement::asString) else entity.hasStatusEffect(statusEffect)

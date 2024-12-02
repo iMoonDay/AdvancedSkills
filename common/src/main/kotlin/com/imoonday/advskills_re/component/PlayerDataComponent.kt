@@ -15,14 +15,20 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
 
     var dirty: Boolean = false
     override var synced: Boolean = false
-    var container: SkillContainer = SkillContainer.create(entity.world)
+    var container: SkillContainer = SkillContainer()
     var level: SkillLevelData = SkillLevelData()
     var learnable: LearnableSkillData = LearnableSkillData()
 
     override fun readFromNbt(tag: NbtCompound) {
-        container = SkillContainer.fromNbt(tag.getCompound("container"))
-        level = SkillLevelData.fromNbt(tag.getCompound("level"))
-        learnable = LearnableSkillData.fromNbt(tag.getCompound("learnable"))
+        if (tag.contains("container")) {
+            container = SkillContainer.fromNbt(tag.getCompound("container"))
+        }
+        if (tag.contains("level")) {
+            level = SkillLevelData.fromNbt(tag.getCompound("level"))
+        }
+        if (tag.contains("learnable")) {
+            learnable = LearnableSkillData.fromNbt(tag.getCompound("learnable"))
+        }
     }
 
     override fun writeToNbt(tag: NbtCompound) {
@@ -33,7 +39,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
 
     override fun tick() {
         container.forEachData { it.tick() }
-        container.getAllSlots { it.skill.isInvalid(entity.world) && !it.isEmpty() }.forEach {
+        container.getAllSlots { it.skill.invalid && !it.isEmpty() }.forEach {
             val name = it.skill.name
             it.unequip()
             if (!entity.world.isClient) {
@@ -42,7 +48,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
                 entity.updateScreen()
             }
         }
-        if (entity is ServerPlayerEntity && (dirty || learnable.correct(entity.world, entity.learnedSkills))) {
+        if (entity is ServerPlayerEntity && (dirty || learnable.correct(entity.learnedSkills))) {
             sync()
             dirty = false
         }
@@ -59,20 +65,20 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
     }
 
     override fun applySyncNbt(tag: NbtCompound) {
-        val oldSkills = container.getAllSkills(entity.world) { _, data -> data.using }
+        val oldSkills = container.getAllSkills { _, data -> data.using }
         val hasChoice = learnable.hasNext()
         super.applySyncNbt(tag)
-        val newSkills = container.getAllSkills(entity.world) { _, data -> data.using }
+        val newSkills = container.getAllSkills { _, data -> data.using }
         newSkills.subtract(oldSkills)
             .filterIsInstance<ClientUseTrigger>()
             .forEach { it.onUse(entity) }
         oldSkills.subtract(newSkills)
             .filterIsInstance<ClientUseTrigger>()
             .forEach { it.onStop(entity) }
-        if (!hasChoice && learnable.hasNext()) {
-            SkillLearningScreen.new = true
-        }
-        if (entity.world.isClient) {
+        if (entity.isCurrentClientPlayer) {
+            if (!hasChoice && learnable.hasNext()) {
+                SkillLearningScreen.new = true
+            }
             entity.updateScreen()
         }
     }
@@ -89,7 +95,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
     }
 
     fun reset() {
-        container = SkillContainer.create(entity.world)
+        container = SkillContainer()
         level = SkillLevelData()
         learnable = LearnableSkillData()
         sync()

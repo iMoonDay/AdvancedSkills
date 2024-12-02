@@ -21,8 +21,7 @@ class SyncPropertiesS2CPacket(
     }
 
     override fun apply(context: NetworkManager.PacketContext) {
-        if (context.env == EnvType.CLIENT) {
-            clientPlayer?.world?.getEntityById(entityId)?.propertyComponent?.applySyncNbt(properties)
-        }
+        if (context.env != EnvType.CLIENT) return
+        clientPlayer?.world?.getEntityById(entityId)?.propertyComponent?.applySyncNbt(properties)
     }
 }

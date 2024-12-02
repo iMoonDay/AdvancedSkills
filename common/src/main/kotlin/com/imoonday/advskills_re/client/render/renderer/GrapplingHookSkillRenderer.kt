@@ -71,7 +71,7 @@ class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>(), IPla
             MathHelper.inverseSqrt(leashLengthX * leashLengthX + leashLengthZ * leashLengthZ) * leashThickness / 2.0f
         val offsetX = leashLengthZ * inverseSqrt
         val offsetZ = leashLengthX * inverseSqrt
-        val entityBlockPos = BlockPos.ofFloored(player.getCameraPosVec(tickDelta))
+        val entityBlockPos = player.getCameraPosVec(tickDelta).toBlockPos()
         val holdingEntityBlockPos = pos.toBlockPos()
         val entityBlockLight = player.world.getLightLevel(LightType.BLOCK, entityBlockPos)
         val holdingEntityBlockLight =

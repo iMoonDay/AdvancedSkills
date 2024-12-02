@@ -2,9 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillSlot
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
@@ -16,7 +14,7 @@ class MeteorShowerSkill : LongPressSkill(
     rarity = Rarity.MYTHIC,
 ), AttributeTrigger, UsingRenderTrigger {
 
-    override fun getMaxPressTime(): Int = 20 * 10
+    override fun getMaxPressTime(): Int = 10 * 20
 
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(

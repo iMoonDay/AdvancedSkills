@@ -1,10 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillSlot
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.playSound
+import com.imoonday.advskills_re.util.*
 import net.minecraft.enchantment.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
@@ -21,7 +18,7 @@ class ChargedSweepSkill : LongPressSkill(
     rarity = Rarity.RARE,
 ), AttributeTrigger, UsingRenderTrigger {
 
-    override fun getMaxPressTime(): Int = 20 * 3
+    override fun getMaxPressTime(): Int = 3 * 20
 
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
@@ -45,7 +42,8 @@ class ChargedSweepSkill : LongPressSkill(
         player.stopUsing()
         player.world.getNonSpectatingEntities(
             LivingEntity::class.java, player.boundingBox.expand(5.0)
-        ).filter { it !== player
+        ).filter {
+            it !== player
                 && (it.boundingBox.maxY >= player.boundingBox.minY
                 && it.boundingBox.maxY <= player.boundingBox.maxY
                 || it.boundingBox.minY <= player.boundingBox.maxY

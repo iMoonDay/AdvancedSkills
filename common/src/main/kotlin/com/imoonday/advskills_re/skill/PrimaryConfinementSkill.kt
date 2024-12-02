@@ -31,7 +31,7 @@ class PrimaryConfinementSkill : LongPressSkill(
                 (it.entity as LivingEntity).addStatusEffect(
                     StatusEffectInstance(
                         ModEffects.CONFINEMENT.get(),
-                        20 * 3,
+                        3 * 20,
                         0,
                         false,
                         false,

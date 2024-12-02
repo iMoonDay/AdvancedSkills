@@ -68,19 +68,22 @@ advskills_re:
     query: '黑名单: %s'
     not_found: '%s 不在黑名单中'
     empty: 黑名单为空
+    clear: 已清空黑名单
   defaultSlots:
     generic:
-      query: '通用技能栏: %d个'
-      set: 已将默认通用技能栏设置为 %d 个
+      query: '通用技能槽: %d个'
+      set: 已将默认通用技能槽设置为 %d 个
     active:
-      query: '主动技能栏: %d个'
-      set: 已将默认主动技能栏设置为 %d 个
+      query: '主动技能槽: %d个'
+      set: 已将默认主动技能槽设置为 %d 个
     passive:
-      query: '被动技能栏: %d个'
-      set: 已将默认被动技能栏设置为 %d 个
+      query: '被动技能槽: %d个'
+      set: 已将默认被动技能槽设置为 %d 个
+    reset: 已重置默认技能栏
   resetXp:
     single: 已重置 %s 的技能经验
     multiple: 已重置 %d 名玩家的技能经验
+  resetModifiers: 已重置所有技能的修改
   skillExp:
     give:
       single: 已为 %2$s 增加 %1$d 点技能经验值
@@ -107,6 +110,16 @@ advskills_re:
     active: 反弹未结束
     early: 早了 %d 秒
     late: 晚了 %d 秒
+  sort:
+    default: 无排序
+    id: 按 ID 排序
+    id_reverse: 按 ID 排序 (倒序)
+    name: 按 名称 排序
+    name_reverse: 按 名称 排序 (倒序)
+    rarity: 按 稀有度 排序
+    rarity_reverse: 按 稀有度 排序 (倒序)
+    cooldown: 按 冷却时间 排序
+    cooldown_reverse: 按 冷却时间 排序 (倒序)
   skill:
     empty:
       name: 空
@@ -218,7 +231,7 @@ advskills_re:
       description: 将周围1格内方块击碎
     charged_sweep:
       name: 蓄力横扫
-      description: 蓄力后对前方扇形范围内实体造成伤害
+      description: 蓄力后对前方扇形范围内实体造成伤害，伤害量取决于手持的物品
     active_defense:
       name: 主动防御
       description: 长按使用时减伤20%
@@ -334,7 +347,7 @@ advskills_re:
       description: 缓慢增加额外血量上限,上限10
     pain_feedback:
       name: 痛苦反馈
-      description: 受伤时反弹25%伤害
+      description: 受伤时有50%概率反弹25%伤害
     thunder_fury:
       name: 雷霆之怒
       description: 召唤一道闪电
@@ -391,6 +404,10 @@ advskills_re:
     wall_jump:
       name: 蹬墙跳
       description: 可以在墙上跳跃
+    return:
+      name: 回城
+      description: 原地不动蓄力，然后回到出生点
+      failed: 中断回城
   skillType:
     attack: 攻击
     defense: 防御
@@ -434,6 +451,7 @@ advskills_re:
         inventory: 背包
         learn: 学习
       requiredLevel: '下次学习所需等级: %d'
+      learnedAll: 已学习全部技能
     slot:
       title: 左键拖动移动，右键重置
       compact: 紧凑技能显示
@@ -447,9 +465,9 @@ advskills_re:
       learn: 学习
       count: '剩余技能数: %d'
   skillSlot:
-    generic: '通用技能栏 %d'
-    active: '主动技能栏 %d'
-    passive: '被动技能栏 %d'
+    generic: '通用技能槽 %d'
+    active: '主动技能槽 %d'
+    passive: '被动技能槽 %d'
 item:
   advskills_re:
     skill_fruit: 技能果实
@@ -490,6 +508,7 @@ subtitles:
     piercing: 突刺
     fire: 发射
     laser: 激光
+    return: 回城
 modmenu:
   nameTranslation:
     advskills_re: 进阶技能：重制版

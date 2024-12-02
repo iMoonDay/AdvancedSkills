@@ -24,8 +24,8 @@ class SkillLearningScreen(
 
     override fun init() {
         super.init()
-        val boxWidth = 120
-        val boxHeight = (height * 0.65).toInt()
+        val boxWidth = (width / 4).coerceAtMost(140)
+        val boxHeight = (boxWidth * 1.5).coerceAtMost(height * 0.65).toInt()
         val spacing = ((width - 3 * boxWidth) / 5).coerceAtLeast(5)
         val totalWidth = boxWidth * 3 + spacing * 2
         val startX = (width - totalWidth) / 2
@@ -52,6 +52,7 @@ class SkillLearningScreen(
         learnButton = ButtonWidget.builder(translate("screen.learn.learn")) { selectedBox?.choose() }
             .dimensions(width / 3 * 2 - 25, buttonY, 50, 20)
             .build()
+            .apply { active = false }
             .also(::addDrawableChild)
 
         new = false
@@ -72,14 +73,18 @@ class SkillLearningScreen(
     }
 
     override fun update() {
-        if (player.learnableData.isEmpty()) close()
-        else skillBoxes.forEach(SkillBox::updateSkill)
+        if (player.learnableData.isEmpty()) {
+            close()
+            return
+        } else {
+            skillBoxes.forEach(SkillBox::updateSkill)
+        }
         updateButtons()
     }
 
     private fun updateButtons() {
         refreshButton.active = player.canFreshChoice()
-        learnButton.active = selectedBox != null && !selectedBox!!.skill.isInvalid(player.world)
+        learnButton.active = selectedBox != null && !selectedBox!!.skill.invalid
     }
 
     override fun close() = client!!.setScreen(parent())
@@ -104,10 +109,20 @@ class SkillLearningScreen(
             } else {
                 context.renderDarkPanel(x, y, width, height)
             }
-            if (skill.isInvalid(player.world)) return
+            if (skill.invalid) return
             val gap = 5
             val x = x + 8
             var y = y + gap
+
+            val rarity = skill.rarity.roman
+            context.drawText(
+                textRenderer,
+                rarity,
+                x + width - 15 - textRenderer.getWidth(rarity),
+                y + 2,
+                skill.rarity.color,
+                false
+            )
 
             SkillRenderer.renderIcon(skill, context, this.x + (width - 32) / 2, y, 32)
             y += 32 + 3
@@ -116,7 +131,7 @@ class SkillLearningScreen(
             y -= scrollAmount
             context.drawScrollableText(
                 textRenderer,
-                skill.getFormattedName(player.world),
+                skill.formattedName,
                 x, y,
                 x + width - 15, y + textRenderer.fontHeight,
                 0xFFFFFF, false
@@ -125,7 +140,7 @@ class SkillLearningScreen(
 
             context.drawScrollableText(
                 textRenderer,
-                skill.getCooldownSeconds(),
+                skill.cooldownText,
                 x, y,
                 x + width - 15, y + textRenderer.fontHeight,
                 0x81C784, false
@@ -134,7 +149,7 @@ class SkillLearningScreen(
 
             context.drawScrollableText(
                 textRenderer,
-                Text.literal(skill.types.joinToString(", ") { type -> type.displayName.string }),
+                skill.types.joinToString(", ") { type -> type.displayName.string }.toText(),
                 x, y,
                 x + width - 15, y + textRenderer.fontHeight,
                 0x4FC3F7, false
@@ -186,15 +201,18 @@ class SkillLearningScreen(
             lastClickTime = System.currentTimeMillis()
         }
 
-        fun choose() {
-            chooseAction()
-            if (player.learnableData.hasNext()) updateSkill() else close()
-        }
+        fun choose() = chooseAction()
 
         fun updateSkill() {
-            skill = skillGetter()
-            selectedBox = null
+            val newSkill = skillGetter()
+            if (selectedBox == this && newSkill != skill) {
+                selectedBox = null
+            }
+            skill = newSkill
             updateButtons()
+            lastClickTime = 0
+            scrollAmount = 0
+            maxScrollAmount = null
         }
     }
 

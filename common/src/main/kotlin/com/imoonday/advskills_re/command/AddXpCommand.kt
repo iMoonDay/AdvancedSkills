@@ -31,7 +31,7 @@ object AddXpCommand : XpCommand("add") {
             context.sendFeedback(
                 "skillExp.give.single",
                 amount,
-                targets.first().displayName.string
+                targets.first().displayName
             )
         } else {
             context.sendFeedback(
@@ -54,7 +54,7 @@ object AddXpCommand : XpCommand("add") {
             context.sendFeedback(
                 "skillLevel.give.single",
                 amount,
-                targets.first().displayName.string
+                targets.first().displayName
             )
         } else {
             context.sendFeedback(

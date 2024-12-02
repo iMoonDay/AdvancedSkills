@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.util
 
 import com.google.gson.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import com.mojang.brigadier.*
 import com.mojang.brigadier.arguments.*
@@ -21,7 +22,7 @@ class SkillArgumentType(private val containsInvalid: Boolean) : ArgumentType<Ski
         builder: SuggestionsBuilder,
     ): CompletableFuture<Suggestions> =
         CommandSource.suggestFromIdentifier(
-            if (containsInvalid) Skills.getSkillsNotEmpty()
+            if (containsInvalid) Skills.getSkills()
             else Skills.getValidSkills(),
             builder,
             Skill::id,
@@ -38,7 +39,7 @@ class SkillArgumentType(private val containsInvalid: Boolean) : ArgumentType<Ski
         try {
             val id = if (":" in string) Identifier(string) else id(string)
             val skill = Skills.fromIdNullable(id) ?: throw UNKNOWN.create()
-            if (!containsInvalid && skill.isInvalid() || skill.isEmpty()) throw INVALID.create()
+            if (!containsInvalid && skill.invalid || skill.isEmpty()) throw INVALID.create()
             return skill
         } catch (e: InvalidIdentifierException) {
             reader.cursor = i

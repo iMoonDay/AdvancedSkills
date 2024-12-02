@@ -1,17 +1,13 @@
 package com.imoonday.advskills_re.config
 
 import com.imoonday.advskills_re.*
+import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import net.fabricmc.api.*
 import org.slf4j.*
 import java.io.*
-import java.nio.file.*
-import java.nio.file.StandardWatchEventKinds.*
-import kotlin.concurrent.*
-import kotlin.io.path.*
 
 @Serializable
 class ClientConfig {
@@ -26,9 +22,14 @@ class ClientConfig {
             field = value
             save()
         }
-    var layout: Array<IntArray> = defaultLayout
+    var skillSorter: SkillSorter = SkillSorter.DEFAULT
+        set(value) {
+            field = value
+            save()
+        }
+    var layout: Array<IntArray> = DEFAULT_LAYOUT
         get() {
-            if (!isValidLayout(field)) field = defaultLayout
+            if (!isValidLayout(field)) field = DEFAULT_LAYOUT
             return field
         }
         set(value) {
@@ -40,8 +41,37 @@ class ClientConfig {
             field = value
             save()
         }
+    var displayedSkills: MutableSet<String> = mutableSetOf()
+        set(value) {
+            field = value
+            save()
+        }
 
     fun toJson(): String = JSON.encodeToString(serializer(), this)
+
+    fun load() {
+        LOGGER.info("Loading $MOD_ID configuration file")
+        try {
+            if (!file.exists()) {
+                save()
+            } else {
+                instance = fromJson(file.readText(Charsets.UTF_8))
+            }
+        } catch (e: Exception) {
+            LOGGER.error(
+                "Read $MOD_ID configuration failed. Try to save the current configuration", e
+            )
+            save()
+        }
+    }
+
+    fun save() {
+        try {
+            file.writeText(instance.toJson(), Charsets.UTF_8)
+        } catch (e: Exception) {
+            LOGGER.error("Couldn't save $MOD_ID configuration file", e)
+        }
+    }
 
     companion object {
 
@@ -51,77 +81,25 @@ class ClientConfig {
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
-        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID-client.json").toFile()
-        var instance = ClientConfig()
-        private var loading = false
-        private var saving = false
+        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID.json").toFile()
+        private var instance = ClientConfig()
 
-        fun load() {
-            if (loading) return
-            loading = true
-            LOGGER.info("Loading $MOD_ID-client configuration file")
-            var text: String
-            try {
-                val file = file
-                if (!file.exists()) {
-                    save()
-                } else {
-                    text = file.readText(Charsets.UTF_8)
-                    var times = 0
-                    while (text.isEmpty() && times++ < 10) {
-                        Thread.sleep(100)
-                        text = file.readText(Charsets.UTF_8)
-                    }
-                    instance = fromJson(text)
-                }
-            } catch (e: Exception) {
-                LOGGER.error(
-                    "Read $MOD_ID-client configuration failed. Try to save the current configuration", e
-                )
-                save()
-            } finally {
-                loading = false
-            }
-        }
+        @JvmStatic
+        fun get(): ClientConfig = instance
 
-        fun save() {
-            if (saving) return
-            saving = true
-            try {
-                file.writeText(instance.toJson(), Charsets.UTF_8)
-            } catch (e: Exception) {
-                LOGGER.error("Couldn't save $MOD_ID-client configuration file", e)
-            } finally {
-                saving = false
-            }
-        }
+        @JvmStatic
+        val DEFAULT_LAYOUT = arrayOf(
+            intArrayOf(1, 2),
+            intArrayOf(3, 4),
+            intArrayOf(5, 6),
+            intArrayOf(7, 8),
+            intArrayOf(9, 10),
+        )
 
+        @JvmStatic
         fun fromJson(json: String): ClientConfig = JSON.decodeFromString(serializer(), json)
 
-        fun initWatchService() {
-            if (Platform.getEnv() != EnvType.CLIENT) return
-            val service = FileSystems.getDefault().newWatchService()
-            file.parentFile.toPath().register(service, ENTRY_MODIFY)
-            val fileName = file.name
-            var lastEventTime = System.currentTimeMillis()
-
-            thread(start = true, name = "Client Config Watch Service") {
-                while (true) {
-                    val key = service.take()
-                    if (key.pollEvents().any {
-                            (it.context() as Path).fileName.name == fileName && it.kind() == ENTRY_MODIFY
-                        }
-                        && System.currentTimeMillis() - lastEventTime > 1000
-                        && !saving && !loading
-                    ) {
-                        load()
-                        lastEventTime = System.currentTimeMillis()
-                    }
-                    if (!key.reset()) break
-                }
-            }
-        }
-
+        @JvmStatic
         fun isValidLayout(layout: Array<IntArray>?): Boolean {
             if (layout == null) return false
             val numbers = mutableSetOf<Int>()
@@ -137,13 +115,5 @@ class ClientConfig {
             }
             return numbers.size == 10
         }
-
-        val defaultLayout = arrayOf(
-            intArrayOf(1, 2),
-            intArrayOf(3, 4),
-            intArrayOf(5, 6),
-            intArrayOf(7, 8),
-            intArrayOf(9, 10),
-        )
     }
 }

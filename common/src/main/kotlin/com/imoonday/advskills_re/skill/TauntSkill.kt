@@ -2,9 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillSlot
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.server.network.*
@@ -16,7 +14,7 @@ class TauntSkill : Skill(
     rarity = Rarity.SUPERB,
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {
 
-    override val persistTime: Int = 20 * 15
+    override val persistTime: Int = 15 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 

@@ -20,38 +20,40 @@ class SkillSlotScreen : Screen(translate("screen.slot.title")) {
         return if (button == 0) {
             val layout = SkillSlotRenderer.getValidLayout(clientPlayer!!.skillContainer.slotSize)
             if (layout.isEmpty()) return false
-            ClientConfig.instance.uiOffsetX =
-                client!!.window.scaledWidth - mouseX.toInt() - 18 * layout.maxOf { it.size } - 2
-            ClientConfig.instance.uiOffsetY = mouseY.toInt() - client!!.window.scaledHeight / 2 + (9 * layout.size) + 2
+            val config = ClientConfig.get()
+            config.uiOffsetX = client!!.window.scaledWidth - mouseX.toInt() - 18 * layout.maxOf { it.size } - 2
+            config.uiOffsetY = mouseY.toInt() - client!!.window.scaledHeight / 2 + (9 * layout.size) + 2
             true
         } else false
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         return if (button == 1) {
-            ClientConfig.instance.uiOffsetX = 0
-            ClientConfig.instance.uiOffsetY = 0
+            val config = ClientConfig.get()
+            config.uiOffsetX = 0
+            config.uiOffsetY = 0
             true
         } else false
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
         val amount = if (hasShiftDown()) 10 else 1
+        val config = ClientConfig.get()
         when (keyCode) {
             GLFW.GLFW_KEY_LEFT, client!!.options.leftKey.keyCode -> {
-                ClientConfig.instance.uiOffsetX += amount
+                config.uiOffsetX += amount
             }
 
             GLFW.GLFW_KEY_RIGHT, client!!.options.rightKey.keyCode -> {
-                ClientConfig.instance.uiOffsetX -= amount
+                config.uiOffsetX -= amount
             }
 
             GLFW.GLFW_KEY_UP, client!!.options.forwardKey.keyCode -> {
-                ClientConfig.instance.uiOffsetY -= amount
+                config.uiOffsetY -= amount
             }
 
             GLFW.GLFW_KEY_DOWN, client!!.options.backKey.keyCode -> {
-                ClientConfig.instance.uiOffsetY += amount
+                config.uiOffsetY += amount
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers)

@@ -2,9 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.translate
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.effect.*
@@ -31,7 +29,7 @@ class DisarmSkill : Skill(
     ): Float {
         if (!player.isUsing()) return amount
         if (Random.nextFloat() <= 0.45f) {
-            target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM.get(), 20 * 5, 0))
+            target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM.get(), 5 * 20, 0))
             player.sendMessage(translate("skill.disarm.success"), true)
             target.world.playSound(null, player.blockPos, ModSounds.DISARM.get(), SoundCategory.PLAYERS)
             (target as? PlayerEntity)?.sendMessage(translate("skill.disarm.disarmed"), true)

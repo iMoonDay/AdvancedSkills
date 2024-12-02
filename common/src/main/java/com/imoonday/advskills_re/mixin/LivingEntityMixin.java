@@ -61,7 +61,7 @@ public abstract class LivingEntityMixin extends EntityMixin {
             if (attacker instanceof ServerPlayerEntity player) {
                 newAmount = SkillTriggerHandler.onAttack(newAmount, source, player, target);
             }
-            cir.setReturnValue(newAmount);
+             cir.setReturnValue(newAmount);
         }
     }
 

@@ -12,7 +12,10 @@ import net.minecraft.world.*
 class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
     constructor(skill: Skill) : this(skill, Settings().maxCount(1))
 
-    override fun getName(): Text = skill.getFormattedName()
+    override fun getName(): Text {
+        val name = skill.formattedName
+        return if (skill.invalid) name.formatted(Formatting.STRIKETHROUGH) else name
+    }
 
     override fun getName(stack: ItemStack): Text = name
 
@@ -22,14 +25,14 @@ class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
         tooltip: MutableList<Text>,
         context: TooltipContext,
     ) {
-        tooltip.addAll(skill.getItemTooltips(world))
+        tooltip.addAll(skill.getItemTooltips())
         super.appendTooltip(stack, world, tooltip, context)
     }
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         val stack = user.getStackInHand(hand)
         if (world.isClient) return TypedActionResult.success(stack)
-        if (skill.isInvalid(world)) {
+        if (skill.invalid) {
             user.sendMessage(translate("learnSkill.invalid", skill.name))
             return TypedActionResult.fail(stack)
         }

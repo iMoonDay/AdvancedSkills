@@ -23,5 +23,5 @@ abstract class HealingSkill(
     }
 
     override fun getOtherSkills(player: PlayerEntity): Set<Skill> =
-        Skills.getValidSkills(player.world).filter { it is HealingSkill && it != this }.toSet()
+        Skills.getValidSkills().filter { it is HealingSkill && it != this }.toSet()
 }

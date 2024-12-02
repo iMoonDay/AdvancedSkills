@@ -46,5 +46,11 @@
     "sounds": [
       "advskills_re:laser"
     ]
+  },
+  "return": {
+    "subtitle": "subtitles.advskills_re.return",
+    "sounds": [
+      "advskills_re:return"
+    ]
   }
 }

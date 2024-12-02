@@ -63,11 +63,12 @@ advskills_re:
     set: Experience gain multiplier has been set to %d
     value: Experience gain multiplier is %d
   blacklist:
-      add: '%s has been added to the blacklist'
-      remove: '%s has been removed from the blacklist'
-      query: 'Blacklist: %s'
-      not_found: '%s is not in the blacklist'
-      empty: The blacklist is empty
+    add: '%s has been added to the blacklist'
+    remove: '%s has been removed from the blacklist'
+    query: 'Blacklist: %s'
+    not_found: '%s is not in the blacklist'
+    empty: The blacklist is empty
+    clear: The blacklist has been cleared
   defaultSlots:
     generic:
       query: 'Generic Slots: %d'
@@ -78,9 +79,11 @@ advskills_re:
     passive:
       query: 'Passive Slots: %d'
       set: Default passive slots has been set to %d
+    reset: Default slots has been reset
   resetXp:
     single: "%s's skill xp has been reset"
     multiple: Skill xp has been reset for %d players
+  resetModifiers: All modifiers have been reset
   skillExp:
     give:
       single: 'Gave %d skill experience points to %s'
@@ -107,6 +110,16 @@ advskills_re:
     active: Reflection is not finished
     early: '%ds early!'
     late: '%ds late!'
+  sort:
+    default: No Sorting
+    id: Sort by ID
+    id_reverse: Sort by ID (Reverse)
+    name: Sort by Name
+    name_reverse: Sort by Name (Reverse)
+    rarity: Sort by Rarity
+    rarity_reverse: Sort by Rarity (Reverse)
+    cooldown: Sort by Cooldown
+    cooldown_reverse: Sort by Cooldown (Reverse)
   skill:
     empty:
       name: Empty
@@ -218,7 +231,7 @@ advskills_re:
       description: Break the blocks within 1 square around
     charged_sweep:
       name: Charged Sweep
-      description: After charging, it will cause damage to entities within the fan-shaped range in front
+      description: After charging, it will cause damage to entities within the fan-shaped range in front. The amount of damage depends on the item held.
     active_defense:
       name: Active Defense
       description: Reduce damage by 20% when long pressed
@@ -334,7 +347,7 @@ advskills_re:
       description: Slowly increase the absorption amount, the upper limit is 10
     pain_feedback:
       name: Pain Feedback
-      description: Reflects 25% damage when damaged
+      description: When injured, there is a 50% chance of rebounding 25% of the damage
     thunder_fury:
       name: Thunder Fury
       description: Summon a lightning bolt
@@ -391,6 +404,10 @@ advskills_re:
     wall_jump:
       name: Wall Jump
       description: Can jump while on a wall
+    return:
+      name: Return
+      description: Stay where you are, charge up, and then return to your spawn point
+      failed: Return interrupted
   skillType:
     attack: Attack
     defense: Defense
@@ -434,6 +451,7 @@ advskills_re:
         inventory: Inventory
         learn: Learn
       requiredLevel: 'Next level to learn: %d'
+      learnedAll: You have learned all skills
     slot:
       title: Left drag to move, right click to reset
       compact: Compact skill display
@@ -490,3 +508,4 @@ subtitles:
     piercing: Piercing
     fire: Fire
     laser: Laser
+    return: Return

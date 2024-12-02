@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
+    "BlockRenderManagerAccessor",
     "CameraMixin",
     "ClientPlayerEntityMixin",
     "ClientWorldMixin",
@@ -19,12 +20,12 @@
     "MouseMixin",
     "PlayerEntityRendererMixin",
     "ScreenAccessor",
-    "WorldRendererAccessor",
-    "BlockRenderManagerAccessor"
+    "WorldRendererAccessor"
   ],
   "mixins": [
     "ArgumentTypesMixin",
     "BlazeEntity$ShootFireballGoalMixin",
+    "BlockLootTableGeneratorAccessor",
     "CreeperEntityMixin",
     "CreeperIgniteGoalMixin",
     "CrossbowAttackGoalMixin",

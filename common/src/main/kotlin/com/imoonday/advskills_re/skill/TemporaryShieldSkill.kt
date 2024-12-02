@@ -1,8 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
+import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
 
 class TemporaryShieldSkill : Skill(
@@ -14,7 +13,7 @@ class TemporaryShieldSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override val persistTime: Int = 20 * 10
+    override val persistTime: Int = 10 * 20
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (player.isUsing() && usedTime % 20 == 0) player.absorptionAmount =

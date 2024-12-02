@@ -25,7 +25,7 @@ object XpMultiplierCommand : XpCommand("multiplier") {
             context.sendMessage(
                 translate(
                     "xpMultiplier.value",
-                    context.skillConfig.skillXpMultiplier,
+                    SkillConfig.get().skillXpMultiplier,
                 )
             )
             1
@@ -35,11 +35,11 @@ object XpMultiplierCommand : XpCommand("multiplier") {
         context: CommandContext<ServerCommandSource>,
         multiplier: Double,
     ): Int {
-        context.skillConfig.skillXpMultiplier = multiplier
+        SkillConfig.get().skillXpMultiplier = multiplier
         context.syncConfig()
         context.sendFeedback(
             "xpMultiplier.set",
-            context.skillConfig.skillXpMultiplier
+            SkillConfig.get().skillXpMultiplier
         )
         return 1
     }

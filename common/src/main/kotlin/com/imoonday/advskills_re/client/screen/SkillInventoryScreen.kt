@@ -1,6 +1,9 @@
 package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.render.*
+import com.imoonday.advskills_re.client.screen.component.*
+import com.imoonday.advskills_re.config.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import com.imoonday.advskills_re.util.SkillSlot.Companion.indexTexture
@@ -36,6 +39,7 @@ class SkillInventoryScreen(
         get() = player.learnedSkills
             .filterNot(player::hasEquipped)
             .filter { (selectedTab?.type ?: return@filter true) in it.types }
+            .sortedWith(ClientConfig.get().skillSorter)
     var bgWidth: Int = width
     var bgHeight: Int = height
     val bgX: Int
@@ -86,6 +90,43 @@ class SkillInventoryScreen(
                     equippedSlots.add(it)
                 }
         }
+        val config = ClientConfig.get()
+        ButtonIconWidget(bgX - 16, bgY + 5, 16, 16, sortTexture)
+            .addClickAction(0) { updateSorter(config, it, true) }
+            .addClickAction(1) { updateSorter(config, it, false) }
+            .setScrollAction { widget, amount ->
+                if (amount > 0) {
+                    updateSorter(config, widget, false)
+                    true
+                } else if (amount < 0) {
+                    updateSorter(config, widget, true)
+                    true
+                } else null
+            }.apply { tooltip = createSorterTooltip() }
+            .also(::addDrawableChild)
+    }
+
+    private fun updateSorter(
+        config: ClientConfig,
+        widget: ButtonIconWidget,
+        next: Boolean
+    ) {
+        config.skillSorter = config.skillSorter.run { if (next) next() else previous() }
+        widget.tooltip = createSorterTooltip()
+        update()
+    }
+
+    private fun createSorterTooltip(): Tooltip {
+        val sorter = ClientConfig.get().skillSorter
+        return Tooltip.of(
+            SkillSorter.entries.toText(
+                formatter = {
+                    it.displayName.copy()
+                        .formatted(if (sorter == it) Formatting.GREEN else Formatting.GRAY)
+                },
+                separator = "\n".toText()
+            )
+        )
     }
 
     override fun resize(client: MinecraftClient, width: Int, height: Int) {
@@ -100,7 +141,7 @@ class SkillInventoryScreen(
         val title = if (selectedTab == null) translate(
             "screen.inventory.title",
             player.learnedSkills.size,
-            Skills.getValidSkills(player.world).size
+            Skills.getValidSkills().size
         ) else selectedTab!!.type.displayName.copy().formatted(Formatting.BLACK)
         context.drawText(
             textRenderer,
@@ -125,7 +166,7 @@ class SkillInventoryScreen(
             close()
             return true
         }
-        return if (selectingSlot != null && !selectingSlot!!.skill.isInvalid(player.world) && selectingSlot != selectedSlot) {
+        return if (selectingSlot != null && !selectingSlot!!.skill.invalid && selectingSlot != selectedSlot) {
             val slot = selectingSlot!!
             when (keyCode) {
                 GLFW.GLFW_KEY_1 -> swap(slot, 1)
@@ -146,7 +187,7 @@ class SkillInventoryScreen(
     private fun swap(slot: Slot, index: Int): Boolean {
         val original = player.getSkill(index)
         val result = player.equip(slot.skill, index)
-        if (slot.slot != null && !original.isInvalid(player.world)) {
+        if (slot.slot != null && !original.invalid) {
             player.equip(original, slot.slot)
         }
         return result
@@ -190,8 +231,8 @@ class SkillInventoryScreen(
                 slotTexture,
                 x,
                 y,
-                skill.getRarity(player.world).level * 24f,
-                0f,
+                skill.rarity.level * 24f,
+                32f,
                 width,
                 height,
                 256,
@@ -202,9 +243,9 @@ class SkillInventoryScreen(
                 y + 1,
                 x + width - 1,
                 y + 3,
-                skill.getRarity(player.world).formatting.colorValue ?: 0
+                skill.rarity.color
             )
-            if (!skill.isInvalid(player.world) && selectedSlot?.skill != skill) {
+            if (!skill.invalid && selectedSlot?.skill != skill) {
                 SkillRenderer.renderIcon(skill, context, x + 4, y + 4)
             }
             if (hovered) {
@@ -216,10 +257,10 @@ class SkillInventoryScreen(
                     y + height - edge,
                     true
                 )
-                selectingSlot = if (!skill.isInvalid(player.world)) {
+                selectingSlot = if (!skill.invalid) {
                     if (selectedSlot == null) {
                         if (hasShiftDown()) {
-                            val list = skill.getItemTooltips(player.world, true)
+                            val list = skill.getItemTooltips(displayName = true, displayId = true)
                             val orderedList = list.map(Text::asOrderedText).toMutableList()
                             val lines = Tooltip.wrapLines(client, list[1])
                             if (lines.size > 1) {
@@ -228,7 +269,7 @@ class SkillInventoryScreen(
                             }
                             setTooltip(orderedList)
                         } else {
-                            setTooltip(skill.name)
+                            setTooltip(skill.formattedName)
                         }
                     }
                     this
@@ -250,18 +291,18 @@ class SkillInventoryScreen(
                         player.equip(Skills.EMPTY, selectedSlot!!.slot!!)
                         selectedSlot = null
                     } else {
-                        selectedSlot = if (selectedSlot == null && !skill.isInvalid(player.world)) this else null
+                        selectedSlot = if (selectedSlot == null && !skill.invalid) this else null
                     }
                 }
             } else if (selectedSlot != null && selectedSlot != this) {
                 if (!slot.canEquip(selectedSlot!!.skill)) return false
                 player.equip(selectedSlot!!.skill, slot)
-                if (selectedSlot!!.slot != null && !selectedSlot!!.skill.isInvalid(player.world)) player.equip(
+                if (selectedSlot!!.slot != null && !selectedSlot!!.skill.invalid) player.equip(
                     skill,
                     selectedSlot!!.slot!!
                 )
                 selectedSlot = null
-            } else if (!skill.isInvalid(player.world)) {
+            } else if (!skill.invalid) {
                 if (hasShiftDown()) {
                     player.equip(Skills.EMPTY, slot)
                 } else {
@@ -367,6 +408,7 @@ class SkillInventoryScreen(
         }
 
         override fun children(): MutableList<out Element> = slots
+
         override fun isMouseOver(mouseX: Double, mouseY: Double): Boolean =
             mouseX.toInt() in x..x + width && mouseY.toInt() in y..y + viewportHeight
 
@@ -377,26 +419,25 @@ class SkillInventoryScreen(
             hoveredSlot = null
             // 计算可见行范围
             val startRow = (scrollOffset / (SLOT_SIZE + gap)).coerceAtLeast(0)
+            val renderingSlots = slots.toList()
             val endRow = ((scrollOffset + viewportHeight) / (SLOT_SIZE + gap) + 1)
-                .coerceAtMost((slots.size + columns - 1) / columns + 1)
+                .coerceAtMost((renderingSlots.size + columns - 1) / columns + 1)
             // 渲染可见插槽
             context.enableScissor(x, y + padding.top, x + width, y + viewportHeight - padding.bottom)
-            for (index in (startRow * columns) until minOf((endRow * columns), slots.size)) {
-                if (index >= slots.size) break
-                val slot = slots[index]
+            for (index in (startRow * columns) until minOf((endRow * columns), renderingSlots.size)) {
+                val slot = renderingSlots[index]
                 slot.x = x + padding.left + (index % columns) * (SLOT_SIZE + gap)
                 slot.y = y + padding.top + (index / columns) * (SLOT_SIZE + gap) - scrollOffset
-                slot.render(context, mouseX, mouseY, delta)
                 if (slot.isMouseOver(mouseX.toDouble(), mouseY.toDouble()) && !isOutOfBound(mouseX, mouseY)) {
                     slot.hovered = true
                     hoveredSlot = slot
                 } else {
                     slot.hovered = false
                 }
+                slot.render(context, mouseX, mouseY, delta)
             }
-            if (selectingSlot?.isMouseOver(mouseX.toDouble(), mouseY.toDouble()) == true && isOutOfBound(
-                    mouseX, mouseY
-                )
+            if (selectingSlot?.isMouseOver(mouseX.toDouble(), mouseY.toDouble()) == true
+                && isOutOfBound(mouseX, mouseY)
             ) {
                 selectingSlot = null
             }
@@ -471,6 +512,7 @@ class SkillInventoryScreen(
         val type: SkillType,
         val index: Int, x: Int, y: Int,
         var reverse: Boolean,
+        displayIcon: Skill? = null,
     ) : ClickableWidget(x, y, 26, 32, type.displayName) {
 
         val selected
@@ -482,7 +524,7 @@ class SkillInventoryScreen(
                 if (selected) v += 32
                 return v
             }
-        private val displaySkill = Skills.getValidSkills(player.world).firstOrNull { type in it.types } ?: Skills.EMPTY
+        private val displaySkill = displayIcon ?: type.representsSkill()
 
         override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
             context.drawTexture(
@@ -520,6 +562,7 @@ class SkillInventoryScreen(
 
         private val tabTexture = Identifier("textures/gui/container/creative_inventory/tabs.png")
         private val slotTexture = id("slot.png")
+        private val sortTexture = id("sort.png")
         private const val SLOT_SIZE = 24
     }
 }

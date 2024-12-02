@@ -60,7 +60,7 @@ class HookEntityRenderer(context: EntityRendererFactory.Context) : EntityRendere
             MathHelper.inverseSqrt(leashLengthX * leashLengthX + leashLengthZ * leashLengthZ) * leashThickness / 2.0f
         val offsetX = leashLengthZ * inverseSqrt
         val offsetZ = leashLengthX * inverseSqrt
-        val entityBlockPos = BlockPos.ofFloored(target.getCameraPosVec(tickDelta))
+        val entityBlockPos = target.getCameraPosVec(tickDelta).toBlockPos()
         val holdingEntityBlockPos = pos.toBlockPos()
         val entityBlockLight = target.world.getLightLevel(LightType.BLOCK, entityBlockPos)
         val holdingEntityBlockLight =

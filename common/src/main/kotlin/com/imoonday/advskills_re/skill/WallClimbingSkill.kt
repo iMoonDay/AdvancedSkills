@@ -2,10 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillSlot
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.getData
-import com.imoonday.advskills_re.util.syncData
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.server.network.*
@@ -19,7 +16,7 @@ class WallClimbingSkill : PassiveSkill(
 
     override fun isClimbing(player: PlayerEntity): Boolean = player.isUsing() && player.shouldClimb()
 
-    override val persistTime: Int = 20 * 15
+    override val persistTime: Int = 15 * 20
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
@@ -32,11 +29,13 @@ class WallClimbingSkill : PassiveSkill(
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = player.isReady() && player.shouldClimb()
 
-    override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
-        super.serverTick(player, usedTime)
+    override fun tick(player: PlayerEntity, usedTime: Int) {
+        super<AutoStopTrigger>.tick(player, usedTime)
         if (player.isUsing()) {
-            val horizontalCollision = player.properties.getBoolean(HORIZONTAL_COLLISION_KEY)
+            val horizontalCollision =
+                player.horizontalCollision || player.properties.getBoolean(HORIZONTAL_COLLISION_KEY)
             val data = player.getData(this)
+            val oldSpeed = data?.usingSpeed
             if (!horizontalCollision) {
                 data?.usingSpeed = -1
                 if (usedTime <= 0) {
@@ -46,14 +45,14 @@ class WallClimbingSkill : PassiveSkill(
             } else if (data?.usingSpeed == -1) {
                 data.usingSpeed = 1
             }
-            player.syncData()
+            if (oldSpeed != data?.usingSpeed) {
+                player.syncData()
+            }
         }
     }
 
-    override fun write(player: PlayerEntity, data: NbtCompound): NbtCompound {
-        data.putBoolean(HORIZONTAL_COLLISION_KEY, player.horizontalCollision)
-        return data
-    }
+    override fun write(player: PlayerEntity, data: NbtCompound): NbtCompound =
+        data.apply { putBoolean(HORIZONTAL_COLLISION_KEY, player.horizontalCollision) }
 
     override fun apply(player: ServerPlayerEntity, data: NbtCompound) {
         player.properties.putBoolean(HORIZONTAL_COLLISION_KEY, data.getBoolean(HORIZONTAL_COLLISION_KEY))

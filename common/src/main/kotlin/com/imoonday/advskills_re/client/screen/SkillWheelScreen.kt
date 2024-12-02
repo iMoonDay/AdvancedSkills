@@ -70,7 +70,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
                     Color.GRAY.alpha(0.4).rgb
                 )
             }
-            it.let { player.getSkill(it) }.takeIf { !it.isInvalid(player.world) }?.run {
+            it.let { player.getSkill(it) }.takeIf { !it.invalid }?.run {
                 var y = centerY + 60
                 textRenderer.textHandler.wrapLines(description, (context.scaledWindowWidth * 0.65).toInt(), Style.EMPTY)
                     .forEach {
@@ -151,7 +151,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
 
             2 -> {
                 selectingSlot?.let { index ->
-                    clientPlayer?.getSkill(index)?.takeUnless { it.isInvalid(client?.world) }?.let {
+                    clientPlayer?.getSkill(index)?.takeUnless { it.invalid }?.let {
                         client!!.setScreen(SkillGalleryScreen(it))
                     }
                 } ?: run {

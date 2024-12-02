@@ -17,15 +17,14 @@ object ResetXpCommand : XpCommand("reset") {
     private fun resetXp(context: CommandContext<ServerCommandSource>): Int {
         val targets = EntityArgumentType.getPlayers(context, "targets")
 
-        for (entity in targets) {
-            entity.skillExp = 0
-            entity.skillLevel = 0
-            entity.levelData.cycle = 0
+        for (player in targets) {
+            player.levelData.reset()
+            player.syncData()
         }
         if (targets.size == 1) {
             context.sendFeedback(
                 "resetXp.single",
-                targets.first().displayName.string
+                targets.first().displayName
             )
         } else {
             context.sendFeedback(

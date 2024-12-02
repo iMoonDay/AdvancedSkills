@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.client.render
 
 import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.client.render.renderer.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.network.*

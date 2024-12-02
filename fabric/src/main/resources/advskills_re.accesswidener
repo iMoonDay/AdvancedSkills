@@ -33,3 +33,5 @@ mutable field net/minecraft/client/render/entity/feature/ArmorFeatureRenderer in
 mutable field net/minecraft/client/render/entity/feature/ArmorFeatureRenderer outerModel Lnet/minecraft/client/render/entity/model/BipedEntityModel;
 
 accessible field net/minecraft/client/gui/screen/Screen tooltip Lnet/minecraft/client/gui/screen/Screen$PositionedTooltip;
+
+accessible class net/minecraft/client/gui/screen/Screen$PositionedTooltip

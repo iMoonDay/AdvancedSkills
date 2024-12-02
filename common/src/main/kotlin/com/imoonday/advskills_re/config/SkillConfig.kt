@@ -1,16 +1,20 @@
 package com.imoonday.advskills_re.config
 
+import com.imoonday.advskills_re.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.nbt.*
+import net.minecraft.server.*
 import net.minecraft.util.*
 
 class SkillConfig {
 
+    private var saveAction: (() -> Unit)? = null
+
     var skillCooldownMultiplier: Double = 1.0
     var skillXpMultiplier: Double = 1.0
-    var skillModifier: MutableMap<String, SkillModifier> = mutableMapOf()
-    var skillBlackList: MutableSet<String> = mutableSetOf()
-    var defaultSkillSlots: MutableMap<String, Int> = SkillContainer.DEFAULT_SLOTS.toMutableMap()
+    val skillModifier: MutableMap<String, SkillModifier> = mutableMapOf()
+    val skillBlackList: MutableSet<String> = mutableSetOf()
+    val defaultSkillSlots: MutableMap<String, Int> = SkillContainer.DEFAULT_SLOTS.toMutableMap()
 
     fun getModifier(id: Identifier): SkillModifier? = skillModifier[id.toString()]
 
@@ -45,7 +49,7 @@ class SkillConfig {
         defaultSkillSlots["passive"] = count
     }
 
-    fun fromTag(tag: NbtCompound) {
+    fun load(tag: NbtCompound) {
         skillModifier.clear()
         skillBlackList.clear()
         defaultSkillSlots.clear()
@@ -67,34 +71,64 @@ class SkillConfig {
         }
 
         skillCooldownMultiplier = tag.getDouble("skillCooldownMultiplier")
-
         skillXpMultiplier = tag.getDouble("skillXpMultiplier")
     }
 
-    fun toTag(tag: NbtCompound): NbtCompound {
-        return tag.apply {
-            put("skillModifier", NbtCompound().apply {
-                for ((id, modifier) in skillModifier) {
-                    put(id, modifier.toNbt())
-                }
-            })
-            put("skillBlackList", NbtList().apply {
-                skillBlackList.forEach {
-                    add(NbtString.of(it))
-                }
-            })
-            put("defaultSkillSlots", NbtCompound().apply {
-                for ((slot, count) in defaultSkillSlots) {
-                    putInt(slot, count)
-                }
-            })
-            putDouble("skillCooldownMultiplier", skillCooldownMultiplier)
-            putDouble("skillXpMultiplier", skillXpMultiplier)
-        }
+    fun save(tag: NbtCompound): NbtCompound = tag.apply {
+        put("skillModifier", NbtCompound().apply {
+            for ((id, modifier) in skillModifier) {
+                put(id, modifier.toNbt())
+            }
+        })
+        put("skillBlackList", NbtList().apply {
+            skillBlackList.forEach { add(NbtString.of(it)) }
+        })
+        put("defaultSkillSlots", NbtCompound().apply {
+            for ((slot, count) in defaultSkillSlots) {
+                putInt(slot, count)
+            }
+        })
+        putDouble("skillCooldownMultiplier", skillCooldownMultiplier)
+        putDouble("skillXpMultiplier", skillXpMultiplier)
     }
+
+    fun reset() {
+        skillModifier.clear()
+        skillBlackList.clear()
+        defaultSkillSlots.clear()
+        skillCooldownMultiplier = 1.0
+        skillXpMultiplier = 1.0
+    }
+
+    fun markDirty() {
+        saveAction?.invoke()
+    }
+
+    private fun setSaveAction(action: (() -> Unit)?) {
+        saveAction = action
+    }
+
+    fun connectToServer(server: MinecraftServer) {
+        server.overworld.persistentStateManager
+            .getOrCreate(SkillConfigState.Companion::fromNbt, ::SkillConfigState, MOD_ID)
+            .run {
+                markDirty()
+                setSaveAction(::markDirty)
+            }
+    }
+
+    fun disconnect() = instance.run {
+        reset()
+        setSaveAction(null)
+    }
+
+    fun isConnected(): Boolean = saveAction != null
 
     companion object {
 
-        var instance = SkillConfig()
+        private val instance = SkillConfig()
+
+        @JvmStatic
+        fun get(): SkillConfig = instance.apply(SkillConfig::markDirty)
     }
 }

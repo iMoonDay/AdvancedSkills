@@ -44,7 +44,7 @@ val KeyBinding.keyCategory: InputUtil.Type
     get() = key.category
 
 fun PlayerEntity.updateScreen() {
-    if (world.isClient) {
+    if (isCurrentClientPlayer) {
         val screen = client!!.currentScreen
         if (screen is AutoSyncedScreen && (screen as ScreenAccessor).isScreenInitialized) {
             screen.update()
@@ -74,3 +74,6 @@ fun ClientPlayerEntity.requestUse(
 
 val Skill.modelId
     get() = ModelIdentifier(Registries.ITEM.getId(item), "inventory")
+
+val PlayerEntity.isCurrentClientPlayer: Boolean
+    get() = client != null && this == clientPlayer

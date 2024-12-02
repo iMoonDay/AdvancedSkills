@@ -3,12 +3,7 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillSlot
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.equippedSkills
-import com.imoonday.advskills_re.util.playSound
-import com.imoonday.advskills_re.util.resetUsedTime
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.damage.*
@@ -28,7 +23,7 @@ class DangerPerceptionSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
-    override val persistTime: Int = 20 * 2
+    override val persistTime: Int = 2 * 20
 
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(

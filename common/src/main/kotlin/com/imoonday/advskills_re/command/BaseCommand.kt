@@ -20,8 +20,6 @@ abstract class BaseCommand(
     override val root: String = "skills"
     protected lateinit var registry: CommandRegistryAccess
     protected lateinit var selection: CommandManager.RegistrationEnvironment
-    protected val CommandContext<ServerCommandSource>.skillConfig: SkillConfig
-        get() = source.server.skillConfig
 
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
@@ -52,7 +50,7 @@ abstract class BaseCommand(
         val server = source.server
         Channels.SYNC_CONFIG_S2C.sendToPlayers(
             server.playerManager.playerList,
-            SyncConfigS2CPacket(server.skillConfig.toTag(NbtCompound()))
+            SyncConfigS2CPacket(SkillConfig.get().save(NbtCompound()))
         )
     }
 }

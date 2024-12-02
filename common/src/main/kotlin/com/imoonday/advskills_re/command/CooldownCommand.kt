@@ -25,7 +25,7 @@ object CooldownCommand : BaseCommand("cooldown") {
             context.sendMessage(
                 translate(
                     "cooldownMultiplier.value",
-                    context.skillConfig.skillCooldownMultiplier,
+                    SkillConfig.get().skillCooldownMultiplier,
                 )
             )
             1
@@ -35,7 +35,7 @@ object CooldownCommand : BaseCommand("cooldown") {
         context: CommandContext<ServerCommandSource>,
         multiplier: Double,
     ): Int {
-        val config = context.skillConfig
+        val config = SkillConfig.get()
         config.skillCooldownMultiplier = multiplier
         context.syncConfig()
         context.sendFeedback(

@@ -18,8 +18,10 @@ interface LongPressTrigger : TickTrigger, AutoStopTrigger {
 
     fun onPress(player: ServerPlayerEntity): UseResult {
         player.startUsing()
-        return UseResult.fail(translate("useSkill.charging", getAsSkill().name))
+        return getChargingResult()
     }
+
+    fun getChargingResult() = UseResult.fail(translate("useSkill.charging", getAsSkill().name))
 
     fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult
 

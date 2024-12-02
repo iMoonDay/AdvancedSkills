@@ -23,7 +23,7 @@ object ForgetCommand : PlayerCommand("forget") {
         if (!player.forget(skill)) {
             context.sendFeedback(
                 "forgetSkill.failed",
-                player.displayName.string,
+                player.displayName,
                 skill.name
             )
         }

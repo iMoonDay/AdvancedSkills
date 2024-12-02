@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.network.c2s
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
@@ -25,7 +26,7 @@ class EquipSkillC2SRequest(
 
     override fun apply(context: PacketContext) {
         val player = context.player as? ServerPlayerEntity ?: return
-        if (player.equip(skill, slot) && !skill.isInvalid(player.world)) {
+        if (player.equip(skill, slot) && !skill.invalid) {
             player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC)
         }
     }

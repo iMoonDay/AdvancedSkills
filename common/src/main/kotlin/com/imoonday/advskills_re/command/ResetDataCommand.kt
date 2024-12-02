@@ -19,7 +19,7 @@ object ResetDataCommand : PlayerCommand("reset") {
         player.resetData()
         context.sendFeedback(
             "reset",
-            player.displayName.string
+            player.displayName
         )
         return 1
     }

@@ -135,7 +135,6 @@ object ModEntities {
         attributeContainerSupplier: Supplier<DefaultAttributeContainer.Builder>,
     ): RegistrySupplier<EntityType<T>> {
         val supplier = register(name)
-//        EntityAttributeRegistry.register(supplier, attributeContainerSupplier)
         livingAttributeRegistry += { EntityAttributeRegistry.register(supplier, attributeContainerSupplier) }
         return supplier
     }

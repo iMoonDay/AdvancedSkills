@@ -56,7 +56,7 @@ class HookEntity(type: EntityType<out HookEntity>, world: World) : Entity(type, 
         set(value) {
             dataTracker.set(TARGET_UUID, Optional.ofNullable(value))
         }
-    var life: Int = 20 * 5
+    var life: Int = 5 * 20
 
     constructor(world: World, owner: Entity) : this(ModEntities.HOOK.get(), world) {
         this.owner = owner

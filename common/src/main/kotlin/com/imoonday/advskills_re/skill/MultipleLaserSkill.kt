@@ -10,7 +10,6 @@ import net.minecraft.server.network.*
 import net.minecraft.text.*
 import net.minecraft.util.hit.*
 import net.minecraft.util.math.*
-import net.minecraft.world.*
 import org.joml.*
 
 class MultipleLaserSkill : LongPressSkill(
@@ -70,19 +69,19 @@ class MultipleLaserSkill : LongPressSkill(
         }
     }
 
-    override fun getMaxPressTime(): Int = 20 * 10
+    override fun getMaxPressTime(): Int = 10 * 20
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopUsing()
-        player.startCooling(calculateCooldown(player.world, pressedTime))
+        player.startCooling(calculateCooldown(pressedTime))
         return UseResult.fail(Text.empty())
     }
 
-    private fun calculateCooldown(world: World?, pressedTime: Int) =
-        (pressedTime.toFloat() / getMaxPressTime() * getCooldown(world)).toInt()
+    private fun calculateCooldown(pressedTime: Int) =
+        (pressedTime.toFloat() / getMaxPressTime() * cooldown).toInt()
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
-        if (player.isUsing()) player.startCooling(calculateCooldown(player.world, player.getUsedTime()))
+        if (player.isUsing()) player.startCooling(calculateCooldown(player.getUsedTime()))
         return true
     }
 

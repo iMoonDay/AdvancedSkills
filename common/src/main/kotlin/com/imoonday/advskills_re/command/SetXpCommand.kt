@@ -30,7 +30,7 @@ object SetXpCommand : XpCommand("set") {
             context.sendFeedback(
                 "skillExp.set.single",
                 amount,
-                targets.first().displayName.string
+                targets.first().displayName
             )
         } else {
             context.sendFeedback(
@@ -53,7 +53,7 @@ object SetXpCommand : XpCommand("set") {
             context.sendFeedback(
                 "skillLevel.set.single",
                 amount,
-                targets.first().displayName.string
+                targets.first().displayName
             )
         } else {
             context.sendFeedback(

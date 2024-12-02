@@ -31,5 +31,7 @@ interface ReflectionTrigger : AutoStopTrigger {
         super.onStop(player)
     }
 
+    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) = Unit
+
     fun getStartTime(player: ServerPlayerEntity) = player.getUsingData()?.getLong("startTime")
 }

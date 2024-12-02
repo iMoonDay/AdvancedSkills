@@ -1,8 +1,8 @@
 package com.imoonday.advskills_re.util
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.nbt.*
-import net.minecraft.world.*
 
 class LearnableSkillData(
     private var choice: SkillChoice = SkillChoice.EMPTY,
@@ -17,10 +17,10 @@ class LearnableSkillData(
     val third
         get() = choice.third
 
-    fun next(world: World?, except: Collection<Skill> = emptyList(), filter: (Skill) -> Boolean = { true }) {
-        if (hasNext()) {
+    fun next(except: Collection<Skill> = emptyList(), filter: (Skill) -> Boolean = { true }) {
+        if (hasNext() && SkillChoice.canGenerate(except, filter)) {
             count--
-            choice = SkillChoice.generate(world, except, filter)
+            choice = SkillChoice.generate(except, filter)
         } else {
             choice = SkillChoice.EMPTY
         }
@@ -44,18 +44,16 @@ class LearnableSkillData(
     fun isEmpty() = choice.isEmpty()
 
     fun refresh(
-        world: World?,
         force: Boolean = false,
         except: Collection<Skill> = emptyList(),
         filter: (Skill) -> Boolean = { true },
     ) {
-        if (refreshed && !force || choice.isEmpty() || !SkillChoice.canGenerate(world, except, filter)) return
+        if (refreshed && !force || choice.isEmpty() || !SkillChoice.canGenerate(except, filter)) return
         refreshed = true
-        choice = SkillChoice.generate(world, except, filter)
+        choice = SkillChoice.generate(except, filter)
     }
 
     fun correct(
-        world: World?,
         except: Collection<Skill> = emptyList(),
         filter: (Skill) -> Boolean = { true }
     ): Boolean {
@@ -64,8 +62,23 @@ class LearnableSkillData(
             count = 0
             modified = true
         }
-        if (choice.isEmpty() && hasNext()) {
-            next(world, except, filter)
+        if (choice.isEmpty() && hasNext() && SkillChoice.canGenerate(except, filter)) {
+            next(except, filter)
+            modified = true
+        }
+        if (choice.hasDuplicates()) {
+            choice = choice.removeDuplicates()
+            modified = true
+        }
+        val replacePredicate: (Skill) -> Boolean = { it.invalid || it in except || !filter(it) }
+        if (!choice.isEmpty() && choice.skills.any(replacePredicate)) {
+            choice = choice.replaceWith(replacePredicate) { set ->
+                Skills.random(except + set, filter).also {
+                    if (!it.isEmpty()) {
+                        set.add(it)
+                    }
+                }
+            }
             modified = true
         }
         return modified

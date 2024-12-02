@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.network.s2c.*
@@ -64,7 +65,7 @@ val PlayerEntity.data: PlayerDataComponent
 val PlayerEntity.skillContainer: SkillContainer
     get() = data.container
 val PlayerEntity.learnedSkills: Set<Skill>
-    get() = skillContainer.getAllSkills(world)
+    get() = skillContainer.getAllSkills()
 
 fun PlayerEntity.syncData(force: Boolean = true) {
     if (this is ServerPlayerEntity) {
@@ -97,8 +98,8 @@ fun PlayerEntity.isCooling(skill: Skill): Boolean = getCooldown(skill) > 0
 fun PlayerEntity.startCooling(skill: Skill, cooldown: Int? = null) {
     if (isCooling(skill)) return
     modifySkillData(skill) {
-        var time = cooldown ?: skill.getCooldown(world)
-        getTriggers<CooldownTrigger>().forEach { trigger -> time = trigger.getCooldown(time) }
+        var time = cooldown ?: skill.cooldown
+        forEachTrigger<CooldownTrigger> { trigger -> time = trigger.getCooldown(time) }
         it.cooldown = if (isCreative) min(20, time) else time
         true
     }
@@ -127,7 +128,7 @@ fun PlayerEntity.modifySkillData(skill: Skill, operation: (SkillData) -> Boolean
     } ?: false
 
 fun PlayerEntity.learn(skill: Skill, toast: Boolean = true, message: Boolean = true): Boolean =
-    skillContainer.learn(world, skill) { result ->
+    skillContainer.learn(skill) { result ->
         if (result) {
             skillContainer.getEmptySlot(skill)?.equip(skill)
             (this as? ServerPlayerEntity)?.let {
@@ -142,7 +143,7 @@ fun PlayerEntity.learn(skill: Skill, toast: Boolean = true, message: Boolean = t
                         )
                     )
                 })
-                if (skillContainer.getAllSkills(world).size == Skills.getValidSkills(world).size)
+                if (skillContainer.getAllSkills().size == Skills.getValidSkills().size)
                     sendMessage(translate("learnSkill.all"))
             }
         }
@@ -150,8 +151,8 @@ fun PlayerEntity.learn(skill: Skill, toast: Boolean = true, message: Boolean = t
     }
 
 fun PlayerEntity.learnAll() {
-    if (skillContainer.getAllSkills(world).size != Skills.getValidSkills(world).size) {
-        skillContainer.learnAll(world) {
+    if (skillContainer.getAllSkills().size != Skills.getValidSkills().size) {
+        skillContainer.learnAll {
             skillContainer.getEmptySlot(it)?.equip(it)
         }
         syncData()
@@ -180,7 +181,7 @@ fun PlayerEntity.forget(skill: Skill, message: Boolean = true): Boolean =
     }
 
 fun PlayerEntity.forgetAll() {
-    if (skillContainer.getAllSkills(world).isNotEmpty()) {
+    if (skillContainer.getAllSkills().isNotEmpty()) {
         skillContainer.forgetAll {
             if (this is ServerPlayerEntity && it is UnequipTrigger) {
                 it.postUnequipped(this, it)
@@ -193,7 +194,7 @@ fun PlayerEntity.forgetAll() {
 }
 
 fun PlayerEntity.learnRandomly(filter: (Skill) -> Boolean = { true }): Boolean =
-    Skills.random(world) { !hasLearned(it) && filter(it) }
+    Skills.random { !hasLearned(it) && filter(it) }
         .takeUnless { it.isEmpty() }
         ?.let { learn(it) } ?: false
 
@@ -207,14 +208,14 @@ fun ServerPlayerEntity.addChoice() {
 fun PlayerEntity.getChoice(): SkillChoice = learnableData.get()
 
 fun PlayerEntity.refreshChoice(force: Boolean = false) = if (this is ServerPlayerEntity) {
-    learnableData.refresh(world, force, learnedSkills)
+    learnableData.refresh(force, learnedSkills)
     syncData()
 } else {
     Channels.REFRESH_CHOICE_C2S.sendToServer(RefreshChoiceC2SRequest())
 }
 
 fun PlayerEntity.canFreshChoice(): Boolean =
-    SkillChoice.canGenerate(world, learnedSkills) && !learnableData.refreshed
+    SkillChoice.canGenerate(learnedSkills) && !learnableData.refreshed
 
 fun PlayerEntity.choose(id: Int): Boolean = when (id) {
     0 -> chooseFirst()
@@ -232,12 +233,12 @@ private fun ServerPlayerEntity.choose(index: Int): Boolean {
             2 -> third
             else -> return false
         }
-        if (skill.isInvalid(world)) {
-            correct(world, learnedSkills)
+        if (skill.invalid) {
+            correct(learnedSkills)
             return false
         }
         learn(skill)
-        next(world, learnedSkills)
+        next(learnedSkills)
         syncData()
     }
     return true
@@ -273,15 +274,15 @@ fun PlayerEntity.equip(skill: Skill, index: Int): Boolean {
         Channels.EQUIP_SKILL_C2S.sendToServer(EquipSkillC2SRequest(index, skill))
         return true
     } else if (this is ServerPlayerEntity) {
-        if (skill.isInvalid(world) && !skill.isEmpty()) return false
-        if (!skill.isInvalid(world) && !hasLearned(skill)) return false
+        if (skill.invalid && !skill.isEmpty()) return false
+        if (!skill.invalid && !hasLearned(skill)) return false
         val slot = skillContainer.getSlot(index) ?: return false
         if (slot.skill == skill || !slot.canEquip(skill)) return false
         val original = slot.skill
         var move = false
-        if (!skill.isInvalid(world)) skillContainer.getSlot(skill)?.let { it.unequip { move = true } }
+        if (!skill.invalid) skillContainer.getSlot(skill)?.let { it.unequip { move = true } }
         if (!move) {
-            if (skill.isInvalid(world)) {
+            if (skill.invalid) {
                 if (SkillChangeEvents.UNEQUIPPED.invoker().onUnequipped(this, slot, original).isFalse) {
                     syncData()
                     return false
@@ -295,11 +296,11 @@ fun PlayerEntity.equip(skill: Skill, index: Int): Boolean {
         }
         slot.equip(skill) { syncData() }
         if (!move) {
-            if (skill.isInvalid(world)) {
+            if (skill.invalid) {
                 SkillChangeEvents.POST_UNEQUIPPED.invoker().postUnequipped(this, slot, original)
             } else {
                 SkillChangeEvents.POST_EQUIPPED.invoker().postEquipped(this, slot, skill)
-                if (!original.isInvalid(world)) SkillChangeEvents.POST_UNEQUIPPED.invoker()
+                if (!original.invalid) SkillChangeEvents.POST_UNEQUIPPED.invoker()
                     .postUnequipped(this, slot, original)
             }
         }
@@ -333,6 +334,15 @@ var PlayerEntity.skillLevel: Int
         updateCycle()
         syncData()
     }
+var PlayerEntity.skillCycle: Int
+    get() {
+        updateCycle()
+        return levelData.cycle
+    }
+    set(value) {
+        levelData.cycle = value
+        syncData()
+    }
 val PlayerEntity.levelData: SkillLevelData
     get() = data.level
 
@@ -364,11 +374,11 @@ private fun PlayerEntity.updateCycle() {
 }
 
 val PlayerEntity.usingSkills: Set<Skill>
-    get() = skillContainer.getAllSkills(world) { _, data -> data.using }
+    get() = skillContainer.getAllSkills { _, data -> data.using }
 
 fun PlayerEntity.startUsing(skill: Skill, data: NbtCompound? = null): Boolean {
     if (skill in usingSkills) return false
-    if (skill.isInvalid(world)) return false
+    if (skill.invalid) return false
     getData(skill)?.apply {
         using = true
         usedTime = 0
@@ -456,6 +466,17 @@ fun PlayerEntity.raycastVisualBlock(maxDistance: Double): HitResult {
 
 inline fun <reified T : SkillTrigger> PlayerEntity.getTriggers(): List<T> =
     equippedSkills.filterIsInstance<T>()
+
+inline fun <reified T : SkillTrigger> PlayerEntity.forEachTrigger(
+    filter: (T) -> Boolean = { true },
+    action: (T) -> Unit
+) = getTriggers<T>().filter(filter).forEach(action)
+
+inline fun <reified T : SkillTrigger> PlayerEntity.anyTrigger(mapper: (T) -> Boolean): Boolean =
+    getTriggers<T>().map(mapper).any { it }
+
+inline fun <reified T : SkillTrigger> PlayerEntity.allTriggers(mapper: (T) -> Boolean): Boolean =
+    getTriggers<T>().map(mapper).all { it }
 
 /**
  * @return The angle between the player and the given position, between 0 to π

@@ -13,34 +13,41 @@ object ClientTriggerHandler {
 
     @JvmStatic
     fun isGlowing(entity: Entity): Boolean {
-        val player = clientPlayer
-        return player?.getTriggers<GlowingTrigger>()
-            ?.map { it.isGlowing(entity, player) }
-            ?.any { it } ?: false
+        val player = clientPlayer ?: return false
+        return player.anyTrigger<GlowingTrigger> { it.isGlowing(entity, player) }
     }
 
+    /**
+     * Should invert mouse
+     *
+     * @return Pair of should invert horizontal mouse and should invert vertical mouse
+     */
     @JvmStatic
     fun shouldInvertMouse(): Pair<Boolean, Boolean> {
-        val player = clientPlayer
-        return player?.getTriggers<InvertMouseTrigger>()?.run {
+        val player = clientPlayer ?: return false to false
+        return player.getTriggers<InvertMouseTrigger>().run {
             map { it.shouldInvertMouseX(player) }.any { it } to map { it.shouldInvertMouseY(player) }.any { it }
-        } ?: (false to false)
+        }
     }
 
+    /**
+     * Should invert input
+     *
+     * @return Pair of should invert horizontal input and should invert vertical input
+     */
     @JvmStatic
     fun shouldInvertInput(): Pair<Boolean, Boolean> {
-        val player = clientPlayer
-        return player?.getTriggers<InvertInputTrigger>()?.run {
+        val player = clientPlayer ?: return false to false
+        return player.getTriggers<InvertInputTrigger>().run {
             map { it.shouldInvertHorizontalInput(player) }.any { it } to map { it.shouldInvertVerticalInput(player) }.any { it }
-        } ?: (false to false)
+        }
     }
 
     @JvmStatic
     fun getCameraMovement(original: Float): Float {
         var movement = original
         val player = clientPlayer
-        player?.getTriggers<CameraUpdateMovementTrigger>()
-            ?.forEach { movement = it.getDelta(movement, player) }
+        player?.forEachTrigger<CameraUpdateMovementTrigger> { movement = it.getDelta(movement, player) }
         return movement
     }
 
@@ -52,14 +59,14 @@ object ClientTriggerHandler {
 
     @JvmStatic
     fun sendPlayerData(player: PlayerEntity) =
-        player.getTriggers<SendPlayerDataTrigger>()
-            .filter { it.getSendTime().shouldSendOnTick(player, it.getAsSkill()) }
-            .forEach {
-                Channels.SEND_PLAYER_DATA_C2S.sendToServer(
-                    SendPlayerDataC2SPacket(
-                        it.getAsSkill(),
-                        it.write(player, NbtCompound())
-                    )
+        player.forEachTrigger<SendPlayerDataTrigger>(
+            { it.getSendTime().shouldSendOnTick(player, it.getAsSkill()) }
+        ) {
+            Channels.SEND_PLAYER_DATA_C2S.sendToServer(
+                SendPlayerDataC2SPacket(
+                    it.getAsSkill(),
+                    it.write(player, NbtCompound())
                 )
-            }
+            )
+        }
 }

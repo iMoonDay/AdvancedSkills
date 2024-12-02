@@ -14,7 +14,7 @@ class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>,
     EffectEnergyBallEntity(entityType, world) {
 
     override var effects = mutableMapOf(
-        StatusEffectInstance(ModEffects.FREEZE.get(), 20 * 3, 0, false, false, true) to 0.3f,
+        StatusEffectInstance(ModEffects.FREEZE.get(), 3 * 20, 0, false, false, true) to 0.3f,
     )
     override var range: Double = 4.0
 

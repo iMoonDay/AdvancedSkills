@@ -25,7 +25,7 @@ class UnstableTntEntity(entityType: EntityType<out UnstableTntEntity>, world: Wo
         this.prevZ = z
         this.causingEntity = igniter
         this.velocity = velocity
-        this.fuse = 20 * 10
+        this.fuse = 10 * 20
     }
 
     override fun tick() {

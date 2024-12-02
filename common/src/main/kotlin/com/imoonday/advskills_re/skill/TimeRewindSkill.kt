@@ -17,7 +17,7 @@ class TimeRewindSkill : LongPressSkill(
     rarity = Rarity.MYTHIC,
 ), UsingRenderTrigger, DeathTrigger {
 
-    override fun getMaxPressTime(): Int = 20 * 5
+    override fun getMaxPressTime(): Int = 5 * 20
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         val properties = player.properties
@@ -57,7 +57,7 @@ class TimeRewindSkill : LongPressSkill(
                             player.pos,
                             NbtCompound().apply { putFloat("Health", player.health / player.maxHealth) })
                     )
-                    keys.filter { (it.toIntOrNull() ?: 0) < player.age - 20 * 5 }.forEach { remove(it) }
+                    keys.filter { (it.toIntOrNull() ?: 0) < player.age - 5 * 20 }.forEach { remove(it) }
                 })
             player.syncProperties()
         }

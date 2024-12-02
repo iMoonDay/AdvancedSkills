@@ -11,15 +11,16 @@ object ModItemGroups {
 
     @JvmField
     val ITEM_GROUPS: DeferredRegister<ItemGroup> = DeferredRegister.create(MOD_ID, RegistryKeys.ITEM_GROUP)
+
+    @JvmField
     val GROUP: RegistrySupplier<ItemGroup> = register("advskills_re") {
         ModItems.UNIQUE_SKILL_FRUIT.get()?.defaultStack ?: Items.BARRIER.defaultStack
     }
 
+    @Suppress("UnstableApiUsage")
     fun init() {
         ITEM_GROUPS.register()
         ModItems.ITEMS.forEach { CreativeTabRegistry.append(GROUP, it) }
-//        CreativeTabRegistry.append(GROUP, *ModItems.FRUITS.toTypedArray())
-//        CreativeTabRegistry.append(GROUP, *Skills.getValidSkills().mapNotNull { it.item }.toTypedArray())
     }
 
     private fun register(name: String, icon: () -> ItemStack): RegistrySupplier<ItemGroup> =

@@ -4,11 +4,8 @@ import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
-import com.mojang.blaze3d.systems.*
-import net.minecraft.client.gui.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
-import net.minecraft.util.*
 
 class PrimaryFreezeSkill : Skill(
     id = "primary_freeze",

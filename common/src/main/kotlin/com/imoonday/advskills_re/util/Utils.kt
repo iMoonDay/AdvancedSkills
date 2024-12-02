@@ -10,6 +10,7 @@ import net.minecraft.util.*
 import net.minecraft.util.math.*
 import java.awt.*
 import kotlin.math.*
+import kotlin.random.*
 
 fun Color.alpha(alpha: Int): Color = Color(this.red, this.green, this.blue, alpha)
 
@@ -49,3 +50,86 @@ fun Boolean?.toEventResult(): EventResult = EventResult.interrupt(this)
 
 val Entity.horizontalRotationVector: Vec3d
     get() = getRotationVector(0f, yaw)
+
+fun <T> Collection<T>.randomByWeight(
+    weightMapper: (T) -> Int,
+    defaultValue: T
+): T {
+    if (isEmpty()) return defaultValue
+
+    val totalWeight = sumOf { weightMapper(it) }
+
+    if (totalWeight <= 0) return defaultValue
+
+    val randomValue = Random.nextInt(totalWeight)
+
+    var currentWeight = 0
+    for (item in this) {
+        currentWeight += weightMapper(item)
+        if (randomValue < currentWeight) {
+            return item
+        }
+    }
+
+    return defaultValue
+}
+
+fun <T> Collection<T>.randomByWeight(
+    weightMapper: (T) -> Int,
+    count: Int,
+    defaultValue: T
+): List<T> {
+    if (count <= 0) return emptyList()
+    if (isEmpty()) return List(count) { defaultValue }
+
+    val totalWeight = sumOf { weightMapper(it) }
+
+    if (totalWeight <= 0) return List(count) { defaultValue }
+
+    val weightedItems = map { it to weightMapper(it) }
+
+    val selectedItems = mutableListOf<T>()
+
+    while (selectedItems.size < count && selectedItems.size < size) {
+        val randomValue = Random.nextInt(totalWeight)
+        var currentWeight = 0
+
+        for ((item, weight) in weightedItems) {
+            currentWeight += weight
+            if (randomValue < currentWeight && item !in selectedItems) {
+                selectedItems.add(item)
+                break
+            }
+        }
+    }
+
+    while (selectedItems.size < count) {
+        selectedItems.add(defaultValue)
+    }
+
+    return selectedItems.toList()
+}
+
+fun <T> Collection<T>.toText(
+    formatter: (T) -> MutableText?,
+    separator: Text = ", ".toText(),
+    prefix: Text = Text.empty(),
+    suffix: Text = Text.empty(),
+): MutableText {
+    var text = prefix.copy()
+    if (isEmpty()) return text
+
+    forEachIndexed { i, item ->
+        val formattedText = formatter(item)
+        if (formattedText != null) {
+            text = text.append(formattedText)
+            if (i != size - 1) {
+                text = text.append(separator)
+            }
+        } else if (i != size - 1) {
+            text.siblings.removeLast()
+        }
+    }
+
+    return text.append(suffix)
+}

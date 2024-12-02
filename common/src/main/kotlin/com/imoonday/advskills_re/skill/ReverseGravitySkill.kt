@@ -1,8 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillType
-import com.imoonday.advskills_re.util.UseResult
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
@@ -24,7 +23,7 @@ class ReverseGravitySkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 
-    override val persistTime: Int = 20 * 15
+    override val persistTime: Int = 15 * 20
 
     override fun onStop(player: ServerPlayerEntity) {
         player.startCooling()

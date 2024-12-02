@@ -19,7 +19,7 @@ object ResetCooldownCommand : PlayerCommand("reset-cooldown") {
         player.learnedSkills.forEach { player.stopCooling(it) }
         context.sendFeedback(
             "resetCooldown",
-            player.displayName.string
+            player.displayName
         )
         return 1
     }

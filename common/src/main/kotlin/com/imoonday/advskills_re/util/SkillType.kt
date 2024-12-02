@@ -1,19 +1,20 @@
 package com.imoonday.advskills_re.util
 
+import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.skill.*
 import net.minecraft.text.*
 
-enum class SkillType(val translationKey: String) {
-    ATTACK("advskills_re.skillType.attack"),
-    DEFENSE("advskills_re.skillType.defense"),
-    FUNCTION("advskills_re.skillType.function"),
-    CONTROL("advskills_re.skillType.control"),
-    PASSIVE("advskills_re.skillType.passive"),
-    ENHANCEMENT("advskills_re.skillType.enhancement"),
-    SUMMON("advskills_re.skillType.summon"),
-    RESTORATION("advskills_re.skillType.restoration"),
-    MOVEMENT("advskills_re.skillType.movement"),
-    DESTRUCTION("advskills_re.skillType.destruction");
+enum class SkillType(val representsSkill: () -> Skill) {
+    ATTACK({ Skills.THUNDER_FURY }),
+    DEFENSE({ Skills.ABSOLUTE_DEFENSE }),
+    FUNCTION({ Skills.ITEM_ATTRACTION }),
+    CONTROL({ Skills.PRIMARY_FREEZE }),
+    PASSIVE({ Skills.MASTERY }),
+    ENHANCEMENT({ Skills.DOPING }),
+    SUMMON({ Skills.EXCLUSIVE_MOUNT }),
+    RESTORATION({ Skills.ADVANCED_PURIFICATION }),
+    MOVEMENT({ Skills.DASH }),
+    DESTRUCTION({ Skills.FIREBALL });
 
-    val displayName: Text
-        get() = Text.translatable(translationKey)
+    val displayName: Text = translate("skillType." + name.lowercase())
 }

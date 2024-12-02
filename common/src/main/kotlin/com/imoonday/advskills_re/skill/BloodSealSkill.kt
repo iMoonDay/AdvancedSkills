@@ -18,7 +18,7 @@ class BloodSealSkill : LongPressSkill(
     rarity = Rarity.EPIC,
 ), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger {
 
-    override fun getMaxPressTime(): Int = 20 * 5
+    override fun getMaxPressTime(): Int = 5 * 20
 
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
@@ -44,7 +44,12 @@ class BloodSealSkill : LongPressSkill(
         player.swingHand(Hand.MAIN_HAND, true)
         player.raycastLivingEntity(5.0)?.takeIf { it.type == HitResult.Type.ENTITY }?.let {
             it.entity.damage(player.damageSources.playerAttack(player), 3f)
-            (it.entity as? LivingEntity)?.addStatusEffect(StatusEffectInstance(ModEffects.SERIOUS_INJURY.get(), 20 * 7))
+            (it.entity as? LivingEntity)?.addStatusEffect(
+                StatusEffectInstance(
+                    ModEffects.SERIOUS_INJURY.get(),
+                    7 * 20
+                )
+            )
             return UseResult.success()
         }
         return UseResult.fail(failedMessage())

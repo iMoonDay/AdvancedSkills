@@ -16,23 +16,23 @@ class AdvancedPurificationSkill : Skill(
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult = user.statusEffects
-        .filter { it.effectType.category == StatusEffectCategory.HARMFUL && it.duration < 20 * 30 }
+        .filter { it.effectType.category == StatusEffectCategory.HARMFUL && it.duration < 30 * 20 }
         .maxByOrNull { it.duration }
         ?.let {
             user.removeStatusEffect(it.effectType)
-            return UseResult.success(message("success", Text.translatable(it.translationKey).string))
+            return UseResult.success(message("success", Text.translatable(it.translationKey)))
         } ?: user.statusEffects
         .filter { it.effectType.category == StatusEffectCategory.HARMFUL }
         .randomOrNull()
-        ?.let {
-            val duration = it.duration
-            it.setDuration(it.mapDuration { it - 30 * 20 })
-            user.sendPacket(EntityStatusEffectS2CPacket(user.id, it))
-            val amount = (duration - it.duration) / 20.0
+        ?.let { instance ->
+            val duration = instance.duration
+            instance.setDuration(instance.mapDuration { it - 30 * 20 })
+            user.sendPacket(EntityStatusEffectS2CPacket(user.id, instance))
+            val amount = (duration - instance.duration) / 20.0
             return UseResult.success(
                 Skills.PRIMARY_PURIFICATION.message(
                     "success",
-                    Text.translatable(it.translationKey),
+                    Text.translatable(instance.translationKey),
                     amount
                 )
             )
