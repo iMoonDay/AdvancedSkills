@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillType
 import net.minecraft.server.network.*
 
 class StaticInvisibilitySkill : PassiveSkill(

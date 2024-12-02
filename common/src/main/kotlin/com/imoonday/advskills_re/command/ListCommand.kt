@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.*
 import net.minecraft.command.*
 import net.minecraft.server.command.*
 import net.minecraft.server.network.*
-import net.minecraft.text.*
 
 object ListCommand : PlayerCommand("list") {
 

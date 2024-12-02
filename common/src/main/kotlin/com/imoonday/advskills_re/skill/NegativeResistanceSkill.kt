@@ -5,7 +5,7 @@ import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.effect.*
 import net.minecraft.entity.player.*
-import net.minecraft.particle.ParticleTypes
+import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
 class NegativeResistanceSkill : Skill(

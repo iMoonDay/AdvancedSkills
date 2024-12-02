@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*

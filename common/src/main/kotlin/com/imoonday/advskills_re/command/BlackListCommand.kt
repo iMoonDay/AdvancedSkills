@@ -8,8 +8,6 @@ import com.mojang.brigadier.builder.*
 import com.mojang.brigadier.context.*
 import net.minecraft.command.*
 import net.minecraft.server.command.*
-import net.minecraft.text.*
-import net.minecraft.util.*
 
 object BlackListCommand : BaseCommand("blacklist") {
 
