@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.trigger.renderer.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -18,6 +19,11 @@ class AbsoluteDefenseSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
+    }
+
     override fun ignoreDamage(
         amount: Float,
         source: DamageSource,
@@ -27,6 +33,7 @@ class AbsoluteDefenseSkill : Skill(
         if (!player.isUsing() || amount <= 0) return false
         player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
         player.stopUsing()
+        player.startCooling()
         return true
     }
 }

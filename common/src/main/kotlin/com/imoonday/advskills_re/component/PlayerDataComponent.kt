@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.component
 
+import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.screen.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
@@ -52,6 +53,11 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
             sync()
             dirty = false
         }
+    }
+
+    override fun clientTick() {
+        super.clientTick()
+        container.getAllSkills { skill, _ -> !entity.hasLearned(skill) }.forEach { container.forget(it) }
     }
 
     override fun requestSync() {

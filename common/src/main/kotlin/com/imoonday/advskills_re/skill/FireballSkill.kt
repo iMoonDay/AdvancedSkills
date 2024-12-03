@@ -10,7 +10,7 @@ class FireballSkill : Skill(
     id = "fireball",
     types = listOf(SkillType.DESTRUCTION),
     cooldown = 5,
-    rarity = Rarity.SUPERB,
+    rarity = Rarity.RARE,
     sound = SoundEvents::ENTITY_ENDER_DRAGON_SHOOT
 ) {
 

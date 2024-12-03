@@ -33,6 +33,8 @@ subprojects {
             name = 'Kotlin for Forge'
             url = 'https://thedarkcolour.github.io/KotlinForForge/'
         }
+        maven { url "https://maven.terraformersmc.com/releases/" }
+        maven { url "https://maven.shedaniel.me/" }
     }
 
     dependencies {

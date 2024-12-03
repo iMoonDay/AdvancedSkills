@@ -1,9 +1,9 @@
 package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.api.*
-import com.imoonday.advskills_re.client.render.*
-import com.imoonday.advskills_re.entity.render.*
-import com.imoonday.advskills_re.entity.render.feature.*
+import com.imoonday.advskills_re.client.render.entity.*
+import com.imoonday.advskills_re.client.render.entity.feature.*
+import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.init.ModEntities.CLONE_PLAYER
 import com.imoonday.advskills_re.init.ModEntities.ENCHANTED_SWORD
 import com.imoonday.advskills_re.init.ModEntities.FREEZE_ENERGY_BALL

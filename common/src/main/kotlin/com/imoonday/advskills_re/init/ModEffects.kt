@@ -58,12 +58,16 @@ val LivingEntity.isWeakened: Boolean
     get() = hasStatusEffect(this, ModEffects.WEAKENED)
 
 val LivingEntity.weakenedLevel: Int
-    get() = (getStatusEffect(ModEffects.WEAKENED.get())?.amplifier?.plus(1)) ?: 0
+    get() = (getStatusEffect(ModEffects.WEAKENED.get())?.amplifier?.plus(1))
+        ?: properties.getCompound("syncEffects")
+            .getCompound("weakened")
+            .getInt("level")
 
 private fun hasStatusEffect(entity: LivingEntity, effect: Supplier<out StatusEffect>): Boolean {
     val statusEffect = effect.get()
-    return if (statusEffect is SyncClientEffect) statusEffect.syncId in entity.properties.getList(
-        "syncEffects",
-        NbtElement.STRING_TYPE.toInt()
-    ).map(NbtElement::asString) else entity.hasStatusEffect(statusEffect)
+    return if (statusEffect is SyncClientEffect) statusEffect.syncId in entity.properties.getCompound("syncEffects").keys
+    else entity.hasStatusEffect(statusEffect)
 }
+
+private fun getSyncEffectData(entity: LivingEntity, effect: Supplier<out SyncClientEffect>): NbtCompound =
+    entity.properties.getCompound("syncEffects").getCompound(effect.get().syncId)

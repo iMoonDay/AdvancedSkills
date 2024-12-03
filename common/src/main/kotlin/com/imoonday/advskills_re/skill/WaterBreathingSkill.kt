@@ -19,8 +19,8 @@ class WaterBreathingSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(false)
 
     override fun onStop(player: ServerPlayerEntity) {
-        player.startCooling()
         super.onStop(player)
+        player.startCooling()
     }
 
     override fun clientTick(player: PlayerEntity, usedTime: Int) {

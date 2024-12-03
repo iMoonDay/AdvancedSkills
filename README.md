@@ -63,7 +63,7 @@
 - `modify [skill: 技能]`
     - `cooldown [seconds: 冷却时间]` - 修改技能冷却时间
     - `rarity [rarity: 稀有度]` - 修改技能稀有度
-    - `time [seconds: 持续时间]` - 修改技能持续时间
+    - `time [seconds: 持续(蓄力)时间]` - 修改技能持续(蓄力)时间
     - `reset` - 清除所有技能修改
 - `blacklist`
     - `add [skill: 技能]` - 将技能加入黑名单

@@ -21,6 +21,9 @@
     ],
     "client": [
       "com.imoonday.advskills_re.fabric.client.AdvancedSkillsFabricClient"
+    ],
+    "modmenu": [
+      "com.imoonday.advskills_re.fabric.client.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -32,6 +35,10 @@
     "minecraft": "~1.20",
     "java": ">=17",
     "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "*",
+    "cloth-config": "*"
   },
   "accessWidener": "advskills_re.accesswidener"
 }

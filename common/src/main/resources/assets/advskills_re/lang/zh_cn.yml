@@ -54,8 +54,8 @@ advskills_re:
     reset: 已重置 %s 的稀有度
     invalid: '无效的稀有度: %s'
   time:
-    set: 已将 %s 的持续时间设置为 %d 秒
-    reset: 已重置 %s 的持续时间
+    set: 已将 %s 的持续(蓄力)时间设置为 %d 秒
+    reset: 已重置 %s 的持续(蓄力)时间
   cooldownMultiplier:
     set: 全局技能冷却倍率已设置为 %d
     value: 当前全局技能冷却倍率为 %d
@@ -262,7 +262,7 @@ advskills_re:
       customName: "%s的奴仆"
     taunt:
       name: 嘲讽
-      description: 嘲讽其他玩家的奴仆，并获得奴仆伤害减伤，持续15s
+      description: 嘲讽其他玩家的奴仆，并获得奴仆伤害减伤，持续15s，使用期间无法解除
     liquid_shield:
       name: 液体护罩
       description: 你将隔离周围液体
@@ -337,7 +337,7 @@ advskills_re:
       description: 缓慢增加额外血量上限,上限10
     pain_feedback:
       name: 痛苦反馈
-      description: 受伤时有50%概率反弹25%伤害
+      description: 受伤时反弹50%伤害
     thunder_fury:
       name: 雷霆之怒
       description: 召唤一道闪电
@@ -407,6 +407,10 @@ advskills_re:
     armor_shatterer:
       name: 破甲者
       description: 发射一个以80%概率给予周围生物易伤效果的能量球，使其受到的伤害增加
+    death_archive:
+      name: 死亡存档
+      description: 使用后记录坐标，死亡时触发技能，阻止此次死亡，并回满血然后传送回记录的坐标，同时给予5秒无敌
+      failed: 当前状态不可使用
   skillType:
     attack: 攻击
     defense: 防御
@@ -473,6 +477,7 @@ advskills_re:
     slot:
       title: 左键拖动移动，右键重置
       compact: 紧凑技能显示
+      config: 设置
     inventory:
       title: '技能背包 %d/%d'
     wheel:
@@ -482,6 +487,20 @@ advskills_re:
       refresh: 重抽
       learn: 学习
       count: '剩余技能数: %d'
+    config:
+      title: 进阶技能：重制版
+      category:
+        render: 渲染
+        general: 通用
+      uiOffsetX: 技能栏X偏移量
+      uiOffsetY: 技能栏Y偏移量
+      skillSorter: 技能排序方式
+      layout: 技能槽布局
+      quickCastWheelHoldTime: 快捷施法轮盘长按时间 (ms)
+      hideSkillCrosshair: 隐藏技能准星
+      invalidLayout: "错误输入! 只能包含1-10和分隔符','"
+      incompleteLayout: "错误输入! 缺少栏位: %s"
+      redundantNumbers: "错误输入! 栏位不能重复: %s"
   skillSlot:
     generic: '通用技能槽 %d'
     active: '主动技能槽 %d'

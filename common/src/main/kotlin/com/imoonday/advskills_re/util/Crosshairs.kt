@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.util
 
-import net.minecraft.client.gui.*
 import net.minecraft.util.*
 
 enum class Crosshairs(
@@ -37,19 +36,4 @@ interface Crosshair {
      * The one with the largest absolute value takes precedence, regardless of positive or negative, and negative numbers take precedence.
      * */
     val priority: Int
-
-    fun draw(context: DrawContext) {
-        if (this == Crosshairs.NONE) return
-        context.drawTexture(
-            texture,
-            (context.scaledWindowWidth - width) / 2,
-            (context.scaledWindowHeight - height) / 2,
-            u,
-            v,
-            width,
-            height,
-            textureWidth,
-            textureHeight
-        )
-    }
 }

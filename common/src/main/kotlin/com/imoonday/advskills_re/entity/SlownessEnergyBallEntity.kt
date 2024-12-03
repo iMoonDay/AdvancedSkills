@@ -8,9 +8,6 @@ import net.minecraft.world.*
 class SlownessEnergyBallEntity(entityType: EntityType<out SlownessEnergyBallEntity>, world: World) :
     EffectEnergyBallEntity(entityType, world) {
 
-    override var effects = mutableMapOf(
-        StatusEffectInstance(StatusEffects.SLOWNESS, 8 * 20, 1) to 0.5f,
-    )
     override var range: Double = 5.0
 
     constructor(
@@ -34,4 +31,8 @@ class SlownessEnergyBallEntity(entityType: EntityType<out SlownessEnergyBallEnti
     ) : this(owner.x, owner.y, owner.z, directionX, directionY, directionZ, world) {
         update(owner)
     }
+
+    override fun getEffects() = mapOf(
+        StatusEffectInstance(StatusEffects.SLOWNESS, 8 * 20, 1) to 0.5f,
+    )
 }

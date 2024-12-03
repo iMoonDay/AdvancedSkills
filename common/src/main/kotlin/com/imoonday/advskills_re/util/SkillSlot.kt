@@ -27,7 +27,9 @@ sealed class SkillSlot(
     }
 
     abstract fun copyWithIndex(index: Int): SkillSlot
+
     abstract fun canEquip(skill: Skill): Boolean
+
     fun equip(skill: Skill, callback: (Boolean) -> Unit = {}): Boolean =
         if (this.skill != skill && canEquip(skill)) {
             this.skill = skill

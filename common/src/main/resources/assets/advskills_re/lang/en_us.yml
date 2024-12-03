@@ -262,7 +262,7 @@ advskills_re:
       customName: "%s's servant"
     taunt:
       name: Taunt
-      description: Taunt other players' minions and gain minion damage reduction for 15 s
+      description: Taunt other players' minions and gain minion damage reduction for 15 s, but cannot be canceled during use
     liquid_shield:
       name: Liquid Shield
       description: You will isolate the liquid
@@ -337,7 +337,7 @@ advskills_re:
       description: Slowly increase the absorption amount, the upper limit is 10
     pain_feedback:
       name: Pain Feedback
-      description: When injured, there is a 50% chance of rebounding 25% of the damage
+      description: When injured, rebounding 50% of the damage
     thunder_fury:
       name: Thunder Fury
       description: Summon a lightning bolt
@@ -407,6 +407,10 @@ advskills_re:
     armor_shatterer:
       name: Armor Shatterer
       description: Fires an energy ball with an 80% probability of making surrounding entities weakened, increasing the damage they receive
+    death_archive:
+      name: Death Archive
+      description: After use, the position is recorded. When death occurs, the skill is triggered to prevent the death, restore full health and then teleport back to the recorded position, while granting 5 seconds of invincibility
+      failed: Cannot use in current state
   skillType:
     attack: Attack
     defense: Defense
@@ -473,6 +477,7 @@ advskills_re:
     slot:
       title: Left drag to move, right click to reset
       compact: Compact skill display
+      config: Config
     inventory:
       title: 'Skill Inventory %d/%d'
     wheel:
@@ -482,6 +487,20 @@ advskills_re:
       refresh: Refresh
       learn: Learn
       count: 'Remaining Skills: %d'
+    config:
+      title: 'Advanced Skills: Remastered'
+      category:
+        render: Render
+        general: General
+      uiOffsetX: Skill Slot X Offset
+      uiOffsetY: Skill Slot Y Offset
+      skillSorter: Skill Sorter
+      layout: Skill Slot Layout
+      quickCastWheelHoldTime: Hold time for Quick Cast Wheel (ms)
+      hideSkillCrosshair: Hide Skill Crosshair
+      invalidLayout: "Wrong input! Can only contain 1-10 and the delimiter ','"
+      incompleteLayout: "Wrong input! Missing slots: %s"
+      redundantNumbers: "Wrong input! Redundant numbers: %s"
   skillSlot:
     generic: 'Generic Skill Slot %d'
     active: 'Active Skill Slot %d'

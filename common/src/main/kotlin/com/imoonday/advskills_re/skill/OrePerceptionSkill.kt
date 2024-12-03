@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.trigger.renderer.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
 import net.minecraft.registry.tag.*
@@ -19,9 +20,9 @@ class OrePerceptionSkill : Skill(
     rarity = Rarity.SUPERB,
 ), AutoStopTrigger, WorldRendererTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).also { updateOres(user) }
-
     override val persistTime: Int = 10 * 20
+
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).also { updateOres(user) }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
@@ -67,6 +68,11 @@ class OrePerceptionSkill : Skill(
             state.isOf(Blocks.ANCIENT_DEBRIS) -> Color.MAGENTA
             else -> Color.WHITE
         }
+    }
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
     }
 
     private fun BlockState.isTagMatches(predicate: Predicate<TagKey<Block>>) = streamTags().anyMatch(predicate)

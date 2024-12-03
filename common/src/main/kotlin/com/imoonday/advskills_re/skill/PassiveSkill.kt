@@ -17,7 +17,7 @@ abstract class PassiveSkill(
     EquipTrigger, AttributeTrigger, RespawnTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = if (toggleable)
-        UseResult.consume(translateActive(user.toggleUsing(), this)) else UseResult.passive(name)
+        UseResult.consume(translateActive(this, user.toggleUsing())) else UseResult.passive(name)
 
     override fun postEquipped(player: ServerPlayerEntity, slot: SkillSlot) = player.addAttributes()
 

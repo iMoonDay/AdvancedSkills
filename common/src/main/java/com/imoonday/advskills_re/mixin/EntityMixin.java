@@ -134,6 +134,15 @@ public abstract class EntityMixin implements Propertied {
         }
     }
 
+    @Inject(method = "isInLava", at = @At("HEAD"), cancellable = true)
+    private void advskills_re$isInLava(CallbackInfoReturnable<Boolean> cir) {
+        if ((Entity) (Object) this instanceof PlayerEntity player) {
+            if (SkillTriggerHandler.ignoreLava(player)) {
+                cir.setReturnValue(false);
+            }
+        }
+    }
+
     @Inject(method = "readNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     private void advskills_re$readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if (nbt.contains("entityPropertyComponent")) {

@@ -27,3 +27,9 @@ versionRange = "[1.20,1.21)"
 ordering = "NONE"
 side = "BOTH"
 
+[[dependencies.advskills_re]]
+modId = "cloth_config"
+mandatory = false
+versionRange = "*"
+ordering = "NONE"
+side = "CLIENT"

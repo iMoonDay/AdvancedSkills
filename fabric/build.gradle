@@ -32,6 +32,8 @@ dependencies {
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
 
     modImplementation("net.fabricmc:fabric-language-kotlin:${rootProject.fabric_kotlin_version}")
+    modApi "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
+    modApi "me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}"
 }
 
 processResources {

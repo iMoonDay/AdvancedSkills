@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.util
 
+import net.minecraft.entity.*
 import net.minecraft.nbt.*
 import net.minecraft.util.math.*
 import java.util.*
@@ -20,7 +21,7 @@ class NbtUtils {
             return null
         }
 
-        fun writeVec3dToTag(vec: Vec3d, tag: NbtCompound): NbtCompound {
+        fun writeVec3dToTag(vec: Vec3d, tag: NbtCompound = NbtCompound()): NbtCompound {
             tag.putDouble("dx", vec.x)
             tag.putDouble("dy", vec.y)
             tag.putDouble("dz", vec.z)
@@ -39,7 +40,7 @@ class NbtUtils {
             return null
         }
 
-        fun writeEntityPositionToTag(pos: Vec3d, tag: NbtCompound): NbtCompound {
+        fun writeEntityPositionToTag(pos: Vec3d, tag: NbtCompound = NbtCompound()): NbtCompound {
             val posList = NbtList()
 
             posList.add(NbtDouble.of(pos.x))
@@ -48,6 +49,25 @@ class NbtUtils {
             tag.put("Pos", posList)
 
             return tag
+        }
+
+        fun readGlobalPosFromTag(tag: NbtCompound?): Optional<GlobalPos> {
+            if (tag != null) {
+                return GlobalPos.CODEC
+                    .parse(NbtOps.INSTANCE, tag.get("GlobalPos"))
+                    .result()
+            }
+            return Optional.empty()
+        }
+
+        fun writeGlobalPosToTag(globalPos: GlobalPos, tag: NbtCompound = NbtCompound()): NbtCompound {
+            GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, globalPos).result().ifPresent { tag.put("GlobalPos", it) }
+            return tag
+        }
+
+        fun writeEntityGlobalPosToTag(entity: Entity, tag: NbtCompound = NbtCompound()): NbtCompound {
+            val globalPos = GlobalPos.create(entity.world.registryKey, entity.blockPos)
+            return writeGlobalPosToTag(globalPos, tag)
         }
     }
 }

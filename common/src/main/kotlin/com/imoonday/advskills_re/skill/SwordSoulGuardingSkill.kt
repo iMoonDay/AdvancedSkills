@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.trigger.renderer.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -33,6 +34,11 @@ class SwordSoulGuardingSkill : Skill(
                 spawnSword(player, attacker)
             }
         }
+    }
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
     }
 
     private fun spawnSword(

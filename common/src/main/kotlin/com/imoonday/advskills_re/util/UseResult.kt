@@ -19,21 +19,88 @@ class UseResult(
 
     companion object {
 
+        /**
+         * @param message optional message to display to the user
+         * @return UseResult with success and start cooling
+         */
+        @JvmOverloads
+        @JvmStatic
         fun success(message: Text? = null) = UseResult(success = true, cooling = true, message = message)
+
+        /**
+         * @param message optional message to display to the user
+         * @return UseResult with success and no cooling
+         */
+        @JvmOverloads
+        @JvmStatic
         fun consume(message: Text? = null) = UseResult(success = true, cooling = false, message = message)
+
+        /**
+         * @param message optional message to display to the user
+         * @return UseResult with failure and no cooling
+         */
+        @JvmOverloads
+        @JvmStatic
         fun fail(message: Text? = null) = UseResult(success = false, cooling = false, message = message)
+
+        /**
+         * @param message optional message to display to the user
+         * @return UseResult with failure and start cooling
+         */
+        @JvmOverloads
+        @JvmStatic
         fun pass(message: Text? = null) = UseResult(success = false, cooling = true, message = message)
+
+        /**
+         * @param success true for success, false for failure
+         * @param message optional message to display to the user
+         */
+        @JvmStatic
         fun of(success: Boolean, message: Text? = null) = if (success) success(message) else fail(message)
+
+        /**
+         * @param success true for success, false for failure
+         * @param successMessage optional message to display to the user if success
+         * @param failMessage optional message to display to the user if failure
+         */
+        @JvmStatic
         fun of(success: Boolean, successMessage: Text? = null, failMessage: Text? = null) =
             if (success) success(successMessage) else fail(failMessage)
 
+        /**
+         * @param name name of the skill
+         * @return UseResult with failure and no cooling and message "$name is passive skill"
+         */
+        @JvmStatic
         fun passive(name: Text) = fail(translate("useSkill.passive", name))
 
-        fun startUsing(user: PlayerEntity, skill: Skill, data: NbtCompound? = null, failedMessage: Text? = null) = of(
-            user.startUsing(skill, data), null,
-            failedMessage ?: translateActive(true, skill)
+        /**
+         * @param user player who is using the skill
+         * @param skill skill being used
+         * @param data optional data for the skill
+         * @param failedMessage optional message to display to the user if failure
+         * @return UseResult with result of whether the skill was successfully started or not
+         */
+        @JvmOverloads
+        @JvmStatic
+        fun startUsing(
+            user: PlayerEntity,
+            skill: Skill,
+            data: NbtCompound? = null,
+            failedMessage: Text? = null
+        ): UseResult = if (user.startUsing(skill, data)) consume(null) else fail(
+            failedMessage ?: translateActive(skill, true)
         )
 
+        /**
+         * @param user player who is using the skill
+         * @param skill skill being used
+         * @param data optional data for the skill
+         * @param onStart optional callback to be executed when the skill is successfully started
+         * @return UseResult with result of whether the skill was successfully toggled or not
+         */
+        @JvmOverloads
+        @JvmStatic
         fun toggleUsing(
             user: PlayerEntity,
             skill: Skill,
@@ -41,8 +108,8 @@ class UseResult(
             onStart: (() -> Unit)? = null,
         ): UseResult {
             val active = user.toggleUsing(skill, data)
-            if (active) onStart?.invoke()
-            return consume(translateActive(active, skill))
+            if (active) onStart?.invoke() else user.startCooling(skill)
+            return consume(translateActive(skill, active))
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.client.screen.component
 
-import net.minecraft.client.font.*
+import com.imoonday.advskills_re.client.*
 import net.minecraft.client.gui.*
 import net.minecraft.text.*
 import net.minecraft.util.*
@@ -23,8 +23,6 @@ class ExpandableIconButtonWidget(
     private var isExpanded: Boolean = false
     private var isExpanding: Boolean = false
     private var isFolding: Boolean = false
-    private var textRenderer: TextRenderer? = null
-    private var textSupplier: (() -> Text)? = null
 
     override fun clicked(mouseX: Double, mouseY: Double): Boolean = isMouseOver(mouseX, mouseY)
 
@@ -99,25 +97,17 @@ class ExpandableIconButtonWidget(
             this.textureHeight
         )
 
-        getText()?.let { text ->
-            textRenderer?.let {
+        message?.takeUnless { it.content == TextContent.EMPTY }?.let {
+            client?.textRenderer?.run {
                 context.drawText(
+                    this,
                     it,
-                    text,
-                    x + xOffset - 3 - it.getWidth(text),
-                    y + (height - it.fontHeight) / 2 + 1,
+                    x + xOffset - 3 - getWidth(it),
+                    y + (height - fontHeight) / 2 + 1,
                     11184810,
                     false
                 )
             }
         }
-    }
-
-    fun getText(): Text? = textSupplier?.invoke()
-
-    fun setTextSupplier(textRenderer: TextRenderer, supplier: (() -> Text)?): ExpandableIconButtonWidget {
-        this.textRenderer = textRenderer
-        textSupplier = supplier
-        return this
     }
 }

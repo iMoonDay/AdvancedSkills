@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.api.*
+import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*

@@ -49,4 +49,9 @@ class ExtremeEvasionSkill : Skill(
         player: ServerPlayerEntity,
         attacker: Entity?,
     ): Boolean = player.isUsing()
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
+    }
 }

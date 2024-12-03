@@ -34,15 +34,14 @@ class EntityPropertyComponent(override val entity: Entity) : Component<Entity> {
 
     fun onEffectsChanged() {
         if (entity is LivingEntity) {
+            properties.remove("syncEffects")
             val effects = entity.statusEffects
                 .map { it.effectType }
                 .filterIsInstance<SyncClientEffect>()
             if (effects.isNotEmpty()) {
-                properties.put("syncEffects", NbtList().apply {
-                    addAll(effects.map { NbtString.of(it.syncId) })
+                properties.put("syncEffects", NbtCompound().apply {
+                    effects.forEach { put(it.syncId, it.writeData(entity)) }
                 })
-            } else {
-                properties.remove("syncEffects")
             }
             dirty = true
         }

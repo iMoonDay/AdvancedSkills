@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.mixin;
 
-import com.imoonday.advskills_re.client.render.SkillRendererHandler;
+import com.imoonday.advskills_re.client.render.skill.SkillRendererHandler;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -20,6 +20,6 @@ public class EntityRenderDispatcherMixin {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
     public <E extends Entity> void render(E entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        SkillRendererHandler.INSTANCE.renderEntity(this.camera, entity, yaw, tickDelta, matrices, vertexConsumers, light);
+        SkillRendererHandler.renderEntity(this.camera, entity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 }

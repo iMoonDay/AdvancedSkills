@@ -11,15 +11,14 @@ import net.minecraft.util.hit.*
 import net.minecraft.world.*
 import kotlin.math.*
 
-private const val EFFECTS_KEY = "Effects"
 private const val EFFECT_RANGE_KEY = "EffectRange"
-private const val CHANCE_KEY = "Chance"
 
 abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBallEntity>, world: World) :
     ExplosiveProjectileEntity(entityType, world) {
 
-    abstract val effects: MutableMap<StatusEffectInstance, Float>
     abstract var range: Double
+
+    abstract fun getEffects(): Map<StatusEffectInstance, Float>
 
     protected fun update(
         x: Double,
@@ -39,9 +38,7 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
         }
     }
 
-    protected fun update(
-        owner: LivingEntity,
-    ) {
+    protected fun update(owner: LivingEntity) {
         this.owner = owner
         this.setRotation(owner.yaw, owner.pitch)
     }
@@ -49,25 +46,19 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
     override fun onCollision(hitResult: HitResult?) {
         super.onCollision(hitResult)
         if (world.isClient) return
-        if (effects.isNotEmpty()) {
+        if (getEffects().isNotEmpty()) {
             world.getNonSpectatingEntities(
                 LivingEntity::class.java,
                 this.boundingBox.expand(range)
-            )
-                .filterIsInstance<LivingEntity>()
-                .forEach {
-                    for (entry in effects) {
-                        if (random.nextFloat() < entry.value || canApply(
-                                entry.key,
-                                entry.value,
-                                it
-                            )
-                        ) it.addStatusEffect(
-                            entry.key,
-                            effectCause
-                        )
+            ).filterIsInstance<LivingEntity>().forEach {
+                for (entry in getEffects()) {
+                    val effect = entry.key
+                    val chance = entry.value
+                    if (random.nextFloat() < chance || canApply(effect, chance, it)) {
+                        it.addStatusEffect(effect, effectCause)
                     }
                 }
+            }
             spawnParticles()
             playSound()
         }
@@ -80,14 +71,8 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
     protected open fun spawnParticles() {
         (world as? ServerWorld)?.spawnParticles(
             getExplosionParticle(),
-            x,
-            y,
-            z,
-            (range * range * 100).toInt(),
-            range - 1,
-            range - 1,
-            range - 1,
-            0.0
+            x, y, z, (range * range * 100).toInt(),
+            range - 1, range - 1, range - 1, 0.0
         )
     }
 
@@ -98,22 +83,12 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
         nbt.putDouble(EFFECT_RANGE_KEY, range)
-        if (effects.isNotEmpty()) {
-            val nbtList = NbtList()
-            for (entry in effects) {
-                nbtList.add(entry.key.writeNbt(NbtCompound().apply { putFloat(CHANCE_KEY, entry.value) }))
-            }
-            nbt.put(EFFECTS_KEY, nbtList)
-        }
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         super.readCustomDataFromNbt(nbt)
         if (nbt.contains(EFFECT_RANGE_KEY, NbtElement.NUMBER_TYPE.toInt())) {
             range = nbt.getDouble(EFFECT_RANGE_KEY)
-        }
-        for (entry in getEffects(nbt)) {
-            effects[entry.key] = entry.value
         }
     }
 
@@ -124,20 +99,4 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
     override fun getDrag(): Float = 1.0f
 
     override fun isTouchingWater(): Boolean = false
-
-    fun getEffects(nbt: NbtCompound): MutableMap<StatusEffectInstance, Float> =
-        mutableMapOf<StatusEffectInstance, Float>().apply {
-            getEffects(nbt, this)
-        }
-
-    fun getEffects(nbt: NbtCompound, map: MutableMap<StatusEffectInstance, Float>) {
-        if (nbt.contains(EFFECTS_KEY, NbtElement.LIST_TYPE.toInt())) {
-            val nbtList = nbt.getList(EFFECTS_KEY, NbtElement.COMPOUND_TYPE.toInt())
-            for (i in nbtList.indices) {
-                val nbtCompound = nbtList.getCompound(i)
-                val statusEffectInstance = StatusEffectInstance.fromNbt(nbtCompound) ?: continue
-                map[statusEffectInstance] = nbtCompound.getFloat(CHANCE_KEY)
-            }
-        }
-    }
 }

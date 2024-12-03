@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.render.*
+import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.gui.*
@@ -22,18 +23,18 @@ class SkillWheelScreen : Screen(Text.empty()) {
         val player = clientPlayer ?: return
         var size = player.skillContainer.slotSize
         if (size <= 0) size = 1
+
         val centerX = context.scaledWindowWidth / 2
         val centerY = context.scaledWindowHeight / 2
         val tip = translate("screen.wheel.tip", client!!.options.inventoryKey.boundKeyLocalizedText)
         var tipY = 6
+
+        val textColor = Color.WHITE.rgb
+        val backgroundColor = Color.GRAY.alpha(0.4).rgb
+        val borderColor = Color.GREEN.rgb
+
         textRenderer.wrapLines(tip, (context.scaledWindowWidth * 0.9).toInt()).forEach {
-            context.drawTextWithBackground(
-                it,
-                centerX,
-                tipY,
-                Color.WHITE.rgb,
-                Color.GRAY.alpha(0.4).rgb
-            )
+            context.drawTextWithBackground(it, centerX, tipY, textColor, backgroundColor)
             tipY += textRenderer.fontHeight + 2
         }
         val positions = calculatePositions(size)
@@ -44,46 +45,37 @@ class SkillWheelScreen : Screen(Text.empty()) {
             val startY = centerY + y - 8
             SkillRenderer.renderIcon(player.getSkill(i + 1), context, startX, startY, player)
             if (selectingSlot == i + 1) {
-                context.drawBorder(
-                    startX - 1,
-                    startY - 1,
-                    16 + 2,
-                    16 + 2,
-                    Color.GREEN.rgb
-                )
+                context.drawBorder(startX - 1, startY - 1, 16 + 2, 16 + 2, borderColor)
             }
         }
         context.drawTextWithBackground(
             selectingSlot?.let { player.getSkill(it).name } ?: translate("screen.wheel.cancel"),
-            centerX,
-            centerY - 16 - 4,
-            Color.WHITE.rgb,
-            Color.GRAY.alpha(0.4).rgb
+            centerX, centerY - 16 - 4,
+            textColor, backgroundColor
         )
-        selectingSlot?.let {
-            ModKeyBindings.skillKeys.getOrNull(it - 1)?.run {
-                if (!this.isUnbound) context.drawTextWithBackground(
-                    boundKeyLocalizedText,
-                    centerX,
-                    centerY + 8 + 4,
-                    Color.WHITE.rgb,
-                    Color.GRAY.alpha(0.4).rgb
-                )
+        selectingSlot?.let { slot ->
+            ModKeyBindings.skillKeys.getOrNull(slot - 1)?.run {
+                if (!this.isUnbound) {
+                    context.drawTextWithBackground(
+                        boundKeyLocalizedText,
+                        centerX,
+                        centerY + 8 + 4,
+                        textColor,
+                        backgroundColor
+                    )
+                }
             }
-            it.let { player.getSkill(it) }.takeIf { !it.invalid }?.run {
-                var y = centerY + 60
-                textRenderer.textHandler.wrapLines(description, (context.scaledWindowWidth * 0.65).toInt(), Style.EMPTY)
-                    .forEach {
-                        context.drawTextWithBackground(
-                            it.string,
-                            centerX,
-                            y,
-                            Color.WHITE.rgb,
-                            Color.GRAY.alpha(0.4).rgb
-                        )
-                        y += textRenderer.fontHeight + 2
-                    }
-            }
+            slot.let { player.getSkill(it) }
+                .takeIf { !it.invalid }
+                ?.run {
+                    var y = centerY + 60
+                    textRenderer.textHandler
+                        .wrapLines(description, (context.scaledWindowWidth * 0.65).toInt(), Style.EMPTY)
+                        .forEach {
+                            context.drawTextWithBackground(it.string, centerX, y, textColor, backgroundColor)
+                            y += textRenderer.fontHeight + 2
+                        }
+                }
         }
     }
 
@@ -183,9 +175,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
             options.jumpKey,
             options.sprintKey,
             options.sneakKey
-        ).forEach {
-            it.isPressed = it.isPressedInScreen
-        }
+        ).forEach { it.isPressed = it.isPressedInScreen }
     }
 
     companion object {

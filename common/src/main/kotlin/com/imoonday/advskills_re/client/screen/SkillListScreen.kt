@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.render.*
+import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.client.screen.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*

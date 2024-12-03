@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.client.modifier
 
+import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.util.math.*

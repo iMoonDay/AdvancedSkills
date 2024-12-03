@@ -7,7 +7,6 @@ import net.minecraft.entity.damage.*
 import net.minecraft.entity.effect.*
 import net.minecraft.registry.tag.*
 import net.minecraft.server.network.*
-import net.minecraft.sound.*
 
 class ResuscitationSkill : Skill(
     id = "resuscitation",
@@ -25,7 +24,7 @@ class ResuscitationSkill : Skill(
         player.health = 1.0f
         player.startUsing()
         player.startCooling()
-        player.playSound(SoundEvents.ITEM_TOTEM_USE)
+        player.world.sendEntityStatus(player, EntityStatuses.USE_TOTEM_OF_UNDYING)
         player.addStatusEffect(StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20))
         return false
     }

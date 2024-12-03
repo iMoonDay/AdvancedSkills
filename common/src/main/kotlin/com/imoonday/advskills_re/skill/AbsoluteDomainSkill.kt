@@ -15,9 +15,9 @@ class AbsoluteDomainSkill : Skill(
 
     private val maxHardness = Blocks.OBSIDIAN.hardness
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
-
     override val persistTime: Int = 3 * 20
+
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
@@ -30,5 +30,10 @@ class AbsoluteDomainSkill : Skill(
             player.spawnParticles(ParticleTypes.SMOKE, false, centerPos, 1, 0.0, 0.0, 0.0, 0.0)
             player.world.breakBlock(it, true, player)
         }
+    }
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
     }
 }

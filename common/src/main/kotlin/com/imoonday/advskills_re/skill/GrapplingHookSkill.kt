@@ -1,9 +1,9 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.trigger.renderer.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
-import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 import net.minecraft.util.hit.*
 import kotlin.math.*
@@ -25,8 +25,8 @@ class GrapplingHookSkill : LongPressSkill(
             UseResult.startUsing(
                 player,
                 this,
-                NbtUtils.writeVec3dToTag(raycast.pos, NbtCompound())
-            ).withCooling(false)
+                NbtUtils.writeVec3dToTag(raycast.pos)
+            )
         } else {
             UseResult.fail(failedMessage())
         }
@@ -34,6 +34,7 @@ class GrapplingHookSkill : LongPressSkill(
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopUsing()
+        player.startCooling()
         return UseResult.success()
     }
 

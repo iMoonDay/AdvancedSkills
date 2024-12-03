@@ -41,6 +41,7 @@ dependencies {
     shadowBundle project(path: ':common', configuration: 'transformProductionForge')
 
     implementation "thedarkcolour:kotlinforforge:${rootProject.forge_kotlin_version}"
+    modApi "me.shedaniel.cloth:cloth-config-forge:${rootProject.cloth_config_version}"
 }
 
 processResources {

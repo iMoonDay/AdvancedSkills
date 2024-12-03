@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.network.s2c
 
-import com.imoonday.advskills_re.client.render.renderer.*
+import com.imoonday.advskills_re.client.render.skill.renderer.*
 import com.imoonday.advskills_re.network.*
 import dev.architectury.networking.*
 import net.fabricmc.api.*

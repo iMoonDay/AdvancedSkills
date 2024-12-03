@@ -13,10 +13,15 @@ class LivingDetectionSkill : Skill(
     rarity = Rarity.SUPERB,
 ), AutoStopTrigger, GlowingTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
-
     override val persistTime: Int = 5 * 20
+
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
     override fun isGlowing(entity: Entity, player: PlayerEntity): Boolean =
         player.isUsing() && entity != player && entity.isLiving && entity.isAlive && player.distanceTo(entity) <= 50 && (entity.x != entity.prevX || entity.y != entity.prevY || entity.z != entity.prevZ)
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
+    }
 }

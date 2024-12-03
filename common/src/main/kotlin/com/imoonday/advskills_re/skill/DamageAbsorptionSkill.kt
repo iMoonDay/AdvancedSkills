@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.trigger.renderer.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -28,6 +29,12 @@ class DamageAbsorptionSkill : Skill(
         player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
         player.heal(amount)
         player.stopUsing()
+        player.startCooling()
         return true
+    }
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
     }
 }

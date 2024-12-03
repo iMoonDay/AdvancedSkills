@@ -1,8 +1,8 @@
 package com.imoonday.advskills_re.network.s2c
 
+import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.network.*
-import com.imoonday.advskills_re.util.*
 import dev.architectury.networking.*
 import net.fabricmc.api.*
 import net.minecraft.nbt.*

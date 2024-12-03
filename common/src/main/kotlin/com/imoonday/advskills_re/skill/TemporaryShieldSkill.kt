@@ -11,9 +11,9 @@ class TemporaryShieldSkill : Skill(
     rarity = Rarity.LEGENDARY
 ), AutoStopTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
-
     override val persistTime: Int = 10 * 20
+
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(true)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (player.isUsing() && usedTime % 20 == 0) player.absorptionAmount =

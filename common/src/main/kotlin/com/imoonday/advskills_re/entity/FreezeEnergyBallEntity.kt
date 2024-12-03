@@ -12,9 +12,6 @@ import kotlin.random.Random
 class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>, world: World) :
     EffectEnergyBallEntity(entityType, world) {
 
-    override var effects = mutableMapOf(
-        StatusEffectInstance(ModEffects.FREEZE.get(), 3 * 20, 0, false, false, true) to 0.3f,
-    )
     override var range: Double = 4.0
 
     constructor(
@@ -38,6 +35,10 @@ class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>,
     ) : this(owner.x, owner.y, owner.z, directionX, directionY, directionZ, world) {
         update(owner)
     }
+
+    override fun getEffects() = mapOf(
+        StatusEffectInstance(ModEffects.FREEZE.get(), 3 * 20, 0, false, false, true) to 0.3f,
+    )
 
     override fun getExplosionParticle(): ParticleEffect = DustParticleEffect(particleColor, 1f)
 

@@ -50,28 +50,41 @@ class SkillConfig {
     }
 
     fun load(tag: NbtCompound) {
-        skillModifier.clear()
-        skillBlackList.clear()
-        defaultSkillSlots.clear()
+        if (tag.contains("skillModifier")) {
+            skillModifier.clear()
 
-        val skillModifierTag = tag.getCompound("skillModifier")
-        for (id in skillModifierTag.keys) {
-            val modifierTag = skillModifierTag.getCompound(id)
-            skillModifier[id] = SkillModifier.fromNbt(modifierTag)
+            val skillModifierTag = tag.getCompound("skillModifier")
+            for (id in skillModifierTag.keys) {
+                val modifierTag = skillModifierTag.getCompound(id)
+                skillModifier[id] = SkillModifier.fromNbt(modifierTag)
+            }
         }
 
-        val skillBlackListTag = tag.getList("skillBlackList", NbtElement.STRING_TYPE.toInt())
-        skillBlackListTag.forEach {
-            skillBlackList.add(it.asString())
+        if (tag.contains("skillBlackList")) {
+            skillBlackList.clear()
+
+            val skillBlackListTag = tag.getList("skillBlackList", NbtElement.STRING_TYPE.toInt())
+            skillBlackListTag.forEach {
+                skillBlackList.add(it.asString())
+            }
         }
 
-        val defaultSkillSlotsTag = tag.getCompound("defaultSkillSlots")
-        for (namespace in defaultSkillSlotsTag.keys) {
-            defaultSkillSlots[namespace] = defaultSkillSlotsTag.getInt(namespace)
+        if (tag.contains("defaultSkillSlots")) {
+            defaultSkillSlots.clear()
+
+            val defaultSkillSlotsTag = tag.getCompound("defaultSkillSlots")
+            for (namespace in defaultSkillSlotsTag.keys) {
+                defaultSkillSlots[namespace] = defaultSkillSlotsTag.getInt(namespace)
+            }
         }
 
-        skillCooldownMultiplier = tag.getDouble("skillCooldownMultiplier")
-        skillXpMultiplier = tag.getDouble("skillXpMultiplier")
+        if (tag.contains("skillCooldownMultiplier")) {
+            skillCooldownMultiplier = tag.getDouble("skillCooldownMultiplier")
+        }
+
+        if (tag.contains("skillXpMultiplier")) {
+            skillXpMultiplier = tag.getDouble("skillXpMultiplier")
+        }
     }
 
     fun save(tag: NbtCompound): NbtCompound = tag.apply {
@@ -96,6 +109,7 @@ class SkillConfig {
         skillModifier.clear()
         skillBlackList.clear()
         defaultSkillSlots.clear()
+        defaultSkillSlots.putAll(SkillContainer.DEFAULT_SLOTS)
         skillCooldownMultiplier = 1.0
         skillXpMultiplier = 1.0
     }

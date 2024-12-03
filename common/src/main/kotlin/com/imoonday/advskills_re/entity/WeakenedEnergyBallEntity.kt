@@ -10,9 +10,6 @@ import net.minecraft.world.*
 class WeakenedEnergyBallEntity(entityType: EntityType<out WeakenedEnergyBallEntity>, world: World) :
     EffectEnergyBallEntity(entityType, world) {
 
-    override var effects = mutableMapOf(
-        StatusEffectInstance(ModEffects.WEAKENED.get(), 8 * 20, 0, false, false, true) to 0.8f,
-    )
     override var range: Double = 5.0
 
     constructor(
@@ -35,6 +32,16 @@ class WeakenedEnergyBallEntity(entityType: EntityType<out WeakenedEnergyBallEnti
         world: World,
     ) : this(owner.x, owner.y, owner.z, directionX, directionY, directionZ, world) {
         update(owner)
+    }
+
+    override fun getEffects(): Map<StatusEffectInstance, Float> {
+        val effect = ModEffects.WEAKENED.get()
+        return linkedMapOf(
+            StatusEffectInstance(effect, 8 * 20, 0, false, false, true) to 0.8f,
+            StatusEffectInstance(effect, 8 * 20, 1, false, false, true) to 0.4f,
+            StatusEffectInstance(effect, 8 * 20, 2, false, false, true) to 0.2f,
+            StatusEffectInstance(effect, 8 * 20, 3, false, false, true) to 0.1f,
+        )
     }
 
     override fun getExplosionParticle(): ParticleEffect = DustParticleEffect(particleColor, 1f)

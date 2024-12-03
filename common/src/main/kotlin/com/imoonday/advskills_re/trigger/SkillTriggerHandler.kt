@@ -197,4 +197,7 @@ object SkillTriggerHandler {
     @JvmStatic
     fun postAttack(source: DamageSource, player: ServerPlayerEntity, target: LivingEntity) =
         player.forEachTrigger<PostAttackTrigger> { it.postAttack(source, player, target) }
+
+    @JvmStatic
+    fun ignoreLava(player: PlayerEntity): Boolean = player.anyTrigger<LavaTrigger> { it.ignoreLava(player) }
 }

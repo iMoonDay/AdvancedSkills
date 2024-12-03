@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.trigger.renderer.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -15,7 +16,12 @@ class LavaWalkerSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 30,
     rarity = Rarity.EPIC,
-), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger, UsingRenderTrigger, DamageTrigger {
+), WalkOnFluidTrigger,
+    AutoStopTrigger,
+    FluidMovementTrigger,
+    UsingRenderTrigger,
+    DamageTrigger,
+    LavaTrigger {
 
     override val persistTime: Int = 20 * 20
 
@@ -48,4 +54,6 @@ class LavaWalkerSkill : Skill(
         attacker: Entity?
     ): Boolean =
         player.isUsing() && source.isOf(DamageTypes.HOT_FLOOR) || super.ignoreDamage(amount, source, player, attacker)
+
+    override fun ignoreLava(player: PlayerEntity): Boolean = ignoreFluid(player, FluidTags.LAVA)
 }

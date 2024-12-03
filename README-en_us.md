@@ -67,7 +67,7 @@
 - `modify [skill]`
     - `cooldown [seconds]` - Modify skill cooldown time
     - `rarity [rarity]` - Modify skill rarity
-    - `time [seconds]` - Modify skill duration
+    - `time [seconds]` - Modify skill duration (charging time)
     - `reset` - Remove all modifications to the skill
 - `blacklist`
     - `add [skill]` - Add skill to blacklist

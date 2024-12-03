@@ -1,11 +1,10 @@
 package com.imoonday.advskills_re.network.s2c
 
+import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.screen.component.*
-import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.skill.*
-import com.imoonday.advskills_re.util.*
 import dev.architectury.networking.*
 import dev.architectury.utils.*
 import net.minecraft.client.sound.*

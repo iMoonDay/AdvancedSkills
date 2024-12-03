@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.trigger.renderer.*
 import net.minecraft.entity.player.*
 
 class InsightfulEyeSkill : PassiveSkill(

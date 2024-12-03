@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.trigger.renderer.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -11,7 +12,7 @@ class TauntSkill : Skill(
     id = "taunt",
     types = listOf(SkillType.FUNCTION, SkillType.DEFENSE),
     cooldown = 30,
-    rarity = Rarity.SUPERB,
+    rarity = Rarity.UNCOMMON,
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {
 
     override val persistTime: Int = 15 * 20
@@ -26,4 +27,9 @@ class TauntSkill : Skill(
     ): Float = if (!player.isUsing() || attacker !is Servant) amount else amount * 0.75f
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean = !player.isUsing()
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
+    }
 }

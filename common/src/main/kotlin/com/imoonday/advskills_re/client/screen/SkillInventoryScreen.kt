@@ -1,8 +1,9 @@
 package com.imoonday.advskills_re.client.screen
 
+import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.render.*
+import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.client.screen.component.*
-import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
@@ -99,7 +100,6 @@ class SkillInventoryScreen(
         val config = ClientConfig.get()
         var y = bgY + 5
         ExpandableIconButtonWidget(bgX - 16, y, 16, 16, sortTexture)
-            .setTextSupplier(textRenderer) { config.skillSorter.displayName }
             .addClickAction(0) { updateSorter(config, it, true) }
             .addClickAction(1) { updateSorter(config, it, false) }
             .setScrollAction { widget, amount ->
@@ -110,12 +110,14 @@ class SkillInventoryScreen(
                     updateSorter(config, widget, true)
                     true
                 } else null
-            }.apply { tooltip = createSorterTooltip() }
+            }.apply {
+                tooltip = createSorterTooltip()
+                message = config.skillSorter.displayName
+            }
             .also(::addDrawableChild)
 
         y += 16 + 5
         ExpandableIconButtonWidget(bgX - 16, y, 16, 16, filterTexture)
-            .setTextSupplier(textRenderer) { skillFilter.displayName }
             .addClickAction(0) { updateFilter(it, true) }
             .addClickAction(1) { updateFilter(it, false) }
             .setScrollAction { widget, amount ->
@@ -126,12 +128,14 @@ class SkillInventoryScreen(
                     updateFilter(widget, true)
                     true
                 } else null
-            }.apply { tooltip = createFilterTooltip() }
+            }.apply {
+                tooltip = createFilterTooltip()
+                message = skillFilter.displayName
+            }
             .also(::addDrawableChild)
 
         y += 16 + 5
         ExpandableIconButtonWidget(bgX - 16, y, 16, 16, rarityFilterTexture)
-            .setTextSupplier(textRenderer) { rarityFilter.displayName }
             .addClickAction(0) { updateRarityFilter(it, true) }
             .addClickAction(1) { updateRarityFilter(it, false) }
             .setScrollAction { widget, amount ->
@@ -142,7 +146,10 @@ class SkillInventoryScreen(
                     updateRarityFilter(widget, true)
                     true
                 } else null
-            }.apply { tooltip = createRarityFilterTooltip() }
+            }.apply {
+                tooltip = createRarityFilterTooltip()
+                message = rarityFilter.displayName
+            }
             .also(::addDrawableChild)
     }
 
@@ -152,6 +159,7 @@ class SkillInventoryScreen(
     ) {
         rarityFilter = rarityFilter.run { if (next) next() else previous() }
         widget.tooltip = createRarityFilterTooltip()
+        widget.message = rarityFilter.displayName
         update()
     }
 
@@ -174,6 +182,7 @@ class SkillInventoryScreen(
     ) {
         skillFilter = skillFilter.run { if (next) next() else previous() }
         widget.tooltip = createFilterTooltip()
+        widget.message = skillFilter.displayName
         update()
     }
 
@@ -197,6 +206,7 @@ class SkillInventoryScreen(
     ) {
         config.skillSorter = config.skillSorter.run { if (next) next() else previous() }
         widget.tooltip = createSorterTooltip()
+        widget.message = config.skillSorter.displayName
         update()
     }
 
