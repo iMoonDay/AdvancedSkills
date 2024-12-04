@@ -9,8 +9,8 @@ import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +40,7 @@ public class ClientEventHandler {
     }
 
     public static void registerConfigScreenFactory() {
-        FMLJavaModLoadingContext.get().registerExtensionPoint(
+        ModLoadingContext.get().registerExtensionPoint(
                 ConfigScreenHandler.ConfigScreenFactory.class,
                 () -> new ConfigScreenHandler.ConfigScreenFactory(
                         (client, parent) -> com.imoonday.advskills_re.client.screen.ConfigScreenHandler.createScreen(parent)

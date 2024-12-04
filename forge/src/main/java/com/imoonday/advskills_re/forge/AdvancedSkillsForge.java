@@ -12,7 +12,6 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@SuppressWarnings("removal")
 @Mod(AdvancedSkillsKt.MOD_ID)
 public final class AdvancedSkillsForge {
 
