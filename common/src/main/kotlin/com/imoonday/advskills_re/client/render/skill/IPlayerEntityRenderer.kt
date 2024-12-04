@@ -5,7 +5,7 @@ import net.minecraft.client.network.*
 import net.minecraft.client.render.*
 import net.minecraft.client.util.math.*
 
-interface IPlayerEntityRenderer<T : Skill> : com.imoonday.advskills_re.client.render.skill.IRenderer<T> {
+interface IPlayerEntityRenderer<T : Skill> : IRenderer<T> {
 
     fun render(
         skill: T,

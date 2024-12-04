@@ -16,6 +16,7 @@ import net.minecraft.loot.*
 import net.minecraft.loot.condition.*
 import net.minecraft.loot.entry.*
 import net.minecraft.loot.function.*
+import net.minecraft.loot.provider.number.*
 import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 
@@ -90,9 +91,9 @@ object EventHandler {
         val chestLootTables = mapOf(
             LootTables.ANCIENT_CITY_CHEST to 0.25f,
             LootTables.BURIED_TREASURE_CHEST to 0.25f,
-            LootTables.END_CITY_TREASURE_CHEST to 0.25f,
-            LootTables.SPAWN_BONUS_CHEST to 1f
+            LootTables.END_CITY_TREASURE_CHEST to 0.25f
         )
+        val spawnBonusChest = LootTables.SPAWN_BONUS_CHEST
         val builder = {
             var builder = LootPool.builder()
             ModItems.FRUITS.forEach {
@@ -116,6 +117,8 @@ object EventHandler {
                     chestLootTables.containsKey(id) -> context.addPool(
                         builder().conditionally(RandomChanceLootCondition.builder(chestLootTables[id]!!))
                     )
+
+                    id == spawnBonusChest -> context.addPool(builder().rolls(UniformLootNumberProvider.create(1f, 6f)))
                 }
             }
         }

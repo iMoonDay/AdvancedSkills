@@ -11,6 +11,7 @@ import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.PlayerUtils.getNextLevelExp
 import com.imoonday.advskills_re.util.PlayerUtils.shouldLearnSkill
+import net.minecraft.entity.*
 import net.minecraft.entity.player.*
 import net.minecraft.entity.projectile.*
 import net.minecraft.item.*
@@ -95,9 +96,15 @@ fun PlayerEntity.getSlot(slot: SkillSlot): SkillSlot? = skillContainer.getSlot(s
 fun PlayerEntity.hasLearned(skill: Skill): Boolean = skill in learnedSkills
 
 fun PlayerEntity.getCooldown(skill: Skill): Int = skillContainer.getData(skill)?.cooldown ?: 0
+
 fun PlayerEntity.isCooling(skill: Skill): Boolean = getCooldown(skill) > 0
+
 fun PlayerEntity.startCooling(skill: Skill, cooldown: Int? = null) {
     if (isCooling(skill)) return
+    cooldown(skill, cooldown)
+}
+
+private fun PlayerEntity.cooldown(skill: Skill, cooldown: Int? = null) {
     modifySkillData(skill) {
         var time = cooldown ?: skill.cooldown
         forEachTrigger<CooldownTrigger> { trigger -> time = trigger.getCooldown(time) }
@@ -136,7 +143,7 @@ fun PlayerEntity.learn(skill: Skill, toast: Boolean = true, message: Boolean = t
                 Channels.LEARN_SKILL_S2C.sendToPlayer(it, LearnSkillS2CPacket(skill, toast))
             }
             if (message) {
-                sendMessage(translate("learnSkill.message", skill.name).styled {
+                sendMessage(translate("learnSkill.message", skill.formattedName).styled {
                     it.withHoverEvent(
                         HoverEvent(
                             HoverEvent.Action.SHOW_ITEM,
@@ -391,13 +398,17 @@ fun PlayerEntity.startUsing(skill: Skill, data: NbtCompound? = null): Boolean {
 
 fun PlayerEntity.stopUsing(skill: Skill): Boolean {
     if (skill !in usingSkills) return false
+    stop(skill)
+    syncData()
+    return true
+}
+
+private fun PlayerEntity.stop(skill: Skill) {
     getData(skill)?.apply {
         using = false
         activeData.clear()
-        SkillTriggerHandler.postStop(this@stopUsing)
+        SkillTriggerHandler.postStop(this@stop)
     }
-    syncData()
-    return true
 }
 
 fun PlayerEntity.toggleUsing(skill: Skill, data: NbtCompound? = null): Boolean =
@@ -407,6 +418,17 @@ fun PlayerEntity.toggleUsing(skill: Skill, data: NbtCompound? = null): Boolean =
     } else startUsing(skill, data)
 
 fun PlayerEntity.isUsing(skill: Skill) = skill in usingSkills
+
+fun PlayerEntity.stopAndCooldown(skill: Skill, cooldown: Int? = null) {
+    if (skill in usingSkills) {
+        stop(skill)
+    }
+    if (!isCooling(skill)) {
+        cooldown(skill, cooldown)
+    } else {
+        syncData()
+    }
+}
 
 fun PlayerEntity.getUsedTime(skill: Skill): Int = getData(skill)?.usedTime ?: 0
 
@@ -504,16 +526,31 @@ fun PlayerEntity.calculateAngle(pos: Vec3d): Double {
     return adjustedAngle
 }
 
-fun PlayerEntity.raycastLivingEntity(distance: Double): EntityHitResult? {
+fun PlayerEntity.raycastLivingEntity(distance: Double): EntityHitResult? =
+    raycastAllLivingEntities(distance, limit = 1).firstOrNull()
+
+fun PlayerEntity.raycastAllLivingEntities(
+    distance: Double,
+    filter: (LivingEntity) -> Boolean = { true },
+    limit: Int? = null
+): List<EntityHitResult> {
     val cameraPos = getCameraPosVec(0f)
-    return ProjectileUtil.raycast(
-        this,
-        cameraPos,
-        cameraPos.add(rotationVector.multiply(distance)),
-        boundingBox.stretch(rotationVector.multiply(distance)).expand(1.0),
-        { !it.isSpectator && it.isAlive && it.isLiving },
-        distance * distance
-    )
+    val entities: MutableList<LivingEntity> = mutableListOf()
+    val result: MutableList<EntityHitResult> = mutableListOf()
+    while (limit == null || entities.size < limit) {
+        ProjectileUtil.raycast(
+            this,
+            cameraPos,
+            cameraPos.add(rotationVector.multiply(distance)),
+            boundingBox.stretch(rotationVector.multiply(distance)),
+            { !it.isSpectator && it.isAlive && it.isLiving && it is LivingEntity && filter(it) && it !in entities },
+            distance * distance
+        )?.takeUnless { it.type == HitResult.Type.MISS }?.let {
+            entities += it.entity as LivingEntity
+            result += it
+        } ?: break
+    }
+    return result
 }
 
 fun PlayerEntity.sendPacket(packet: Packet<out PacketListener>) = if (this is ServerPlayerEntity) {

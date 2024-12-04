@@ -29,8 +29,7 @@ class NegativeResistanceSkill : Skill(
                     false, it.centerPos, 10,
                     0.5, 0.5, 0.5, 0.1
                 )
-                it.stopUsing()
-                it.startCooling()
+                it.stopAndCooldown()
             }
             true
         } else false

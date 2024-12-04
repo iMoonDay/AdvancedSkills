@@ -284,6 +284,9 @@ object Skills {
     @JvmField
     val DEATH_ARCHIVE = register(DeathArchiveSkill())
 
+    @JvmField
+    val WITHERING_TOUCH = register(WitheringTouchSkill())
+
     fun init() = Unit
 
     fun <T : Skill> register(skill: T): T {

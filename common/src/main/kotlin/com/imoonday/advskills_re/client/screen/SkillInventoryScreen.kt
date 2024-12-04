@@ -498,6 +498,11 @@ class SkillInventoryScreen(
         fun replaceSlots(skills: Collection<Skill>) {
             slots.clear()
             skills.forEach(::addSlot)
+            val size = skills.size
+            val totalSlots = rows * columns
+            repeat(if (size < totalSlots) totalSlots - size else columns - (if (size % columns == 0) columns else size % columns)) {
+                addSlot(Skills.EMPTY)
+            }
             scrollOffset = scrollOffset
         }
 

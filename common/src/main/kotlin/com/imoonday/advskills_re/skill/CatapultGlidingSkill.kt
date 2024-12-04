@@ -27,8 +27,7 @@ class CatapultGlidingSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         if (!canUse(player)) return failedResult()
         if (player.isFallFlying) return fallFlyingResult()
-        player.stopUsing()
-        player.startCooling()
+        player.stopAndCooldown()
         player.playSkillSound()
         player.setOnGround(false)
         player.startFallFlying()

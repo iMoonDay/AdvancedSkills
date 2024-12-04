@@ -14,7 +14,6 @@ import net.minecraft.entity.*
 
 object SkillRendererHandler {
 
-    private val renderers: MutableMap<Skill, IRenderer<Skill>> = mutableMapOf()
     private val overlayRenderers: MutableMap<Skill, IOverlayRenderer<Skill>> = mutableMapOf()
     private val hudRenderers: MutableMap<Skill, IHudRenderer<Skill>> = mutableMapOf()
     private val crosshairRenderers: MutableMap<Skill, ICrosshairRenderer<Skill>> = mutableMapOf()
@@ -28,7 +27,6 @@ object SkillRendererHandler {
     @JvmStatic
     @Suppress("UNCHECKED_CAST")
     fun <T : Skill> T.registerRenderer(renderer: IRenderer<T>) {
-        renderers[this] = renderer as IRenderer<Skill>
         if (renderer is IOverlayRenderer) overlayRenderers[this] = renderer as IOverlayRenderer<Skill>
         if (renderer is IHudRenderer) hudRenderers[this] = renderer as IHudRenderer<Skill>
         if (renderer is ICrosshairRenderer) crosshairRenderers[this] = renderer as ICrosshairRenderer<Skill>
@@ -41,10 +39,6 @@ object SkillRendererHandler {
             renderer as IPlayerFeatureRenderer<Skill>
         if (renderer is IWorldRenderer) worldRenderers[this] = renderer as IWorldRenderer<Skill>
     }
-
-    @JvmStatic
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Skill> T.getRenderer(): IRenderer<T>? = renderers[this] as? IRenderer<T>
 
     @JvmStatic
     fun renderOverlay(drawContext: DrawContext) = overlayRenderers.forEach { it.value.render(it.key, drawContext) }

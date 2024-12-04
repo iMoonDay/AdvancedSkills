@@ -16,8 +16,7 @@ interface SkillTrigger {
     fun PlayerEntity.clearPersistentData() = this.clearPersistentData(getAsSkill())
     fun PlayerEntity.getUsedTime(): Int = getUsedTime(getAsSkill())
     fun PlayerEntity.modifyUsedTime(operation: (Int) -> Int) = modifyUsedTime(getAsSkill(), operation)
-    fun PlayerEntity.startCooling() = startCooling(getAsSkill())
-    fun PlayerEntity.startCooling(cooldown: Int) = startCooling(getAsSkill(), cooldown)
+    fun PlayerEntity.startCooling(cooldown: Int? = null) = startCooling(getAsSkill(), cooldown)
     fun PlayerEntity.stopCooling() = stopCooling(getAsSkill())
     fun PlayerEntity.modifyCooldown(operation: (Int) -> Int) = modifyCooldown(getAsSkill(), operation)
     fun PlayerEntity.startUsing(data: ((NbtCompound) -> Unit)? = null): Boolean =
@@ -26,6 +25,7 @@ interface SkillTrigger {
     fun PlayerEntity.stopUsing(): Boolean = stopUsing(getAsSkill())
     fun PlayerEntity.toggleUsing(): Boolean = toggleUsing(getAsSkill())
     fun PlayerEntity.isReady(): Boolean = hasEquipped() && !isCooling() && !isUsing()
+    fun PlayerEntity.stopAndCooldown(cooldown: Int? = null) = stopAndCooldown(getAsSkill(), cooldown)
 
     companion object {
 

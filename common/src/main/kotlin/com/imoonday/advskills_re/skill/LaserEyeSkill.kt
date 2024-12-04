@@ -10,7 +10,6 @@ import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.util.hit.*
-import net.minecraft.util.math.*
 import org.joml.*
 
 class LaserEyeSkill : Skill(
@@ -48,7 +47,7 @@ class LaserEyeSkill : Skill(
                 user,
                 cameraPos,
                 cameraPos.add(user.rotationVector.multiply(maxDistance)),
-                Box.of(user.eyePos, 0.1, 0.1, 0.1).stretch(user.rotationVector.multiply(maxDistance)),
+                user.boundingBox.stretch(user.rotationVector.multiply(maxDistance)),
                 { !it.isSpectator && it.isAlive && it.isLiving && it !in entities },
                 maxDistance * maxDistance
             )?.takeUnless { it.type == HitResult.Type.MISS }?.let {

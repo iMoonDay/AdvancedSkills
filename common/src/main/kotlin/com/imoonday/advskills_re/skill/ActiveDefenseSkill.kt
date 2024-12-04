@@ -39,8 +39,7 @@ class ActiveDefenseSkill : LongPressSkill(
     }
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
-        player.stopUsing()
-        player.startCooling()
+        player.stopAndCooldown()
         if (pressedTime.toFloat() / getMaxPressTime() < 0.5f) {
             player.modifyCooldown { it / 2 }
         }

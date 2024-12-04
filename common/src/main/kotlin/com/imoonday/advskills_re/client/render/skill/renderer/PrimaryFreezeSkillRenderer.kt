@@ -20,7 +20,7 @@ class PrimaryFreezeSkillRenderer : IOverlayRenderer<PrimaryFreezeSkill> {
         RenderSystem.disableDepthTest()
         RenderSystem.depthMask(false)
         context.drawTexture(
-            com.imoonday.advskills_re.client.render.skill.renderer.PrimaryFreezeSkillRenderer.Companion.FROZEN_OVERLAY,
+            FROZEN_OVERLAY,
             0,
             0,
             -90,

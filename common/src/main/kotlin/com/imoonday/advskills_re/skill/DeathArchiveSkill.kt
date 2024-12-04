@@ -57,8 +57,7 @@ class DeathArchiveSkill : Skill(
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (player.isUsing() && player.isInInvulnerableState() && usedTime >= 5 * 20) {
-            player.stopUsing()
-            player.startCooling()
+            player.stopAndCooldown()
         }
     }
 

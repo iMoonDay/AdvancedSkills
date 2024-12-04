@@ -33,8 +33,7 @@ class GrapplingHookSkill : LongPressSkill(
     }
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
-        player.stopUsing()
-        player.startCooling()
+        player.stopAndCooldown()
         return UseResult.success()
     }
 
@@ -49,8 +48,7 @@ class GrapplingHookSkill : LongPressSkill(
                     || player.calculateAngle(this) > PI / 4.5
                 ) {
                     if (!player.world.isClient) {
-                        player.stopUsing()
-                        player.startCooling()
+                        player.stopAndCooldown()
                     }
                     return@run
                 }

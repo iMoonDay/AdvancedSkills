@@ -31,13 +31,14 @@ advskills_re:
     failed: '%s already know %s'
     failedSelf: 'You already know %s'
     invalid: 'Unable to learn %s'
+    noLearnableSkills: No skills to learn
   forgetSkill:
     message: 'Forgotten %s'
     failed: "%s don't know %s"
     all: Forgotten all skills
   equipSkill:
     success: '%s equipped %s to Slot %d'
-    failed: '%s already equipped %s on Slot %d'
+    failed: '%s cannot equip %s on Slot %d'
   unequipSkill:
     success: '%s has removed %s from slot %d'
     failed: '%s has no equipped skill on slot %d'
@@ -384,16 +385,16 @@ advskills_re:
       description: Clean up weeds around
     unhindered_stride:
       name: Unhindered Stride
-      description: Can cross any obstacle without being blocked
+      description: You can cross any obstacle without being blocked
     damage_absorption:
       name: Damage Absorption
       description: Within a certain period of time, absorb one damage and restore your own health according to the amount of damage
     disguise:
       name: Disguise
-      description: Disguised as a block under your feet and end when using any skill
+      description: Disguises as a block beneath your feet, ending when any skill is used
     wall_jump:
       name: Wall Jump
-      description: Can jump while on a wall
+      description: You can jump while on the wall
     return:
       name: Return
       description: Stay where you are, charge up, and then return to your spawn point
@@ -406,11 +407,14 @@ advskills_re:
       description: You can walk on lava and are immune to magma blocks
     armor_shatterer:
       name: Armor Shatterer
-      description: Fires an energy ball with an 80% probability of making surrounding entities weakened, increasing the damage they receive
+      description: Fires an energy ball with an 80% chance to weaken nearby entities, increasing the damage they take
     death_archive:
       name: Death Archive
-      description: After use, the position is recorded. When death occurs, the skill is triggered to prevent the death, restore full health and then teleport back to the recorded position, while granting 5 seconds of invincibility
+      description: After activation, the player's position is recorded. Upon death, the skill is triggered to prevent the death, restore full health, and teleport the player back to the recorded position, granting 5 seconds of invincibility
       failed: Cannot use in current state
+    withering_touch:
+      name: Withering Touch
+      description: Strengthen your attacks for up to 3 hits. Each attack will apply the Wither effect to the target, lasting for 3 seconds and stacking with each hit
   skillType:
     attack: Attack
     defense: Defense
@@ -483,6 +487,7 @@ advskills_re:
     wheel:
       cancel: Cancel
       tip: Release to select, left click to use, right click to cancel, middle click to view details, press %s to open Skill Inventory
+      empty: No skill slot
     learn:
       refresh: Refresh
       learn: Learn

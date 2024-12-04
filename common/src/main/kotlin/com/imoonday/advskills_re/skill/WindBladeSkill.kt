@@ -27,8 +27,7 @@ class WindBladeSkill : Skill(
         player.world.spawnEntity(TornadoEntity(player.world, player, player.horizontalRotationVector * 0.25).apply {
             setPosition(target.pos)
         })
-        player.stopUsing()
-        player.startCooling()
+        player.stopAndCooldown()
     }
 
     override fun onDeath(player: ServerPlayerEntity, source: DamageSource) {

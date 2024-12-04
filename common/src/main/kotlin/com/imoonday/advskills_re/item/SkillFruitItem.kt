@@ -4,8 +4,8 @@ import com.imoonday.advskills_re.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.item.*
-
 import net.minecraft.entity.*
+import net.minecraft.entity.player.*
 import net.minecraft.item.*
 import net.minecraft.server.network.*
 import net.minecraft.text.*
@@ -20,8 +20,14 @@ class SkillFruitItem(val rarity: Skill.Rarity, settings: Settings) : Item(settin
     )
 
     override fun finishUsing(stack: ItemStack, world: World, user: LivingEntity): ItemStack {
-        (user as? ServerPlayerEntity)?.learnRandomly { it.rarity.level <= rarity.level }
-        stack.decrement(1)
+        (user as? ServerPlayerEntity)?.learnRandomly { it.rarity.level <= rarity.level }?.let {
+            if (!it) {
+                user.sendMessage(translate("learnSkill.noLearnableSkills"), true)
+            }
+        }
+        if (user !is PlayerEntity || !user.abilities.creativeMode) {
+            stack.decrement(1)
+        }
         return stack
     }
 

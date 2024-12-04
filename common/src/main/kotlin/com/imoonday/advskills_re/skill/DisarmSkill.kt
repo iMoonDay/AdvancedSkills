@@ -46,8 +46,7 @@ class DisarmSkill : Skill(
             player.sendMessage(translate("skill.disarm.failed"), true)
         }
 
-        player.stopUsing()
-        player.startCooling()
+        player.stopAndCooldown()
         return amount
     }
 

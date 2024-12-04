@@ -49,16 +49,19 @@ interface ITargetRenderer<T> : ILivingFeatureRenderer<T> where T : Skill, T : Ta
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90f))
         RenderSystem.enableDepthTest()
         RenderSystem.enableBlend()
-        RenderSystem.setShaderTexture(0, id("indicator.png"))
+        RenderSystem.disableCull()
+        RenderSystem.setShaderTexture(0, indicatorTexture)
         Renderer2d.renderTexture(matrices, 0.0, 0.0, 2.0, 2.0, 0f, 0f, 16.0, 16.0, 16.0, 16.0)
         RenderSystem.disableDepthTest()
         RenderSystem.disableBlend()
+        RenderSystem.enableCull()
         matrices.pop()
     }
 
     companion object {
 
-        fun <T> create(): com.imoonday.advskills_re.client.render.skill.ITargetRenderer<T> where T : Skill, T : TargetRenderTrigger = object :
-            com.imoonday.advskills_re.client.render.skill.ITargetRenderer<T> {}
+        private val indicatorTexture = id("indicator.png")
+
+        fun <T> create(): ITargetRenderer<T> where T : Skill, T : TargetRenderTrigger = object : ITargetRenderer<T> {}
     }
 }

@@ -9,7 +9,6 @@ import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.text.*
 import net.minecraft.util.hit.*
-import net.minecraft.util.math.*
 import org.joml.*
 
 class MultipleLaserSkill : LongPressSkill(
@@ -37,7 +36,7 @@ class MultipleLaserSkill : LongPressSkill(
                     player,
                     cameraPos,
                     cameraPos.add(player.rotationVector.multiply(maxDistance)),
-                    Box.of(player.eyePos, 0.25, 0.25, 0.25).stretch(player.rotationVector.multiply(maxDistance)),
+                    player.boundingBox.stretch(player.rotationVector.multiply(maxDistance)),
                     { !it.isSpectator && it.isAlive && it.isLiving && it !in entities },
                     maxDistance * maxDistance
                 )?.takeUnless { it.type == HitResult.Type.MISS }?.let {
@@ -72,8 +71,7 @@ class MultipleLaserSkill : LongPressSkill(
     override fun getMaxPressTime(): Int = 10 * 20
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
-        player.stopUsing()
-        player.startCooling(calculateCooldown(pressedTime))
+        player.stopAndCooldown(calculateCooldown(pressedTime))
         return UseResult.fail(Text.empty())
     }
 

@@ -37,7 +37,9 @@ class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
             return TypedActionResult.fail(stack)
         }
         if (user.learn(skill)) {
-            stack.decrement(1)
+            if (!user.abilities.creativeMode) {
+                stack.decrement(1)
+            }
             return TypedActionResult.success(stack)
         }
         user.sendMessage(translate("learnSkill.failedSelf", skill.name))

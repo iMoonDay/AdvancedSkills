@@ -35,8 +35,7 @@ class PortableChestSkill : Skill(
         super.serverTick(player, usedTime)
         if (player.isUsing() && (player.currentScreenHandler as ScreenHandlerAccessor).typeField != ScreenHandlerType.GENERIC_9X3) {
             player.playSound(SoundEvents.BLOCK_ENDER_CHEST_CLOSE)
-            player.stopUsing()
-            player.startCooling()
+            player.stopAndCooldown()
         }
     }
 

@@ -17,7 +17,7 @@ class BloodSealSkill : LongPressSkill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 45,
     rarity = Rarity.EPIC,
-), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger {
+), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
 
     override fun getMaxPressTime(): Int = 5 * 20
 
@@ -72,5 +72,10 @@ class BloodSealSkill : LongPressSkill(
             if (raycastLivingEntity(5.0)?.type == HitResult.Type.ENTITY) return Crosshairs.CROSS
         }
         return Crosshairs.NONE
+    }
+
+    override fun isTarget(player: PlayerEntity, entity: LivingEntity): Boolean {
+        if (!player.isUsing()) return false
+        return player.raycastLivingEntity(5.0)?.entity == entity
     }
 }

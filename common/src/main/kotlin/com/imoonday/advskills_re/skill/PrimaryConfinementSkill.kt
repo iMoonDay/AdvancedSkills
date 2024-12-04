@@ -24,8 +24,7 @@ class PrimaryConfinementSkill : LongPressSkill(
     override fun getMaxPressTime(): Int = 5 * 20
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
-        player.stopUsing()
-        player.startCooling()
+        player.stopAndCooldown()
         player.swingHand(Hand.MAIN_HAND, true)
         player.raycastLivingEntity(5.0)?.takeIf { it.type == HitResult.Type.ENTITY }?.let {
             if (Random.nextFloat() < 0.8f * pressedTime / getMaxPressTime()) {

@@ -24,8 +24,7 @@ class DisguiseSkill : Skill(
     }
 
     override fun interrupt(player: PlayerEntity) {
-        player.stopUsing()
-        player.startCooling()
+        player.stopAndCooldown()
     }
 
     override fun isDisguising(player: PlayerEntity): Boolean = player.isUsing() && getDisguisePos(player) != null

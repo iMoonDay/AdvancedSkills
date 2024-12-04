@@ -32,8 +32,7 @@ class AbsoluteDefenseSkill : Skill(
     ): Boolean {
         if (!player.isUsing() || amount <= 0) return false
         player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
-        player.stopUsing()
-        player.startCooling()
+        player.stopAndCooldown()
         return true
     }
 }

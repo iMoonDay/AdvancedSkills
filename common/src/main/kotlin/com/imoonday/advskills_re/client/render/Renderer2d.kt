@@ -75,7 +75,7 @@ object Renderer2d {
         buffer.vertex(matrix, x1.toFloat(), y0.toFloat(), z.toFloat()).texture(u1, v0).next()
         buffer.vertex(matrix, x0.toFloat(), y0.toFloat(), z.toFloat()).texture(u0, v0).next()
 
-        RenderSystem.setShader { GameRenderer.getPositionTexProgram() }
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram)
         draw(buffer)
     }
 

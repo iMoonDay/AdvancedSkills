@@ -31,13 +31,14 @@ advskills_re:
     failed: '%s 已学习 %s'
     failedSelf: '你已学习 %s'
     invalid: '无法学习 %s'
+    noLearnableSkills: 没有可学习的技能
   forgetSkill:
     message: '遗忘了 %s'
     failed: "%s 未学习 %s"
     all: 已遗忘所有技能
   equipSkill:
     success: '%s 已装备 %s 至插槽 %d'
-    failed: '%s 已经装备了 %s 在插槽 %d 上'
+    failed: '%s 无法装备 %s 至插槽 %d'
   unequipSkill:
     success: '%s 已将 %s 从插槽 %d 卸下'
     failed: '%s 未装备技能在插槽 %d 上'
@@ -411,6 +412,9 @@ advskills_re:
       name: 死亡存档
       description: 使用后记录坐标，死亡时触发技能，阻止此次死亡，并回满血然后传送回记录的坐标，同时给予5秒无敌
       failed: 当前状态不可使用
+    withering_touch:
+      name: 凋零之触
+      description: 强化3次普攻，攻击使目标附加凋零效果，持续3秒，可叠加
   skillType:
     attack: 攻击
     defense: 防御
@@ -483,6 +487,7 @@ advskills_re:
     wheel:
       cancel: 取消
       tip: 松开选中，左键使用，右键取消，中键查看详情，按下 %s 打开技能背包
+      empty: 无技能槽
     learn:
       refresh: 重抽
       learn: 学习

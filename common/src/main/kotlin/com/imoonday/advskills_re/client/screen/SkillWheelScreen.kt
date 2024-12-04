@@ -22,7 +22,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
         super.render(context, mouseX, mouseY, delta)
         val player = clientPlayer ?: return
         var size = player.skillContainer.slotSize
-        if (size <= 0) size = 1
+        if (size < 0) size = 0
 
         val centerX = context.scaledWindowWidth / 2
         val centerY = context.scaledWindowHeight / 2
@@ -37,19 +37,23 @@ class SkillWheelScreen : Screen(Text.empty()) {
             context.drawTextWithBackground(it, centerX, tipY, textColor, backgroundColor)
             tipY += textRenderer.fontHeight + 2
         }
-        val positions = calculatePositions(size)
-        selectingSlot = findSlot(size, mouseX, mouseY, centerX, centerY)
-        for (i in 0 until size) {
-            val (x, y) = positions[i]
-            val startX = centerX + x - 8
-            val startY = centerY + y - 8
-            SkillRenderer.renderIcon(player.getSkill(i + 1), context, startX, startY, player)
-            if (selectingSlot == i + 1) {
-                context.drawBorder(startX - 1, startY - 1, 16 + 2, 16 + 2, borderColor)
+        if (size > 0) {
+            val positions = calculatePositions(size)
+            selectingSlot = findSlot(size, mouseX, mouseY, centerX, centerY)
+            for (i in 0 until size) {
+                val (x, y) = positions[i]
+                val startX = centerX + x - 8
+                val startY = centerY + y - 8
+                SkillRenderer.renderIcon(player.getSkill(i + 1), context, startX, startY, player)
+                if (selectingSlot == i + 1) {
+                    context.drawBorder(startX - 1, startY - 1, 16 + 2, 16 + 2, borderColor)
+                }
             }
         }
+
         context.drawTextWithBackground(
-            selectingSlot?.let { player.getSkill(it).name } ?: translate("screen.wheel.cancel"),
+            selectingSlot?.let { player.getSkill(it).name }
+                ?: if (size == 0) translate("screen.wheel.empty") else translate("screen.wheel.cancel"),
             centerX, centerY - 16 - 4,
             textColor, backgroundColor
         )
