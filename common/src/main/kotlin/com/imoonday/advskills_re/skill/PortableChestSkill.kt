@@ -12,7 +12,7 @@ import net.minecraft.text.*
 
 class PortableChestSkill : Skill(
     id = "portable_chest",
-    types = listOf(SkillType.FUNCTION),
+    types = listOf(SkillType.UTILITY),
     cooldown = 5,
     rarity = Rarity.SUPERB
 ), TickTrigger, UsingProgressTrigger {

@@ -1,5 +1,7 @@
 package com.imoonday.advskills_re.entity
 
+import com.imoonday.advskills_re.entity.goal.AttackWithOwnerGoal
+import com.imoonday.advskills_re.entity.goal.TrackOwnerAttackerGoal
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.trigger.*
 import net.minecraft.entity.*
@@ -39,18 +41,16 @@ class ServantWitherSkeletonEntity(
         goalSelector.add(3, LookAroundGoal(this))
         targetSelector.add(
             0,
-            ActiveTargetGoal(
-                this,
-                PlayerEntity::class.java,
-                true
-            ) { it.uuid != ownerUuid && (it as? PlayerEntity)?.run { SkillTriggerHandler.isTaunter(this) } == true })
+            ActiveTargetGoal(this, PlayerEntity::class.java, true)
+            { it.uuid != ownerUuid && (it as? PlayerEntity)?.run { SkillTriggerHandler.isTaunter(this) } == true }
+        )
         targetSelector.add(
             1,
             ActiveTargetGoal(this, LivingEntity::class.java, true) { it is Servant && it.ownerUuid != this.ownerUuid })
         targetSelector.add(2, ActiveTargetGoal(this, PlayerEntity::class.java, true) { it.uuid != ownerUuid })
-        targetSelector.add(
-            3,
-            ActiveTargetGoal(this, HostileEntity::class.java, true) { it !is Servant })
+        targetSelector.add(3, ActiveTargetGoal(this, HostileEntity::class.java, true) { it !is Servant })
+        targetSelector.add(4, TrackOwnerAttackerGoal(this))
+        targetSelector.add(5, AttackWithOwnerGoal(this))
     }
 
     override fun isAffectedByDaylight(): Boolean = false

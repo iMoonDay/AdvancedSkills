@@ -7,7 +7,7 @@ import net.minecraft.text.*
 enum class SkillType(val representsSkill: () -> Skill) {
     ATTACK({ Skills.THUNDER_FURY }),
     DEFENSE({ Skills.ABSOLUTE_DEFENSE }),
-    FUNCTION({ Skills.ITEM_ATTRACTION }),
+    UTILITY({ Skills.ITEM_ATTRACTION }),
     CONTROL({ Skills.PRIMARY_FREEZE }),
     PASSIVE({ Skills.MASTERY }),
     ENHANCEMENT({ Skills.DOPING }),

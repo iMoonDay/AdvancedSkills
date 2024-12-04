@@ -97,6 +97,7 @@ object ConfigScreenHandler {
                         translate("screen.config.quickCastWheelHoldTime"),
                         config.quickCastWheelHoldTime
                     ).setDefaultValue(250)
+                        .setMin(0)
                         .setSaveConsumer { config.quickCastWheelHoldTime = it }
                         .build()
                 )

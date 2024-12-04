@@ -55,7 +55,7 @@ object ModKeyBindings {
         },
         releaseCallback = { client, _, pressTime ->
             isUsingQuickCast = false
-            if (pressTime <= 250) {
+            if (pressTime <= ClientConfig.get().quickCastWheelHoldTime) {
                 client.player?.run {
                     val slot = quickCastSlot ?: return@run
                     if (!isSpectator) {

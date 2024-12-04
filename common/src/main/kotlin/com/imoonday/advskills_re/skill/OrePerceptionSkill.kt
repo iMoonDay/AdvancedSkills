@@ -15,7 +15,7 @@ import java.util.function.*
 
 class OrePerceptionSkill : Skill(
     id = "ore_perception",
-    types = listOf(SkillType.FUNCTION),
+    types = listOf(SkillType.UTILITY),
     cooldown = 30,
     rarity = Rarity.SUPERB,
 ), AutoStopTrigger, WorldRendererTrigger {

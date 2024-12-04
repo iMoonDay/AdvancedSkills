@@ -9,7 +9,6 @@ import net.minecraft.client.gui.hud.InGameHud.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.player.*
-import net.minecraft.registry.tag.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
@@ -23,7 +22,7 @@ class DyingCounterattackSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean {
-        if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) || player.isUsing() || player.isCooling()) return true
+        if (player.isUsing() || player.isCooling()) return true
         player.health = player.maxHealth
         player.startUsing()
         player.playSound(SoundEvents.ITEM_TOTEM_USE)

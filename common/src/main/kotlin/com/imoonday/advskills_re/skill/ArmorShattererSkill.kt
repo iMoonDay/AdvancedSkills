@@ -19,7 +19,7 @@ class ArmorShattererSkill : Skill(
         user.run {
             val rotation = rotationVector.normalize().multiply(1.5)
             world.spawnEntity(
-                WeakenedEnergyBallEntity(
+                VulnerableEnergyBallEntity(
                     this,
                     rotationVector.x,
                     rotationVector.y,
@@ -33,5 +33,5 @@ class ArmorShattererSkill : Skill(
         return UseResult.success()
     }
 
-    override fun isInSpecialState(player: PlayerEntity): Boolean = player.isWeakened
+    override fun isInSpecialState(player: PlayerEntity): Boolean = player.isVulnerable
 }

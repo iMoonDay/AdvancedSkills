@@ -8,7 +8,7 @@ import net.minecraft.server.network.*
 
 class LivingDetectionSkill : Skill(
     id = "living_detection",
-    types = listOf(SkillType.FUNCTION),
+    types = listOf(SkillType.UTILITY),
     cooldown = 20,
     rarity = Rarity.SUPERB,
 ), AutoStopTrigger, GlowingTrigger {

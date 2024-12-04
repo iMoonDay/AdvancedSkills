@@ -34,7 +34,7 @@ object ModEffects {
     val SERIOUS_INJURY = SeriousInjuryEffect().register("serious_injury")
 
     @JvmField
-    val WEAKENED = WeakenedEffect().register("weakened")
+    val VULNERABLE = VulnerableEffect().register("vulnerable")
 
     fun <T : StatusEffect> T.register(id: String): RegistrySupplier<T> {
         if (this is SyncClientEffect) SYNC_CLIENT_EFFECTS.add(this)
@@ -54,13 +54,13 @@ val LivingEntity.isConfined: Boolean
     get() = hasStatusEffect(this, ModEffects.CONFINEMENT)
 val LivingEntity.isSeriousInjured: Boolean
     get() = hasStatusEffect(this, ModEffects.SERIOUS_INJURY)
-val LivingEntity.isWeakened: Boolean
-    get() = hasStatusEffect(this, ModEffects.WEAKENED)
+val LivingEntity.isVulnerable: Boolean
+    get() = hasStatusEffect(this, ModEffects.VULNERABLE)
 
-val LivingEntity.weakenedLevel: Int
-    get() = (getStatusEffect(ModEffects.WEAKENED.get())?.amplifier?.plus(1))
+val LivingEntity.vulnerableLevel: Int
+    get() = (getStatusEffect(ModEffects.VULNERABLE.get())?.amplifier?.plus(1))
         ?: properties.getCompound("syncEffects")
-            .getCompound("weakened")
+            .getCompound("vulnerable")
             .getInt("level")
 
 private fun hasStatusEffect(entity: LivingEntity, effect: Supplier<out StatusEffect>): Boolean {

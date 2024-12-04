@@ -61,8 +61,8 @@ public abstract class LivingEntityMixin extends EntityMixin {
             if (attacker instanceof ServerPlayerEntity player) {
                 newAmount = SkillTriggerHandler.onAttack(newAmount, source, player, target);
             }
-            if (ModEffectsKt.isWeakened(target)) {
-                float multiplier = ModEffectsKt.getWeakenedLevel(target) * 0.25f;
+            if (ModEffectsKt.isVulnerable(target)) {
+                float multiplier = ModEffectsKt.getVulnerableLevel(target) * 0.25f;
                 if (multiplier > 0.0f) {
                     newAmount *= 1 + multiplier;
                 }

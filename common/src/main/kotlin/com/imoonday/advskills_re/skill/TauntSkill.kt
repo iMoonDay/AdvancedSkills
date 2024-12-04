@@ -10,7 +10,7 @@ import net.minecraft.server.network.*
 
 class TauntSkill : Skill(
     id = "taunt",
-    types = listOf(SkillType.FUNCTION, SkillType.DEFENSE),
+    types = listOf(SkillType.UTILITY, SkillType.DEFENSE),
     cooldown = 30,
     rarity = Rarity.UNCOMMON,
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {

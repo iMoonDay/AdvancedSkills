@@ -10,7 +10,7 @@ import net.minecraft.server.network.*
 
 class ItemAttractionSkill : LongPressSkill(
     id = "item_attraction",
-    types = listOf(SkillType.FUNCTION),
+    types = listOf(SkillType.UTILITY),
     cooldown = 15,
     rarity = Rarity.SUPERB,
 ), UsingRenderTrigger, GlowingTrigger {

@@ -8,7 +8,6 @@ import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
-import net.minecraft.registry.tag.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.util.math.*
@@ -29,7 +28,7 @@ class DeathArchiveSkill : Skill(
     }
 
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean =
-        if (!source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) && player.isUsing()) {
+        if (player.isUsing()) {
             if (!player.isInInvulnerableState()) {
                 player.health = player.maxHealth
                 player.fallDistance = 0f

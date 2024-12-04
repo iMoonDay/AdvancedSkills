@@ -28,6 +28,20 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.advskills_re]]
+modId = "architectury"
+mandatory = true
+versionRange = "[9,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.advskills_re]]
+modId = "kotlinforforge"
+mandatory = true
+versionRange = "[4,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.advskills_re]]
 modId = "cloth_config"
 mandatory = false
 versionRange = "*"

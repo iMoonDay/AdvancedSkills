@@ -18,6 +18,7 @@ import net.minecraft.loot.entry.*
 import net.minecraft.loot.function.*
 import net.minecraft.loot.provider.number.*
 import net.minecraft.nbt.*
+import net.minecraft.registry.tag.*
 import net.minecraft.server.network.*
 
 object EventHandler {
@@ -44,7 +45,10 @@ object EventHandler {
             newPlayer.syncProperties()
         }
         AllowDeathEvent.EVENT.register { player, source, amount ->
-            player.allTriggers<DeathTrigger> { it.allowDeath(player, source, amount) }
+            !source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)
+                && player.allTriggers<DeathTrigger> {
+                it.allowDeath(player, source, amount)
+            }
         }
         EntityEvent.LIVING_DEATH.register { entity, source ->
             if (entity is ServerPlayerEntity) {

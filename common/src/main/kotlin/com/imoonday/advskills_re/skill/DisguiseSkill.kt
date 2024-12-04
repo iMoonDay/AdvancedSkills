@@ -9,7 +9,7 @@ import net.minecraft.util.math.*
 
 class DisguiseSkill : Skill(
     id = "disguise",
-    types = listOf(SkillType.FUNCTION),
+    types = listOf(SkillType.UTILITY),
     cooldown = 20,
     rarity = Rarity.EPIC
 ), DisguiseTrigger, UseInterruptTrigger, AutoStopTrigger {

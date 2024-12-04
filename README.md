@@ -4,8 +4,8 @@
 
 ### 前置模组:
 
-1. Fabric Language Kotlin(Fabric) / Kotlin for Forge(Forge)
-2. Architectury API
+1. `Fabric Language Kotlin`(Fabric) / `Kotlin for Forge`(Forge)
+2. `Architectury API`
 
 ### 玩法介绍:
 
@@ -95,7 +95,7 @@
 | 史诗  | 4  |
 | 传奇  | 3  |
 | 神话  | 2  |
-| 唯一  | 1  |
+| 无双  | 1  |
 
 ### 实用小技巧:
 

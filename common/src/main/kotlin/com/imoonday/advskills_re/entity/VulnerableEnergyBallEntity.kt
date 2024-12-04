@@ -7,7 +7,7 @@ import net.minecraft.particle.*
 import net.minecraft.util.math.*
 import net.minecraft.world.*
 
-class WeakenedEnergyBallEntity(entityType: EntityType<out WeakenedEnergyBallEntity>, world: World) :
+class VulnerableEnergyBallEntity(entityType: EntityType<out VulnerableEnergyBallEntity>, world: World) :
     EffectEnergyBallEntity(entityType, world) {
 
     override var range: Double = 5.0
@@ -20,7 +20,7 @@ class WeakenedEnergyBallEntity(entityType: EntityType<out WeakenedEnergyBallEnti
         directionY: Double,
         directionZ: Double,
         world: World,
-    ) : this(ModEntities.WEAKENED_ENERGY_BALL.get(), world) {
+    ) : this(ModEntities.VULNERABLE_ENERGY_BALL.get(), world) {
         update(x, y, z, directionX, directionY, directionZ)
     }
 
@@ -35,7 +35,7 @@ class WeakenedEnergyBallEntity(entityType: EntityType<out WeakenedEnergyBallEnti
     }
 
     override fun getEffects(): Map<StatusEffectInstance, Float> {
-        val effect = ModEffects.WEAKENED.get()
+        val effect = ModEffects.VULNERABLE.get()
         return linkedMapOf(
             StatusEffectInstance(effect, 8 * 20, 0, false, false, true) to 0.8f,
             StatusEffectInstance(effect, 8 * 20, 1, false, false, true) to 0.4f,

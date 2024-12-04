@@ -8,7 +8,7 @@ import net.minecraft.util.math.*
 
 class WeedCleanerSkill : Skill(
     id = "weed_cleaner",
-    types = listOf(SkillType.FUNCTION),
+    types = listOf(SkillType.UTILITY),
     cooldown = 10,
     rarity = Rarity.COMMON
 ) {

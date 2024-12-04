@@ -418,7 +418,7 @@ advskills_re:
   skillType:
     attack: 攻击
     defense: 防御
-    function: 功能
+    utility: 实用
     control: 控制
     passive: 被动
     enhancement: 强化
@@ -435,7 +435,7 @@ advskills_re:
     epic: 史诗
     legendary: 传奇
     mythic: 神话
-    unique: 唯一
+    unique: 无双
   skillSort:
     default: 默认
     id: ID ↑
@@ -520,7 +520,7 @@ effect:
     freeze: 冻结
     confinement: 禁锢
     serious_injury: 重伤
-    weakened: 易伤
+    vulnerable: 易伤
 entity:
   advskills_re:
     silence_energy_ball: 沉默能量球
@@ -537,7 +537,7 @@ entity:
     clone_player: 玩家
     magnet: 磁石
     ungrounded_arrow: 不可接地的箭
-    weakened_energy_ball: 易伤能量球
+    vulnerable_energy_ball: 易伤能量球
 block:
   advskills_re:
     invisible_trap: 隐形陷阱

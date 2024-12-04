@@ -47,15 +47,15 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
             horizonOffset += 0.5f
         }
         delta -= 10
-        if (entity.isWeakened) {
+        if (entity.isVulnerable) {
             renderEffects(
                 matrices,
                 vertexConsumers,
                 entity,
                 delta,
-                weakenedModelId,
+                vulnerableModelId,
                 horizonOffset,
-                entity.weakenedLevel.coerceAtMost(4)
+                entity.vulnerableLevel.coerceAtMost(4)
             )
         }
     }
@@ -104,6 +104,6 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
         val silenceModelId = Skills.PRIMARY_SILENCE.modelId
         val disarmModelId = Skills.DISARM.modelId
         val confinementModelId = ModelIdentifier(Registries.ITEM.getId(Items.BARRIER), "inventory")
-        val weakenedModelId = Skills.ARMOR_SHATTERER.modelId
+        val vulnerableModelId = Skills.ARMOR_SHATTERER.modelId
     }
 }

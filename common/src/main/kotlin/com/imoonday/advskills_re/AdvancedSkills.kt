@@ -6,9 +6,6 @@ import com.imoonday.advskills_re.util.*
 
 const val MOD_ID = "advskills_re"
 
-/**
- * TODO 凋零：强化三次普攻，附带凋零效果，持续3s，可叠加
- */
 object AdvancedSkills {
 
     @JvmStatic

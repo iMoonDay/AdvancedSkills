@@ -4,8 +4,8 @@
 
 ### Required Mods:
 
-1. Fabric Language Kotlin / Kotlin for Forge
-2. Architectury API
+1. `Fabric Language Kotlin` / `Kotlin for Forge`
+2. `Architectury API`
 
 ### Gameplay Introduction:
 

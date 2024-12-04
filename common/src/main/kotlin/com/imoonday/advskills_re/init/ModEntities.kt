@@ -128,12 +128,12 @@ object ModEntities {
             .register("ungrounded_arrow")
 
     @JvmField
-    val WEAKENED_ENERGY_BALL: RegistrySupplier<EntityType<WeakenedEnergyBallEntity>> =
-        EntityType.Builder.create(::WeakenedEnergyBallEntity, SpawnGroup.MISC)
+    val VULNERABLE_ENERGY_BALL: RegistrySupplier<EntityType<VulnerableEnergyBallEntity>> =
+        EntityType.Builder.create(::VulnerableEnergyBallEntity, SpawnGroup.MISC)
             .setDimensions(1.0f, 1.0f)
             .maxTrackingRange(4)
             .trackingTickInterval(10)
-            .register("weakened_energy_ball")
+            .register("vulnerable_energy_ball")
 
     fun <T : Entity> EntityType.Builder<T>.register(name: String): RegistrySupplier<EntityType<T>> =
         ENTITIES.register(name) { this.build(name) }

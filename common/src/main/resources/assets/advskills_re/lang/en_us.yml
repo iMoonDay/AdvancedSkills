@@ -418,7 +418,7 @@ advskills_re:
   skillType:
     attack: Attack
     defense: Defense
-    function: Function
+    utility: Utility
     control: Control
     passive: Passive
     enhancement: Enhancement
@@ -520,7 +520,7 @@ effect:
     freeze: Freeze
     confinement: Confinement
     serious_injury: Serious Injury
-    weakened: Weakened
+    vulnerable: Vulnerable
 entity:
   advskills_re:
     silence_energy_ball: Silence Energy Ball
@@ -537,7 +537,7 @@ entity:
     clone_player: Player
     magnet: Magnet
     ungrounded_arrow: Ungrounded Arrow
-    weakened_energy_ball: Weakened Energy Ball
+    vulnerable_energy_ball: Vulnerable Energy Ball
 block:
   advskills_re:
     invisible_trap: Invisible Trap

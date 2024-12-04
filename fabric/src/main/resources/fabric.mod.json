@@ -34,7 +34,9 @@
     "fabricloader": ">=0.14",
     "minecraft": "~1.20",
     "java": ">=17",
-    "fabric-api": "*"
+    "fabric-api": "*",
+    "architectury": "*",
+    "fabric-language-kotlin" : "*"
   },
   "suggests": {
     "modmenu": "*",
