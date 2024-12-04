@@ -18,22 +18,19 @@
 
 ### Sample Skills Introduction:
 
-1. **Reflective Skills**: Skills that have a certain chance of reflecting the first incoming damage within a specific
-   time. Different types of reflective effects exist.
-2. **Movement Skills**: Includes various movement abilities, such as dashing, teleporting, dodging, jumping, grappling,
-   etc.
+1. **Reflective Skills**: Skills that have a certain chance of reflecting the first incoming damage within a specific time. Different types of reflective effects exist.
+2. **Movement Skills**: Includes various movement abilities, such as dashing, teleporting, dodging, jumping, grappling, etc.
 3. **Control Skills**: Includes various control abilities, such as immobilizing, slowing, silencing, etc.
-4. **Passive Skills**: All skills that are not passive are considered active. Passive skills include self-healing,
-   passive effects, wall climbing, invisibility, and more.
-5. **Enhancement Skills**: Various enhancement skills, such as X-ray vision, water bypassing, and resistance to negative
-   effects.
+4. **Passive Skills**: All skills that are not passive are considered active. Passive skills include self-healing, passive effects, wall climbing, invisibility, and more.
+5. **Enhancement Skills**: Various enhancement skills, such as X-ray vision, water bypassing, and resistance to negative effects.
 6. **Summoning Skills**: Includes summoning duplicates, mounts, minions, etc.
 7. **Healing Skills**: Different healing skills restore varying amounts of health.
 8. **Destructive Skills**: Includes fireballs, TNT, meteorites, etc.
 
 ### Command Overview:
 
-#### /skills
+<details>
+  <summary> /skills (Click to expand) </summary>
 
 - `equip [skill] [slot]` - Equip a skill to a skill slot
 - `unequip [slot]` - Unequip the skill from the specified slot
@@ -74,6 +71,7 @@
     - `remove [id]` - Remove skill from blacklist by ID
     - `list` - List all blacklisted skills
     - `clear` - Clear skill blacklist
+</details>
 
 ### Skill Fruit:
 

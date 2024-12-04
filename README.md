@@ -29,7 +29,8 @@
 
 ### 指令介绍:
 
-#### /skills
+<details>
+  <summary> /skills (点击展开) </summary>
 
 - `equip [skill: 技能] [slot: 技能槽位(1-10)]` - 装备技能到技能槽
 - `unequip [slot: 技能槽(1-10)]` - 卸下技能槽上的技能
@@ -70,6 +71,7 @@
     - `remove [id: 技能id]` - 将技能移出黑名单
     - `list` - 列出所有黑名单中的技能
     - `clear` - 清空技能黑名单
+</details>
 
 ### 技能果实:
 
