@@ -32,7 +32,9 @@ class WallJumpSkill : PassiveSkill(
             if (colliding) {
                 jump(player)
                 player.playSkillSound()
-                player.getPersistentData().putBoolean("wallJumped", true)
+                val data = player.getPersistentData()
+                data.remove("jumped")
+                data.putBoolean("wallJumped", true)
             } else {
                 player.sendPacket(EntityPositionS2CPacket(player))
                 player.sendPacket(EntityVelocityUpdateS2CPacket(player))
@@ -58,11 +60,7 @@ class WallJumpSkill : PassiveSkill(
     }
 
     override fun write(player: PlayerEntity, data: NbtCompound): NbtCompound {
-        val pos = player.eyePos.offset(player.horizontalFacing, player.width / 2.0 + 0.1).toBlockPos()
-        val jumping = (player as LivingEntityAccessor).isJumping
-        val colliding = player.horizontalCollision && jumping &&
-            (!player.world.getBlockState(pos).isAir || !player.world.getBlockState(pos.down()).isAir)
-        val jumped = jumping && colliding
+        val jumped = hasJumped(player)
         data.putBoolean("jumped", jumped)
         if (jumped) {
             jump(player)
@@ -70,7 +68,18 @@ class WallJumpSkill : PassiveSkill(
         return data
     }
 
-    override fun getSendTime(): SendTime = SendTime.EQUIPPED
+    override fun getSendTime(): SendTime = SendTime.PREDICATE
+
+    override fun shouldSendData(player: PlayerEntity): Boolean = player is ServerPlayerEntity || hasJumped(player)
+
+    private fun hasJumped(player: PlayerEntity): Boolean {
+        val pos = player.eyePos.offset(player.horizontalFacing, player.width / 2.0 + 0.1).toBlockPos()
+        val jumping = (player as LivingEntityAccessor).isJumping
+        val colliding = player.horizontalCollision && jumping &&
+            (!player.world.getBlockState(pos).isAir || !player.world.getBlockState(pos.down()).isAir)
+        val jumped = jumping && colliding
+        return jumped
+    }
 
     override fun getProgress(player: PlayerEntity): Double = if (player.isUsing()) 1.0 else 0.0
 }

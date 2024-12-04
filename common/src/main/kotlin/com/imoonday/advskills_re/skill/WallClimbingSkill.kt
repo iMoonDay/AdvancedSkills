@@ -53,7 +53,10 @@ class WallClimbingSkill : PassiveSkill(
     override fun write(player: PlayerEntity, data: NbtCompound): NbtCompound =
         data.apply { putBoolean(HORIZONTAL_COLLISION_KEY, player.horizontalCollision) }
 
-    override fun getSendTime(): SendTime = SendTime.EQUIPPED
+    override fun getSendTime(): SendTime = SendTime.PREDICATE
+
+    override fun shouldSendData(player: PlayerEntity): Boolean =
+        player is ServerPlayerEntity || player.horizontalCollision != player.wasHorizontalCollision
 
     private fun PlayerEntity.shouldClimb(): Boolean =
         (horizontalCollision || getPersistentData().getBoolean(HORIZONTAL_COLLISION_KEY)) && !abilities.flying

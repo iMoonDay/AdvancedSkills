@@ -16,7 +16,7 @@ class PiercingSkill : Skill(
     cooldown = 15,
     rarity = Rarity.SUPERB,
     sound = ModSounds.PIERCING
-), AutoStopTrigger {
+), AutoStopTrigger, DangerTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.stopFallFlying()
@@ -86,6 +86,4 @@ class PiercingSkill : Skill(
             )
         }
     }
-
-    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 }

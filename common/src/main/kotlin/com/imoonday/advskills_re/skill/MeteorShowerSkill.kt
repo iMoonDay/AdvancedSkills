@@ -13,7 +13,7 @@ class MeteorShowerSkill : LongPressSkill(
     types = listOf(SkillType.ATTACK, SkillType.DESTRUCTION),
     cooldown = 120,
     rarity = Rarity.MYTHIC,
-), AttributeTrigger, UsingRenderTrigger {
+), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 10 * 20
 
@@ -60,6 +60,4 @@ class MeteorShowerSkill : LongPressSkill(
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) =
         super<AttributeTrigger>.postUnequipped(player, slot)
-
-    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 }

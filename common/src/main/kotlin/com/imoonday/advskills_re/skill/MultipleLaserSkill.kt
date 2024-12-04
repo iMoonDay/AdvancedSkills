@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
@@ -17,7 +18,7 @@ class MultipleLaserSkill : LongPressSkill(
     cooldown = 45,
     rarity = Rarity.LEGENDARY,
     sound = ModSounds.LASER
-) {
+), DangerTrigger {
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
@@ -82,9 +83,4 @@ class MultipleLaserSkill : LongPressSkill(
         if (player.isUsing()) player.startCooling(calculateCooldown(player.getUsedTime()))
         return true
     }
-
-    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
-
-//    override fun shouldRender(player: PlayerEntity, entity: Entity): Boolean =
-//        entity is PlayerEntity && entity.isUsing()
 }

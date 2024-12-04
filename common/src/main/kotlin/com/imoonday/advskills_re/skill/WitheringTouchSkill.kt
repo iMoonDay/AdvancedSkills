@@ -14,7 +14,7 @@ class WitheringTouchSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 0,
     rarity = Rarity.EPIC
-), UsingProgressTrigger, PostAttackTrigger {
+), UsingProgressTrigger, PostAttackTrigger, DangerTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 

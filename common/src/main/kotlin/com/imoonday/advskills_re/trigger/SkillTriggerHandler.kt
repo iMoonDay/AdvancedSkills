@@ -200,4 +200,8 @@ object SkillTriggerHandler {
 
     @JvmStatic
     fun ignoreLava(player: PlayerEntity): Boolean = player.anyTrigger<LavaTrigger> { it.ignoreLava(player) }
+
+    @JvmStatic
+    fun shouldHaveStatusEffect(player: PlayerEntity, effect: StatusEffect): Boolean =
+        player.anyTrigger<StatusEffectTrigger> { it.shouldHaveStatusEffect(player, effect) }
 }

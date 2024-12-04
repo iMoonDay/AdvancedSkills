@@ -17,7 +17,7 @@ class BloodSealSkill : LongPressSkill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 45,
     rarity = Rarity.EPIC,
-), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
+), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 5 * 20
 
@@ -63,8 +63,6 @@ class BloodSealSkill : LongPressSkill(
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) =
         super<AttributeTrigger>.postUnequipped(player, slot)
-
-    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 
     override fun getCrosshair(player: PlayerEntity): Crosshair {
         player.run {

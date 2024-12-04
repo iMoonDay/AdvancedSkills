@@ -7,7 +7,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
@@ -131,8 +130,10 @@ public abstract class LivingEntityMixin extends EntityMixin {
 
     @Inject(method = "hasStatusEffect", at = @At("RETURN"), cancellable = true)
     public void advskills_re$hasStatusEffect(StatusEffect effect, CallbackInfoReturnable<Boolean> cir) {
+        if (cir.getReturnValue()) return;
+
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (!cir.getReturnValue() && effect == StatusEffects.NIGHT_VISION && entity instanceof PlayerEntity player && SkillTriggerHandler.hasNightVision(player)) {
+        if (entity instanceof PlayerEntity player && SkillTriggerHandler.shouldHaveStatusEffect(player, effect)) {
             cir.setReturnValue(true);
         }
     }

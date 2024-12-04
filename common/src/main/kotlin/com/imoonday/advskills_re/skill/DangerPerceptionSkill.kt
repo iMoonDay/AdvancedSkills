@@ -120,15 +120,17 @@ class DangerPerceptionSkill : Skill(
                         it is HostileEntity && it.isAlive && it.target == player -> true
                         it is PotionEntity &&
                             (PotionUtil.getPotion(it.stack).effects
-                                .any { !it.effectType.isBeneficial }
+                                .any { effect -> !effect.effectType.isBeneficial }
                                 || PotionUtil.getPotionEffects(it.stack)
-                                .any { !it.effectType.isBeneficial })
+                                .any { effect -> !effect.effectType.isBeneficial })
                         -> true
 
                         it is TntEntity -> true
                         it is PufferfishEntity && it.puffState > 0 -> true
                         it is FallingBlockEntity && it.blockX == player.blockX && it.blockY >= player.blockY && it.blockZ == player.blockZ -> true
-                        it is ServerPlayerEntity && it.equippedSkills.any { skill -> skill.isDangerous(it) } -> true
+                        it is ServerPlayerEntity
+                            && it.anyTrigger<DangerTrigger> { skill -> skill.isDangerousTo(it, player) } -> true
+
                         else -> false
                     }
                 }

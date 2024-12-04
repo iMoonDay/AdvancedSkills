@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.*
+import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.mixin.*
 import dev.architectury.event.*
 import net.minecraft.entity.*
@@ -144,3 +145,14 @@ fun NbtCompound.replaceAll(nbt: NbtCompound?) {
 
 val Entity.centerPos: Vec3d
     get() = Vec3d(pos.x, pos.y + height / 2, pos.z)
+
+val Entity.wasHorizontalCollision: Boolean
+    get() = (this as ICollisionRecorder).wasHorizontalCollision()
+
+val Entity.wasVerticalCollision: Boolean
+    get() = (this as ICollisionRecorder).wasVerticalCollision()
+
+val Entity.wasGroundCollision: Boolean
+    get() = (this as ICollisionRecorder).wasGroundCollision()
+
+fun Entity.hasMoved(): Boolean = prevX != x || prevY != y || prevZ != z

@@ -57,7 +57,9 @@ object EventHandler {
             EventResult.pass()
         }
         PlayerEvent.PLAYER_RESPAWN.register { player, _ ->
-            player.usingSkills.forEach { player.stopUsing(it) }
+            player.usingSkills
+                .filterNot { it is RespawnTrigger && it.keepUsingAfterRespawn(player) }
+                .forEach { player.stopUsing(it) }
             player.forEachTrigger<RespawnTrigger> { it.afterRespawn(player) }
         }
         PlayerEvent.ATTACK_ENTITY.register { player, _, _, _, _ ->

@@ -14,7 +14,7 @@ class GroundWhackSkill : Skill(
     types = listOf(SkillType.ATTACK, SkillType.MOVEMENT),
     cooldown = 8,
     rarity = Rarity.RARE
-), LandingTrigger, PersistentTrigger, FallTrigger {
+), LandingTrigger, PersistentTrigger, FallTrigger, DangerTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         if (user.isOnGround) return UseResult.fail(failedMessage())
@@ -59,6 +59,4 @@ class GroundWhackSkill : Skill(
         if (!player.isUsing()) return amount
         return if (fallDistance < 10) 0 else amount / 2
     }
-
-    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 }

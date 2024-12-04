@@ -17,7 +17,7 @@ class ChargedSweepSkill : LongPressSkill(
     types = listOf(SkillType.ATTACK),
     cooldown = 9,
     rarity = Rarity.RARE,
-), AttributeTrigger, UsingRenderTrigger {
+), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 3 * 20
 
@@ -73,6 +73,4 @@ class ChargedSweepSkill : LongPressSkill(
         val product = vectorX * vector.x + vectorZ * vector.z
         return acos(product / magnitude)
     }
-
-    override fun isDangerous(player: ServerPlayerEntity): Boolean = player.isUsing()
 }

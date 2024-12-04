@@ -14,6 +14,7 @@ object SkillModifierHandler {
         if (modifier is IGameRendererModifier) gameRendererModifiers[skill] = modifier as IGameRendererModifier<Skill>
     }
 
+    @JvmStatic
     fun applyGameRendererModifiers(tickDelta: Float, limitTime: Long, matrices: MatrixStack) {
         gameRendererModifiers.forEach { it.value.modifyWorld(it.key, tickDelta, limitTime, matrices) }
     }

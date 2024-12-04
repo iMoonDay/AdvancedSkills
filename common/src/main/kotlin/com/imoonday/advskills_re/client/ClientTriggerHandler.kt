@@ -4,7 +4,6 @@ import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.trigger.*
 import com.imoonday.advskills_re.util.*
-import net.minecraft.client.gui.hud.InGameHud.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
@@ -50,12 +49,6 @@ object ClientTriggerHandler {
         player?.forEachTrigger<CameraUpdateMovementTrigger> { movement = it.getDelta(movement, player) }
         return movement
     }
-
-    @JvmStatic
-    fun getHeartType(player: PlayerEntity): HeartType? =
-        player.getTriggers<HeartTypeTrigger>()
-            .mapNotNull { it.getHeartType(player) }
-            .maxByOrNull { it.second }?.first
 
     @JvmStatic
     fun sendPlayerData(player: PlayerEntity) =
