@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.UseResult
 import net.minecraft.entity.projectile.*
 import net.minecraft.server.network.*
@@ -10,7 +10,7 @@ class FireballSkill : Skill(
     id = "fireball",
     types = listOf(SkillType.DESTRUCTION),
     cooldown = 5,
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
     sound = SoundEvents::ENTITY_ENDER_DRAGON_SHOOT
 ) {
 

@@ -1,7 +1,8 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.effect.*
 import net.minecraft.server.network.*
@@ -10,7 +11,7 @@ class DuplicationSkill : Skill(
     id = "duplication",
     types = listOf(SkillType.SUMMON),
     cooldown = 30,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), SendPlayerVelocityTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {

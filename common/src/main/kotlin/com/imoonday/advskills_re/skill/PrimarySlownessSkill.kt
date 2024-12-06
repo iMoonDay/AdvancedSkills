@@ -2,7 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.UseResult
 import net.minecraft.server.network.*
 
@@ -10,7 +10,7 @@ class PrimarySlownessSkill : Skill(
     id = "primary_slowness",
     types = listOf(SkillType.CONTROL),
     cooldown = 6,
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
     sound = ModSounds.FIRE
 ) {
 

@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.*
-import com.imoonday.advskills_re.util.*
+import com.imoonday.advskills_re.skill.enums.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
 import kotlinx.serialization.Serializable

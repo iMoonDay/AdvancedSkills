@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
@@ -10,7 +11,7 @@ class ArrowRainSkill : Skill(
     id = "arrow_rain",
     types = listOf(SkillType.ATTACK, SkillType.SUMMON),
     cooldown = 15,
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
     sound = SoundEvents::ENTITY_ARROW_SHOOT
 ) {
 

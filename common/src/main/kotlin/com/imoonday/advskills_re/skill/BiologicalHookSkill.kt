@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.UseResult
 import com.imoonday.advskills_re.util.plus
 import com.imoonday.advskills_re.util.times
@@ -11,7 +11,7 @@ class BiologicalHookSkill : Skill(
     id = "biological_hook",
     types = listOf(SkillType.CONTROL),
     cooldown = 15,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {

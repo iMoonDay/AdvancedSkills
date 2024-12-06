@@ -1,13 +1,14 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
 
 class SelfRepairSkill : Skill(
     id = "self_repair",
     types = listOf(SkillType.PASSIVE),
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
     cooldown = 10,
 ), AutoTrigger, AutoStopTrigger {
 

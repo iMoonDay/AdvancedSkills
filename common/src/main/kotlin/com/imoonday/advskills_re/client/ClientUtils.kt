@@ -4,7 +4,7 @@ import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.skill.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.*
 import net.minecraft.client.network.*
@@ -47,7 +47,7 @@ val KeyBinding.keyCategory: InputUtil.Type
 fun PlayerEntity.updateScreen() {
     if (isCurrentClientPlayer) {
         val screen = client!!.currentScreen
-        if (screen is AutoSyncedScreen && (screen as ScreenAccessor).isScreenInitialized) {
+        if (screen is Syncable && (screen as ScreenAccessor).isScreenInitialized) {
             screen.update()
         }
     }

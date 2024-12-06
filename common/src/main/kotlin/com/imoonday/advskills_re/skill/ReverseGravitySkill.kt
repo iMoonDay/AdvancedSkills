@@ -1,6 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
@@ -11,7 +13,7 @@ class ReverseGravitySkill : Skill(
     id = "reverse_gravity",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 30,
-    rarity = Rarity.EPIC,
+    rarity = SkillRarity.EPIC,
 ), AutoStopTrigger,
     InvertMouseTrigger,
     FlipUpsideDownTrigger,
@@ -74,13 +76,13 @@ class ReverseGravitySkill : Skill(
         dimensions: EntityDimensions,
     ): Float = if (player.isUsing()) dimensions.height - original else original
 
-    override fun onStop(player: PlayerEntity) {
-        super<ClientUseTrigger>.onStop(player)
-        player.run {
+    override fun onStop(clientPlayer: PlayerEntity) {
+        super<ClientUseTrigger>.onStop(clientPlayer)
+        clientPlayer.run {
             calculateDimensions()
             pitch = -pitch
         }
     }
 
-    override fun getDelta(original: Float, player: PlayerEntity): Float = 1f
+    override fun getDelta(original: Float, clientPlayer: PlayerEntity): Float = 1f
 }

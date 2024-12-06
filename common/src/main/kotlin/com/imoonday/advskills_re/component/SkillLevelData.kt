@@ -1,0 +1,37 @@
+package com.imoonday.advskills_re.component
+
+import net.minecraft.nbt.*
+
+data class SkillLevelData(
+    var experience: Int = 0,
+    var level: Int = 0,
+    var cycle: Int = 0,
+) {
+
+    fun toNbt(): NbtCompound = NbtCompound().apply {
+        putInt("experience", experience)
+        putInt("level", level)
+        putInt("cycle", cycle)
+    }
+
+    fun copyFrom(data: SkillLevelData) {
+        this.experience = data.experience
+        this.level = data.level
+        this.cycle = data.cycle
+    }
+
+    fun reset() {
+        this.experience = 0
+        this.level = 0
+        this.cycle = 0
+    }
+
+    companion object {
+
+        fun fromNbt(nbt: NbtCompound): SkillLevelData = SkillLevelData(
+            nbt.getInt("experience"),
+            nbt.getInt("level"),
+            nbt.getInt("cycle")
+        )
+    }
+}

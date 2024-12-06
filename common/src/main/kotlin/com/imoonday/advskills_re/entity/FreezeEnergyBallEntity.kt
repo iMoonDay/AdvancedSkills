@@ -7,7 +7,6 @@ import net.minecraft.particle.*
 import net.minecraft.sound.*
 import net.minecraft.world.*
 import org.joml.*
-import kotlin.random.Random
 
 class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>, world: World) :
     EffectEnergyBallEntity(entityType, world) {
@@ -46,7 +45,7 @@ class FreezeEnergyBallEntity(entityType: EntityType<out FreezeEnergyBallEntity>,
         world.playSound(null, blockPos, SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.VOICE)
 
     override fun canApply(effect: StatusEffectInstance, chance: Float, target: LivingEntity): Boolean =
-        target.isWet && Random.nextFloat() < chance * 2f
+        target.isWet && target.random.nextFloat() < chance * 2f
 
     companion object {
 

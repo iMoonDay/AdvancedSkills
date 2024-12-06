@@ -5,7 +5,7 @@ import com.imoonday.advskills_re.api.Propertied;
 import com.imoonday.advskills_re.client.ClientTriggerHandler;
 import com.imoonday.advskills_re.component.EntityPropertyComponent;
 import com.imoonday.advskills_re.init.ModEffectsKt;
-import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
+import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;

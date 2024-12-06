@@ -1,12 +1,13 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.util.SkillSlot
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.skill.enums.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.server.network.*
 
 class StrongPhysiqueSkill : PassiveSkill(
     id = "strong_physique",
-    rarity = Rarity.SUPERB
+    rarity = SkillRarity.SUPERB
 ) {
 
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -13,7 +14,7 @@ class WitheringTouchSkill : Skill(
     id = "withering_touch",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 0,
-    rarity = Rarity.EPIC
+    rarity = SkillRarity.EPIC
 ), UsingProgressTrigger, PostAttackTrigger, DangerTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)

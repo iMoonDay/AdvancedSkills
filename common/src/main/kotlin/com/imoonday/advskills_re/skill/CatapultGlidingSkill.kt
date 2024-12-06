@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.item.*
@@ -12,7 +13,7 @@ class CatapultGlidingSkill : LongPressSkill(
     id = "catapult_gliding",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 30,
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
     sound = ModSounds.DASH
 ) {
 

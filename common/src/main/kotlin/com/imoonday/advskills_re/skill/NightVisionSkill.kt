@@ -1,11 +1,12 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import net.minecraft.server.network.*
 
 class NightVisionSkill : PassiveSkill(
     id = "night_vision",
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
     toggleable = true
 ), PersistentTrigger, NightVisionTrigger {
 

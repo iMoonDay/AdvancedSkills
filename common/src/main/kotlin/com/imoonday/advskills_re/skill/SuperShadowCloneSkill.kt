@@ -1,7 +1,8 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.effect.*
 import net.minecraft.server.network.*
@@ -11,7 +12,7 @@ class SuperShadowCloneSkill : Skill(
     id = "super_shadow_clone",
     types = listOf(SkillType.SUMMON),
     cooldown = 90,
-    rarity = Rarity.LEGENDARY,
+    rarity = SkillRarity.LEGENDARY,
 ), SendPlayerVelocityTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {

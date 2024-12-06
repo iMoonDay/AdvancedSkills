@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -12,7 +13,7 @@ import net.minecraft.sound.*
 
 class CounterblastSkill : PassiveSkill(
     id = "counterblast",
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), PostAttackedTrigger, ProgressTrigger {
 
     override fun postAttacked(source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {

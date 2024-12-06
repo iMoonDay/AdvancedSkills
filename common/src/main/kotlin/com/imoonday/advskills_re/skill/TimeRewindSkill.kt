@@ -1,8 +1,9 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.damage.*
 import net.minecraft.registry.*
@@ -13,7 +14,7 @@ class TimeRewindSkill : LongPressSkill(
     id = "time_rewind",
     types = listOf(SkillType.RESTORATION, SkillType.MOVEMENT),
     cooldown = 60,
-    rarity = Rarity.MYTHIC,
+    rarity = SkillRarity.MYTHIC,
 ), UsingRenderTrigger, DeathTrigger {
 
     override fun getMaxPressTime(): Int = 5 * 20

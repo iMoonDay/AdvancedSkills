@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.command
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.*

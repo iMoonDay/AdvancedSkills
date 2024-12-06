@@ -5,6 +5,12 @@ import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.text.*
 
+/**
+ * Result of a skill use
+ * @param success play sound and send message if true, otherwise send message only
+ * @param cooling start cooling if true
+ * @param message send message if not null, otherwise send the default failure message. If the content is empty, do not send any message
+ */
 class UseResult(
     val success: Boolean,
     val cooling: Boolean,
@@ -56,7 +62,7 @@ class UseResult(
          * @param message optional message to display to the user
          */
         @JvmStatic
-        fun of(success: Boolean, message: Text? = null) = if (success) success(message) else fail(message)
+        fun of(success: Boolean, message: Text? = null) = of(success, message, message)
 
         /**
          * @param success true for success, false for failure
@@ -88,9 +94,8 @@ class UseResult(
             skill: Skill,
             data: NbtCompound? = null,
             failedMessage: Text? = null
-        ): UseResult = if (user.startUsing(skill, data)) consume(null) else fail(
-            failedMessage ?: translateActive(skill, true)
-        )
+        ): UseResult = if (user.startUsing(skill, data)) consume(null)
+        else fail(failedMessage ?: translateActive(skill, true))
 
         /**
          * @param user player who is using the skill
@@ -105,10 +110,11 @@ class UseResult(
             user: PlayerEntity,
             skill: Skill,
             data: NbtCompound? = null,
+            startCoolingAfterStop: Boolean = true,
             onStart: (() -> Unit)? = null,
         ): UseResult {
             val active = user.toggleUsing(skill, data)
-            if (active) onStart?.invoke() else user.startCooling(skill)
+            if (active) onStart?.invoke() else if (startCoolingAfterStop) user.startCooling(skill)
             return consume(translateActive(skill, active))
         }
     }

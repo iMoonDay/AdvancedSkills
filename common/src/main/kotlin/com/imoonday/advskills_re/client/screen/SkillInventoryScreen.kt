@@ -4,10 +4,12 @@ import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.client.screen.component.*
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.component.SkillSlot.Companion.indexTexture
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
-import com.imoonday.advskills_re.util.SkillSlot.Companion.indexTexture
 import net.minecraft.client.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.gui.screen.*
@@ -24,7 +26,7 @@ import java.util.*
 class SkillInventoryScreen(
     val player: PlayerEntity,
     val parent: () -> Screen? = { null },
-) : Screen(Text.empty()), AutoSyncedScreen {
+) : Screen(Text.empty()), Syncable {
 
     var selectedSlot: Slot? = null
     var selectedTab: Tab? = null

@@ -1,7 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -15,7 +16,7 @@ class LavaWalkerSkill : Skill(
     id = "lava_walker",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 30,
-    rarity = Rarity.EPIC,
+    rarity = SkillRarity.EPIC,
 ), WalkOnFluidTrigger,
     AutoStopTrigger,
     FluidMovementTrigger,

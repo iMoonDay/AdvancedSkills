@@ -1,7 +1,8 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -9,31 +10,27 @@ import net.minecraft.entity.effect.*
 import net.minecraft.entity.player.*
 import net.minecraft.item.*
 import net.minecraft.server.network.*
-import net.minecraft.sound.*
-import kotlin.random.*
 
 class DisarmSkill : Skill(
     id = "disarm",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 15,
-    rarity = Rarity.SUPERB,
-), AttackTrigger, PersistentTrigger, DeathTrigger {
+    rarity = SkillRarity.SUPERB,
+), PostAttackTrigger, PersistentTrigger, DeathTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(false)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override fun onAttack(
-        amount: Float,
-        source: DamageSource,
-        player: ServerPlayerEntity,
-        target: LivingEntity,
-    ): Float {
-        if (!player.isUsing()) return amount
-        if (Random.nextFloat() <= 0.45f) {
+    override fun postAttack(source: DamageSource, player: ServerPlayerEntity, target: LivingEntity) {
+        super.postAttack(source, player, target)
+        if (!player.isUsing()) return
+
+        val random = player.random
+        if (random.nextFloat() < 0.45f) {
             target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM.get(), 5 * 20, 0))
             player.sendMessage(translate("skill.disarm.success"), true)
-            target.world.playSound(null, player.blockPos, ModSounds.DISARM.get(), SoundCategory.PLAYERS)
+            player.playSound(ModSounds.DISARM.get())
             (target as? PlayerEntity)?.sendMessage(translate("skill.disarm.disarmed"), true)
-            if (Random.nextFloat() <= 0.01f) {
+            if (random.nextFloat() < 0.01f) {
                 if (target is ServerPlayerEntity)
                     target.dropSelectedItem(true)
                 else if (target.dropStack(target.mainHandStack) != null) {
@@ -47,7 +44,6 @@ class DisarmSkill : Skill(
         }
 
         player.stopAndCooldown()
-        return amount
     }
 
     override fun onDeath(player: ServerPlayerEntity, source: DamageSource) {

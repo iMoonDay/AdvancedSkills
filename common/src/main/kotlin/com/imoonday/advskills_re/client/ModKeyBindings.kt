@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.client.screen.*
 import com.imoonday.advskills_re.client.screen.SkillWheelScreen.Companion.quickCastSlot
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.util.*

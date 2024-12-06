@@ -3,10 +3,11 @@ package com.imoonday.advskills_re.client.screen
 import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.client.screen.component.*
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.component.SkillSlot.Companion.indexTexture
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
-import com.imoonday.advskills_re.util.SkillSlot.Companion.indexTexture
 import net.minecraft.client.gui.*
 import net.minecraft.client.gui.screen.*
 import net.minecraft.client.gui.screen.narration.*
@@ -20,7 +21,7 @@ import java.awt.*
 
 class SkillListScreen(
     val player: PlayerEntity,
-) : Screen(Text.empty()), AutoSyncedScreen {
+) : Screen(Text.empty()), Syncable {
 
     private var showCreativeButtons = false
     var selectedSkill: Skill? = null

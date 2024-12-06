@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.client
 import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.client.render.entity.*
 import com.imoonday.advskills_re.client.render.entity.feature.*
+import com.imoonday.advskills_re.client.render.entity.model.*
 import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.init.ModEntities.CLONE_PLAYER
 import com.imoonday.advskills_re.init.ModEntities.ENCHANTED_SWORD

@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.fluid.*
@@ -11,12 +12,12 @@ class WaterBreathingSkill : Skill(
     id = "water_breathing",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 10,
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
 ), AutoStopTrigger, BreatheInWaterTrigger {
 
     override val persistTime: Int = 30 * 20
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(false)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

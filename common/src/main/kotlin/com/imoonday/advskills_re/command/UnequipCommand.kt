@@ -1,8 +1,8 @@
 package com.imoonday.advskills_re.command
 
+import com.imoonday.advskills_re.component.SkillContainer.Companion.MAX_SLOT_SIZE
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.*
-import com.imoonday.advskills_re.util.SkillContainer.Companion.MAX_SLOT_SIZE
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.*
 import com.mojang.brigadier.context.*

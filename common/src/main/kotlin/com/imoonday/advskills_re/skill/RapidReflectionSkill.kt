@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.skill.enums.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.server.network.*
@@ -7,7 +8,7 @@ import net.minecraft.server.network.*
 class RapidReflectionSkill : ReflectionSkill(
     id = "rapid_reflection",
     cooldown = 4,
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
     duration = 10,
 ) {
 

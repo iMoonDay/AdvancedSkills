@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.mixin;
 
-import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
+import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;

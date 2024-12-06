@@ -1,14 +1,14 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
 class AutomaticUphillSkill : PassiveSkill(
     id = "automatic_uphill",
     extraTypes = listOf(SkillType.MOVEMENT),
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
     toggleable = true
 ), StepHeightTrigger, PersistentTrigger {
 

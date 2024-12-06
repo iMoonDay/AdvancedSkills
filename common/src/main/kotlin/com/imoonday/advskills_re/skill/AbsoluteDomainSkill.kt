@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
 import net.minecraft.particle.*
@@ -10,7 +11,7 @@ class AbsoluteDomainSkill : Skill(
     id = "absolute_domain",
     types = listOf(SkillType.DESTRUCTION),
     cooldown = 15,
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
 ), AutoStopTrigger {
 
     private val maxHardness = Blocks.OBSIDIAN.hardness

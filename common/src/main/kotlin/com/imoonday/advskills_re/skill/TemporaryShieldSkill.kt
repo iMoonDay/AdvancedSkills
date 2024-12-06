@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
 
@@ -8,7 +9,7 @@ class TemporaryShieldSkill : Skill(
     id = "temporary_shield",
     types = listOf(SkillType.DEFENSE),
     cooldown = 30,
-    rarity = Rarity.LEGENDARY
+    rarity = SkillRarity.LEGENDARY
 ), AutoStopTrigger {
 
     override val persistTime: Int = 10 * 20

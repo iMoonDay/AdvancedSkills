@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.fluid.*
@@ -13,7 +14,7 @@ class LiquidShieldSkill : Skill(
     id = "liquid_shield",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 60,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), TickTrigger, AutoStopTrigger, FluidMovementTrigger, BreatheInWaterTrigger {
 
     override val persistTime: Int = 15 * 20

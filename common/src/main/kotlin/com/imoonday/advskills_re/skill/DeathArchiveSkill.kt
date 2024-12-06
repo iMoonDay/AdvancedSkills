@@ -1,6 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import com.imoonday.advskills_re.util.UseResult.Companion.consume
 import com.imoonday.advskills_re.util.UseResult.Companion.fail
@@ -16,7 +18,7 @@ class DeathArchiveSkill : Skill(
     id = "death_archive",
     types = listOf(SkillType.DEFENSE, SkillType.RESTORATION),
     cooldown = 300,
-    rarity = Rarity.UNIQUE
+    rarity = SkillRarity.UNIQUE
 ), UsingProgressTrigger, DeathTrigger, DamageTrigger, TickTrigger, UnequipTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {

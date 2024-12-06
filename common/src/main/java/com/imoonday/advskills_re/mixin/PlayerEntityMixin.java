@@ -4,7 +4,7 @@ import com.imoonday.advskills_re.api.PlayerDataContainer;
 import com.imoonday.advskills_re.component.PlayerDataComponent;
 import com.imoonday.advskills_re.config.SkillConfig;
 import com.imoonday.advskills_re.entity.Servant;
-import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
+import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
 import com.imoonday.advskills_re.util.PlayerUtilsKt;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;

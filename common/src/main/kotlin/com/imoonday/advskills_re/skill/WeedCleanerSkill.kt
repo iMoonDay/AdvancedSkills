@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.Blocks.*
 import net.minecraft.entity.*
@@ -10,7 +11,7 @@ class WeedCleanerSkill : Skill(
     id = "weed_cleaner",
     types = listOf(SkillType.UTILITY),
     cooldown = 10,
-    rarity = Rarity.COMMON
+    rarity = SkillRarity.COMMON
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {

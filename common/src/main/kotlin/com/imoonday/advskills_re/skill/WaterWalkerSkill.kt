@@ -1,7 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.fluid.*
@@ -13,7 +14,7 @@ class WaterWalkerSkill : Skill(
     id = "water_walker",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 15,
-    rarity = Rarity.SUPERB
+    rarity = SkillRarity.SUPERB
 ), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = 15 * 20

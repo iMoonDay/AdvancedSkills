@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.mixin;
 
 import com.imoonday.advskills_re.client.modifier.SkillModifierHandler;
-import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
+import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;

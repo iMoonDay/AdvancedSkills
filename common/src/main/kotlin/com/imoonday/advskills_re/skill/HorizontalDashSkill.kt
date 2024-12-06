@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.UseResult
 import com.imoonday.advskills_re.util.sendPacket
 import com.imoonday.advskills_re.util.spawnParticles
@@ -14,7 +14,7 @@ class HorizontalDashSkill : Skill(
     id = "horizontal_dash",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 1,
-    rarity = Rarity.COMMON,
+    rarity = SkillRarity.COMMON,
     sound = ModSounds.DASH
 ) {
 

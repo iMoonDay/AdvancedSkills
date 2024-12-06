@@ -1,14 +1,14 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.UseResult
 import net.minecraft.server.network.*
 
 class MasterySkill : Skill(
     id = "mastery",
     types = listOf(SkillType.PASSIVE),
-    rarity = Rarity.LEGENDARY
+    rarity = SkillRarity.LEGENDARY
 ), CooldownTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)

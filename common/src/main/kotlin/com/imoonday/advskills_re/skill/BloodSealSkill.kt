@@ -1,8 +1,10 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
@@ -16,7 +18,7 @@ class BloodSealSkill : LongPressSkill(
     id = "blood_seal",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 45,
-    rarity = Rarity.EPIC,
+    rarity = SkillRarity.EPIC,
 ), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 5 * 20
@@ -72,8 +74,8 @@ class BloodSealSkill : LongPressSkill(
         return Crosshairs.NONE
     }
 
-    override fun isTarget(player: PlayerEntity, entity: LivingEntity): Boolean {
-        if (!player.isUsing()) return false
-        return player.raycastLivingEntity(5.0)?.entity == entity
+    override fun isTarget(clientPlayer: PlayerEntity, entity: LivingEntity): Boolean {
+        if (!clientPlayer.isUsing()) return false
+        return clientPlayer.raycastLivingEntity(5.0)?.entity == entity
     }
 }

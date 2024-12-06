@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.api;
 
+import com.imoonday.advskills_re.component.SkillSlot;
 import com.imoonday.advskills_re.skill.Skill;
-import com.imoonday.advskills_re.util.SkillSlot;
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
 import dev.architectury.event.EventResult;

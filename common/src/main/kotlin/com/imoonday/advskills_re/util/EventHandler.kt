@@ -7,7 +7,7 @@ import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.trigger.*
 import dev.architectury.event.*
 import dev.architectury.event.events.common.*
 import net.minecraft.block.*
@@ -45,9 +45,9 @@ object EventHandler {
             newPlayer.syncProperties()
         }
         AllowDeathEvent.EVENT.register { player, source, amount ->
-            !source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)
-                && player.allTriggers<DeathTrigger> {
-                it.allowDeath(player, source, amount)
+            source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)
+                || player.getTriggers<DeathTrigger>().none {
+                !it.allowDeath(player, source, amount)
             }
         }
         EntityEvent.LIVING_DEATH.register { entity, source ->

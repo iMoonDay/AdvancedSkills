@@ -1,6 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
@@ -11,7 +13,7 @@ abstract class LongPressSkill(
     id: String,
     types: List<SkillType>,
     cooldown: Int,
-    rarity: Rarity,
+    rarity: SkillRarity,
     sound: Supplier<SoundEvent>? = null,
 ) : Skill(id, types, cooldown, rarity, sound), LongPressTrigger {
 

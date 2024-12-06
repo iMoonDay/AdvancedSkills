@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
@@ -13,7 +14,7 @@ class GroundWhackSkill : Skill(
     id = "ground_whack",
     types = listOf(SkillType.ATTACK, SkillType.MOVEMENT),
     cooldown = 8,
-    rarity = Rarity.RARE
+    rarity = SkillRarity.RARE
 ), LandingTrigger, PersistentTrigger, FallTrigger, DangerTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {

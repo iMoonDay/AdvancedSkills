@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
@@ -11,7 +12,7 @@ class TeleportSkill : Skill(
     id = "teleport",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 2,
-    rarity = Rarity.UNCOMMON
+    rarity = SkillRarity.UNCOMMON
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {

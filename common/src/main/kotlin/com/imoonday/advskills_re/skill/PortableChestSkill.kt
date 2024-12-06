@@ -1,7 +1,8 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.mixin.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.screen.*
@@ -14,7 +15,7 @@ class PortableChestSkill : Skill(
     id = "portable_chest",
     types = listOf(SkillType.UTILITY),
     cooldown = 5,
-    rarity = Rarity.SUPERB
+    rarity = SkillRarity.SUPERB
 ), TickTrigger, UsingProgressTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {

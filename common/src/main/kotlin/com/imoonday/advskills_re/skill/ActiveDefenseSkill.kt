@@ -1,10 +1,10 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
-import com.imoonday.advskills_re.util.SkillSlot
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.UseResult
 import com.imoonday.advskills_re.util.isUsing
 import net.minecraft.entity.*
@@ -17,7 +17,7 @@ class ActiveDefenseSkill : LongPressSkill(
     id = "active_defense",
     types = listOf(SkillType.DEFENSE),
     cooldown = 10,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), DamageTrigger, AttributeTrigger, UsingRenderTrigger {
 
     override fun getMaxPressTime(): Int = 10 * 10
@@ -54,6 +54,6 @@ class ActiveDefenseSkill : LongPressSkill(
         attacker: LivingEntity?,
     ): Float = if (!player.isUsing()) amount else amount * 0.8f
 
-    override fun shouldRenderFeature(target: PlayerEntity, player: PlayerEntity): Boolean =
+    override fun shouldRenderFeature(target: PlayerEntity, clientPlayer: PlayerEntity): Boolean =
         target.isUsing() && !target.isUsing(Skills.ABSOLUTE_DEFENSE)
 }

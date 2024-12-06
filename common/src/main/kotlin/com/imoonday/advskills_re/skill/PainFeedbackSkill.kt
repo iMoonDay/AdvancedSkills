@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.server.network.*
@@ -8,7 +9,7 @@ import net.minecraft.server.network.*
 class PainFeedbackSkill : PassiveSkill(
     id = "pain_feedback",
     cooldown = 5,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), PostDamagedTrigger {
 
     override fun postDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {

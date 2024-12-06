@@ -1,8 +1,10 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.server.network.*
@@ -12,7 +14,7 @@ class MeteorShowerSkill : LongPressSkill(
     id = "meteor_shower",
     types = listOf(SkillType.ATTACK, SkillType.DESTRUCTION),
     cooldown = 120,
-    rarity = Rarity.MYTHIC,
+    rarity = SkillRarity.MYTHIC,
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 10 * 20

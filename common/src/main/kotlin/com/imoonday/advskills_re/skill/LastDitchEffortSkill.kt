@@ -1,7 +1,9 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
@@ -12,9 +14,10 @@ class LastDitchEffortSkill : Skill(
     id = "last_ditch_effort",
     types = listOf(SkillType.PASSIVE),
     cooldown = 180,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
     sound = ModSounds.HEAL
-), DamageTrigger, AutoStopTrigger, AttackTrigger, AttributeTrigger, AutoTrigger, DeathTrigger {
+), DamageTrigger, AutoStopTrigger, AttackTrigger,
+    AttributeTrigger, AutoTrigger, DeathTrigger {
 
     override val persistTime: Int = 15 * 20
 

@@ -45,29 +45,27 @@ object ModEffects {
 }
 
 val LivingEntity.isDisarmed: Boolean
-    get() = hasStatusEffect(this, ModEffects.DISARM)
+    get() = this.hasStatusEffect(ModEffects.DISARM)
 val LivingEntity.isSilenced: Boolean
-    get() = hasStatusEffect(this, ModEffects.SILENCE)
+    get() = this.hasStatusEffect(ModEffects.SILENCE)
 val LivingEntity.isForceFrozen: Boolean
-    get() = hasStatusEffect(this, ModEffects.FREEZE)
+    get() = this.hasStatusEffect(ModEffects.FREEZE)
 val LivingEntity.isConfined: Boolean
-    get() = hasStatusEffect(this, ModEffects.CONFINEMENT)
+    get() = this.hasStatusEffect(ModEffects.CONFINEMENT)
 val LivingEntity.isSeriousInjured: Boolean
-    get() = hasStatusEffect(this, ModEffects.SERIOUS_INJURY)
+    get() = this.hasStatusEffect(ModEffects.SERIOUS_INJURY)
 val LivingEntity.isVulnerable: Boolean
-    get() = hasStatusEffect(this, ModEffects.VULNERABLE)
+    get() = this.hasStatusEffect(ModEffects.VULNERABLE)
 
 val LivingEntity.vulnerableLevel: Int
     get() = (getStatusEffect(ModEffects.VULNERABLE.get())?.amplifier?.plus(1))
-        ?: properties.getCompound("syncEffects")
-            .getCompound("vulnerable")
-            .getInt("level")
+        ?: this.getSyncEffectData(ModEffects.VULNERABLE).getInt("level")
 
-private fun hasStatusEffect(entity: LivingEntity, effect: Supplier<out StatusEffect>): Boolean {
+private fun LivingEntity.hasStatusEffect(effect: Supplier<out StatusEffect>): Boolean {
     val statusEffect = effect.get()
-    return if (statusEffect is SyncClientEffect) statusEffect.syncId in entity.properties.getCompound("syncEffects").keys
-    else entity.hasStatusEffect(statusEffect)
+    return if (statusEffect is SyncClientEffect) statusEffect.syncId in properties.getCompound("syncEffects").keys
+    else hasStatusEffect(statusEffect)
 }
 
-private fun getSyncEffectData(entity: LivingEntity, effect: Supplier<out SyncClientEffect>): NbtCompound =
-    entity.properties.getCompound("syncEffects").getCompound(effect.get().syncId)
+private fun LivingEntity.getSyncEffectData(effect: Supplier<out SyncClientEffect>): NbtCompound =
+    properties.getCompound("syncEffects").getCompound(effect.get().syncId)

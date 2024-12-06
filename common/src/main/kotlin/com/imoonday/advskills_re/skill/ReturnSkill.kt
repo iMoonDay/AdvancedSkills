@@ -1,7 +1,8 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.particle.*
@@ -14,7 +15,7 @@ class ReturnSkill : LongPressSkill(
     id = "return",
     types = listOf(SkillType.UTILITY, SkillType.MOVEMENT),
     cooldown = 0,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
     sound = ModSounds.RETURN
 ), UsingRenderTrigger {
 

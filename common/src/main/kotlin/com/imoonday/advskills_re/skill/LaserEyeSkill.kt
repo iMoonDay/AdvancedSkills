@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.projectile.*
@@ -16,7 +17,7 @@ class LaserEyeSkill : Skill(
     id = "laser_eye",
     types = listOf(SkillType.ATTACK),
     cooldown = 15,
-    rarity = Rarity.EPIC,
+    rarity = SkillRarity.EPIC,
     sound = ModSounds.LASER
 ) {
 

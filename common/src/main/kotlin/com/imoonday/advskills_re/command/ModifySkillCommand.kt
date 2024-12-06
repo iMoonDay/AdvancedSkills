@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.command
 
 import com.imoonday.advskills_re.config.*
-import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.*
@@ -104,7 +104,7 @@ object ModifySkillCommand : BaseCommand("modify") {
     private fun setRarity(context: CommandContext<ServerCommandSource>): Int {
         val skill = context.getSkill()
         val rarityStr = StringArgumentType.getString(context, "rarity")
-        val rarity = Skill.Rarity.fromId(rarityStr)
+        val rarity = SkillRarity.fromId(rarityStr)
         return if (rarity == null) {
             context.sendError(
                 "rarity.invalid",
@@ -125,10 +125,10 @@ object ModifySkillCommand : BaseCommand("modify") {
 
     private fun suggestRarity(builder: SuggestionsBuilder): CompletableFuture<Suggestions> =
         CommandSource.suggestMatching(
-            Skill.Rarity.entries,
+            SkillRarity.entries,
             builder,
-            Skill.Rarity::id,
-            Skill.Rarity::displayName
+            SkillRarity::id,
+            SkillRarity::displayName
         )
 
     private fun resetCooldown(context: CommandContext<ServerCommandSource>): Int {

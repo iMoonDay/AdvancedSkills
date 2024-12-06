@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.item
 
 import com.imoonday.advskills_re.*
-import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.item.*
 import net.minecraft.entity.*
@@ -12,9 +12,9 @@ import net.minecraft.text.*
 import net.minecraft.util.*
 import net.minecraft.world.*
 
-class SkillFruitItem(val rarity: Skill.Rarity, settings: Settings) : Item(settings) {
+class SkillFruitItem(val rarity: SkillRarity, settings: Settings) : Item(settings) {
 
-    constructor(rarity: Skill.Rarity) : this(
+    constructor(rarity: SkillRarity) : this(
         rarity,
         Settings().food(FoodComponent.Builder().alwaysEdible().build())
     )

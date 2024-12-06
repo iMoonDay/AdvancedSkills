@@ -1,7 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.client.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
@@ -12,7 +13,7 @@ class ItemAttractionSkill : LongPressSkill(
     id = "item_attraction",
     types = listOf(SkillType.UTILITY),
     cooldown = 15,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), UsingRenderTrigger, GlowingTrigger {
 
     override fun getMaxPressTime(): Int = 10 * 20
@@ -48,7 +49,7 @@ class ItemAttractionSkill : LongPressSkill(
         super.tick(player, usedTime)
     }
 
-    override fun isGlowing(entity: Entity, player: PlayerEntity): Boolean =
-        (player.isUsing() && entity is ItemEntity && !entity.cannotPickup()
-            && player.boundingBox.expand(15.0).contains(entity.pos))
+    override fun isGlowing(entity: Entity, clientPlayer: PlayerEntity): Boolean =
+        (clientPlayer.isUsing() && entity is ItemEntity && !entity.cannotPickup()
+            && clientPlayer.boundingBox.expand(15.0).contains(entity.pos))
 }

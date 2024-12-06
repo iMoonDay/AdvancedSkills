@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -11,7 +12,7 @@ class ResuscitationSkill : Skill(
     id = "resuscitation",
     types = listOf(SkillType.PASSIVE, SkillType.DEFENSE),
     cooldown = 300,
-    rarity = Rarity.LEGENDARY
+    rarity = SkillRarity.LEGENDARY
 ), DeathTrigger, AutoStopTrigger, DamageTrigger {
 
     override val persistTime: Int = 2 * 20

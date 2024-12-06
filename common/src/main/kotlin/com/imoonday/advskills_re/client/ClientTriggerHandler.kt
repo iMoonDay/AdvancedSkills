@@ -2,7 +2,8 @@ package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*

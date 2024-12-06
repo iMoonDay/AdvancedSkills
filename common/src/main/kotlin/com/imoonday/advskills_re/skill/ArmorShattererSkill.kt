@@ -2,7 +2,8 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
@@ -11,7 +12,7 @@ class ArmorShattererSkill : Skill(
     id = "armor_shatterer",
     types = listOf(SkillType.ATTACK),
     cooldown = 15,
-    rarity = Rarity.EPIC,
+    rarity = SkillRarity.EPIC,
     sound = ModSounds.FIRE
 ), SpecialStateRenderTrigger {
 

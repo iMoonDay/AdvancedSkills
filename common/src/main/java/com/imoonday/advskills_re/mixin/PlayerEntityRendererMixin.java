@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.mixin;
 
 import com.imoonday.advskills_re.client.render.skill.SkillRendererHandler;
-import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
+import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;

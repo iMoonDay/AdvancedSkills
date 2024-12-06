@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
@@ -12,21 +12,15 @@ class GrapplingHookSkill : LongPressSkill(
     id = "grappling_hook",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 15,
-    rarity = Rarity.EPIC
+    rarity = SkillRarity.EPIC
 ), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger {
 
     override fun getMaxPressTime(): Int = 3 * 20
 
-    private val maxDistance = 30.0
-
     override fun onPress(player: ServerPlayerEntity): UseResult {
-        val raycast = player.raycastVisualBlock(maxDistance)
+        val raycast = player.raycastBlock(MAX_DISTANCE)
         return if (raycast.type == HitResult.Type.BLOCK) {
-            UseResult.startUsing(
-                player,
-                this,
-                NbtUtils.writeVec3dToTag(raycast.pos)
-            )
+            UseResult.startUsing(player, this, NbtUtils.writeVec3dToTag(raycast.pos))
         } else {
             UseResult.fail(failedMessage())
         }
@@ -58,7 +52,7 @@ class GrapplingHookSkill : LongPressSkill(
                     player.height.toDouble() / 2.0 + rotation.y,
                     rotation.z
                 ).subtract(pos).normalize()
-                    .multiply((distance / maxDistance) + 1)
+                    .multiply((distance / MAX_DISTANCE) + 1)
                 player.velocityDirty = true
                 player.addVelocity((newVelocity - player.velocity).multiply(0.5))
             }
@@ -67,6 +61,11 @@ class GrapplingHookSkill : LongPressSkill(
     }
 
     override fun getCrosshair(player: PlayerEntity): Crosshair =
-        if (player.isReady() && player.raycastVisualBlock(maxDistance).type == HitResult.Type.BLOCK)
+        if (player.isReady() && player.raycastBlock(MAX_DISTANCE).type == HitResult.Type.BLOCK)
             Crosshairs.RING else Crosshairs.NONE
+
+    companion object {
+
+        private const val MAX_DISTANCE = 30.0
+    }
 }

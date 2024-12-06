@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.UseResult
 import com.imoonday.advskills_re.util.sendPacket
 import com.imoonday.advskills_re.util.spawnParticles
@@ -12,7 +12,7 @@ class JumpSkill : Skill(
     id = "jump",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 1,
-    rarity = Rarity.COMMON
+    rarity = SkillRarity.COMMON
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {

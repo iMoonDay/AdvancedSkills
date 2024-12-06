@@ -1,8 +1,8 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.effect.*
@@ -11,13 +11,12 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.util.*
 import net.minecraft.util.hit.*
-import kotlin.random.*
 
 class PrimaryConfinementSkill : LongPressSkill(
     id = "primary_confinement",
     types = listOf(SkillType.CONTROL),
     cooldown = 12,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
     sound = SoundEvents::BLOCK_ENCHANTMENT_TABLE_USE
 ), UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
 
@@ -27,7 +26,7 @@ class PrimaryConfinementSkill : LongPressSkill(
         player.stopAndCooldown()
         player.swingHand(Hand.MAIN_HAND, true)
         player.raycastLivingEntity(5.0)?.takeIf { it.type == HitResult.Type.ENTITY }?.let {
-            if (Random.nextFloat() < 0.8f * pressedTime / getMaxPressTime()) {
+            if (player.random.nextFloat() < 0.8f * pressedTime / getMaxPressTime()) {
                 (it.entity as LivingEntity).addStatusEffect(
                     StatusEffectInstance(
                         ModEffects.CONFINEMENT.get(),
@@ -53,8 +52,8 @@ class PrimaryConfinementSkill : LongPressSkill(
         return Crosshairs.NONE
     }
 
-    override fun isTarget(player: PlayerEntity, entity: LivingEntity): Boolean {
-        if (!player.isUsing()) return false
-        return player.raycastLivingEntity(5.0)?.entity == entity
+    override fun isTarget(clientPlayer: PlayerEntity, entity: LivingEntity): Boolean {
+        if (!clientPlayer.isUsing()) return false
+        return clientPlayer.raycastLivingEntity(5.0)?.entity == entity
     }
 }

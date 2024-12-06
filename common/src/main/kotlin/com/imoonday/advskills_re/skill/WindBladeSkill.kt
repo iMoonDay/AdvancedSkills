@@ -1,9 +1,9 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.UseResult
 import com.imoonday.advskills_re.util.horizontalRotationVector
 import com.imoonday.advskills_re.util.times
@@ -16,10 +16,10 @@ class WindBladeSkill : Skill(
     id = "wind_blade",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 10,
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
 ), PostAttackTrigger, PersistentTrigger, DeathTrigger, UsingRenderTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(false)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
     override fun postSweepAttack(player: PlayerEntity, target: LivingEntity) {
         super.postSweepAttack(player, target)

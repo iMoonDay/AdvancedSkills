@@ -1,6 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.network.packet.s2c.play.*
@@ -11,7 +13,7 @@ class ChargedDashSkill : LongPressSkill(
     id = "charged_dash",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 15,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), AttributeTrigger {
 
     override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

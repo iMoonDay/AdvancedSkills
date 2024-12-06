@@ -2,7 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.block.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.UseResult
 import net.minecraft.fluid.*
 import net.minecraft.server.network.*
@@ -11,7 +11,7 @@ class InvisibleTrapSkill : Skill(
     id = "invisible_trap",
     types = listOf(SkillType.ATTACK),
     cooldown = 8,
-    rarity = Rarity.UNCOMMON,
+    rarity = SkillRarity.UNCOMMON,
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {

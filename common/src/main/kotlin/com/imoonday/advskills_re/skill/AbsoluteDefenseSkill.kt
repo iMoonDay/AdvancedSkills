@@ -1,7 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -12,7 +13,7 @@ class AbsoluteDefenseSkill : Skill(
     id = "absolute_defense",
     types = listOf(SkillType.DEFENSE),
     cooldown = 30,
-    rarity = Rarity.SUPERB
+    rarity = SkillRarity.SUPERB
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
 
     override val persistTime = 30 * 20

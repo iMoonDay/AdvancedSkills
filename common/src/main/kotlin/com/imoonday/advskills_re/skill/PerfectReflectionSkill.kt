@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.playSound
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -9,7 +10,7 @@ import net.minecraft.sound.*
 class PerfectReflectionSkill : ReflectionSkill(
     id = "perfect_reflection",
     cooldown = 5,
-    rarity = Rarity.EPIC,
+    rarity = SkillRarity.EPIC,
     duration = 2
 ) {
 

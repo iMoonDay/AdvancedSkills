@@ -1,13 +1,14 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import net.minecraft.entity.player.*
 import net.minecraft.item.*
 import net.minecraft.util.*
 
 class FasterEatingSkill : PassiveSkill(
     id = "faster_eating",
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), ItemMaxUseTimeTrigger {
 
     override fun getItemMaxUseTimeMultiplier(player: PlayerEntity, stack: ItemStack): Float {

@@ -1,6 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
 import net.minecraft.entity.player.*
@@ -11,7 +13,7 @@ class DisguiseSkill : Skill(
     id = "disguise",
     types = listOf(SkillType.UTILITY),
     cooldown = 20,
-    rarity = Rarity.EPIC
+    rarity = SkillRarity.EPIC
 ), DisguiseTrigger, UseInterruptTrigger, AutoStopTrigger {
 
     override val persistTime: Int = 30 * 20

@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
@@ -10,7 +11,7 @@ class ExclusiveMountSkill : Skill(
     id = "exclusive_mount",
     types = listOf(SkillType.SUMMON),
     cooldown = 60,
-    rarity = Rarity.EPIC,
+    rarity = SkillRarity.EPIC,
     sound = SoundEvents::ENTITY_HORSE_SADDLE
 ) {
 

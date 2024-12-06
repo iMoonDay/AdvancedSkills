@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.ClientConfig.Companion.DEFAULT_LAYOUT_STRING_LIST
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import me.shedaniel.clothconfig2.api.*

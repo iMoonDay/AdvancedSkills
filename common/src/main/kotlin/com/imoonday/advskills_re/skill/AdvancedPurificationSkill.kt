@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.effect.*
 import net.minecraft.network.packet.s2c.play.*
@@ -12,7 +13,7 @@ class AdvancedPurificationSkill : Skill(
     id = "advanced_purification",
     types = listOf(SkillType.RESTORATION),
     cooldown = 30,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
     sound = ModSounds.PURIFY
 ) {
 

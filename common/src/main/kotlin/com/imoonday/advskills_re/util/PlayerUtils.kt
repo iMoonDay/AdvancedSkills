@@ -8,7 +8,7 @@ import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.skill.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.PlayerUtils.getNextLevelExp
 import com.imoonday.advskills_re.util.PlayerUtils.shouldLearnSkill
 import net.minecraft.entity.*
@@ -30,15 +30,11 @@ import kotlin.math.*
 
 object PlayerUtils {
 
-    private val levelExpCache = IntArray(101) { -1 }
-    fun getNextLevelExp(level: Int): Int =
-        if (levelExpCache[level] >= 0) {
-            levelExpCache[level]
-        } else when {
-            level >= 30 -> 112 + (level - 30) * 9
-            level >= 15 -> 37 + (level - 15) * 5
-            else -> 7 + level * 2
-        }.also { levelExpCache[level] = it }
+    fun getNextLevelExp(level: Int): Int = when {
+        level >= 30 -> 112 + (level - 30) * 9
+        level >= 15 -> 37 + (level - 15) * 5
+        else -> 7 + level * 2
+    }
 
     fun shouldLearnSkill(level: Int): Boolean = when {
         level <= 0 -> false
@@ -481,7 +477,13 @@ fun ServerPlayerEntity.onDamage() {
     }
 }
 
-fun PlayerEntity.raycastVisualBlock(maxDistance: Double): HitResult {
+fun PlayerEntity.raycastVisualBlock(maxDistance: Double): HitResult =
+    raycastBlock(maxDistance, RaycastContext.ShapeType.VISUAL)
+
+fun PlayerEntity.raycastBlock(
+    maxDistance: Double,
+    shapeType: RaycastContext.ShapeType = RaycastContext.ShapeType.COLLIDER
+): HitResult {
     val vec3d: Vec3d = getCameraPosVec(0f)
     val vec3d2: Vec3d = getRotationVec(0f)
     val vec3d3 = vec3d.add(vec3d2.x * maxDistance, vec3d2.y * maxDistance, vec3d2.z * maxDistance)
@@ -489,7 +491,7 @@ fun PlayerEntity.raycastVisualBlock(maxDistance: Double): HitResult {
         RaycastContext(
             vec3d,
             vec3d3,
-            RaycastContext.ShapeType.VISUAL,
+            shapeType,
             RaycastContext.FluidHandling.NONE,
             this
         )
@@ -543,7 +545,7 @@ fun PlayerEntity.raycastAllLivingEntities(
             cameraPos,
             cameraPos.add(rotationVector.multiply(distance)),
             boundingBox.stretch(rotationVector.multiply(distance)),
-            { !it.isSpectator && it.isAlive && it.isLiving && it is LivingEntity && filter(it) && it !in entities },
+            { !it.isSpectator && it.isAlive && it.isLiving && it is LivingEntity && it !in entities && filter(it) },
             distance * distance
         )?.takeUnless { it.type == HitResult.Type.MISS }?.let {
             entities += it.entity as LivingEntity

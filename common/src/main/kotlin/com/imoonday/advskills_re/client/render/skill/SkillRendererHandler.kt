@@ -2,10 +2,10 @@ package com.imoonday.advskills_re.client.render.skill
 
 import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.client.*
-import com.imoonday.advskills_re.client.render.skill.renderer.*
+import com.imoonday.advskills_re.client.render.skill.special.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.network.*
 import net.minecraft.client.render.*
@@ -26,7 +26,7 @@ object SkillRendererHandler {
 
     @JvmStatic
     @Suppress("UNCHECKED_CAST")
-    fun <T : Skill> T.registerRenderer(renderer: IRenderer<T>) {
+    fun <T> T.registerRenderer(renderer: IRenderer<T>) where T : Skill, T : RenderTrigger {
         if (renderer is IOverlayRenderer) overlayRenderers[this] = renderer as IOverlayRenderer<Skill>
         if (renderer is IHudRenderer) hudRenderers[this] = renderer as IHudRenderer<Skill>
         if (renderer is ICrosshairRenderer) crosshairRenderers[this] = renderer as ICrosshairRenderer<Skill>

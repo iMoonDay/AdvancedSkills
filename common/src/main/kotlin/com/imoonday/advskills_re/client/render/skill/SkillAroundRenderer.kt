@@ -2,7 +2,7 @@ package com.imoonday.advskills_re.client.render.skill
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.skill.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import net.minecraft.client.render.*
 import net.minecraft.client.render.entity.*
 import net.minecraft.client.render.entity.feature.*

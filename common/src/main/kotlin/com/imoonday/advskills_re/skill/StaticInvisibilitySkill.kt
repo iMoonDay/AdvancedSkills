@@ -1,12 +1,14 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
 
 class StaticInvisibilitySkill : PassiveSkill(
     id = "static_invisibility",
-    rarity = Rarity.EPIC,
+    rarity = SkillRarity.EPIC,
 ), AutoTrigger, PersistentTrigger, InvisibilityTrigger {
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean {

@@ -2,7 +2,7 @@ package com.imoonday.advskills_re.mixin;
 
 import com.imoonday.advskills_re.effect.SeriousInjuryEffect;
 import com.imoonday.advskills_re.init.ModEffectsKt;
-import com.imoonday.advskills_re.trigger.SkillTriggerHandler;
+import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
@@ -35,9 +35,6 @@ public abstract class LivingEntityMixin extends EntityMixin {
 
     @Shadow
     public abstract ItemStack getStackInHand(Hand hand);
-
-    @Shadow
-    public abstract boolean isDead();
 
     @Shadow
     public abstract float getMaxHealth();

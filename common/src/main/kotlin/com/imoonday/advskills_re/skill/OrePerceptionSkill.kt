@@ -2,8 +2,9 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
 import net.minecraft.registry.tag.*
@@ -17,7 +18,7 @@ class OrePerceptionSkill : Skill(
     id = "ore_perception",
     types = listOf(SkillType.UTILITY),
     cooldown = 30,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), AutoStopTrigger, WorldRendererTrigger {
 
     override val persistTime: Int = 10 * 20

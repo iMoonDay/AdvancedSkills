@@ -1,9 +1,11 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
@@ -20,7 +22,7 @@ class DangerPerceptionSkill : Skill(
     id = "danger_perception",
     types = listOf(SkillType.PASSIVE),
     cooldown = 12,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
 ), AutoStopTrigger, AttributeTrigger, DamageTrigger, UsingRenderTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)

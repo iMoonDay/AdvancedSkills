@@ -1,8 +1,8 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.util.SkillSlot
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.UseResult
 import com.imoonday.advskills_re.util.playSound
 import net.minecraft.entity.*
@@ -16,7 +16,7 @@ class DyingCounterattackSkill : Skill(
     id = "dying_counterattack",
     types = listOf(SkillType.PASSIVE),
     cooldown = 180,
-    rarity = Rarity.EPIC,
+    rarity = SkillRarity.EPIC,
 ), DeathTrigger, PersistentTrigger, AttackTrigger, TickTrigger, UnequipTrigger, StatusEffectTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)

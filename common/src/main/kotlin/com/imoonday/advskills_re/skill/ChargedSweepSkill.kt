@@ -1,7 +1,9 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.trigger.*
-import com.imoonday.advskills_re.trigger.renderer.*
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.enchantment.*
 import net.minecraft.entity.*
@@ -16,7 +18,7 @@ class ChargedSweepSkill : LongPressSkill(
     id = "charged_sweep",
     types = listOf(SkillType.ATTACK),
     cooldown = 9,
-    rarity = Rarity.RARE,
+    rarity = SkillRarity.RARE,
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 3 * 20

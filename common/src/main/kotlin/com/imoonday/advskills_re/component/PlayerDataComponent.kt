@@ -5,7 +5,7 @@ import com.imoonday.advskills_re.client.screen.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.network.s2c.*
-import com.imoonday.advskills_re.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*

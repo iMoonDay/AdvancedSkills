@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.config
 
 import com.imoonday.advskills_re.*
-import com.imoonday.advskills_re.util.*
+import com.imoonday.advskills_re.component.*
 import net.minecraft.nbt.*
 import net.minecraft.server.*
 import net.minecraft.util.*

@@ -2,7 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.util.SkillType
+import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.UseResult
 import net.minecraft.server.network.*
 
@@ -10,7 +10,7 @@ class PrimarySilenceSkill : Skill(
     id = "primary_silence",
     types = listOf(SkillType.CONTROL),
     cooldown = 20,
-    rarity = Rarity.SUPERB,
+    rarity = SkillRarity.SUPERB,
     sound = ModSounds.FIRE
 ) {
 
