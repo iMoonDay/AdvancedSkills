@@ -1,9 +1,11 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.item.*
 import com.imoonday.advskills_re.network.c2s.*
+import com.imoonday.advskills_re.skill.enhancement.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -22,9 +24,10 @@ abstract class Skill(
     val description: Text,
     val icon: Identifier = id("unknown.png"),
     val types: List<SkillType> = emptyList(),
-    cooldown: Int = 0,
+    val defaultCooldown: Int = 0,
     rarity: SkillRarity,
     val sound: Supplier<SoundEvent>? = null,
+    enhancements: Set<SkillEnhancementType<*>> = emptySet(),
     invalid: Boolean = false,
 ) : SkillTrigger {
 
@@ -55,10 +58,10 @@ abstract class Skill(
     val item: SkillItem?
         get() = Registries.ITEM[id] as? SkillItem
 
-    val cooldown: Int = cooldown
+    val cooldown: Int
         get() {
             val config = SkillConfig.get()
-            val cooldown = config.getModifier(id)?.cooldown ?: field
+            val cooldown = config.getModifier(id)?.cooldown ?: defaultCooldown
             val multiplier = config.skillCooldownMultiplier
             return (cooldown * multiplier).toInt()
         }
@@ -74,15 +77,23 @@ abstract class Skill(
             )
         }
 
+    val availableEnhancements: Set<SkillEnhancementType<*>> =
+        if (defaultCooldown > 0) enhancements + SkillEnhancements.COOLDOWN
+        else enhancements
+
+    private val enhancementTooltips: MutableMap<SkillEnhancementType<*>, (SkillEnhancement) -> MutableText> =
+        mutableMapOf()
+
     /**
      * @param cooldown cooldown in seconds
      */
-    protected constructor(
+    internal constructor(
         id: String,
         types: List<SkillType>,
         cooldown: Int = 0,
         rarity: SkillRarity,
         sound: Supplier<SoundEvent>? = null,
+        enhancements: Set<SkillEnhancementType<*>> = emptySet(),
     ) : this(
         id(id),
         translateSkill(id, "name"),
@@ -92,6 +103,7 @@ abstract class Skill(
         20 * cooldown,
         rarity,
         sound,
+        enhancements,
         false
     )
 
@@ -99,7 +111,7 @@ abstract class Skill(
 
     fun createUuid(content: String): UUID = UUID.nameUUIDFromBytes("$id-$content".toByteArray())
 
-    open fun getItemTooltips(displayName: Boolean = false, displayId: Boolean = false): List<Text> =
+    open fun getItemTooltips(displayName: Boolean = false, displayId: Boolean = false): MutableList<Text> =
         mutableListOf<Text>().apply {
             if (displayName) {
                 add(formattedName)
@@ -116,6 +128,32 @@ abstract class Skill(
                 add(id.toString().toText().formatted(Formatting.DARK_GRAY))
             }
         }
+
+    @Suppress("UNCHECKED_CAST")
+    protected fun <T : SkillEnhancement> addEnhancementTooltip(
+        type: SkillEnhancementType<T>,
+        tooltip: (T) -> MutableText
+    ) {
+        enhancementTooltips[type] = tooltip as (SkillEnhancement) -> MutableText
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    protected fun <T : SkillEnhancement> addEnhancementTooltipWithArg(type: SkillEnhancementType<T>, arg: (T) -> Any) {
+        enhancementTooltips[type] =
+            { enhancement: T -> message(type.id, arg(enhancement)) } as (SkillEnhancement) -> MutableText
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    protected fun <T : SkillEnhancement> addEnhancementTooltipWithArgs(
+        type: SkillEnhancementType<T>,
+        args: (T) -> Array<Any>
+    ) {
+        enhancementTooltips[type] =
+            { enhancement: T -> message(type.id, *args(enhancement)) } as (SkillEnhancement) -> MutableText
+    }
+
+    fun <T : SkillEnhancement> getEnhancementTooltip(enhancement: T): MutableText =
+        enhancementTooltips[enhancement.type]?.invoke(enhancement) ?: enhancement.description.copy()
 
     abstract fun use(user: ServerPlayerEntity): UseResult
 
@@ -192,4 +230,16 @@ abstract class Skill(
     fun failedMessage() = translateSkill(id.path, "failed")
 
     fun message(key: String, vararg args: Any) = translateSkill(id.path, key, *args)
+
+    open fun applyCooldownEnhancements(player: PlayerEntity, cooldown: Int): Int =
+        getEnhancedValue(player, SkillEnhancements.COOLDOWN, cooldown).coerceAtLeast(0)
+
+    open fun getEnhancementTooltips(player: PlayerEntity): List<Text> =
+        player.getEnhancements().map { getEnhancementTooltip(it).formatted(Formatting.BLUE) }
+
+    fun isAvailable(enhancement: SkillEnhancement): Boolean =
+        availableEnhancements.contains(enhancement.type)
+
+    fun isAvailableFor(player: PlayerEntity, enhancement: SkillEnhancement): Boolean =
+        isAvailable(enhancement) && !player.hasEnhancement(enhancement.type)
 }

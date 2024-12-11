@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.UseResult
@@ -17,6 +18,7 @@ class DyingCounterattackSkill : Skill(
     types = listOf(SkillType.PASSIVE),
     cooldown = 180,
     rarity = SkillRarity.EPIC,
+    enhancements = setOf(SkillEnhancements.HEALING_AMOUNT, SkillEnhancements.USE_COST)
 ), DeathTrigger, PersistentTrigger, AttackTrigger, TickTrigger, UnequipTrigger, StatusEffectTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
@@ -36,7 +38,8 @@ class DyingCounterattackSkill : Skill(
         target: LivingEntity,
     ): Float {
         if (player.isUsing() && amount > 0) {
-            player.heal(amount / 10)
+            val healingAmount = getEnhancedValue(player, SkillEnhancements.HEALING_AMOUNT, amount / 10)
+            player.heal(healingAmount)
         }
         return amount
     }
@@ -44,10 +47,9 @@ class DyingCounterattackSkill : Skill(
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return
         if (usedTime % 20 == 0) {
-            player.damage(
-                player.damageSources.wither(),
-                2.0f * (usedTime / 200 + if (usedTime % 200 == 0) 0 else 1)
-            )
+            val multiplier = 1 - player.getEnhancementLvl(SkillEnhancements.USE_COST) * 0.1f
+            val amount = 2.0f * (usedTime / 200 + if (usedTime % 200 == 0) 0 else 1) * multiplier
+            player.damage(player.damageSources.wither(), amount)
         }
         if (player.isDead) player.startCooling()
     }

@@ -75,6 +75,9 @@ object EventHandler {
         PlayerEvent.PLAYER_JOIN.register {
             Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(SkillConfig.get().save(NbtCompound())))
         }
+        LifecycleEvent.SERVER_BEFORE_START.register {
+            ServerConfig.init(it)
+        }
         LifecycleEvent.SERVER_STARTED.register {
             SkillConfig.get().connectToServer(it)
         }
@@ -109,7 +112,7 @@ object EventHandler {
             builder
         }
         LootEvent.MODIFY_LOOT_TABLE.register { _, id, context, builtin ->
-            if (builtin) {
+            if (!ServerConfig.get().disableSkillFruitGeneration && builtin) {
                 when {
                     blockLootTables.containsKey(id) -> context.addPool(
                         builder().apply(ApplyBonusLootFunction.uniformBonusCount(Enchantments.FORTUNE))

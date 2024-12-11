@@ -16,7 +16,8 @@ class ReturnSkill : LongPressSkill(
     types = listOf(SkillType.UTILITY, SkillType.MOVEMENT),
     cooldown = 0,
     rarity = SkillRarity.SUPERB,
-    sound = ModSounds.RETURN
+    sound = ModSounds.RETURN,
+    enhancements = setOf(SkillEnhancements.CHARGE_TIME)
 ), UsingRenderTrigger {
 
     override fun onPress(player: ServerPlayerEntity): UseResult {
@@ -85,7 +86,7 @@ class ReturnSkill : LongPressSkill(
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopUsing()
-        if (pressedTime < getMaxPressTime()) {
+        if (pressedTime < getModifiedPersistTime(player)) {
             return UseResult.fail(failedMessage())
         }
         val (spawnAngle, world, teleportPos) = getTeleportInfo(player)

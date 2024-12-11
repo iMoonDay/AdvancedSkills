@@ -20,7 +20,7 @@ class MicroReflectionSkill : ReflectionSkill(
     ): Float {
         if (!player.isUsing()) return amount
         player.stopUsing()
-        if (player.random.nextFloat() <= 0.25f) {
+        if (player.random.nextFloat() < 0.25f) {
             reflect(player, attacker, amount / 2)
         } else {
             reflectedFailed(player)

@@ -23,9 +23,13 @@ object ModKeyBindings {
     val OPEN_LIST_SCREEN = register("openListScreen", GLFW.GLFW_KEY_K, false) { client, _ ->
         val player = client.player!!
         client.setScreen(
-            if (!player.learnableData.isEmpty() && SkillLearningScreen.new)
+            if (!player.learnableData.isEmpty() && SkillLearningScreen.new) {
                 SkillLearningScreen(player) { SkillListScreen(player) }
-            else SkillListScreen(player)
+            } else if (!player.enhancementData.isEmpty() && SkillEnhancementScreen.new) {
+                SkillEnhancementScreen(player) { SkillListScreen(player) }
+            } else {
+                SkillListScreen(player)
+            }
         )
     }
 

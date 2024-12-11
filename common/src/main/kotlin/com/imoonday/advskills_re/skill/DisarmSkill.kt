@@ -16,6 +16,7 @@ class DisarmSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 15,
     rarity = SkillRarity.SUPERB,
+    enhancements = setOf(SkillEnhancements.CHANCE, SkillEnhancements.STATUS_EFFECT_DURATION)
 ), PostAttackTrigger, PersistentTrigger, DeathTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
@@ -24,13 +25,16 @@ class DisarmSkill : Skill(
         super.postAttack(source, player, target)
         if (!player.isUsing()) return
 
+        val chance = player.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.05f
         val random = player.random
-        if (random.nextFloat() < 0.45f) {
-            target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM.get(), 5 * 20, 0))
+        if (random.nextFloat() < 0.45f + chance) {
+            val duration = getEnhancedValue(player, SkillEnhancements.STATUS_EFFECT_DURATION, 5 * 20)
+            target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM.get(), duration))
             player.sendMessage(translate("skill.disarm.success"), true)
             player.playSound(ModSounds.DISARM.get())
             (target as? PlayerEntity)?.sendMessage(translate("skill.disarm.disarmed"), true)
-            if (random.nextFloat() < 0.01f) {
+            val dropChance = player.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.01f
+            if (random.nextFloat() < 0.01f + dropChance) {
                 if (target is ServerPlayerEntity)
                     target.dropSelectedItem(true)
                 else if (target.dropStack(target.mainHandStack) != null) {

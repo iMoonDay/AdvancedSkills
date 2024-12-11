@@ -19,15 +19,22 @@ class BloodSealSkill : LongPressSkill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 45,
     rarity = SkillRarity.EPIC,
+    enhancements = setOf(
+        SkillEnhancements.CHARGE_TIME,
+        SkillEnhancements.CHARGE_SLOWDOWN,
+        SkillEnhancements.DAMAGE,
+        SkillEnhancements.DISTANCE,
+        SkillEnhancements.STATUS_EFFECT_DURATION
+    )
 ), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 5 * 20
 
-    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Blood Seal Charging"),
             "Blood Seal Charging",
-            -0.25,
+            player.applyChargeSlowdownEnhancement(-0.25),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -40,23 +47,31 @@ class BloodSealSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.removeAttributes()
         player.stopUsing()
-        if (pressedTime < getMaxPressTime()) {
+        if (pressedTime < getModifiedPersistTime(player)) {
             player.startCooling(10)
             return UseResult.fail(message("interrupt"))
         }
         player.swingHand(Hand.MAIN_HAND, true)
-        player.raycastLivingEntity(5.0)?.takeIf { it.type == HitResult.Type.ENTITY }?.let {
-            it.entity.damage(player.damageSources.playerAttack(player), 3f)
-            (it.entity as? LivingEntity)?.addStatusEffect(
-                StatusEffectInstance(
-                    ModEffects.SERIOUS_INJURY.get(),
-                    7 * 20
+        player.raycastLivingEntity(player.getRaycastDistance())
+            ?.takeIf { it.type == HitResult.Type.ENTITY }
+            ?.let {
+                it.entity.damage(
+                    player.damageSources.playerAttack(player),
+                    getEnhancedValue(player, SkillEnhancements.DAMAGE, 3f)
                 )
-            )
-            return UseResult.success()
-        }
+                (it.entity as? LivingEntity)?.addStatusEffect(
+                    StatusEffectInstance(
+                        ModEffects.SERIOUS_INJURY.get(),
+                        getEnhancedValue(player, SkillEnhancements.STATUS_EFFECT_DURATION, 7 * 20),
+                    )
+                )
+                return UseResult.success()
+            }
         return UseResult.fail(failedMessage())
     }
+
+    private fun PlayerEntity.getRaycastDistance() =
+        5.0 + getEnhancementLvl(SkillEnhancements.DISTANCE)
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(10)
@@ -69,13 +84,13 @@ class BloodSealSkill : LongPressSkill(
     override fun getCrosshair(player: PlayerEntity): Crosshair {
         player.run {
             if (!isUsing()) return Crosshairs.NONE
-            if (raycastLivingEntity(5.0)?.type == HitResult.Type.ENTITY) return Crosshairs.CROSS
+            if (raycastLivingEntity(player.getRaycastDistance())?.type == HitResult.Type.ENTITY) return Crosshairs.CROSS
         }
         return Crosshairs.NONE
     }
 
     override fun isTarget(clientPlayer: PlayerEntity, entity: LivingEntity): Boolean {
         if (!clientPlayer.isUsing()) return false
-        return clientPlayer.raycastLivingEntity(5.0)?.entity == entity
+        return clientPlayer.raycastLivingEntity(clientPlayer.getRaycastDistance())?.entity == entity
     }
 }

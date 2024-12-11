@@ -24,16 +24,32 @@ package com.imoonday.advskills_re.mixin;
 
 import com.imoonday.advskills_re.api.PlayerDataContainer;
 import com.imoonday.advskills_re.api.Propertied;
+import com.imoonday.advskills_re.api.TaskHandler;
+import com.imoonday.advskills_re.util.LoopTask;
+import com.mojang.logging.LogUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerWorld;
+import org.objectweb.asm.Opcodes;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.BooleanSupplier;
+
 @Mixin(ServerWorld.class)
-public abstract class ServerWorldMixin {
+public abstract class ServerWorldMixin implements TaskHandler {
+
+    @Unique
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    @Unique
+    private final List<LoopTask> advskills_re$loopTasks = new ArrayList<>();
 
     @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.AFTER))
     private void tick(Entity entity, CallbackInfo ci) {
@@ -50,6 +66,30 @@ public abstract class ServerWorldMixin {
         ((Propertied) entity).getPropertyComponent().serverTick();
         if (entity instanceof PlayerDataContainer container) {
             container.getDataComponent().serverTick();
+        }
+    }
+
+    @Override
+    public void addTask(LoopTask task) {
+        advskills_re$loopTasks.add(task);
+    }
+
+    @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/server/world/ServerWorld;inBlockTick:Z", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
+    private void startWorldTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+        Iterator<LoopTask> iterator = advskills_re$loopTasks.iterator();
+        while (iterator.hasNext()) {
+            LoopTask task = iterator.next();
+            if (task.getFinished()) {
+                iterator.remove();
+                continue;
+            }
+
+            try {
+                task.execute();
+            } catch (Exception e) {
+                LOGGER.error("Error executing loop task", e);
+                iterator.remove();
+            }
         }
     }
 }

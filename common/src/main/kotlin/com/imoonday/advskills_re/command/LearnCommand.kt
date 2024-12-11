@@ -20,13 +20,13 @@ object LearnCommand : PlayerCommand("learn") {
         player: ServerPlayerEntity,
     ): Int {
         val skill = SkillArgumentType.getSkill(context)
-        if (!player.learn(skill)) {
+        return if (!player.learn(skill)) {
             context.sendFeedback(
                 "learnSkill.failed",
                 player.displayName,
                 skill.name
             )
-        }
-        return 1
+            0
+        } else 1
     }
 }

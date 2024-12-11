@@ -28,7 +28,9 @@ object ModCommands {
                 CooldownCommand,
                 XpMultiplierCommand,
                 BlackListCommand,
-                DefaultSlotsCommand
+                DefaultSlotsCommand,
+                EnhanceCommand,
+                DeEnhanceCommand,
             )
         }
     }

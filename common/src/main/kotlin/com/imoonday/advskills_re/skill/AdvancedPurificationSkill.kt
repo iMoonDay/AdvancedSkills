@@ -2,8 +2,10 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.effect.*
+import net.minecraft.entity.player.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
@@ -14,11 +16,12 @@ class AdvancedPurificationSkill : Skill(
     types = listOf(SkillType.RESTORATION),
     cooldown = 30,
     rarity = SkillRarity.SUPERB,
-    sound = ModSounds.PURIFY
+    sound = ModSounds.PURIFY,
+    enhancements = setOf(SkillEnhancements.TIME_UP_LIMIT)
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult = user.statusEffects
-        .filter { it.effectType.category == StatusEffectCategory.HARMFUL && it.duration < 30 * 20 }
+        .filter { it.effectType.category == StatusEffectCategory.HARMFUL && it.duration < getTimeUpLimit(user) }
         .maxByOrNull { it.duration }
         ?.let {
             user.removeStatusEffect(it.effectType)
@@ -27,13 +30,13 @@ class AdvancedPurificationSkill : Skill(
                 false, user.centerPos, 10,
                 0.25, 0.25, 0.25, 0.1
             )
-            return UseResult.success(message("success", Text.translatable(it.translationKey)))
+            UseResult.success(message("success", Text.translatable(it.translationKey)))
         } ?: user.statusEffects
         .filter { it.effectType.category == StatusEffectCategory.HARMFUL }
         .randomOrNull()
         ?.let { instance ->
             val duration = instance.duration
-            instance.setDuration(instance.mapDuration { it - 30 * 20 })
+            instance.setDuration(instance.mapDuration { it - getTimeUpLimit(user) })
             user.sendPacket(EntityStatusEffectS2CPacket(user.id, instance))
             val amount = (duration - instance.duration) / 20.0
             user.spawnParticles(
@@ -41,7 +44,7 @@ class AdvancedPurificationSkill : Skill(
                 false, user.centerPos, amount.toInt() * 10,
                 0.5, 0.5, 0.5, 0.1
             )
-            return UseResult.success(
+            UseResult.success(
                 Skills.PRIMARY_PURIFICATION.message(
                     "success",
                     Text.translatable(instance.translationKey),
@@ -50,4 +53,7 @@ class AdvancedPurificationSkill : Skill(
             )
         }
     ?: UseResult.fail(failedMessage())
+
+    private fun getTimeUpLimit(player: PlayerEntity) =
+        getEnhancedValue(player, SkillEnhancements.TIME_UP_LIMIT, 30 * 20)
 }

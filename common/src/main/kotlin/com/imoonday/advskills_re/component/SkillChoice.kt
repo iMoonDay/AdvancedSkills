@@ -5,67 +5,24 @@ import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.nbt.*
 
-data class SkillChoice(
-    val first: Skill,
-    val second: Skill,
-    val third: Skill,
-) {
+class SkillChoice(
+    first: Skill,
+    second: Skill,
+    third: Skill,
+) : Choice<Skill>(first, second, third) {
 
-    fun isEmpty() = this === EMPTY || first.invalid && second.invalid && third.invalid
+    override fun create(first: Skill, second: Skill, third: Skill): Choice<Skill> = SkillChoice(first, second, third)
 
-    fun hasEmpty() = this === EMPTY || first.invalid || second.invalid || third.invalid
+    override fun isEmpty(item: Skill): Boolean = item.invalid
 
-    fun hasDuplicates() = !isEmpty() && skills.distinct().size < skills.size
+    override val emptyChoice: Choice<Skill> = EMPTY
 
-    val skills = listOf(first, second, third)
+    override val emptyItem: Skill = Skills.EMPTY
 
-    fun withFirst(skill: Skill): SkillChoice = SkillChoice(skill, second, third)
-
-    fun withSecond(skill: Skill): SkillChoice = SkillChoice(first, skill, third)
-
-    fun withThird(skill: Skill): SkillChoice = SkillChoice(first, second, skill)
-
-    fun replaceWith(filter: (Skill) -> Boolean, generator: (except: MutableSet<Skill>) -> Skill): SkillChoice {
-        var choice = this
-        val except = skills.toMutableSet()
-        if (filter(first)) choice = choice.withFirst(generator(except))
-        if (filter(second)) choice = choice.withSecond(generator(except))
-        if (filter(third)) choice = choice.withThird(generator(except))
-        return choice
-    }
-
-    fun toNbt(): NbtCompound = NbtCompound().apply {
+    override fun toNbt(): NbtCompound = NbtCompound().apply {
         putString("1", first.id.toString())
         putString("2", second.id.toString())
         putString("3", third.id.toString())
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is SkillChoice) return false
-
-        if (first != other.first) return false
-        if (second != other.second) return false
-        if (third != other.third) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = first.hashCode()
-        result = 31 * result + second.hashCode()
-        result = 31 * result + third.hashCode()
-        return result
-    }
-
-    fun removeDuplicates(): SkillChoice {
-        if (!hasDuplicates()) return this
-        val distinctSkills = skills.distinct()
-        return when (distinctSkills.size) {
-            1 -> SkillChoice(distinctSkills[0], Skills.EMPTY, Skills.EMPTY)
-            2 -> SkillChoice(distinctSkills[0], distinctSkills[1], Skills.EMPTY)
-            else -> this
-        }
     }
 
     companion object {

@@ -15,7 +15,8 @@ abstract class PassiveSkill(
     rarity: SkillRarity,
     sound: Supplier<SoundEvent>? = null,
     val toggleable: Boolean = false,
-) : Skill(id, (setOf(SkillType.PASSIVE) + extraTypes).toList(), cooldown, rarity, sound),
+    enhancements: Set<SkillEnhancementType<*>> = emptySet(),
+) : Skill(id, (setOf(SkillType.PASSIVE) + extraTypes).toList(), cooldown, rarity, sound, enhancements),
     EquipTrigger, AttributeTrigger, RespawnTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = if (toggleable)

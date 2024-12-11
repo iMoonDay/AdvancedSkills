@@ -26,7 +26,7 @@ object Channels {
         EQUIP_SKILL_C2S.register(::EquipSkillC2SRequest)
         SEND_PLAYER_DATA_C2S.register(::SendPlayerDataC2SPacket)
         CHOOSE_SKILL_C2S.register(::ChooseSkillC2SRequest)
-        REFRESH_CHOICE_C2S.register { _ -> RefreshChoiceC2SRequest() }
+        REFRESH_CHOICE_C2S.register(::RefreshChoiceC2SRequest)
         SYNC_CONFIG_S2C.register(::SyncConfigS2CPacket)
         LEARN_SKILL_S2C.register(::LearnSkillS2CPacket)
         SYNC_PROPERTIES_S2C.register(::SyncPropertiesS2CPacket)

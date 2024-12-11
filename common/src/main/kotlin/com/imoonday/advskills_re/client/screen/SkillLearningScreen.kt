@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.client.screen
 import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.gui.*
@@ -17,8 +18,8 @@ class SkillLearningScreen(
     val parent: () -> Screen? = { null },
 ) : Screen(Text.empty()), Syncable {
 
-    private val choice: SkillChoice
-        get() = player.getChoice()
+    private val choice: Choice<Skill>
+        get() = player.getSkillChoice()
     private val skillBoxes: MutableList<SkillBox> = mutableListOf()
     private var selectedBox: SkillBox? = null
     private lateinit var refreshButton: ButtonWidget
@@ -47,10 +48,11 @@ class SkillLearningScreen(
                 addDrawableChild(it)
             }
         val buttonY = (40 + boxHeight + height) / 2 - 10
-        refreshButton = ButtonWidget.builder(translate("screen.learn.refresh")) { player.refreshChoice() }
-            .dimensions(width / 3 - 25, buttonY, 50, 20)
-            .build()
-            .also(::addDrawableChild)
+        refreshButton =
+            ButtonWidget.builder(translate("screen.learn.refresh")) { player.refreshSkillChoice(RefreshChoiceC2SRequest.Type.SKILL) }
+                .dimensions(width / 3 - 25, buttonY, 50, 20)
+                .build()
+                .also(::addDrawableChild)
         learnButton = ButtonWidget.builder(translate("screen.learn.learn")) { selectedBox?.choose() }
             .dimensions(width / 3 * 2 - 25, buttonY, 50, 20)
             .build()
@@ -85,7 +87,7 @@ class SkillLearningScreen(
     }
 
     private fun updateButtons() {
-        refreshButton.active = player.canFreshChoice()
+        refreshButton.active = player.canFreshChoice(RefreshChoiceC2SRequest.Type.SKILL)
         learnButton.active = selectedBox != null && !selectedBox!!.skill.invalid
     }
 

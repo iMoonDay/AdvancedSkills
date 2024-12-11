@@ -19,7 +19,8 @@ class MultipleLaserSkill : LongPressSkill(
     types = listOf(SkillType.ATTACK),
     cooldown = 45,
     rarity = SkillRarity.LEGENDARY,
-    sound = ModSounds.LASER
+    sound = ModSounds.LASER,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), DangerTrigger {
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
@@ -74,15 +75,15 @@ class MultipleLaserSkill : LongPressSkill(
     override fun getMaxPressTime(): Int = 10 * 20
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
-        player.stopAndCooldown(calculateCooldown(pressedTime))
+        player.stopAndCooldown(calculateCooldown(player, pressedTime))
         return UseResult.fail(Text.empty())
     }
 
-    private fun calculateCooldown(pressedTime: Int) =
-        (pressedTime.toFloat() / getMaxPressTime() * cooldown).toInt()
+    private fun calculateCooldown(player: PlayerEntity, pressedTime: Int) =
+        (pressedTime.toFloat() / getModifiedPersistTime(player) * cooldown).toInt()
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
-        if (player.isUsing()) player.startCooling(calculateCooldown(player.getUsedTime()))
+        if (player.isUsing()) player.startCooling(calculateCooldown(player, player.getUsedTime()))
         return true
     }
 }

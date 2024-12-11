@@ -1,9 +1,8 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.sendPacket
-import com.imoonday.advskills_re.util.spawnParticles
+import com.imoonday.advskills_re.util.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
@@ -12,16 +11,17 @@ class TripleJumpSkill : Skill(
     id = "triple_jump",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 5,
-    rarity = SkillRarity.RARE
+    rarity = SkillRarity.RARE,
+    enhancements = setOf(SkillEnhancements.POWER)
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             stopFallFlying()
             jump()
-            velocityDirty = true
-            velocity = velocity.multiply(1.0, 1.7, 1.0)
-            sendPacket(EntityVelocityUpdateS2CPacket(this))
+            val power = 1.7 * (1 + user.getEnhancementLvl(SkillEnhancements.POWER) * 0.1)
+            velocity = velocity.multiply(1.0, power, 1.0)
+            updateVelocity()
             user.spawnParticles(
                 ParticleTypes.CLOUD,
                 false,

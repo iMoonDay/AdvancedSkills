@@ -287,6 +287,9 @@ object Skills {
     @JvmField
     val WITHERING_TOUCH = register(WitheringTouchSkill())
 
+    @JvmField
+    val FORCED_GROWTH = register(ForcedGrowthSkill())
+
     fun init() = Unit
 
     fun <T : Skill> register(skill: T): T {

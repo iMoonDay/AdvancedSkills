@@ -38,7 +38,7 @@ class WallJumpSkill : PassiveSkill(
                 data.putBoolean("wallJumped", true)
             } else {
                 player.sendPacket(EntityPositionS2CPacket(player))
-                player.sendPacket(EntityVelocityUpdateS2CPacket(player))
+                player.updateVelocity()
             }
         }
     }

@@ -32,6 +32,8 @@ class InsightfulEyeSkillRenderer : IPlayerFeatureRenderer<InsightfulEyeSkill> {
     ) {
         val clientPlayer = clientPlayer ?: return
         if (!skill.shouldRenderFeature(player, clientPlayer)) return
+        if (player.isInvisible || player.isInvisibleTo(clientPlayer)) return
+
         val cameraPos = context.renderDispatcher.camera.pos
         if (!player.shouldRender(cameraPos.x, cameraPos.y, cameraPos.z)) return
         if (player.isInvisibleTo(player)) return

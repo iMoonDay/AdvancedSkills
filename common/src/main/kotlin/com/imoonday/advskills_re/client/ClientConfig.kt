@@ -46,6 +46,11 @@ class ClientConfig {
             field = value
             save()
         }
+    var hideSkillInfo: Boolean = false
+        set(value) {
+            field = value
+            save()
+        }
     var displayedSkills: MutableSet<String> = mutableSetOf()
         set(value) {
             field = value
@@ -106,7 +111,7 @@ class ClientConfig {
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
-        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID.json").toFile()
+        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID-client.json").toFile()
         private var instance = ClientConfig()
 
         @JvmStatic

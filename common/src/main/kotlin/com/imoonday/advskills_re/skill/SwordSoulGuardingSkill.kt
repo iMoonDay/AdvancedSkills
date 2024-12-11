@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -15,6 +16,7 @@ class SwordSoulGuardingSkill : Skill(
     types = listOf(SkillType.SUMMON, SkillType.ATTACK),
     cooldown = 30,
     rarity = SkillRarity.LEGENDARY,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), PostAttackTrigger, PostAttackedTrigger, AutoStopTrigger, UsingRenderTrigger, DangerTrigger {
 
     override val persistTime: Int = 20 * 20

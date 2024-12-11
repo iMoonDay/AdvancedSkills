@@ -43,6 +43,20 @@ advskills_re:
     success: '%s 已将 %s 从插槽 %d 卸下'
     failed: '%s 未装备技能在插槽 %d 上'
     banned: '%s 被服务器禁用'
+  enhanceSkill:
+    success: '%s 的 %s 已获得 %d级 %s'
+    failed: '%s 尚未学习 %s'
+    unknown: '未知增幅类型：%s'
+    invalid: '%s 无法应用于 %s'
+    allSuccess: '已将 %d 个增幅应用于 %s 的 %s'
+    all: '已增幅 %s 的所有技能'
+  deEnhanceSkill:
+    success: '已去除 %s 的 %s 的 %s'
+    failed: '%s 尚未学习 %s'
+    unknown: '未知增幅类型：%s'
+    invalid: '%s 的 %s 尚未获得 %s'
+    allSuccess: '已去除 %s 的 %s 的所有增幅'
+    all: '已去除 %s 的所有技能的增幅'
   resetCooldown: '%s 重置了所有技能的冷却时间'
   reset: '已重置 %s 的所有数据'
   cooldown:
@@ -53,7 +67,7 @@ advskills_re:
   rarity:
     set: '已将 %s 的稀有度设置为 %s'
     reset: 已重置 %s 的稀有度
-    invalid: '无效的稀有度: %s'
+    invalid: '无效的稀有度：%s'
   time:
     set: 已将 %s 的持续(蓄力)时间设置为 %d 秒
     reset: 已重置 %s 的持续(蓄力)时间
@@ -66,19 +80,19 @@ advskills_re:
   blacklist:
     add: '%s 已添加到黑名单'
     remove: '%s 已从黑名单中删除'
-    query: '黑名单: %s'
+    query: '黑名单：%s'
     not_found: '%s 不在黑名单中'
     empty: 黑名单为空
     clear: 已清空黑名单
   defaultSlots:
     generic:
-      query: '通用技能槽: %d个'
+      query: '通用技能槽：%d个'
       set: 已将默认通用技能槽设置为 %d 个
     active:
-      query: '主动技能槽: %d个'
+      query: '主动技能槽：%d个'
       set: 已将默认主动技能槽设置为 %d 个
     passive:
-      query: '被动技能槽: %d个'
+      query: '被动技能槽：%d个'
       set: 已将默认被动技能槽设置为 %d 个
     reset: 已重置默认技能栏
   resetXp:
@@ -101,7 +115,9 @@ advskills_re:
       single: 已设置 %2$s 的技能等级为 %1$d 级
       multiple: 已设置 %d 名玩家的技能等级为 %d 级
     query: '%s 的技能等级为 %d 级'
-    addChoice: 你可以学习新技能了
+    addChoice:
+      learn: 你可以学习新技能了
+      enhance: 你可以强化技能了
   command:
     unknown: 未知的技能ID
     invalid: 无效的技能ID
@@ -194,7 +210,7 @@ advskills_re:
       description: 受到致命伤害时，血量恢复到上限，然后进入死亡模式：持续扣血，攻击其他生物可以吸血，当血量不足时死亡
     disarm:
       name: 缴械
-      description: 下一次攻击有45%概率对目标施加缴械
+      description: 下一次攻击有45%概率对目标施加缴械，缴械成功后有极小概率夺取目标手持物品
       success: 缴械成功！
       failed: 缴械失败
       disarmed: 你被缴械了！
@@ -415,6 +431,11 @@ advskills_re:
     withering_touch:
       name: 凋零之触
       description: 强化3次普攻，攻击使目标附加凋零效果，持续3秒，可叠加
+    forced_growth:
+      name: 拔苗助长
+      description: 有概率催熟周围农作物
+      success: 成功催熟了 %d 个农作物
+      failed: 没有催熟任何农作物
   skillType:
     attack: 攻击
     defense: 防御
@@ -476,14 +497,18 @@ advskills_re:
         resetCooldown: 重置冷却
         inventory: 背包
         learn: 学习
-      requiredLevel: '下次学习所需等级: %d'
-      learnedAll: 已学习全部技能
+        enhance: 强化
+      requiredLevel:
+        learn: '下次学习所需等级：%d'
+        enhance: '下次强化所需等级：%d'
+      enhancedAll: 已学习并强化所有技能
     slot:
       title: 左键拖动移动，右键重置
       compact: 紧凑技能显示
       config: 设置
     inventory:
       title: '技能背包 %d/%d'
+      enhance: '当装备时：'
     wheel:
       cancel: 取消
       tip: 松开选中，左键使用，右键取消，中键查看详情，按下 %s 打开技能背包
@@ -491,7 +516,10 @@ advskills_re:
     learn:
       refresh: 重抽
       learn: 学习
-      count: '剩余技能数: %d'
+      count: '剩余技能数：%d'
+    enhance:
+      enhance: 强化
+      count: '剩余强化数：%d'
     config:
       title: 进阶技能：重制版
       category:
@@ -503,13 +531,84 @@ advskills_re:
       layout: 技能槽布局
       quickCastWheelHoldTime: 快捷施法轮盘长按时间 (ms)
       hideSkillCrosshair: 隐藏技能准星
+      hideSkillInfo: 默认隐藏技能信息 (按住Shift显示)
       invalidLayout: "错误输入! 只能包含1-10和分隔符','"
-      incompleteLayout: "错误输入! 缺少栏位: %s"
-      redundantNumbers: "错误输入! 栏位不能重复: %s"
+      incompleteLayout: "错误输入! 缺少栏位：%s"
+      redundantNumbers: "错误输入! 栏位不能重复：%s"
   skillSlot:
     generic: '通用技能槽 %d'
     active: '主动技能槽 %d'
     passive: '被动技能槽 %d'
+  skillEnhancement:
+    empty:
+      name: 无增幅
+      description: 无效果
+    cooldown:
+      name: 冷却增幅
+      description: -%d%% 冷却时间
+    persistent_time:
+      name: 持续时间增幅
+      description: +%d%% 持续时间
+    charge_time:
+      name: 蓄力时间增幅
+      description: -%d%% 蓄力时间
+    damage:
+      name: 伤害增幅
+      description: +%d%% 伤害
+    healing_amount:
+      name: 恢复量增幅
+      description: +%d%% 恢复量
+    use_times:
+      name: 使用次数增幅
+      description: 使用次数++
+    summon_amount:
+      name: 召唤数量增幅
+      description: 召唤数量++
+    range:
+      name: 范围增幅
+      description: 范围++
+    distance:
+      name: 距离增幅
+      description: 距离++
+    effect_count:
+      name: 生效次数增幅
+      description: 生效次数++
+    defense_effect:
+      name: 防御效果增幅
+      description: 防御效果++
+    charge_slowdown:
+      name: 蓄力减速增幅
+      description: -%d%% 蓄力减速
+    time_up_limit:
+      name: 时间上限增幅
+      description: +%d%% 时间上限
+    movement_speed:
+      name: 移动速度增幅
+      description: 移动速度++
+    launch_count:
+      name: 发射次数增幅
+      description: 发射次数++
+    effect_value:
+      name: 效果数值增幅
+      description: 效果数值++
+    status_effect_duration:
+      name: 效果持续时间增幅
+      description: +%d%% 效果持续时间
+    status_effect_amplifier:
+      name: 状态效果增幅
+      description: +%d 状态效果
+    velocity:
+      name: 速度增幅
+      description: 速度++
+    power:
+      name: 力量增幅
+      description: 力量++
+    chance:
+      name: 概率增幅
+      description: 概率++
+    use_cost:
+      name: 使用成本增幅
+      description: 使用成本--
 item:
   advskills_re:
     skill_fruit: 技能果实

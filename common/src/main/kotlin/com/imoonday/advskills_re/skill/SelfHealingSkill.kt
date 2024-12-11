@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -10,7 +11,8 @@ import net.minecraft.server.network.*
 class SelfHealingSkill : Skill(
     id = "self_healing",
     types = listOf(SkillType.PASSIVE, SkillType.RESTORATION),
-    rarity = SkillRarity.RARE
+    rarity = SkillRarity.RARE,
+    enhancements = setOf(SkillEnhancements.CHARGE_TIME)
 ), AutoTrigger, AutoStopTrigger, DamageTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)

@@ -15,7 +15,8 @@ abstract class LongPressSkill(
     cooldown: Int,
     rarity: SkillRarity,
     sound: Supplier<SoundEvent>? = null,
-) : Skill(id, types, cooldown, rarity, sound), LongPressTrigger {
+    enhancements: Set<SkillEnhancementType<*>> = emptySet(),
+) : Skill(id, types, cooldown, rarity, sound, enhancements), LongPressTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = onRelease(user, 1)
 

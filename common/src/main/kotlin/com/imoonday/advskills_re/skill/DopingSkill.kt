@@ -16,15 +16,20 @@ class DopingSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 3,
     rarity = SkillRarity.MYTHIC,
+    enhancements = setOf(
+        SkillEnhancements.PERSISTENT_TIME,
+        SkillEnhancements.MOVEMENT_SPEED,
+        SkillEnhancements.USE_COST
+    )
 ), AttributeTrigger, AutoStopTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = 10 * 20
 
-    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Doping"),
             "Doping",
-            0.5,
+            0.5 + player.getEnhancementLvl(SkillEnhancements.MOVEMENT_SPEED) * 0.05,
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -33,7 +38,8 @@ class DopingSkill : Skill(
         val result = UseResult.startUsing(user, this)
         if (!result.success) return result
         user.addAttributes()
-        user.health = max(user.health - 5f, 1f)
+        val cost = 5f * (1 - user.getEnhancementLvl(SkillEnhancements.USE_COST) * 0.16f)
+        user.health = max(user.health - cost, 1f)
         user.playSound(ModSounds.DASH.get())
         return result
     }

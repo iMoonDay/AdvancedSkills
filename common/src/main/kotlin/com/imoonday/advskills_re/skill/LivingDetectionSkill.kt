@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.*
@@ -13,14 +14,24 @@ class LivingDetectionSkill : Skill(
     types = listOf(SkillType.UTILITY),
     cooldown = 20,
     rarity = SkillRarity.SUPERB,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.RANGE)
 ), AutoStopTrigger, GlowingTrigger {
 
     override val persistTime: Int = 5 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override fun isGlowing(entity: Entity, clientPlayer: PlayerEntity): Boolean =
-        clientPlayer.isUsing() && entity != clientPlayer && entity.isLiving && entity.isAlive && clientPlayer.distanceTo(entity) <= 50 && (entity.x != entity.prevX || entity.y != entity.prevY || entity.z != entity.prevZ)
+    override fun isGlowing(entity: Entity, clientPlayer: PlayerEntity): Boolean {
+        val range = 50 * (1.0 + clientPlayer.getEnhancementLvl(SkillEnhancements.RANGE) * 0.2)
+        return clientPlayer.isUsing()
+            && entity != clientPlayer
+            && entity.isLiving
+            && entity.isAlive
+            && clientPlayer.distanceTo(entity) <= range
+            && (entity.x != entity.prevX
+            || entity.y != entity.prevY
+            || entity.z != entity.prevZ)
+    }
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

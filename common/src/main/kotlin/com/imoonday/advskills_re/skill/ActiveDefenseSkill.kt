@@ -18,14 +18,24 @@ class ActiveDefenseSkill : LongPressSkill(
     types = listOf(SkillType.DEFENSE),
     cooldown = 10,
     rarity = SkillRarity.SUPERB,
+    enhancements = setOf(
+        SkillEnhancements.PERSISTENT_TIME,
+        SkillEnhancements.DEFENSE_EFFECT,
+        SkillEnhancements.CHARGE_SLOWDOWN
+    )
 ), DamageTrigger, AttributeTrigger, UsingRenderTrigger {
 
-    override fun getMaxPressTime(): Int = 10 * 10
-    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getMaxPressTime(): Int = 5 * 20
+
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.DEFENSE_EFFECT) { it.level * 6 }
+    }
+
+    override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Active Defense"),
             "Active Defense",
-            -0.5,
+            player.applyChargeSlowdownEnhancement(-0.5),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -40,7 +50,7 @@ class ActiveDefenseSkill : LongPressSkill(
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopAndCooldown()
-        if (pressedTime.toFloat() / getMaxPressTime() < 0.5f) {
+        if (pressedTime.toFloat() / getModifiedPersistTime(player) < 0.5f) {
             player.modifyCooldown { it / 2 }
         }
         player.removeAttributes()
@@ -52,7 +62,8 @@ class ActiveDefenseSkill : LongPressSkill(
         source: DamageSource,
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
-    ): Float = if (!player.isUsing()) amount else amount * 0.8f
+    ): Float = if (!player.isUsing()) amount
+    else amount * (0.8f - player.getEnhancementLvl(SkillEnhancements.DEFENSE_EFFECT) * 0.06f)
 
     override fun shouldRenderFeature(target: PlayerEntity, clientPlayer: PlayerEntity): Boolean =
         target.isUsing() && !target.isUsing(Skills.ABSOLUTE_DEFENSE)

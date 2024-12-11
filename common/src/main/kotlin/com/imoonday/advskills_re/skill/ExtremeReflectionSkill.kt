@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -9,7 +10,8 @@ class ExtremeReflectionSkill : ReflectionSkill(
     id = "extreme_reflection",
     cooldown = 3,
     rarity = SkillRarity.RARE,
-    duration = 5
+    duration = 5,
+    enhancements = setOf(SkillEnhancements.CHANCE)
 ) {
 
     override fun ignoreDamage(
@@ -21,7 +23,8 @@ class ExtremeReflectionSkill : ReflectionSkill(
         if (!player.isUsing()) return false
         player.stopUsing()
         player.stopCooling()
-        return if (player.random.nextFloat() <= 0.75f) {
+        val extraChance = player.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.05f
+        return if (player.random.nextFloat() < 0.75f + extraChance) {
             reflect(player, attacker as? LivingEntity, amount)
             true
         } else {

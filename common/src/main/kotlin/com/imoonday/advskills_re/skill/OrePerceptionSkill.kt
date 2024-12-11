@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.skill.enums.*
@@ -19,6 +20,7 @@ class OrePerceptionSkill : Skill(
     types = listOf(SkillType.UTILITY),
     cooldown = 30,
     rarity = SkillRarity.SUPERB,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), AutoStopTrigger, WorldRendererTrigger {
 
     override val persistTime: Int = 10 * 20

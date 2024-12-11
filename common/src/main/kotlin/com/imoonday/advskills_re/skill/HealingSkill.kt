@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -17,18 +18,20 @@ abstract class HealingSkill(
     rarity: SkillRarity,
     sound: Supplier<SoundEvent>? = ModSounds.HEAL,
     val amount: Float,
-) : Skill(id, types, cooldown, rarity, sound), SynchronousCoolingTrigger {
+    enhancements: Set<SkillEnhancementType<*>> = setOf(SkillEnhancements.HEALING_AMOUNT)
+) : Skill(id, types, cooldown, rarity, sound, enhancements), SynchronousCoolingTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        user.heal(amount)
+        val healingAmount = getEnhancedValue(user, SkillEnhancements.HEALING_AMOUNT, amount)
+        user.heal(healingAmount)
         user.spawnParticles(
             ParticleTypes.HEART,
-            false, user.centerPos, amount.toInt(),
+            false, user.centerPos, healingAmount.toInt(),
             0.5, 0.5, 0.5, 0.1
         )
         return UseResult.success()
     }
 
     override fun getOtherSkills(player: PlayerEntity): Set<Skill> =
-        Skills.getValidSkills().filter { it is HealingSkill && it != this }.toSet()
+        player.learnedSkills.filter { it is HealingSkill && it != this }.toSet()
 }

@@ -31,8 +31,8 @@ class PerfectReflectionSkill : ReflectionSkill(
         player.sendMessage(message("success", time?.let { " ${it / 1000.0}s" } ?: ""), true)
         attacker?.run {
             damage(player.damageSources.thorns(player), amount * 1.5f)
-            velocityDirty = true
             velocity = pos.subtract(player.pos).normalize().multiply(1.5, 0.0, 1.5).add(0.0, 0.5, 0.0)
+            velocityDirty = true
         }
         return true
     }

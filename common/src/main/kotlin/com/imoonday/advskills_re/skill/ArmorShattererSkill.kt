@@ -13,25 +13,32 @@ class ArmorShattererSkill : Skill(
     types = listOf(SkillType.ATTACK),
     cooldown = 15,
     rarity = SkillRarity.EPIC,
-    sound = ModSounds.FIRE
+    enhancements = setOf(SkillEnhancements.LAUNCH_COUNT)
 ), SpecialStateRenderTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
-            val rotation = rotationVector.normalize().multiply(1.5)
-            world.spawnEntity(
-                VulnerableEnergyBallEntity(
-                    this,
-                    rotationVector.x,
-                    rotationVector.y,
-                    rotationVector.z,
-                    world
-                ).apply {
-                    setPosition(x + rotation.x, eyeY, z + rotation.z)
-                }
-            )
+            val count = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
+            user.executeAndAddTask(5, count) { spawnEnergyBall() }
         }
         return UseResult.success()
+    }
+
+    private fun ServerPlayerEntity.spawnEnergyBall(): Boolean {
+        val rotation = rotationVector.normalize().multiply(1.5)
+        return world.spawnEntity(
+            VulnerableEnergyBallEntity(
+                this,
+                rotationVector.x,
+                rotationVector.y,
+                rotationVector.z,
+                world
+            ).apply {
+                setPosition(x + rotation.x, eyeY, z + rotation.z)
+            }.also {
+                playSound(ModSounds.FIRE.get())
+            }
+        )
     }
 
     override fun isInSpecialState(player: PlayerEntity): Boolean = player.isVulnerable

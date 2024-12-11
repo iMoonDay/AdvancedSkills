@@ -8,6 +8,7 @@ import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.skill.enhancement.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.PlayerUtils.getNextLevelExp
 import com.imoonday.advskills_re.util.PlayerUtils.shouldLearnSkill
@@ -102,9 +103,9 @@ fun PlayerEntity.startCooling(skill: Skill, cooldown: Int? = null) {
 
 private fun PlayerEntity.cooldown(skill: Skill, cooldown: Int? = null) {
     modifySkillData(skill) {
-        var time = cooldown ?: skill.cooldown
+        var time = skill.applyCooldownEnhancements(this, cooldown ?: skill.cooldown)
         forEachTrigger<CooldownTrigger> { trigger -> time = trigger.getCooldown(time) }
-        it.cooldown = if (isCreative) min(20, time) else time
+        it.cooldown = (if (isCreative) min(20, time) else time).coerceAtLeast(0)
         true
     }
 }
@@ -119,7 +120,7 @@ fun PlayerEntity.stopCooling(skill: Skill) {
 
 fun PlayerEntity.modifyCooldown(skill: Skill, operation: (Int) -> Int) {
     modifySkillData(skill) {
-        it.cooldown = operation(getCooldown(skill))
+        it.cooldown = skill.applyCooldownEnhancements(this, operation(getCooldown(skill)))
         true
     }
 }
@@ -147,8 +148,9 @@ fun PlayerEntity.learn(skill: Skill, toast: Boolean = true, message: Boolean = t
                         )
                     )
                 })
-                if (skillContainer.getAllSkills().size == Skills.getValidSkills().size)
+                if (hasLearnedAll()) {
                     sendMessage(translate("learnSkill.all"))
+                }
             }
         }
         syncData()
@@ -163,6 +165,8 @@ fun PlayerEntity.learnAll() {
     }
     sendMessage(translate("learnSkill.all"))
 }
+
+fun PlayerEntity.hasLearnedAll(): Boolean = learnedSkills.size >= Skills.getValidSkills().size
 
 fun PlayerEntity.forget(skill: Skill, message: Boolean = true): Boolean =
     skillContainer.forget(skill, { result ->
@@ -205,21 +209,42 @@ fun PlayerEntity.learnRandomly(filter: (Skill) -> Boolean = { true }): Boolean =
 val PlayerEntity.learnableData: LearnableSkillData
     get() = data.learnable
 
+val PlayerEntity.enhancementData: LearnableEnhancementData
+    get() = data.enhancements
+
 fun ServerPlayerEntity.addChoice() {
-    learnableData.count++
+    if (hasLearnedAll()) {
+        enhancementData.count++
+    } else {
+        learnableData.count++
+    }
 }
 
-fun PlayerEntity.getChoice(): SkillChoice = learnableData.get()
+fun PlayerEntity.getSkillChoice(): Choice<Skill> = learnableData.get()
 
-fun PlayerEntity.refreshChoice(force: Boolean = false) = if (this is ServerPlayerEntity) {
-    learnableData.refresh(force, learnedSkills)
-    syncData()
-} else {
-    Channels.REFRESH_CHOICE_C2S.sendToServer(RefreshChoiceC2SRequest())
-}
+fun PlayerEntity.getEnhancementChoice(): Choice<EnhancementChoice.Pair> = enhancementData.get()
 
-fun PlayerEntity.canFreshChoice(): Boolean =
-    SkillChoice.canGenerate(learnedSkills) && !learnableData.refreshed
+fun PlayerEntity.refreshSkillChoice(type: RefreshChoiceC2SRequest.Type, force: Boolean = false) =
+    if (this is ServerPlayerEntity) {
+        when (type) {
+            RefreshChoiceC2SRequest.Type.SKILL -> {
+                learnableData.refresh(force, learnedSkills)
+            }
+
+            RefreshChoiceC2SRequest.Type.ENHANCEMENT -> {
+                enhancementData.refresh(this, force)
+            }
+        }
+        syncData()
+    } else {
+        Channels.REFRESH_CHOICE_C2S.sendToServer(RefreshChoiceC2SRequest(type))
+    }
+
+fun PlayerEntity.canFreshChoice(type: RefreshChoiceC2SRequest.Type): Boolean =
+    when (type) {
+        RefreshChoiceC2SRequest.Type.SKILL -> SkillChoice.canGenerate(learnedSkills) && !learnableData.refreshed
+        RefreshChoiceC2SRequest.Type.ENHANCEMENT -> EnhancementChoice.canGenerate(this) && !enhancementData.refreshed
+    }
 
 fun PlayerEntity.choose(id: Int): Boolean = when (id) {
     0 -> chooseFirst()
@@ -229,23 +254,83 @@ fun PlayerEntity.choose(id: Int): Boolean = when (id) {
 }
 
 private fun ServerPlayerEntity.choose(index: Int): Boolean {
-    if (learnableData.isEmpty()) return false
-    learnableData.run {
-        val skill = when (index) {
-            0 -> first
-            1 -> second
-            2 -> third
-            else -> return false
+    if (!learnableData.isEmpty()) {
+        learnableData.run {
+            val skill = when (index) {
+                0 -> first
+                1 -> second
+                2 -> third
+                else -> return false
+            }
+            if (skill.invalid) {
+                correct(learnedSkills)
+                return false
+            }
+            learn(skill)
+            next(learnedSkills)
+            syncData()
         }
-        if (skill.invalid) {
-            correct(learnedSkills)
-            return false
+        return true
+    } else if (!enhancementData.isEmpty()) {
+        enhancementData.run {
+            val pair = when (index) {
+                0 -> first
+                1 -> second
+                2 -> third
+                else -> return false
+            }
+            if (pair.isEmtpy()) {
+                correct(this@choose)
+                return false
+            }
+            enhance(pair.skill, pair.enhancement)
+            next(this@choose)
+            syncData()
         }
-        learn(skill)
-        next(learnedSkills)
-        syncData()
     }
+    return false
+}
+
+fun PlayerEntity.enhance(skill: Skill, enhancement: SkillEnhancement): Boolean {
+    getData(skill)?.run {
+        enhancements[enhancement.type]?.let {
+            it.level = enhancement.level
+        } ?: run {
+            enhancements[enhancement.type] = enhancement.copy()
+        }
+    } ?: return false
+
+    syncData()
     return true
+}
+
+fun PlayerEntity.enhanceAll(skill: Skill): Boolean {
+    return getData(skill)?.run {
+        skill.availableEnhancements.forEach {
+            enhancements[it]?.let { enhancement ->
+                enhancement.level = enhancement.type.maxLevel
+            } ?: run {
+                enhancements[it] = it.createMax()
+            }
+        }
+        syncData()
+        true
+    } ?: false
+}
+
+fun PlayerEntity.deEnhance(skill: Skill, type: SkillEnhancementType<*>): Boolean {
+    getData(skill)?.enhancements?.remove(type) ?: return false
+
+    syncData()
+    return true
+}
+
+fun PlayerEntity.deEnhanceAll(skill: Skill): Boolean {
+    return getData(skill)?.run {
+        enhancements.clear()
+        syncData()
+        true
+    } ?: false
 }
 
 fun PlayerEntity.chooseFirst(): Boolean = if (this is ServerPlayerEntity) choose(0) else {
@@ -364,8 +449,10 @@ private fun PlayerEntity.updateLevel() {
         }
     }
     if (added && this is ServerPlayerEntity) {
-        sendMessage(translate("skillLevel.addChoice"))
-        playSound(SoundEvents.ENTITY_PLAYER_LEVELUP)
+        if (SkillChoice.canGenerate(learnedSkills) || EnhancementChoice.canGenerate(this)) {
+            sendMessage(translate("skillLevel.addChoice.${if (hasLearnedAll()) "enhance" else "learn"}"))
+            playSound(SoundEvents.ENTITY_PLAYER_LEVELUP)
+        }
         syncData()
     }
 }
@@ -452,6 +539,25 @@ fun PlayerEntity.clearPersistentData(skill: Skill) {
 fun PlayerEntity.getData(skill: Skill): SkillData? = skillContainer.getData(skill)
 
 fun PlayerEntity.isCharging(skill: Skill): Boolean = skill is LongPressTrigger && isUsing(skill)
+
+fun PlayerEntity.getEnhancements(skill: Skill): List<SkillEnhancement> =
+    getData(skill)?.enhancements?.values?.toList() ?: emptyList()
+
+@Suppress("UNCHECKED_CAST")
+fun <T : SkillEnhancement> PlayerEntity.getEnhancement(skill: Skill, type: SkillEnhancementType<T>): T? =
+    getData(skill)?.enhancements?.get(type) as? T
+
+fun PlayerEntity.addEnhancement(skill: Skill, enhancement: SkillEnhancement): Boolean =
+    modifySkillData(skill) {
+        if (enhancement.isSuitableFor(this, skill)) {
+            it.enhancements[enhancement.type] = enhancement
+            true
+        } else false
+    }
+
+@Suppress("UNCHECKED_CAST")
+fun <T : SkillEnhancement> PlayerEntity.removeEnhancement(skill: Skill, type: SkillEnhancementType<T>): T? =
+    getData(skill)?.enhancements?.remove(type) as? T
 
 var ServerPlayerEntity.lastDamagedTime: Long
     get() = properties.getLong("lastDamagedTime")
@@ -600,3 +706,5 @@ fun ServerPlayerEntity.spawnParticles(
 }
 
 fun ServerPlayerEntity.playSound(sound: SoundEvent) = world.playSound(null, blockPos, sound, SoundCategory.PLAYERS)
+
+fun ServerPlayerEntity.updateVelocity() = sendPacket(EntityVelocityUpdateS2CPacket(this))

@@ -26,7 +26,7 @@ class TeleportSkill : Skill(
             val prevPos = centerPos
             requestTeleportOffset(offset.x, offset.y, offset.z)
             this.velocity = velocity
-            sendPacket(EntityVelocityUpdateS2CPacket(this))
+            updateVelocity()
             world.playSound(
                 null,
                 prevPos.x,

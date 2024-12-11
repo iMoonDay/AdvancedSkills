@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -19,15 +20,21 @@ class ChargedSweepSkill : LongPressSkill(
     types = listOf(SkillType.ATTACK),
     cooldown = 9,
     rarity = SkillRarity.RARE,
+    enhancements = setOf(
+        SkillEnhancements.CHARGE_TIME,
+        SkillEnhancements.CHARGE_SLOWDOWN,
+        SkillEnhancements.RANGE,
+        SkillEnhancements.DAMAGE
+    )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 3 * 20
 
-    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Charged Sweep Charging"),
             "Charged Sweep Charging",
-            -0.8,
+            player.applyChargeSlowdownEnhancement(-0.8),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -43,8 +50,12 @@ class ChargedSweepSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.removeAttributes()
         player.stopUsing()
+        val range = player.getEnhancementLvl(SkillEnhancements.RANGE)
+        val baseDamage = player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
+        val multiplier = pressedTime.toFloat() / getModifiedPersistTime(player) * 2
+        val stack = player.mainHandStack
         player.world.getNonSpectatingEntities(
-            LivingEntity::class.java, player.boundingBox.expand(5.0)
+            LivingEntity::class.java, player.boundingBox.expand(5.0 + range)
         ).filter {
             it !== player
                 && (it.boundingBox.maxY >= player.boundingBox.minY
@@ -53,17 +64,17 @@ class ChargedSweepSkill : LongPressSkill(
                 && it.boundingBox.minY >= player.boundingBox.minY)
                 && player.calculateAngle(it) <= PI / 3
         }.forEach {
-            val amount = (player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
-                + EnchantmentHelper.getAttackDamage(
-                player.mainHandStack,
-                it.group
-            )) * (pressedTime.toFloat() / getMaxPressTime() * 2)
+            val amount = getEnhancedValue(
+                player,
+                SkillEnhancements.DAMAGE,
+                (baseDamage + EnchantmentHelper.getAttackDamage(stack, it.group)) * multiplier
+            )
             it.damage(player.damageSources.playerAttack(player), amount)
         }
         player.swingHand(Hand.MAIN_HAND, true)
         player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
         player.startCooling(pressedTime * 3)
-        player.mainHandStack.damage(1, player) { it.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND) }
+        stack.damage(1, player) { it.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND) }
         return UseResult.consume()
     }
 

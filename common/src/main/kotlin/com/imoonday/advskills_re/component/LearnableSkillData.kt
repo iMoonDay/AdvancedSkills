@@ -2,10 +2,12 @@ package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.util.*
+import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 
 class LearnableSkillData(
-    private var choice: SkillChoice = SkillChoice.EMPTY,
+    private var choice: Choice<Skill> = SkillChoice.EMPTY,
     var refreshed: Boolean = false,
     var count: Int = 0,
 ) {
@@ -71,13 +73,9 @@ class LearnableSkillData(
             modified = true
         }
         val replacePredicate: (Skill) -> Boolean = { it.invalid || it in except || !filter(it) }
-        if (!choice.isEmpty() && choice.skills.any(replacePredicate)) {
+        if (!choice.isEmpty() && choice.choices.any(replacePredicate)) {
             choice = choice.replaceWith(replacePredicate) { set ->
-                Skills.random(except + set, filter).also {
-                    if (!it.isEmpty()) {
-                        set.add(it)
-                    }
-                }
+                Skills.random(except + set, filter).also { if (!it.isEmpty()) set.add(it) }
             }
             modified = true
         }

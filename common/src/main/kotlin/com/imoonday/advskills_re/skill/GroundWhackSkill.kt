@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -14,15 +15,22 @@ class GroundWhackSkill : Skill(
     id = "ground_whack",
     types = listOf(SkillType.ATTACK, SkillType.MOVEMENT),
     cooldown = 8,
-    rarity = SkillRarity.RARE
+    rarity = SkillRarity.RARE,
+    enhancements = setOf(
+        SkillEnhancements.VELOCITY,
+        SkillEnhancements.RANGE,
+        SkillEnhancements.DAMAGE,
+        SkillEnhancements.POWER
+    )
 ), LandingTrigger, PersistentTrigger, FallTrigger, DangerTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         if (user.isOnGround) return UseResult.fail(failedMessage())
         user.run {
             if (abilities.flying) abilities.flying = false
-            velocity = Vec3d(0.0, min(velocity.y, -1.0), 0.0)
-            sendPacket(EntityVelocityUpdateS2CPacket(this))
+            val velocityY = min(velocity.y, -1.0) * (1.0 + user.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1)
+            velocity = Vec3d(0.0, velocityY, 0.0)
+            updateVelocity()
             sendPacket(PlayerAbilitiesS2CPacket(abilities))
             startUsing()
         }
@@ -33,13 +41,17 @@ class GroundWhackSkill : Skill(
         if (!player.isUsing()) return
         if (height > 0) {
             val newHeight = min(height.toDouble(), 20.0)
+            val damage = getEnhancedValue(player, SkillEnhancements.DAMAGE, min(newHeight / 2, 5.0).toFloat())
+            val velocity = min(newHeight / 5, 2.0) + player.getEnhancementLvl(SkillEnhancements.POWER) * 0.1
+            val rangeMultiplier = 1.0 + player.getEnhancementLvl(SkillEnhancements.RANGE) * 0.1
             player.world.getOtherEntities(
                 player,
-                player.boundingBox.expand(newHeight)
+                player.boundingBox.expand(newHeight * rangeMultiplier)
             ) { it.isLiving && it.isAlive && !it.isSpectator && (player.y - it.y).absoluteValue <= 1 }
                 .forEach {
-                    it.damage(player.damageSources.playerAttack(player), min(newHeight / 2, 5.0).toFloat())
-                    it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(min(newHeight / 5, 2.0)))
+                    it.damage(player.damageSources.playerAttack(player), damage)
+                    it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(velocity))
+                    (it as? ServerPlayerEntity)?.updateVelocity()
                 }
             player.spawnParticles(
                 ParticleTypes.CLOUD,

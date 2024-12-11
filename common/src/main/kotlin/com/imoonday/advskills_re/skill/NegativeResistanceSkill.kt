@@ -15,6 +15,7 @@ class NegativeResistanceSkill : Skill(
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 30,
     rarity = SkillRarity.SUPERB,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), AutoStopTrigger, StatusEffectTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = 5 * 20

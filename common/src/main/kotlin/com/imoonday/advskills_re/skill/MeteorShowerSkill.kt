@@ -2,11 +2,13 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.attribute.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
 
@@ -15,15 +17,16 @@ class MeteorShowerSkill : LongPressSkill(
     types = listOf(SkillType.ATTACK, SkillType.DESTRUCTION),
     cooldown = 120,
     rarity = SkillRarity.MYTHIC,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.CHARGE_SLOWDOWN)
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 10 * 20
 
-    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Meteor Shower Charging"),
             "Meteor Shower Charging",
-            -0.5,
+            player.applyChargeSlowdownEnhancement(-0.5),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -36,7 +39,7 @@ class MeteorShowerSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.removeAttributes()
         player.stopUsing()
-        if (pressedTime < getMaxPressTime()) {
+        if (pressedTime < getModifiedPersistTime(player)) {
             player.startCooling(10)
             return UseResult.fail(failedMessage())
         }

@@ -5,7 +5,6 @@ import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.item.*
-import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
 
@@ -14,35 +13,36 @@ class CatapultGlidingSkill : LongPressSkill(
     types = listOf(SkillType.MOVEMENT),
     cooldown = 30,
     rarity = SkillRarity.RARE,
-    sound = ModSounds.DASH
+    sound = ModSounds.DASH,
+    enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.VELOCITY)
 ) {
 
     override fun getMaxPressTime(): Int = 3 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult =
-        if (!canUse(user)) failedResult() else if (user.isFallFlying) fallFlyingResult() else super.use(user)
+        if (!user.canUse()) failedResult() else if (user.isFallFlying) fallFlyingResult() else super.use(user)
 
     override fun onPress(player: ServerPlayerEntity): UseResult =
-        if (!canUse(player)) failedResult() else if (player.isFallFlying) fallFlyingResult() else super.onPress(player)
+        if (!player.canUse()) failedResult() else if (player.isFallFlying) fallFlyingResult() else super.onPress(player)
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
-        if (!canUse(player)) return failedResult()
+        if (!player.canUse()) return failedResult()
         if (player.isFallFlying) return fallFlyingResult()
         player.stopAndCooldown()
         player.playSkillSound()
         player.setOnGround(false)
         player.startFallFlying()
-        player.velocityDirty = true
-        val progress = pressedTime.toDouble() / getMaxPressTime()
+        val multiplier = 1 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1
+        val progress = pressedTime.toDouble() / getModifiedPersistTime(player) * multiplier
         player.velocity =
             player.rotationVector.normalize().multiply(1.5 * progress, 0.0, 1.5 * progress)
                 .withAxis(Direction.Axis.Y, 3.0 * progress)
-        player.sendPacket(EntityVelocityUpdateS2CPacket(player))
+        player.updateVelocity()
         return UseResult.success()
     }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
-        if (player.isUsing() && !canUse(player)) player.stopUsing()
+        if (player.isUsing() && !player.canUse()) player.stopUsing()
         super.serverTick(player, usedTime)
     }
 
@@ -50,8 +50,8 @@ class CatapultGlidingSkill : LongPressSkill(
 
     private fun fallFlyingResult() = UseResult.fail(message("fallFlying"))
 
-    private fun canUse(player: ServerPlayerEntity): Boolean {
-        val stack = player.getEquippedStack(EquipmentSlot.CHEST)
+    private fun ServerPlayerEntity.canUse(): Boolean {
+        val stack = getEquippedStack(EquipmentSlot.CHEST)
         return (stack.item is ElytraItem && ElytraItem.isUsable(stack))
     }
 }

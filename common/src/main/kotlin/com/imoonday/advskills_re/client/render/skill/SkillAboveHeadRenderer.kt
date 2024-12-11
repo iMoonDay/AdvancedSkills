@@ -31,6 +31,7 @@ interface SkillAboveHeadRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill,
     ) {
         val clientPlayer = clientPlayer ?: return
         if (!skill.shouldRenderFeature(player, clientPlayer)) return
+        if (player.isInvisible || player.isInvisibleTo(clientPlayer)) return
 
         matrices.push()
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180f))

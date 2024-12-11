@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.enums.*
 import net.minecraft.entity.attribute.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
 class StrongPhysiqueSkill : PassiveSkill(
@@ -10,7 +11,7 @@ class StrongPhysiqueSkill : PassiveSkill(
     rarity = SkillRarity.SUPERB
 ) {
 
-    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MAX_HEALTH to EntityAttributeModifier(
             createUuid("Strong Physique"),
             "Strong Physique",

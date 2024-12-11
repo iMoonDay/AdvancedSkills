@@ -33,6 +33,7 @@ interface SkillAroundRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill, T 
     ) {
         val clientPlayer = clientPlayer ?: return
         if (!skill.shouldRenderFeature(player, clientPlayer)) return
+        if (player.isInvisible || player.isInvisibleTo(clientPlayer)) return
 
         val age: Float = player.age + tickDelta
         val rotateAngleY = age / -20.0f

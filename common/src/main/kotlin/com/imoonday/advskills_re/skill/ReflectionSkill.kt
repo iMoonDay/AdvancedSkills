@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.client.*
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -18,20 +19,21 @@ abstract class ReflectionSkill(
     cooldown: Int,
     rarity: SkillRarity,
     duration: Int,
+    enhancements: Set<SkillEnhancementType<*>> = setOf(SkillEnhancements.PERSISTENT_TIME)
 ) : Skill(
     id = id,
     types = types,
     cooldown = cooldown,
-    rarity = rarity
+    rarity = rarity,
+    enhancements = enhancements
 ), DamageTrigger, ReflectionTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = duration
 
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
 
-    protected fun reflectedFailed(player: ServerPlayerEntity) {
+    protected fun reflectedFailed(player: ServerPlayerEntity) =
         player.sendMessage(translate("reflection.failed"), true)
-    }
 
     protected fun reflect(
         player: ServerPlayerEntity,

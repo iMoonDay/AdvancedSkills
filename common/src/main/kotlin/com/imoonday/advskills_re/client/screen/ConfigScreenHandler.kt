@@ -88,6 +88,15 @@ object ConfigScreenHandler {
                         .setSaveConsumer { config.hideSkillCrosshair = it }
                         .build()
                 )
+
+                addEntry(
+                    entryBuilder.startBooleanToggle(
+                        translate("screen.config.hideSkillInfo"),
+                        config.hideSkillInfo
+                    ).setDefaultValue(false)
+                        .setSaveConsumer { config.hideSkillInfo = it }
+                        .build()
+                )
             }
 
             val general = builder.getOrCreateCategory(translate("screen.config.category.general"))

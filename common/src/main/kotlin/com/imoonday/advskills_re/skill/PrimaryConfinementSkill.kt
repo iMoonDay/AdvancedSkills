@@ -17,7 +17,8 @@ class PrimaryConfinementSkill : LongPressSkill(
     types = listOf(SkillType.CONTROL),
     cooldown = 12,
     rarity = SkillRarity.SUPERB,
-    sound = SoundEvents::BLOCK_ENCHANTMENT_TABLE_USE
+    sound = SoundEvents::BLOCK_ENCHANTMENT_TABLE_USE,
+    enhancements = setOf(SkillEnhancements.CHARGE_TIME)
 ), UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
 
     override fun getMaxPressTime(): Int = 5 * 20
@@ -26,7 +27,7 @@ class PrimaryConfinementSkill : LongPressSkill(
         player.stopAndCooldown()
         player.swingHand(Hand.MAIN_HAND, true)
         player.raycastLivingEntity(5.0)?.takeIf { it.type == HitResult.Type.ENTITY }?.let {
-            if (player.random.nextFloat() < 0.8f * pressedTime / getMaxPressTime()) {
+            if (player.random.nextFloat() < 0.8f * pressedTime / getModifiedPersistTime(player)) {
                 (it.entity as LivingEntity).addStatusEffect(
                     StatusEffectInstance(
                         ModEffects.CONFINEMENT.get(),

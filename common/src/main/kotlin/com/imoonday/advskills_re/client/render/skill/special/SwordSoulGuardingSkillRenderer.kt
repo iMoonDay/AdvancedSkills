@@ -32,6 +32,8 @@ class SwordSoulGuardingSkillRenderer : IPlayerFeatureRenderer<SwordSoulGuardingS
     ) {
         val clientPlayer = clientPlayer ?: return
         if (!skill.shouldRenderFeature(player, clientPlayer)) return
+        if (player.isInvisible || player.isInvisibleTo(clientPlayer)) return
+
         matrices.push()
         matrices.translate(-0.2f, 0f, 0.5f)
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180f - headYaw))

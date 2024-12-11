@@ -15,6 +15,7 @@ class TimeRewindSkill : LongPressSkill(
     types = listOf(SkillType.RESTORATION, SkillType.MOVEMENT),
     cooldown = 60,
     rarity = SkillRarity.MYTHIC,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), UsingRenderTrigger, DeathTrigger {
 
     override fun getMaxPressTime(): Int = 5 * 20

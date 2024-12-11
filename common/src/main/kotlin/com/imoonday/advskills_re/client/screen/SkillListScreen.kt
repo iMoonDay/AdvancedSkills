@@ -64,13 +64,18 @@ class SkillListScreen(
         }.dimensions(width - 5 - inventoryButtonWidth, 5, inventoryButtonWidth, 20)
             .build()
             .also(::addDrawableChild)
-        val learnText = translate("screen.list.button.learn")
+        val learnText = if (!player.hasLearnedAll()) translate("screen.list.button.learn")
+        else translate("screen.list.button.enhance")
         val learnButtonWidth = (textRenderer.getWidth(learnText) + 10).coerceAtLeast(50)
         learnButton = ButtonWidget.builder(learnText) {
-            client!!.setScreen(SkillLearningScreen(player) { SkillListScreen(player) })
+            if (!player.enhancementData.isEmpty()) {
+                client!!.setScreen(SkillEnhancementScreen(player) { SkillListScreen(player) })
+            } else {
+                client!!.setScreen(SkillLearningScreen(player) { SkillListScreen(player) })
+            }
         }.dimensions(inventoryButton.x - learnButtonWidth - 5, 5, learnButtonWidth, 20)
             .build()
-            .apply { active = !player.learnableData.isEmpty() }
+            .apply { active = !player.learnableData.isEmpty() || !player.enhancementData.isEmpty() }
             .also(::addDrawableChild)
     }
 
@@ -250,11 +255,12 @@ class SkillListScreen(
             )
         }
         if (!learnButton.active) {
-            val text = if (Skills.getLearnableSkills(player.learnedSkills).isEmpty()) {
-                translate("screen.list.learnedAll")
+            val learnedAll = player.hasLearnedAll()
+            val text = if (learnedAll && !EnhancementChoice.canGenerate(player)) {
+                translate("screen.list.enhancedAll")
             } else {
                 val requiredLevels = PlayerUtils.getLevelRequiredForLearningSkill(level)
-                translate("screen.list.requiredLevel", requiredLevels)
+                translate("screen.list.requiredLevel.${if (learnedAll) "enhance" else "learn"}", requiredLevels)
             }
             context.drawText(
                 textRenderer,
@@ -273,7 +279,12 @@ class SkillListScreen(
         if (skillScroll.children().size != player.learnedSkills.size) {
             skillScroll.refresh()
         }
-        learnButton.active = !player.learnableData.isEmpty()
+        learnButton.active = !player.learnableData.isEmpty() || !player.enhancementData.isEmpty()
+        if (!player.enhancementData.isEmpty() || player.hasLearnedAll()) {
+            learnButton.message = translate("screen.list.button.enhance")
+        } else {
+            learnButton.message = translate("screen.list.button.learn")
+        }
     }
 
     override fun shouldPause(): Boolean = false

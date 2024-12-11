@@ -12,6 +12,7 @@ import net.minecraft.entity.attribute.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.mob.*
 import net.minecraft.entity.passive.*
+import net.minecraft.entity.player.*
 import net.minecraft.entity.projectile.*
 import net.minecraft.entity.projectile.thrown.*
 import net.minecraft.particle.*
@@ -23,17 +24,18 @@ class DangerPerceptionSkill : Skill(
     types = listOf(SkillType.PASSIVE),
     cooldown = 12,
     rarity = SkillRarity.SUPERB,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.MOVEMENT_SPEED, SkillEnhancements.RANGE)
 ), AutoStopTrigger, AttributeTrigger, DamageTrigger, UsingRenderTrigger {
-
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override val persistTime: Int = 2 * 20
 
-    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
+
+    override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Danger Perception"),
             "Danger Perception",
-            0.3,
+            0.3 + player.getEnhancementLvl(SkillEnhancements.MOVEMENT_SPEED) * 0.06,
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -45,8 +47,9 @@ class DangerPerceptionSkill : Skill(
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isCreative && !player.isSpectator && !player.abilities.invulnerable && (player.isUsing() || !player.isCooling())) {
+            val range = player.getEnhancementLvl(SkillEnhancements.RANGE) * 0.4
             val hasDanger = player.world
-                .getOtherEntities(player, player.boundingBox.expand(3.0)) { dangerTest(player, it) }
+                .getOtherEntities(player, player.boundingBox.expand(3.0 + range)) { dangerTest(player, it) }
                 .isNotEmpty()
             if (hasDanger) {
                 if (player.isUsing()) {
@@ -60,6 +63,7 @@ class DangerPerceptionSkill : Skill(
     }
 
     override fun onStop(player: ServerPlayerEntity) {
+        player.startCooling()
         player.removeAttributes()
         super.onStop(player)
     }
@@ -88,7 +92,6 @@ class DangerPerceptionSkill : Skill(
     private fun start(player: ServerPlayerEntity) {
         player.playSound(ModSounds.DASH.get())
         player.startUsing()
-        player.startCooling()
         player.addAttributes()
         player.spawnParticles(
             ParticleTypes.CLOUD,

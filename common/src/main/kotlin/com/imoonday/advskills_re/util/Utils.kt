@@ -7,6 +7,8 @@ import dev.architectury.event.*
 import net.minecraft.entity.*
 import net.minecraft.entity.effect.*
 import net.minecraft.nbt.*
+import net.minecraft.server.network.*
+import net.minecraft.server.world.*
 import net.minecraft.text.*
 import net.minecraft.util.*
 import net.minecraft.util.math.*
@@ -156,3 +158,29 @@ val Entity.wasGroundCollision: Boolean
     get() = (this as ICollisionRecorder).wasGroundCollision()
 
 fun Entity.hasMoved(): Boolean = prevX != x || prevY != y || prevZ != z
+
+inline fun <reified T : Number> Number.toNumber(): T {
+    return when (T::class) {
+        Byte::class -> this.toByte() as T
+        Short::class -> this.toShort() as T
+        Int::class -> this.toInt() as T
+        Long::class -> this.toLong() as T
+        Float::class -> this.toFloat() as T
+        Double::class -> this.toDouble() as T
+        else -> throw IllegalArgumentException("Unsupported type")
+    }
+}
+
+fun ServerWorld.addTask(interval: Int, repeat: Int, task: () -> Boolean) =
+    (this as TaskHandler).addTask(LoopTask(interval, repeat, task))
+
+fun ServerWorld.executeAndAddTask(interval: Int, repeat: Int, task: () -> Boolean) {
+    task()
+    addTask(interval, repeat, task)
+}
+
+fun ServerPlayerEntity.addTask(interval: Int, repeat: Int, task: () -> Boolean) =
+    serverWorld.addTask(interval, repeat, task)
+
+fun ServerPlayerEntity.executeAndAddTask(interval: Int, repeat: Int, task: () -> Boolean) =
+    serverWorld.executeAndAddTask(interval, repeat, task)

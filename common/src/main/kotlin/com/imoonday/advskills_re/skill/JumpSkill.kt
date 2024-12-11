@@ -1,9 +1,8 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.sendPacket
-import com.imoonday.advskills_re.util.spawnParticles
+import com.imoonday.advskills_re.util.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
@@ -12,14 +11,17 @@ class JumpSkill : Skill(
     id = "jump",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 1,
-    rarity = SkillRarity.COMMON
+    rarity = SkillRarity.COMMON,
+    enhancements = setOf(SkillEnhancements.POWER)
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             stopFallFlying()
             jump()
-            sendPacket(EntityVelocityUpdateS2CPacket(this))
+            val power = 1 + user.getEnhancementLvl(SkillEnhancements.POWER) * 0.1
+            velocity = velocity.multiply(1.0, power, 1.0)
+            updateVelocity()
             user.spawnParticles(
                 ParticleTypes.CLOUD,
                 false,

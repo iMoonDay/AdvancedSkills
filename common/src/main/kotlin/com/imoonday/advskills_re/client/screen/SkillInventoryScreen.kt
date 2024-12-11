@@ -355,8 +355,15 @@ class SkillInventoryScreen(
                 )
                 selectingSlot = if (!skill.invalid) {
                     if (selectedSlot == null) {
-                        if (hasShiftDown()) {
-                            val list = skill.getItemTooltips(displayName = true, displayId = true)
+                        if (!ClientConfig.get().hideSkillInfo || hasShiftDown()) {
+                            val list = skill.getItemTooltips(displayName = true)
+                            val tooltips = skill.getEnhancementTooltips(player)
+                            if (tooltips.isNotEmpty()) {
+                                list.add(Text.empty())
+                                list.add(translate("screen.inventory.enhance").formatted(Formatting.GRAY))
+                                list.addAll(tooltips)
+                            }
+                            list.add(skill.id.toString().toText().formatted(Formatting.DARK_GRAY))
                             val orderedList = list.map(Text::asOrderedText).toMutableList()
                             val lines = Tooltip.wrapLines(client, list[1])
                             if (lines.size > 1) {

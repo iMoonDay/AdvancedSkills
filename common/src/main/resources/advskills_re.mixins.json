@@ -42,6 +42,7 @@
     "MeleeAttackGoalMixin",
     "PlayerEntityMixin",
     "ProjectileAttackGoalMixin",
+    "ReloadCommandAccessor",
     "ScreenHandlerAccessor",
     "ServerPlayerEntityMixin",
     "ServerWorldMixin",

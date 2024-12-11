@@ -27,22 +27,22 @@
 
 ### **Sample Skills Introduction:**
 
-1. **Reflective Skills**: Skills that have a certain chance of reflecting the first incoming damage within a specific time.  
+- **Reflective Skills**: Skills that have a certain chance of reflecting the first incoming damage within a specific time.  
    Different types of reflective effects exist.
 
-2. **Movement Skills**: Includes various movement abilities, such as dashing, teleporting, dodging, jumping, grappling, etc.
+- **Movement Skills**: Includes various movement abilities, such as dashing, teleporting, dodging, jumping, grappling, etc.
 
-3. **Control Skills**: Includes various control abilities, such as immobilizing, slowing, silencing, etc.
+- **Control Skills**: Includes various control abilities, such as immobilizing, slowing, silencing, etc.
 
-4. **Passive Skills**: All skills that are not passive are considered active. Passive skills include self-healing, passive effects, wall climbing, invisibility, and more.
+- **Passive Skills**: All skills that are not passive are considered active. Passive skills include self-healing, passive effects, wall climbing, invisibility, and more.
 
-5. **Enhancement Skills**: Various enhancement skills, such as X-ray vision, water bypassing, and resistance to negative effects.
+- **Enhancement Skills**: Various enhancement skills, such as X-ray vision, water bypassing, and resistance to negative effects.
 
-6. **Summoning Skills**: Includes summoning duplicates, mounts, minions, etc.
+- **Summoning Skills**: Includes summoning duplicates, mounts, minions, etc.
 
-7. **Healing Skills**: Different healing skills restore varying amounts of health.
+- **Healing Skills**: Different healing skills restore varying amounts of health.
 
-8. **Destructive Skills**: Includes fireballs, TNT, meteorites, etc.
+- **Destructive Skills**: Includes fireballs, TNT, meteorites, etc.
 
 ---
 
@@ -85,6 +85,7 @@
     - `add [amount] [points/levels]` - Add skill experience or levels
     - `set [amount] [points/levels]` - Set skill experience or levels
     - `query [points/levels]` - Query current skill experience or levels
+    - `multiplier [multiplier]` - Set global skill experience gain multiplier
     - `reset` - Reset skill experience and levels
 
 #### Global Cooldown:
@@ -128,16 +129,16 @@
 
 #### Rarity Weight:
 
-| **Rarity**    | **Weight** |
-|---------------|------------|
-| Common        | 8          |
-| Uncommon      | 7          |
-| Rare          | 6          |
-| Superb        | 5          |
-| Epic          | 4          |
-| Legendary     | 3          |
-| Mythic        | 2          |
-| Unique        | 1          |
+|  **Rarity**   | **Weight** |
+|:-------------:|:----------:|
+|    Common     |     8      |
+|   Uncommon    |     7      |
+|     Rare      |     6      |
+|    Superb     |     5      |
+|     Epic      |     4      |
+|   Legendary   |     3      |
+|    Mythic     |     2      |
+|    Unique     |     1      |
 
 ---
 

@@ -4,6 +4,7 @@ import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.projectile.*
@@ -18,20 +19,31 @@ class LaserEyeSkill : Skill(
     types = listOf(SkillType.ATTACK),
     cooldown = 15,
     rarity = SkillRarity.EPIC,
-    sound = ModSounds.LASER
+    enhancements = setOf(SkillEnhancements.LAUNCH_COUNT, SkillEnhancements.DISTANCE, SkillEnhancements.DAMAGE)
 ) {
 
-    private val particleColor = Vector3f(237 / 255f, 47 / 255f, 50 / 255f)
-
     override fun use(user: ServerPlayerEntity): UseResult {
-        val cameraPos = user.getCameraPosVec(0f)
-        val maxDistance = user.raycastVisualBlock(64.0).let {
-            if (it.type == HitResult.Type.MISS) 64.0 else it.pos.distanceTo(cameraPos)
+        val times = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
+        val distanceMultiplier = 1.0 + user.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.2
+        val distance = 64.0 * distanceMultiplier
+        val damage = getEnhancedValue(user, SkillEnhancements.DAMAGE, 8f)
+
+        user.executeAndAddTask(5, times) {
+            execute(user, distance, damage)
+            true
+        }
+        return UseResult.success()
+    }
+
+    private fun execute(player: ServerPlayerEntity, distance: Double, damage: Float) {
+        val cameraPos = player.getCameraPosVec(0f)
+        val maxDistance = player.raycastVisualBlock(distance).let {
+            if (it.type == HitResult.Type.MISS) distance else it.pos.distanceTo(cameraPos)
         }
         val particles: MutableList<ParticleS2CPacket> = mutableListOf()
         var offset = 0.1
         while (offset <= maxDistance) {
-            val pos = user.eyePos + user.rotationVector * offset
+            val pos = player.eyePos + player.rotationVector * offset
             particles += ParticleS2CPacket(
                 DustParticleEffect(particleColor, 1f),
                 true,
@@ -41,21 +53,26 @@ class LaserEyeSkill : Skill(
             )
             offset += 0.1
         }
-        Channels.SPAWN_PARTICLES_S2C.sendToPlayer(user, SpawnParticlesS2CPacket(particles))
+        Channels.SPAWN_PARTICLES_S2C.sendToPlayer(player, SpawnParticlesS2CPacket(particles))
+        player.playSound(ModSounds.LASER.get())
         val entities: MutableList<LivingEntity> = mutableListOf()
         while (true) {
             ProjectileUtil.raycast(
-                user,
+                player,
                 cameraPos,
-                cameraPos.add(user.rotationVector.multiply(maxDistance)),
-                user.boundingBox.stretch(user.rotationVector.multiply(maxDistance)),
+                cameraPos.add(player.rotationVector.multiply(maxDistance)),
+                player.boundingBox.stretch(player.rotationVector.multiply(maxDistance)),
                 { !it.isSpectator && it.isAlive && it.isLiving && it !in entities },
                 maxDistance * maxDistance
             )?.takeUnless { it.type == HitResult.Type.MISS }?.let {
                 entities.add(it.entity as LivingEntity)
             } ?: break
         }
-        entities.forEach { it.damage(user.damageSources.magic(), 8f) }
-        return UseResult.success()
+        entities.forEach { it.damage(player.damageSources.magic(), damage) }
+    }
+
+    companion object {
+
+        private val particleColor = Vector3f(237 / 255f, 47 / 255f, 50 / 255f)
     }
 }

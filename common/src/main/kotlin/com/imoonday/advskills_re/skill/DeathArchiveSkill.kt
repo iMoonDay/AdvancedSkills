@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -18,7 +19,8 @@ class DeathArchiveSkill : Skill(
     id = "death_archive",
     types = listOf(SkillType.DEFENSE, SkillType.RESTORATION),
     cooldown = 300,
-    rarity = SkillRarity.UNIQUE
+    rarity = SkillRarity.UNIQUE,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), UsingProgressTrigger, DeathTrigger, DamageTrigger, TickTrigger, UnequipTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
@@ -57,10 +59,14 @@ class DeathArchiveSkill : Skill(
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
-        if (player.isUsing() && player.isInInvulnerableState() && usedTime >= 5 * 20) {
+        val maxTime = getMaxInvulnerableTime(player)
+        if (player.isUsing() && player.isInInvulnerableState() && usedTime >= maxTime) {
             player.stopAndCooldown()
         }
     }
+
+    private fun getMaxInvulnerableTime(player: PlayerEntity) =
+        getEnhancedValue(player, SkillEnhancements.PERSISTENT_TIME, 5 * 20.0)
 
     override fun ignoreDamage(
         amount: Float,
@@ -72,7 +78,7 @@ class DeathArchiveSkill : Skill(
     private fun PlayerEntity.isInInvulnerableState(): Boolean = getActiveData().getBoolean("invulnerable")
 
     override fun getProgress(player: PlayerEntity): Double = if (player.isUsing()) {
-        if (player.isInInvulnerableState()) 1 - player.getUsedTime() / (5 * 20.0)
+        if (player.isInInvulnerableState()) 1 - player.getUsedTime() / getMaxInvulnerableTime(player)
         else player.health.toDouble() / player.maxHealth
     } else 0.0
 

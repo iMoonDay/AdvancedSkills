@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -15,6 +16,7 @@ class TauntSkill : Skill(
     types = listOf(SkillType.UTILITY, SkillType.DEFENSE),
     cooldown = 30,
     rarity = SkillRarity.UNCOMMON,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {
 
     override val persistTime: Int = 15 * 20

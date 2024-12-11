@@ -3,9 +3,7 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
-import com.imoonday.advskills_re.util.UseResult
-import com.imoonday.advskills_re.util.sendPacket
-import com.imoonday.advskills_re.util.spawnParticles
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
@@ -18,16 +16,16 @@ class RisingShockSkill : Skill(
     types = listOf(SkillType.MOVEMENT),
     cooldown = 10,
     rarity = SkillRarity.RARE,
-    sound = ModSounds.DASH
+    sound = ModSounds.DASH,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), AutoStopTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.stopFallFlying()
-        user.velocityDirty = true
         user.velocity = Vec3d(0.0, max(user.velocity.y, 0.5), 0.0)
         val noGravity = user.hasNoGravity()
         user.setNoGravity(true)
-        user.sendPacket(EntityVelocityUpdateS2CPacket(user))
+        user.updateVelocity()
         return UseResult.of(user.startUsing {
             it.putBoolean("noGravity", noGravity)
         })
@@ -46,9 +44,8 @@ class RisingShockSkill : Skill(
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return
-        player.velocityDirty = true
         player.velocity = Vec3d(0.0, max(player.velocity.y, 0.5), 0.0)
-        player.sendPacket(EntityVelocityUpdateS2CPacket(player))
+        player.updateVelocity()
         player.spawnParticles(
             ParticleTypes.CLOUD,
             false,
@@ -60,9 +57,9 @@ class RisingShockSkill : Skill(
             0.1
         )
         player.world.getNonSpectatingEntities(LivingEntity::class.java, player.boundingBox.expand(1.0)).forEach {
-            it.velocityDirty = true
             it.velocity = it.velocity.withAxis(Direction.Axis.Y, max(it.velocity.y, 0.5))
-            (it as? ServerPlayerEntity)?.sendPacket(EntityVelocityUpdateS2CPacket(it))
+            it.velocityDirty = true
+            (it as? ServerPlayerEntity)?.updateVelocity()
         }
         super.serverTick(player, usedTime)
     }

@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
@@ -12,13 +13,14 @@ class GrapplingHookSkill : LongPressSkill(
     id = "grappling_hook",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 15,
-    rarity = SkillRarity.EPIC
+    rarity = SkillRarity.EPIC,
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DISTANCE)
 ), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger {
 
     override fun getMaxPressTime(): Int = 3 * 20
 
     override fun onPress(player: ServerPlayerEntity): UseResult {
-        val raycast = player.raycastBlock(MAX_DISTANCE)
+        val raycast = player.raycastBlock(getMaxDistance(player))
         return if (raycast.type == HitResult.Type.BLOCK) {
             UseResult.startUsing(player, this, NbtUtils.writeVec3dToTag(raycast.pos))
         } else {
@@ -52,20 +54,17 @@ class GrapplingHookSkill : LongPressSkill(
                     player.height.toDouble() / 2.0 + rotation.y,
                     rotation.z
                 ).subtract(pos).normalize()
-                    .multiply((distance / MAX_DISTANCE) + 1)
-                player.velocityDirty = true
+                    .multiply((distance / getMaxDistance(player)) + 1)
                 player.addVelocity((newVelocity - player.velocity).multiply(0.5))
+                player.velocityDirty = true
             }
         }
         super.tick(player, usedTime)
     }
 
     override fun getCrosshair(player: PlayerEntity): Crosshair =
-        if (player.isReady() && player.raycastBlock(MAX_DISTANCE).type == HitResult.Type.BLOCK)
+        if (player.isReady() && player.raycastBlock(getMaxDistance(player)).type == HitResult.Type.BLOCK)
             Crosshairs.RING else Crosshairs.NONE
 
-    companion object {
-
-        private const val MAX_DISTANCE = 30.0
-    }
+    fun getMaxDistance(player: PlayerEntity) = 30.0 + player.getEnhancementLvl(SkillEnhancements.DISTANCE) * 4.0
 }

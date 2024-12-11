@@ -43,6 +43,20 @@ advskills_re:
     success: '%s has removed %s from slot %d'
     failed: '%s has no equipped skill on slot %d'
     banned: '%s was banned from server'
+  enhanceSkill:
+    success: '%2$s of %1$s has obtained %d level of %s'
+    failed: '%s has not yet learned %s'
+    unknown: 'Unknown enhancement type: %s'
+    invalid: '%s cannot be applied to %s'
+    allSuccess: 'The %d enhancements has been applied to %3$s of %2$s'
+    all: 'All skills of %s have been enhanced'
+  deEnhanceSkill:
+    success: '%2$s of %1$s removed'
+    failed: '%s has not yet learned %s'
+    unknown: 'Unknown enhancement type: %s'
+    invalid: '%2$s of %1$s has not obtained %s yet'
+    allSuccess: 'All enhancements for %2$s of %1$s have been removed'
+    all: 'All enhancements has been removed from all skills of %s'
   resetCooldown: '%s reset all skills cooldown'
   reset: 'All data for %s has been reset'
   cooldown:
@@ -101,7 +115,9 @@ advskills_re:
       single: Set %d skill level on %s
       multiple: Set %d skill level on %d players
     query: "%s's skill level is level %d"
-    addChoice: You can learn a new skill
+    addChoice:
+      learn: You can learn a new skill
+      enhance: You can enhance skills
   command:
     unknown: Unknown skill ID
     invalid: Invalid skill ID
@@ -194,7 +210,7 @@ advskills_re:
       description: 'When receiving fatal damage, the HP returns to the upper limit, and then enters death mode: HP is continuously deducted, and HP can be sucked by attacking other creatures. When the HP is insufficient, you will die'
     disarm:
       name: Disarm
-      description: The next attack has a 45% chance of disarming the target
+      description: The next attack has a 45% chance to disarm the target, and there is a very small chance to capture the target's handheld item after the disarm
       success: Disarm Successful!
       failed: Disarm Failed
       disarmed: You are disarmed!
@@ -415,6 +431,11 @@ advskills_re:
     withering_touch:
       name: Withering Touch
       description: Strengthen your attacks for up to 3 hits. Each attack will apply the Wither effect to the target, lasting for 3 seconds and stacking with each hit
+    forced_growth:
+      name: Forced Growth
+      description: Has a chance to ripen surrounding crops
+      success: Successfully ripened %d crops
+      failed: No crops are ripened
   skillType:
     attack: Attack
     defense: Defense
@@ -476,14 +497,18 @@ advskills_re:
         resetCooldown: Reset Cooldown
         inventory: Inventory
         learn: Learn
-      requiredLevel: 'Next level to learn: %d'
-      learnedAll: You have learned all skills
+        enhance: Enhance
+      requiredLevel:
+        learn: 'Next level to learn: %d'
+        enhance: 'Next level to enhance: %d'
+      enhancedAll: You have learned and enhanced all skills
     slot:
       title: Left drag to move, right click to reset
       compact: Compact skill display
       config: Config
     inventory:
       title: 'Skill Inventory %d/%d'
+      enhance: 'When equipped:'
     wheel:
       cancel: Cancel
       tip: Release to select, left click to use, right click to cancel, middle click to view details, press %s to open Skill Inventory
@@ -492,6 +517,9 @@ advskills_re:
       refresh: Refresh
       learn: Learn
       count: 'Remaining Skills: %d'
+    enhance:
+      enhance: Enhance
+      count: 'Remaining Enhancements: %d'
     config:
       title: 'Advanced Skills: Remastered'
       category:
@@ -503,6 +531,7 @@ advskills_re:
       layout: Skill Slot Layout
       quickCastWheelHoldTime: Hold time for Quick Cast Wheel (ms)
       hideSkillCrosshair: Hide Skill Crosshair
+      hideSkillInfo: Hide skill information by default (Shift-display)
       invalidLayout: "Wrong input! Can only contain 1-10 and the delimiter ','"
       incompleteLayout: "Wrong input! Missing slots: %s"
       redundantNumbers: "Wrong input! Redundant numbers: %s"
@@ -510,6 +539,76 @@ advskills_re:
     generic: 'Generic Skill Slot %d'
     active: 'Active Skill Slot %d'
     passive: 'Passive Skill Slot %d'
+  skillEnhancement:
+    empty:
+      name: No Enhancement
+      description: No Effect
+    cooldown:
+      name: Cooldown Enhancement
+      description: -%d%% Cooldown
+    persistent_time:
+      name: Persistent Time Enhancement
+      description: +%d%% Persistent Time
+    charge_time:
+      name: Charge Time Enhancement
+      description: +%d%% Charge Time
+    damage:
+      name: Damage Enhancement
+      description: +%d%% Damage
+    healing_amount:
+      name: Healing Amount Enhancement
+      description: +%d%% Healing Amount
+    use_times:
+      name: Use Times Enhancement
+      description: Use Times++
+    summon_amount:
+      name: Summon Amount Enhancement
+      description: Summon Amount++
+    range:
+      name: Range Enhancement
+      description: Range++
+    distance:
+      name: Distance Enhancement
+      description: Distance++
+    effect_count:
+      name: Effect Count Enhancement
+      description: Effect Count++
+    defense_effect:
+      name: Defense Effect Enhancement
+      description: Defense Effect++
+    charge_slowdown:
+      name: Charge Slowdown Enhancement
+      description: -%d%% Charge Slowdown
+    time_up_limit:
+      name: Time Up Limit Enhancement
+      description: +%d%% Time Up Limit
+    movement_speed:
+      name: Movement Speed Enhancement
+      description: Movement Speed++
+    launch_count:
+      name: Launch Count Enhancement
+      description: Launch Count++
+    effect_value:
+      name: Effect Value Enhancement
+      description: Effect Value++
+    status_effect_duration:
+      name: Status Effect Duration Enhancement
+      description: +%d%% Status Effect Duration
+    status_effect_amplifier:
+      name: Status Effect Amplifier Enhancement
+      description: +%d Status Effect Amplifier
+    velocity:
+      name: Velocity Enhancement
+      description: Velocity++
+    power:
+      name: Power Enhancement
+      description: Power++
+    chance:
+      name: Chance Enhancement
+      description: Chance++
+    use_cost:
+      name: Use Cost Enhancement
+      description: Use Cost--
 item:
   advskills_re:
     skill_fruit: Skill Fruit

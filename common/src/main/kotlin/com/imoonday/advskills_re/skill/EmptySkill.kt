@@ -15,5 +15,5 @@ class EmptySkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.fail(Text.empty())
 
-    override fun getItemTooltips(displayName: Boolean, displayId: Boolean): List<Text> = emptyList()
+    override fun getItemTooltips(displayName: Boolean, displayId: Boolean): MutableList<Text> = mutableListOf()
 }

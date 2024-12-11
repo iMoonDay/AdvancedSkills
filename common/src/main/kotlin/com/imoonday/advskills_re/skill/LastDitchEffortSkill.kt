@@ -8,6 +8,7 @@ import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
 class LastDitchEffortSkill : Skill(
@@ -15,17 +16,24 @@ class LastDitchEffortSkill : Skill(
     types = listOf(SkillType.PASSIVE),
     cooldown = 180,
     rarity = SkillRarity.SUPERB,
-    sound = ModSounds.HEAL
+    sound = ModSounds.HEAL,
+    enhancements = setOf(
+        SkillEnhancements.PERSISTENT_TIME,
+        SkillEnhancements.MOVEMENT_SPEED,
+        SkillEnhancements.DAMAGE,
+        SkillEnhancements.HEALING_AMOUNT,
+        SkillEnhancements.USE_COST
+    )
 ), DamageTrigger, AutoStopTrigger, AttackTrigger,
     AttributeTrigger, AutoTrigger, DeathTrigger {
 
     override val persistTime: Int = 15 * 20
 
-    override fun getAttributes(): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
+    override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Last Ditch Effort"),
             "Last Ditch Effort",
-            0.4,
+            0.4 + player.getEnhancementLvl(SkillEnhancements.MOVEMENT_SPEED) * 0.06,
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -42,11 +50,11 @@ class LastDitchEffortSkill : Skill(
         source: DamageSource,
         player: ServerPlayerEntity,
         target: LivingEntity,
-    ): Float = if (!player.isUsing()) amount else amount + 1
+    ): Float = if (!player.isUsing()) amount else getEnhancedValue(player, SkillEnhancements.DAMAGE, amount + 1)
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean =
         if (player.isReady() && !player.isDead && (player.health / player.maxHealth) < 0.3f) {
-            player.health = player.maxHealth * 0.5f
+            player.health = getEnhancedValue(player, SkillEnhancements.HEALING_AMOUNT, player.maxHealth * 0.5f)
             player.playSkillSound()
             player.addAttributes()
             true
@@ -57,7 +65,8 @@ class LastDitchEffortSkill : Skill(
         source: DamageSource,
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
-    ): Float = if (!player.isUsing()) amount else amount + 1
+    ): Float = if (!player.isUsing()) amount
+    else amount + (1 - player.getEnhancementLvl(SkillEnhancements.USE_COST) * 0.2f).coerceAtLeast(0f)
 
     override fun onStop(player: ServerPlayerEntity) {
         player.startCooling()
