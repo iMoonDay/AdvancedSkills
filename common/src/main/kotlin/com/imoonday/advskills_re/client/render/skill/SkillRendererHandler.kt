@@ -140,6 +140,7 @@ object SkillRendererHandler {
         Skills.ORE_PERCEPTION.registerRenderer(OrePerceptionSkillRenderer())
         Skills.INSIGHTFUL_EYE.registerRenderer(InsightfulEyeSkillRenderer())
         Skills.SWORD_SOUL_GUARDING.registerRenderer(SwordSoulGuardingSkillRenderer())
+        Skills.SPACE_BLAST.registerRenderer(SpaceBlastSkillRenderer())
     }
 
     private fun <T> T.registerSkillAboveHeadRenderer() where T : Skill, T : UsingRenderTrigger =

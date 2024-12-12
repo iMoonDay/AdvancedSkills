@@ -51,7 +51,7 @@ object ModBlocks {
     }
 
     @JvmField
-    val FROST_TRAP_ENTITY = registerEntity("frost_trap", ::InvisibleTrapBlockEntity, FROST_TRAP)
+    val FROST_TRAP_ENTITY = registerEntity("frost_trap", ::FrostTrapBlockEntity, FROST_TRAP)
 
     private fun <T : BlockEntity> registerEntity(
         id: String,

@@ -19,13 +19,16 @@ abstract class ReflectionSkill(
     cooldown: Int,
     rarity: SkillRarity,
     duration: Int,
-    enhancements: Set<SkillEnhancementType<*>> = setOf(SkillEnhancements.PERSISTENT_TIME)
+    enhancements: Set<SkillEnhancementType<*>> = emptySet()
 ) : Skill(
     id = id,
     types = types,
     cooldown = cooldown,
     rarity = rarity,
-    enhancements = enhancements
+    enhancements = enhancements + setOf(
+        SkillEnhancements.PERSISTENT_TIME,
+        SkillEnhancements.DAMAGE
+    )
 ), DamageTrigger, ReflectionTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = duration
@@ -41,11 +44,27 @@ abstract class ReflectionSkill(
         amount: Float,
     ) {
         player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
-        attacker?.damage(player.damageSources.thorns(player), amount)?.let {
+        val damage = getEnhancedValue(player, SkillEnhancements.DAMAGE, amount)
+        attacker?.damage(player.damageSources.thorns(player), damage)?.let {
             player.sendMessage(
                 translate("reflection.${if (it) "success" else "failed"}"),
                 true
             )
+        }
+    }
+
+    protected fun ServerPlayerEntity.reflect(
+        chance: Float,
+        attacker: LivingEntity?,
+        amount: Float,
+    ): Boolean {
+        val extraChance = getEnhancementLvl(SkillEnhancements.CHANCE) * 0.05f
+        return if (random.nextFloat() < chance + extraChance) {
+            reflect(this, attacker, amount)
+            true
+        } else {
+            reflectedFailed(this)
+            false
         }
     }
 

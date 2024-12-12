@@ -16,7 +16,7 @@ import org.joml.*
 import java.lang.Math
 import kotlin.math.*
 
-class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>(), IPlayerFeatureRenderer<GrapplingHookSkill>,
+class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>, IPlayerFeatureRenderer<GrapplingHookSkill>,
     IWorldRenderer<GrapplingHookSkill> {
 
     override fun <P : PlayerEntity, M : EntityModel<P>> render(

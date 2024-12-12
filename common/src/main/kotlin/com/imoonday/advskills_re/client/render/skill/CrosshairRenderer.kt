@@ -1,13 +1,12 @@
-package com.imoonday.advskills_re.client.render.skill.special
+package com.imoonday.advskills_re.client.render.skill
 
 import com.imoonday.advskills_re.client.*
-import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.gui.*
 
-open class CrosshairRenderer<T> : ICrosshairRenderer<T> where T : Skill, T : CrosshairTrigger {
+interface CrosshairRenderer<T> : ICrosshairRenderer<T> where T : Skill, T : CrosshairTrigger {
 
     override fun render(skill: T, context: DrawContext) {
         val player = clientPlayer ?: return

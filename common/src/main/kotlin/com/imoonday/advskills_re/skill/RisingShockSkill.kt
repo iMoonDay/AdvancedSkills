@@ -18,29 +18,16 @@ class RisingShockSkill : Skill(
     rarity = SkillRarity.RARE,
     sound = ModSounds.DASH,
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
-), AutoStopTrigger {
+), AutoStopTrigger, GravityTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.stopFallFlying()
         user.velocity = Vec3d(0.0, max(user.velocity.y, 0.5), 0.0)
-        val noGravity = user.hasNoGravity()
-        user.setNoGravity(true)
         user.updateVelocity()
-        return UseResult.of(user.startUsing {
-            it.putBoolean("noGravity", noGravity)
-        })
+        return UseResult.startUsing(user, this)
     }
 
     override val persistTime: Int = 8
-
-    override fun onStop(player: ServerPlayerEntity) {
-        player.getActiveData().let {
-            if (it.contains("noGravity")) {
-                player.setNoGravity(it.getBoolean("noGravity"))
-            }
-        }
-        super.onStop(player)
-    }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return

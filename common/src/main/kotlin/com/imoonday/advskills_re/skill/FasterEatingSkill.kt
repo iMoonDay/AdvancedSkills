@@ -16,6 +16,6 @@ class FasterEatingSkill : PassiveSkill(
     override fun getItemMaxUseTimeMultiplier(player: PlayerEntity, stack: ItemStack): Float {
         val effectValue = player.getEnhancementLvl(SkillEnhancements.EFFECT_VALUE) * 0.05f
         val useAction = stack.item.getUseAction(stack)
-        return if (stack.isFood || stack.item is PotionItem || useAction == UseAction.EAT || useAction == UseAction.DRINK) -0.5f - effectValue else 0f
+        return if (stack.isFood || stack.item is PotionItem || useAction == UseAction.EAT || useAction == UseAction.DRINK) -(0.5f + effectValue).coerceAtMost(1f) else 0f
     }
 }

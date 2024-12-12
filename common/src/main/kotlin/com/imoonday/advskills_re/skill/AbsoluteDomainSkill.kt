@@ -5,11 +5,9 @@ import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
-import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
-import net.minecraft.text.*
 
 class AbsoluteDomainSkill : Skill(
     id = "absolute_domain",

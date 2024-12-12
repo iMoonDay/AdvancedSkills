@@ -28,7 +28,12 @@ class FrostTrapBlock(settings: Settings) : SnowBlock(settings), BlockEntityProvi
         if (entity is PlayerEntity && (entity.isCreative || entity.isSpectator)) return
         val blockEntity = world.getBlockEntity(pos)
         if (blockEntity is FrostTrapBlockEntity && entity.uuid != blockEntity.placer) {
-            entity.addStatusEffect(StatusEffectInstance(ModEffects.FREEZE.get(), 10 * state.get(LAYERS)))
+            entity.addStatusEffect(
+                StatusEffectInstance(
+                    ModEffects.FREEZE.get(),
+                    blockEntity.duration * state.get(LAYERS)
+                )
+            )
             world.breakBlock(pos, false)
         }
     }
@@ -59,6 +64,7 @@ class FrostTrapBlock(settings: Settings) : SnowBlock(settings), BlockEntityProvi
         val entity = world.getBlockEntity(pos)
         if (entity is FrostTrapBlockEntity) {
             entity.placer = placer?.uuid
+            entity.markDirty()
         }
     }
 }

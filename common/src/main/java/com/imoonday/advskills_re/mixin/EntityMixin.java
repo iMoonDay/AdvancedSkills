@@ -29,9 +29,12 @@ public abstract class EntityMixin implements Propertied, ICollisionRecorder {
     @Shadow
     private float stepHeight;
 
-    @Shadow public boolean horizontalCollision;
-    @Shadow public boolean verticalCollision;
-    @Shadow public boolean groundCollision;
+    @Shadow
+    public boolean horizontalCollision;
+    @Shadow
+    public boolean verticalCollision;
+    @Shadow
+    public boolean groundCollision;
     @Unique
     private EntityPropertyComponent propertyComponent;
     @Unique
@@ -174,6 +177,13 @@ public abstract class EntityMixin implements Propertied, ICollisionRecorder {
             if (SkillTriggerHandler.ignoreLava(player)) {
                 cir.setReturnValue(false);
             }
+        }
+    }
+
+    @Inject(method = "hasNoGravity", at = @At("HEAD"), cancellable = true)
+    private void advskills_re$hasNoGravity(CallbackInfoReturnable<Boolean> cir) {
+        if ((Entity) (Object) this instanceof PlayerEntity player && SkillTriggerHandler.shouldIgnoreGravity(player)) {
+            cir.setReturnValue(true);
         }
     }
 

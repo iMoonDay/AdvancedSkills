@@ -289,6 +289,9 @@ object Skills {
 
     @JvmField
     val FORCED_GROWTH = register(ForcedGrowthSkill())
+    
+    @JvmField
+    val SPACE_BLAST = register(SpaceBlastSkill())
 
     fun init() = Unit
 

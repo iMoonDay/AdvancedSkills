@@ -104,7 +104,7 @@ fun PlayerEntity.startCooling(skill: Skill, cooldown: Int? = null) {
 private fun PlayerEntity.cooldown(skill: Skill, cooldown: Int? = null) {
     modifySkillData(skill) {
         var time = skill.applyCooldownEnhancements(this, cooldown ?: skill.cooldown)
-        forEachTrigger<CooldownTrigger> { trigger -> time = trigger.getCooldown(time) }
+        forEachTrigger<CooldownTrigger> { trigger -> time = trigger.getCooldown(this, time) }
         it.cooldown = (if (isCreative) min(20, time) else time).coerceAtLeast(0)
         true
     }

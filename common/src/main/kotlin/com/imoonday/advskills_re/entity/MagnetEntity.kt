@@ -1,6 +1,8 @@
 package com.imoonday.advskills_re.entity
 
 import com.imoonday.advskills_re.init.*
+import dev.architectury.extensions.network.*
+import dev.architectury.networking.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.damage.*
@@ -9,9 +11,9 @@ import net.minecraft.entity.effect.*
 import net.minecraft.entity.player.*
 import net.minecraft.item.*
 import net.minecraft.nbt.*
+import net.minecraft.network.*
 import net.minecraft.network.listener.*
 import net.minecraft.network.packet.*
-import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.registry.tag.*
 import net.minecraft.server.world.*
@@ -21,7 +23,8 @@ import net.minecraft.world.*
 import java.util.*
 import kotlin.math.*
 
-class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : LivingEntity(entityType, world) {
+class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : LivingEntity(entityType, world),
+    EntitySpawnExtension {
 
     init {
         noClip = true
@@ -49,6 +52,9 @@ class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : Liv
     var radius: Float
         get() = dataTracker.get(RADIUS)
         set(value) = dataTracker.set(RADIUS, value)
+    var maxAge: Int
+        get() = dataTracker.get(MAX_AGE)
+        set(value) = dataTracker.set(MAX_AGE, value)
 
     constructor(world: World, pos: Vec3d, owner: Entity) : this(ModEntities.MAGNET.get(), world) {
         refreshPositionAndAngles(pos.x, pos.y, pos.z, yaw, pitch)
@@ -58,6 +64,7 @@ class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : Liv
     override fun initDataTracker() {
         super.initDataTracker()
         dataTracker.startTracking(RADIUS, 3.0f)
+        dataTracker.startTracking(MAX_AGE, 20 * 60 * 5)
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
@@ -69,6 +76,9 @@ class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : Liv
         if (nbt.contains("Radius")) {
             this.radius = nbt.getFloat("Radius")
         }
+        if (nbt.contains("MaxAge")) {
+            this.maxAge = nbt.getInt("MaxAge")
+        }
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
@@ -77,23 +87,26 @@ class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : Liv
             nbt.putUuid("Owner", ownerUuid)
         }
         nbt.putFloat("Radius", radius)
+        nbt.putInt("MaxAge", maxAge)
     }
 
     override fun tick() {
         super.tick()
+        if (!world.isClient && age > maxAge) {
+            discard()
+            return
+        }
         world.getOtherEntities(
             this,
             boundingBox.expand(radius.toDouble(), 1.5, radius.toDouble())
         ) {
-            it.isLiving && it.isAlive && !it.isSpectator && !it.isSneaking && it != owner && (it !is Ownable || it.owner != it)
+            it.isLiving && it.isAlive && !it.isSpectator && !it.isSneaking && it != owner && it.uuid != ownerUuid && (it !is Ownable || it.owner != it)
         }.map { it as LivingEntity }.forEach {
-            if (age % 20 == 0 || !it.hasStatusEffect(StatusEffects.SLOWNESS)) it.addStatusEffect(
-                StatusEffectInstance(
-                    StatusEffects.SLOWNESS,
-                    21,
-                    2
+            if (age % 20 == 0 || !it.hasStatusEffect(StatusEffects.SLOWNESS)) {
+                it.addStatusEffect(
+                    StatusEffectInstance(StatusEffects.SLOWNESS, 21, 2)
                 )
-            )
+            }
             it.addVelocity(pos.subtract(it.pos).normalize().multiply(0.025))
             it.velocityDirty = true
         }
@@ -133,12 +146,7 @@ class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : Liv
 
     override fun getMainArm(): Arm = Arm.RIGHT
 
-    override fun createSpawnPacket(): Packet<ClientPlayPacketListener> = EntitySpawnS2CPacket(this, owner?.id ?: 0)
-
-    override fun onSpawnPacket(packet: EntitySpawnS2CPacket) {
-        super.onSpawnPacket(packet)
-        owner = world.getEntityById(packet.entityData)
-    }
+    override fun createSpawnPacket(): Packet<ClientPlayPacketListener> = NetworkManager.createAddEntityPacket(this)
 
     override fun interact(player: PlayerEntity, hand: Hand): ActionResult {
         if (player.uuid == ownerUuid && player.isSneaking) {
@@ -153,6 +161,9 @@ class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : Liv
         val RADIUS: TrackedData<Float> =
             DataTracker.registerData(MagnetEntity::class.java, TrackedDataHandlerRegistry.FLOAT)
 
+        val MAX_AGE: TrackedData<Int> =
+            DataTracker.registerData(MagnetEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
+
         fun createLivingAttributes(): DefaultAttributeContainer.Builder =
             DefaultAttributeContainer.builder()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 10.0)
@@ -160,5 +171,16 @@ class MagnetEntity(entityType: EntityType<out MagnetEntity>, world: World) : Liv
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.0)
                 .add(EntityAttributes.GENERIC_ARMOR)
                 .add(EntityAttributes.GENERIC_ARMOR_TOUGHNESS)
+    }
+
+    override fun saveAdditionalSpawnData(buf: PacketByteBuf) {
+        buf.writeInt(owner?.id ?: 0)
+        buf.writeUuid(ownerUuid)
+    }
+
+    override fun loadAdditionalSpawnData(buf: PacketByteBuf) {
+        val entityId = buf.readInt()
+        ownerUuid = buf.readUuid()
+        owner = world.getEntityById(entityId)
     }
 }

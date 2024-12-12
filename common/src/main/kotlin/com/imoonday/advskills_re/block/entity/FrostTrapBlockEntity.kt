@@ -11,13 +11,21 @@ class FrostTrapBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(ModBlocks.FROST_TRAP_ENTITY.get(), pos, state) {
 
     var placer: UUID? = null
-    override fun writeNbt(nbt: NbtCompound?) {
+    var duration: Int = 10
+
+    override fun writeNbt(nbt: NbtCompound) {
         super.writeNbt(nbt)
-        if (placer != null) nbt?.putUuid("placer", placer)
+        if (placer != null) nbt.putUuid("placer", placer)
+        nbt.putInt("duration", duration)
     }
 
-    override fun readNbt(nbt: NbtCompound?) {
+    override fun readNbt(nbt: NbtCompound) {
         super.readNbt(nbt)
-        placer = nbt?.getUuid("placer")
+        if (nbt.containsUuid("placer")) {
+            placer = nbt.getUuid("placer")
+        }
+        if (nbt.contains("duration")) {
+            duration = nbt.getInt("duration")
+        }
     }
 }

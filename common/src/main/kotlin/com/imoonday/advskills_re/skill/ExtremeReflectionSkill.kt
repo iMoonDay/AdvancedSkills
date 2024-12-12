@@ -23,13 +23,6 @@ class ExtremeReflectionSkill : ReflectionSkill(
         if (!player.isUsing()) return false
         player.stopUsing()
         player.stopCooling()
-        val extraChance = player.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.05f
-        return if (player.random.nextFloat() < 0.75f + extraChance) {
-            reflect(player, attacker as? LivingEntity, amount)
-            true
-        } else {
-            reflectedFailed(player)
-            false
-        }
+        return player.reflect(0.75f, attacker as? LivingEntity, amount)
     }
 }

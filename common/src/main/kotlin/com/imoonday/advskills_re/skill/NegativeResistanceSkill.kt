@@ -7,20 +7,25 @@ import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.effect.*
 import net.minecraft.entity.player.*
+import net.minecraft.nbt.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
+
+private const val REMAINING_EFFECTS = "RemainingEffects"
 
 class NegativeResistanceSkill : Skill(
     id = "negative_resistance",
     types = listOf(SkillType.ENHANCEMENT),
     cooldown = 30,
     rarity = SkillRarity.SUPERB,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.EFFECT_COUNT)
 ), AutoStopTrigger, StatusEffectTrigger, UsingRenderTrigger {
 
     override val persistTime: Int = 5 * 20
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {
+        putInt(REMAINING_EFFECTS, user.getEnhancementLvl(SkillEnhancements.EFFECT_COUNT))
+    })
 
     override fun cannotHaveStatusEffect(player: PlayerEntity, effect: StatusEffectInstance): Boolean =
         if (player.isUsing() && !effect.effectType.isBeneficial) {
@@ -31,7 +36,14 @@ class NegativeResistanceSkill : Skill(
                     false, it.centerPos, 10,
                     0.5, 0.5, 0.5, 0.1
                 )
-                it.stopAndCooldown()
+
+                val data = it.getActiveData()
+                val remaining = data.getInt(REMAINING_EFFECTS)
+                if (remaining <= 0) {
+                    it.stopAndCooldown()
+                } else {
+                    data.putInt(REMAINING_EFFECTS, remaining - 1)
+                }
             }
             true
         } else false

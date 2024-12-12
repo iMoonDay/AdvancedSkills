@@ -209,4 +209,8 @@ object SkillTriggerHandler {
     @JvmStatic
     fun shouldHaveStatusEffect(player: PlayerEntity, effect: StatusEffect): Boolean =
         player.anyTrigger<StatusEffectTrigger> { it.shouldHaveStatusEffect(player, effect) }
+
+    @JvmStatic
+    fun shouldIgnoreGravity(player: PlayerEntity): Boolean =
+        player.anyTrigger<GravityTrigger> { it.shouldIgnoreGravity(player) }
 }

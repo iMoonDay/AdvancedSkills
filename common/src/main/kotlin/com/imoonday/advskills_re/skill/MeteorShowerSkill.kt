@@ -17,7 +17,14 @@ class MeteorShowerSkill : LongPressSkill(
     types = listOf(SkillType.ATTACK, SkillType.DESTRUCTION),
     cooldown = 120,
     rarity = SkillRarity.MYTHIC,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.CHARGE_SLOWDOWN)
+    enhancements = setOf(
+        SkillEnhancements.CHARGE_TIME,
+        SkillEnhancements.CHARGE_SLOWDOWN,
+        SkillEnhancements.SUMMON_AMOUNT,
+        SkillEnhancements.RANGE,
+        SkillEnhancements.POWER,
+        SkillEnhancements.VELOCITY
+    )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
     override fun getMaxPressTime(): Int = 10 * 20
@@ -45,13 +52,22 @@ class MeteorShowerSkill : LongPressSkill(
         }
         val targetPos = player.raycast(512.0, 0f, false).pos
         val random = player.random
-        for (i in 0 until (5..10).random()) {
-            val x = targetPos.x + random.nextDouble() * 20 - 10
-            val z = targetPos.z + random.nextDouble() * 20 - 10
-            val r = random.nextFloat() + 0.5f
+        val extraAmount = player.getEnhancementLvl(SkillEnhancements.SUMMON_AMOUNT)
+        val amount = (5..10).random() + extraAmount * 2
+        val range = 10 + player.getEnhancementLvl(SkillEnhancements.RANGE) * 2
+        val radiusMultiplier = 1f + player.getEnhancementLvl(SkillEnhancements.POWER) * 0.2f
+        val velocityMultiplier = 1.0 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.2
+        for (i in 0 until amount) {
+            val x = targetPos.x + random.nextDouble() * range * 2 - range
+            val z = targetPos.z + random.nextDouble() * range * 2 - range
+            val r = (random.nextFloat() + 0.5f) * radiusMultiplier
             player.world.spawnEntity(
                 MeteoriteEntity(player.world, Vec3d(x, player.world.topY + r * 2.0, z), r, player).apply {
-                    velocity = Vec3d(random.nextDouble() * 0.2 - 0.1, -2.0, random.nextDouble() * 0.2 - 0.1)
+                    velocity = Vec3d(
+                        random.nextDouble() * 0.2 - 0.1,
+                        -2.0 * velocityMultiplier,
+                        random.nextDouble() * 0.2 - 0.1
+                    )
                 }
             )
         }

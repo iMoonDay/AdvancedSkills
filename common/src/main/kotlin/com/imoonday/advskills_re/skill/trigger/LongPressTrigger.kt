@@ -31,5 +31,9 @@ interface LongPressTrigger : TickTrigger, AutoStopTrigger {
         super.onStop(player)
     }
 
-    override fun getProgress(player: PlayerEntity): Double = 1.0 - super.getProgress(player)
+    override fun getProgress(player: PlayerEntity): Double = (1.0 - super.getProgress(player)).coerceIn(0.0, 1.0)
+
+    fun alwaysKeepCharging(player: PlayerEntity): Boolean = false
+
+    override fun canAutoStop(player: PlayerEntity): Boolean = !alwaysKeepCharging(player) && super.canAutoStop(player)
 }

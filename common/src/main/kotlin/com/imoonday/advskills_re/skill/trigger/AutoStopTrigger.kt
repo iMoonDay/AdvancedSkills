@@ -36,13 +36,15 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
-        if (usedTime >= getModifiedPersistTime(player)) {
+        if (canAutoStop(player) && usedTime >= getModifiedPersistTime(player)) {
             onStop(player)
             player.stopUsing()
         }
     }
 
     fun onStop(player: ServerPlayerEntity) = Unit
+
+    fun canAutoStop(player: PlayerEntity): Boolean = true
 
     override fun getProgress(player: PlayerEntity): Double {
         val time = getModifiedPersistTime(player)

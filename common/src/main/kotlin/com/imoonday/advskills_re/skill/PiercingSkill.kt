@@ -16,19 +16,16 @@ class PiercingSkill : Skill(
     cooldown = 15,
     rarity = SkillRarity.SUPERB,
     sound = ModSounds.PIERCING,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
-), AutoStopTrigger, DangerTrigger {
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DAMAGE, SkillEnhancements.VELOCITY)
+), AutoStopTrigger, DangerTrigger, GravityTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.stopFallFlying()
         user.velocity = user.horizontalRotationVector.normalize().multiply(1.5, 0.0, 1.5)
-        val noGravity = user.hasNoGravity()
-        user.setNoGravity(true)
         user.updateVelocity()
         return UseResult.of(user.startUsing {
             it.putDouble("x", user.velocity.x)
             it.putDouble("z", user.velocity.z)
-            it.putBoolean("noGravity", noGravity)
         })
     }
 
@@ -36,11 +33,6 @@ class PiercingSkill : Skill(
 
     override fun onStop(player: ServerPlayerEntity) {
         player.velocity = Vec3d.ZERO
-        player.getActiveData().let {
-            if (it.contains("noGravity")) {
-                player.setNoGravity(it.getBoolean("noGravity"))
-            }
-        }
         player.updateVelocity()
         super.onStop(player)
     }
@@ -58,11 +50,13 @@ class PiercingSkill : Skill(
                 player.updateVelocity()
             }
         }
+        val damage = getEnhancedValue(player, SkillEnhancements.DAMAGE, 6.0f)
+        val velocity = 1.5 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1
         player.world.getNonSpectatingEntities(
             LivingEntity::class.java, player.boundingBox
         ).filterNot { it === player }.forEach {
-            it.damage(player.damageSources.playerAttack(player), 6.0f)
-            it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(1.5).withAxis(Direction.Axis.Y, 1.0))
+            it.damage(player.damageSources.playerAttack(player), damage)
+            it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(velocity).withAxis(Direction.Axis.Y, 1.0))
             it.velocityDirty = true
             (it as? ServerPlayerEntity)?.updateVelocity()
         }

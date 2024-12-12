@@ -43,7 +43,7 @@ class InvisibleTrapBlock(settings: Settings) : BlockWithEntity(settings), Waterl
         val blockEntity = world.getBlockEntity(pos)
         if (blockEntity is InvisibleTrapBlockEntity && entity.uuid != blockEntity.placer) {
             entity.slowMovement(state, Vec3d(0.25, 1.0, 0.25))
-            entity.damage(world.damageSources.magic(), 2.0f)
+            entity.damage(world.damageSources.magic(), blockEntity.damage)
             world.breakBlock(pos, false)
         }
     }
@@ -72,6 +72,7 @@ class InvisibleTrapBlock(settings: Settings) : BlockWithEntity(settings), Waterl
         val entity = world.getBlockEntity(pos)
         if (entity is InvisibleTrapBlockEntity) {
             entity.placer = placer?.uuid
+            entity.markDirty()
         }
     }
 

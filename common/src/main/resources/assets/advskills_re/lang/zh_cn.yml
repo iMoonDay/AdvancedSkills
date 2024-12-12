@@ -436,6 +436,9 @@ advskills_re:
       description: 有概率催熟周围农作物
       success: 成功催熟了 %d 个农作物
       failed: 没有催熟任何农作物
+    space_blast:
+      name: 空间爆破
+      description: 在前方的区域产生爆炸，摧毁全部方块，并对区域内的生物造成大量伤害
   skillType:
     attack: 攻击
     defense: 防御

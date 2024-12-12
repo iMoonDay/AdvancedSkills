@@ -525,8 +525,12 @@ object Renderer3d {
     fun renderVisibleFaces(
         stack: MatrixStack,
         blocks: List<BlockRenderInfo>,
-        fill: Boolean = true
+        fill: Boolean = true,
+        outline: Boolean = true,
+        disableCull: Boolean = true,
     ) {
+        if (blocks.isEmpty() || !fill && !outline) return
+
         val matrix = stack.peek().positionMatrix
 
         val blockWithFaces = mutableMapOf<BlockPos, MutableSet<Direction>>()
@@ -542,7 +546,9 @@ object Renderer3d {
         }
 
         if (fill) {
-            RenderSystem.disableCull()
+            if (disableCull) {
+                RenderSystem.disableCull()
+            }
             useBuffer(
                 VertexFormat.DrawMode.QUADS,
                 VertexFormats.POSITION_COLOR,
@@ -568,27 +574,32 @@ object Renderer3d {
             }
         }
 
-        useBuffer(
-            VertexFormat.DrawMode.DEBUG_LINES,
-            VertexFormats.POSITION_COLOR,
-            GameRenderer::getPositionColorProgram
-        ) { buffer ->
-            blocks.forEach { block ->
-                val faces = blockWithFaces[block.pos] ?: return@forEach
-                val start = transformVec3d(block.start)
-                val end = transformVec3d(block.end)
-                drawCubeOutline(
-                    buffer,
-                    matrix,
-                    start.x.toFloat(),
-                    start.y.toFloat(),
-                    start.z.toFloat(),
-                    end.x.toFloat(),
-                    end.y.toFloat(),
-                    end.z.toFloat(),
-                    getColor(block.colorOutline),
-                    faces
-                )
+        if (outline) {
+            if (disableCull) {
+                RenderSystem.disableCull()
+            }
+            useBuffer(
+                VertexFormat.DrawMode.DEBUG_LINES,
+                VertexFormats.POSITION_COLOR,
+                GameRenderer::getPositionColorProgram
+            ) { buffer ->
+                blocks.forEach { block ->
+                    val faces = blockWithFaces[block.pos] ?: return@forEach
+                    val start = transformVec3d(block.start)
+                    val end = transformVec3d(block.end)
+                    drawCubeOutline(
+                        buffer,
+                        matrix,
+                        start.x.toFloat(),
+                        start.y.toFloat(),
+                        start.z.toFloat(),
+                        end.x.toFloat(),
+                        end.y.toFloat(),
+                        end.z.toFloat(),
+                        getColor(block.colorOutline),
+                        faces
+                    )
+                }
             }
         }
     }

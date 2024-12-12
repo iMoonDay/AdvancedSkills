@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
@@ -9,7 +10,8 @@ class MicroReflectionSkill : ReflectionSkill(
     id = "micro_reflection",
     cooldown = 6,
     rarity = SkillRarity.RARE,
-    duration = 20
+    duration = 20,
+    enhancements = setOf(SkillEnhancements.CHANCE, SkillEnhancements.DEFENSE_EFFECT)
 ) {
 
     override fun onDamaged(
@@ -20,11 +22,7 @@ class MicroReflectionSkill : ReflectionSkill(
     ): Float {
         if (!player.isUsing()) return amount
         player.stopUsing()
-        if (player.random.nextFloat() < 0.25f) {
-            reflect(player, attacker, amount / 2)
-        } else {
-            reflectedFailed(player)
-        }
-        return amount * 0.75f
+        player.reflect(0.25f, attacker, amount / 2)
+        return amount * (0.75f - player.getEnhancementLvl(SkillEnhancements.DEFENSE_EFFECT) * 0.05f).coerceAtLeast(0f)
     }
 }

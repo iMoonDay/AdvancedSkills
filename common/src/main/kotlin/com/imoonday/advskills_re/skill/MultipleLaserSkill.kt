@@ -20,15 +20,16 @@ class MultipleLaserSkill : LongPressSkill(
     cooldown = 45,
     rarity = SkillRarity.LEGENDARY,
     sound = ModSounds.LASER,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DAMAGE, SkillEnhancements.DISTANCE)
 ), DangerTrigger {
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (!player.isUsing()) return
         val cameraPos = player.getCameraPosVec(0f)
-        val maxDistance = player.raycastVisualBlock(64.0).let {
-            (if (it.type == HitResult.Type.MISS) 64.0 else it.pos.distanceTo(cameraPos))
+        val distance = getMaxDistance(player)
+        val maxDistance = player.raycastVisualBlock(distance).let {
+            (if (it.type == HitResult.Type.MISS) distance else it.pos.distanceTo(cameraPos))
         }
         if (usedTime % 4 == 0) {
             player.playSkillSound()
@@ -47,7 +48,8 @@ class MultipleLaserSkill : LongPressSkill(
                     entities.add(it.entity as LivingEntity)
                 } ?: break
             }
-            entities.forEach { it.damage(player.damageSources.magic(), 2f) }
+            val damage = getEnhancedValue(player, SkillEnhancements.DAMAGE, 2f)
+            entities.forEach { it.damage(player.damageSources.magic(), damage) }
         }
     }
 
@@ -56,7 +58,7 @@ class MultipleLaserSkill : LongPressSkill(
         if (!player.isUsing()) return
         if (usedTime % 2 != 0) return
         val start = player.centerPos
-        val length = player.raycastVisualBlock(64.0).pos.distanceTo(start)
+        val length = player.raycastVisualBlock(getMaxDistance(player)).pos.distanceTo(start)
         val color = Vector3f(0f, 1f, 0f)
         var offset = 0.1
         val world = player.world
@@ -71,6 +73,9 @@ class MultipleLaserSkill : LongPressSkill(
             offset += 0.1
         }
     }
+
+    private fun getMaxDistance(player: PlayerEntity): Double =
+        64.0 * (1 + player.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.2)
 
     override fun getMaxPressTime(): Int = 10 * 20
 

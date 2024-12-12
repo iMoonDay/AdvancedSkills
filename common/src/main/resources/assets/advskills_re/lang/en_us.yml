@@ -436,6 +436,9 @@ advskills_re:
       description: Has a chance to ripen surrounding crops
       success: Successfully ripened %d crops
       failed: No crops are ripened
+    space_blast:
+      name: Space Blast
+      description: Creates an explosion in the area ahead, destroying all blocks and causing a large amount of damage to creatures in the area
   skillType:
     attack: Attack
     defense: Defense
