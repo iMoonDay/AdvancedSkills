@@ -63,7 +63,7 @@ object SkillEnhancements {
     val STATUS_EFFECT_DURATION = register("status_effect_duration", FixedValueEnhancement.createFactory(1.0))
 
     @JvmStatic
-    val STATUS_EFFECT_AMPLIFIER = register("status_effect_amplifier", IncrementEnhancement.createFactory(1.0))
+    val STATUS_EFFECT_AMPLIFIER = register("status_effect_amplifier", ::SkillEnhancement)
 
     @JvmStatic
     val VELOCITY = register("velocity", ::SkillEnhancement)
@@ -76,6 +76,9 @@ object SkillEnhancements {
 
     @JvmStatic
     val USE_COST = register("use_cost", ::SkillEnhancement)
+
+    @JvmStatic
+    val EFFECT_FREQUENCY = register("effect_frequency", ::SkillEnhancement)
 
     fun init() = Unit
 

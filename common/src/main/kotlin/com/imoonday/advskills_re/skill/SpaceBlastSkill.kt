@@ -7,17 +7,21 @@ import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
+import net.minecraft.block.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.player.*
+import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.particle.*
 import net.minecraft.server.network.*
+import net.minecraft.sound.*
 import net.minecraft.util.math.*
 import net.minecraft.world.*
 
 class SpaceBlastSkill : LongPressSkill(
     id = "space_blast",
     types = listOf(SkillType.DESTRUCTION, SkillType.ATTACK),
-    cooldown = 45,
+    cooldown = 60,
     rarity = SkillRarity.MYTHIC,
     enhancements = setOf(
         SkillEnhancements.RANGE,
@@ -41,19 +45,31 @@ class SpaceBlastSkill : LongPressSkill(
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         val world = player.world
-        forEachBlock(player, {
-            val state = world.getBlockState(it)
-            !state.isAir && state.getHardness(world, it) >= 0
-        }) {
-            world.breakBlock(it, false, player)
+        val center = getTargetCenter(player)
+        val damage = getDamage(player)
+
+        player.world.playSound(null, center, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS)
+
+        val particles: MutableList<ParticleS2CPacket> = mutableListOf()
+
+        forEachEntity<Entity>(player) {
+            it.damage(player.damageSources.explosion(player, player), damage)
+            particles.add(createParticlePacket(it.centerPos))
         }
 
-        val damage = getDamage(player)
-        val center = getTargetCenter(player).toCenterPos()
-        forEachEntity<LivingEntity>(player) {
-            player.sendMessage("${it.displayName.string}: ${center.distanceTo(it.pos)}".toText())
-            it.damage(player.damageSources.explosion(player, player), damage)
+        forEachBlock(player, {
+            val state = world.getBlockState(it)
+            (!state.isAir || !state.fluidState.isEmpty) && state.getHardness(world, it) >= 0
+        }) {
+            world.breakBlock(it, false, player)
+            if (!world.getFluidState(it).isEmpty) {
+                world.setBlockState(it, Blocks.AIR.defaultState)
+            }
+            particles.add(createParticlePacket(it.toCenterPos()))
         }
+
+        player.serverWorld.players.forEach { it.sendPacket(BundleS2CPacket(particles)) }
+
         player.stopAndCooldown()
         return UseResult.success()
     }
@@ -64,7 +80,7 @@ class SpaceBlastSkill : LongPressSkill(
     override fun alwaysKeepCharging(player: PlayerEntity): Boolean = true
 
     override fun isGlowing(entity: Entity, clientPlayer: PlayerEntity): Boolean =
-        clientPlayer.isUsing() && entity !== clientPlayer && getEntityStream<LivingEntity>(clientPlayer).contains(entity)
+        clientPlayer.isUsing() && entity !== clientPlayer && getEntityStream<Entity>(clientPlayer).contains(entity)
 
     fun getTargetCenter(player: PlayerEntity): BlockPos =
         player.raycastBlock(
@@ -95,13 +111,18 @@ class SpaceBlastSkill : LongPressSkill(
         }
     }
 
+    fun createParticlePacket(pos: Vec3d): ParticleS2CPacket = ParticleS2CPacket(
+        ParticleTypes.EXPLOSION,
+        false, pos.x, pos.y, pos.z,
+        0f, 0f, 0f, 0f, 1
+    )
+
     inline fun <reified T : Entity> forEachEntity(
         player: PlayerEntity,
         filter: (T) -> Boolean = { true },
         action: (T) -> Unit
     ) = getEntityStream<T>(player, filter).forEach(action)
 
-    // TODO: 目标中心与实际不符
     inline fun <reified T : Entity> getEntityStream(
         player: PlayerEntity,
         filter: (T) -> Boolean = { true }

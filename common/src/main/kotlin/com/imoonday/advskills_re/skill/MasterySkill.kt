@@ -16,5 +16,7 @@ class MasterySkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
-    override fun getCooldown(player: PlayerEntity, original: Int): Int = (original * (0.8 - player.getEnhancementLvl(SkillEnhancements.EFFECT_VALUE) * 0.06).coerceAtLeast(0.2)).toInt()
+    override fun getCooldown(player: PlayerEntity, original: Int): Int = (original * (0.8 - player.getEnhancementLvl(
+        SkillEnhancements.EFFECT_VALUE
+    ) * 0.06).coerceAtLeast(0.2)).toInt()
 }

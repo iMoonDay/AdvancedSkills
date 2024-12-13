@@ -16,6 +16,10 @@ class ArmorShattererSkill : Skill(
     enhancements = setOf(SkillEnhancements.LAUNCH_COUNT)
 ), SpecialStateRenderTrigger {
 
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.LAUNCH_COUNT) { it.level }
+    }
+
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             val count = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)

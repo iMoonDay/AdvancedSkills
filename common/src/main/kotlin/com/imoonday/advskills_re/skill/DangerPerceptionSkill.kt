@@ -29,6 +29,11 @@ class DangerPerceptionSkill : Skill(
 
     override val persistTime: Int = 2 * 20
 
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.MOVEMENT_SPEED) { it.level * 6 }
+        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level * 0.4 }
+    }
+
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

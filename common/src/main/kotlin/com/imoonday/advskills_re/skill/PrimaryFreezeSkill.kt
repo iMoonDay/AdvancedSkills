@@ -13,25 +13,34 @@ class PrimaryFreezeSkill : Skill(
     types = listOf(SkillType.CONTROL),
     cooldown = 8,
     rarity = SkillRarity.SUPERB,
-    sound = ModSounds.FIRE
+    sound = ModSounds.FIRE,
+    enhancements = setOf(
+        SkillEnhancements.RANGE,
+        SkillEnhancements.LAUNCH_COUNT
+    )
 ), SpecialStateRenderTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        user.run {
-            val rotation = rotationVector.normalize().multiply(1.5)
-            world.spawnEntity(
-                FreezeEnergyBallEntity(
-                    this,
-                    rotationVector.x,
-                    rotationVector.y,
-                    rotationVector.z,
-                    world
-                ).apply {
-                    setPosition(x + rotation.x, eyeY, z + rotation.z)
-                }
-            )
-        }
+        val extraRange = user.getEnhancementLvl(SkillEnhancements.RANGE)
+        val times = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
+        user.executeAndAddTask(5, times) { user.spawnEnergyBall(extraRange) }
         return UseResult.success()
+    }
+
+    private fun ServerPlayerEntity.spawnEnergyBall(extraRange: Int): Boolean {
+        val rotation = rotationVector.normalize().multiply(1.5)
+        return world.spawnEntity(
+            FreezeEnergyBallEntity(
+                this,
+                rotationVector.x,
+                rotationVector.y,
+                rotationVector.z,
+                world
+            ).apply {
+                setPosition(x + rotation.x, eyeY, z + rotation.z)
+                range += extraRange
+            }
+        )
     }
 
     override fun isInSpecialState(player: PlayerEntity): Boolean = player.isForceFrozen

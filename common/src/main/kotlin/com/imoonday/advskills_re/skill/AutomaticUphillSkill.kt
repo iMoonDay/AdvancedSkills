@@ -14,6 +14,10 @@ class AutomaticUphillSkill : PassiveSkill(
     enhancements = setOf(SkillEnhancements.EFFECT_VALUE)
 ), StepHeightTrigger, PersistentTrigger {
 
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.EFFECT_VALUE) { it.level * 0.5f }
+    }
+
     override fun getStepHeight(player: PlayerEntity): Float? =
         if (player.isUsing()) 1.0f + player.getEnhancementLvl(SkillEnhancements.EFFECT_VALUE) * 0.5f else null
 

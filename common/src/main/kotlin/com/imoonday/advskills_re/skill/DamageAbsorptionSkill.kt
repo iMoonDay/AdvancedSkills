@@ -21,6 +21,10 @@ class DamageAbsorptionSkill : Skill(
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.EFFECT_COUNT)
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
 
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.EFFECT_COUNT) { it.level }
+    }
+
     override val persistTime: Int = 15 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {

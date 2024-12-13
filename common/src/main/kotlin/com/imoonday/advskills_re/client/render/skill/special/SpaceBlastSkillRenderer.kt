@@ -26,7 +26,7 @@ class SpaceBlastSkillRenderer : IWorldRenderer<SpaceBlastSkill> {
             val state = world.getBlockState(it)
             val start = Vec3d.of(it)
             val end = start + 1.0
-            if (!state.isAir && state.getHardness(world, it) >= 0.0) {
+            if ((!state.isAir || !state.fluidState.isEmpty) && state.getHardness(world, it) >= 0.0) {
                 breakableBlocks.add(Renderer3d.BlockRenderInfo(it, start, end, color, color))
             } else {
                 blocks.add(Renderer3d.BlockRenderInfo(it, start, end, white, white))

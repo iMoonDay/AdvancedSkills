@@ -10,6 +10,7 @@ import net.minecraft.enchantment.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.player.*
+import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.util.*
@@ -27,6 +28,10 @@ class ChargedSweepSkill : LongPressSkill(
         SkillEnhancements.DAMAGE
     )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
+
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level }
+    }
 
     override fun getMaxPressTime(): Int = 3 * 20
 
@@ -54,16 +59,16 @@ class ChargedSweepSkill : LongPressSkill(
         val baseDamage = player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
         val multiplier = pressedTime.toFloat() / getModifiedPersistTime(player) * 2
         val stack = player.mainHandStack
-        player.world.getNonSpectatingEntities(
-            LivingEntity::class.java, player.boundingBox.expand(5.0 + range)
-        ).filter {
-            it !== player
-                && (it.boundingBox.maxY >= player.boundingBox.minY
-                && it.boundingBox.maxY <= player.boundingBox.maxY
-                || it.boundingBox.minY <= player.boundingBox.maxY
-                && it.boundingBox.minY >= player.boundingBox.minY)
+        player.world.getOtherEntities(
+            player, player.boundingBox.expand(5.0 + range)
+        ) {
+            it is LivingEntity &&
+                (it.boundingBox.maxY >= player.boundingBox.minY
+                    && it.boundingBox.maxY <= player.boundingBox.maxY
+                    || it.boundingBox.minY <= player.boundingBox.maxY
+                    && it.boundingBox.minY >= player.boundingBox.minY)
                 && player.calculateAngle(it) <= PI / 3
-        }.forEach {
+        }.filterIsInstance<LivingEntity>().forEach {
             val amount = getEnhancedValue(
                 player,
                 SkillEnhancements.DAMAGE,
@@ -72,6 +77,7 @@ class ChargedSweepSkill : LongPressSkill(
             it.damage(player.damageSources.playerAttack(player), amount)
         }
         player.swingHand(Hand.MAIN_HAND, true)
+        player.spawnSweepAttackParticles()
         player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
         player.startCooling(pressedTime * 3)
         stack.damage(1, player) { it.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND) }

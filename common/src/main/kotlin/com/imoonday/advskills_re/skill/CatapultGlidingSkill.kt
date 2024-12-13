@@ -17,6 +17,10 @@ class CatapultGlidingSkill : LongPressSkill(
     enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.VELOCITY)
 ) {
 
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.VELOCITY) { it.level * 10 }
+    }
+
     override fun getMaxPressTime(): Int = 3 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult =
@@ -35,8 +39,8 @@ class CatapultGlidingSkill : LongPressSkill(
         val multiplier = 1 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1
         val progress = pressedTime.toDouble() / getModifiedPersistTime(player) * multiplier
         player.velocity =
-            player.rotationVector.normalize().multiply(1.5 * progress, 0.0, 1.5 * progress)
-                .withAxis(Direction.Axis.Y, 3.0 * progress)
+            player.rotationVector.normalize().multiply(1.5, 0.0, 1.5)
+                .withAxis(Direction.Axis.Y, 3.0) * progress
         player.updateVelocity()
         return UseResult.success()
     }

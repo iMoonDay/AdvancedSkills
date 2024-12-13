@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.entity.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -13,11 +14,14 @@ class SuperShadowCloneSkill : Skill(
     types = listOf(SkillType.SUMMON),
     cooldown = 90,
     rarity = SkillRarity.LEGENDARY,
+    enhancements = setOf(SkillEnhancements.SUMMON_AMOUNT, SkillEnhancements.STATUS_EFFECT_DURATION)
 ), SendPlayerVelocityTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        spawnClones(user, 8)
-        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, 5 * 20, 0, true, false, true))
+        val amount = 8 + user.getEnhancementLvl(SkillEnhancements.SUMMON_AMOUNT) * 2
+        spawnClones(user, amount)
+        val duration = getEnhancedValue(user, SkillEnhancements.STATUS_EFFECT_DURATION, 5 * 20)
+        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, duration, 0, true, false, true))
         return UseResult.success()
     }
 

@@ -159,6 +159,7 @@ advskills_re:
     absolute_defense:
       name: Absolute Defense
       description: Block any damage once. The skill lasts for 30s
+      effect_count: +%d Block Count
     extreme_reflection:
       name: Extreme Reflection
       description: Reflects the first arbitrary damage within 0.25 seconds at a 75% probability, and resets the cooldown immediately after the reflection
@@ -202,6 +203,7 @@ advskills_re:
     agility:
       name: Agility
       description: Slightly increases movement speed
+      movement_speed: +%d Movement Speed
     resuscitation:
       name: Resuscitation
       description: Blocks fatal damage, becomes invincible for 2 seconds and gains 30 seconds health regeneration
@@ -236,12 +238,14 @@ advskills_re:
     absolute_domain:
       name: Absolute Domain
       description: Break the blocks within 1 square around
+      range: +%d Range
     charged_sweep:
       name: Charged Sweep
       description: After charging, it will cause damage to entities within the fan-shaped range in front. The amount of damage depends on the item held.
     active_defense:
       name: Active Defense
       description: Reduce damage by 20% when long pressed
+      defense_effect: +%d%% Damage Reduction
     self_repair:
       name: Self Repair
       description: Automatically repair your equipment, up to 50%
@@ -396,6 +400,9 @@ advskills_re:
     arrow_rain:
       name: Arrow Rain
       description: Summons several arrows randomly above the target
+      launch_count: +%d Summon Waves
+      range: +%d Summon Range Radius
+      summon_amount: +%d Arrow Count/Wave
     weed_cleaner:
       name: Weed Cleaner
       description: Clean up weeds around
@@ -424,6 +431,7 @@ advskills_re:
     armor_shatterer:
       name: Armor Shatterer
       description: Fires an energy ball with an 80% chance to weaken nearby entities, increasing the damage they take
+      launch_count: +%d Launch Count
     death_archive:
       name: Death Archive
       description: After activation, the player's position is recorded. Upon death, the skill is triggered to prevent the death, restore full health, and teleport the player back to the recorded position, granting 5 seconds of invincibility
@@ -438,7 +446,7 @@ advskills_re:
       failed: No crops are ripened
     space_blast:
       name: Space Blast
-      description: Creates an explosion in the area ahead, destroying all blocks and causing a large amount of damage to creatures in the area
+      description: Blast the area ahead, destroying all destructible blocks and causing massive damage to creatures in the area
   skillType:
     attack: Attack
     defense: Defense
@@ -599,7 +607,7 @@ advskills_re:
       description: +%d%% Status Effect Duration
     status_effect_amplifier:
       name: Status Effect Amplifier Enhancement
-      description: +%d Status Effect Amplifier
+      description: Status Effect Amplifier++
     velocity:
       name: Velocity Enhancement
       description: Velocity++

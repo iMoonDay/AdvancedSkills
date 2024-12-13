@@ -12,7 +12,7 @@ class SelfHealingSkill : Skill(
     id = "self_healing",
     types = listOf(SkillType.PASSIVE, SkillType.RESTORATION),
     rarity = SkillRarity.RARE,
-    enhancements = setOf(SkillEnhancements.CHARGE_TIME)
+    enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.HEALING_AMOUNT)
 ), AutoTrigger, AutoStopTrigger, DamageTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
@@ -22,7 +22,8 @@ class SelfHealingSkill : Skill(
     override fun shouldStart(player: ServerPlayerEntity): Boolean = !player.isDead && player.health < player.maxHealth
 
     override fun onStop(player: ServerPlayerEntity) {
-        player.heal(2.0f)
+        val amount = getEnhancedValue(player, SkillEnhancements.HEALING_AMOUNT, 2.0f)
+        player.heal(amount)
         super.onStop(player)
     }
 

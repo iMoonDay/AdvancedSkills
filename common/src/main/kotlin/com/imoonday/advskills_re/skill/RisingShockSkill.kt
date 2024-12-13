@@ -5,7 +5,7 @@ import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
-import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.entity.player.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
@@ -17,21 +17,22 @@ class RisingShockSkill : Skill(
     cooldown = 10,
     rarity = SkillRarity.RARE,
     sound = ModSounds.DASH,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.RANGE, SkillEnhancements.VELOCITY)
 ), AutoStopTrigger, GravityTrigger {
+
+    override val persistTime: Int = 8
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.stopFallFlying()
-        user.velocity = Vec3d(0.0, max(user.velocity.y, 0.5), 0.0)
+        user.velocity = Vec3d(0.0, user.getVelocityY(), 0.0)
         user.updateVelocity()
         return UseResult.startUsing(user, this)
     }
 
-    override val persistTime: Int = 8
-
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return
-        player.velocity = Vec3d(0.0, max(player.velocity.y, 0.5), 0.0)
+        val velocityY = player.getVelocityY()
+        player.velocity = Vec3d(0.0, velocityY, 0.0)
         player.updateVelocity()
         player.spawnParticles(
             ParticleTypes.CLOUD,
@@ -43,11 +44,16 @@ class RisingShockSkill : Skill(
             0.5,
             0.1
         )
-        player.world.getNonSpectatingEntities(LivingEntity::class.java, player.boundingBox.expand(1.0)).forEach {
-            it.velocity = it.velocity.withAxis(Direction.Axis.Y, max(it.velocity.y, 0.5))
-            it.velocityDirty = true
-            (it as? ServerPlayerEntity)?.updateVelocity()
-        }
+        val range = 1.0 + player.getEnhancementLvl(SkillEnhancements.RANGE) * 0.8
+        player.world.getOtherEntities(player, player.boundingBox.expand(range)) { it is LivingEntity }
+            .forEach {
+                it.velocity = it.velocity.withAxis(Direction.Axis.Y, max(it.velocity.y, velocityY))
+                it.velocityDirty = true
+                (it as? ServerPlayerEntity)?.updateVelocity()
+            }
         super.serverTick(player, usedTime)
     }
+
+    private fun PlayerEntity.getVelocityY(): Double =
+        max(velocity.y, 0.5) * (1.0 + this.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.01)
 }

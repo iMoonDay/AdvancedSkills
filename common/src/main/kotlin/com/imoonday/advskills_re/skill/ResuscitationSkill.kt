@@ -14,7 +14,7 @@ class ResuscitationSkill : Skill(
     types = listOf(SkillType.PASSIVE, SkillType.DEFENSE),
     cooldown = 300,
     rarity = SkillRarity.LEGENDARY,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.STATUS_EFFECT_DURATION)
 ), DeathTrigger, AutoStopTrigger, DamageTrigger {
 
     override val persistTime: Int = 2 * 20
@@ -27,7 +27,8 @@ class ResuscitationSkill : Skill(
         player.startUsing()
         player.startCooling()
         player.world.sendEntityStatus(player, EntityStatuses.USE_TOTEM_OF_UNDYING)
-        player.addStatusEffect(StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20))
+        val duration = getEnhancedValue(player, SkillEnhancements.STATUS_EFFECT_DURATION, 30 * 20)
+        player.addStatusEffect(StatusEffectInstance(StatusEffects.REGENERATION, duration))
         return false
     }
 

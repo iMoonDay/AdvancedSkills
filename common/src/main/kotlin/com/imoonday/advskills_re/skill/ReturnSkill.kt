@@ -10,7 +10,7 @@ import net.minecraft.server.network.*
 import net.minecraft.server.world.*
 import net.minecraft.util.math.*
 
-//TODO 服务器跨维度传送坐标异常
+//TODO 服务器跨维度传送坐标异常?
 class ReturnSkill : LongPressSkill(
     id = "return",
     types = listOf(SkillType.UTILITY, SkillType.MOVEMENT),

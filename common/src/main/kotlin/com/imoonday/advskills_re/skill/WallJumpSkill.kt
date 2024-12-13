@@ -16,7 +16,8 @@ class WallJumpSkill : PassiveSkill(
     extraTypes = listOf(SkillType.MOVEMENT),
     cooldown = 0,
     rarity = SkillRarity.SUPERB,
-    sound = ModSounds.DASH
+    sound = ModSounds.DASH,
+    enhancements = setOf(SkillEnhancements.POWER)
 ), AutoTrigger, SendPlayerDataTrigger, UsingProgressTrigger, FallTrigger {
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = player.getPersistentData().getBoolean("jumped")
@@ -47,6 +48,8 @@ class WallJumpSkill : PassiveSkill(
         player.isSprinting = false
         player.jump()
         player.velocity -= Vec3d.of(player.horizontalFacing.vector) * 0.25
+        val power = 1.0 + player.getEnhancementLvl(SkillEnhancements.POWER) * 0.1
+        player.velocity.multiply(1.0, power, 1.0)
         player.abilities.flying = false
     }
 

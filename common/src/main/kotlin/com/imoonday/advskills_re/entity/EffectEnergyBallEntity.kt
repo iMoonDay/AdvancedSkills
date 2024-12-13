@@ -46,19 +46,18 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
     override fun onCollision(hitResult: HitResult?) {
         super.onCollision(hitResult)
         if (world.isClient) return
-        if (getEffects().isNotEmpty()) {
-            world.getNonSpectatingEntities(
-                LivingEntity::class.java,
-                this.boundingBox.expand(range)
-            ).filterIsInstance<LivingEntity>().forEach {
-                for (entry in getEffects()) {
-                    val effect = entry.key
-                    val chance = entry.value
-                    if (random.nextFloat() < chance || canApply(effect, chance, it)) {
-                        it.addStatusEffect(effect, effectCause)
+        val effects = getEffects()
+        if (effects.isNotEmpty()) {
+            world.getOtherEntities(null, this.boundingBox.expand(range)) { it is LivingEntity }
+                .filterIsInstance<LivingEntity>().forEach {
+                    for (entry in effects) {
+                        val effect = entry.key
+                        val chance = entry.value
+                        if (random.nextFloat() < chance || canApply(effect, chance, it)) {
+                            it.addStatusEffect(effect, effectCause)
+                        }
                     }
                 }
-            }
             spawnParticles()
             playSound()
         }

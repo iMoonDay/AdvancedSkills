@@ -17,6 +17,12 @@ class CounterblastSkill : PassiveSkill(
     enhancements = setOf(SkillEnhancements.RANGE, SkillEnhancements.POWER, SkillEnhancements.CHANCE),
 ), PostAttackedTrigger, ProgressTrigger {
 
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level }
+        addEnhancementTooltipWithArg(SkillEnhancements.POWER) { it.level * 10 }
+        addEnhancementTooltipWithArg(SkillEnhancements.CHANCE) { it.level * 4 }
+    }
+
     override fun postAttacked(source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
         super.postAttacked(source, player, attacker)
         if (attacker != null) {
@@ -27,16 +33,15 @@ class CounterblastSkill : PassiveSkill(
             if (times > 0 && player.random.nextFloat() < 0.2f * times + chance) {
                 data.remove("damagedTimes")
                 val range = player.getEnhancementLvl(SkillEnhancements.RANGE)
-                val power = player.getEnhancementLvl(SkillEnhancements.POWER) * 0.2
-                player.world.getNonSpectatingEntities(
-                    LivingEntity::class.java,
+                val power = 1.0 + player.getEnhancementLvl(SkillEnhancements.POWER) * 0.1
+                player.world.getOtherEntities(
+                    player,
                     player.boundingBox.expand(5.0 + range)
-                ).filterNot { it === player }
-                    .forEach {
-                        it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(2.0 * power))
-                        it.velocityDirty = true
-                        (it as? ServerPlayerEntity)?.updateVelocity()
-                    }
+                ) { it is LivingEntity }.forEach {
+                    it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(2.0 * power))
+                    it.velocityDirty = true
+                    (it as? ServerPlayerEntity)?.updateVelocity()
+                }
                 player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
                 player.spawnParticles(
                     ParticleTypes.CLOUD,

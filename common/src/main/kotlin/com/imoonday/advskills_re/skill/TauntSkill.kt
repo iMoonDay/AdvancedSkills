@@ -16,7 +16,7 @@ class TauntSkill : Skill(
     types = listOf(SkillType.UTILITY, SkillType.DEFENSE),
     cooldown = 30,
     rarity = SkillRarity.UNCOMMON,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DEFENSE_EFFECT)
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {
 
     override val persistTime: Int = 15 * 20
@@ -28,7 +28,9 @@ class TauntSkill : Skill(
         source: DamageSource,
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
-    ): Float = if (!player.isUsing() || attacker !is Servant) amount else amount * 0.75f
+    ): Float =
+        if (!player.isUsing() || attacker !is Servant) amount
+        else amount * (0.75f - player.getEnhancementLvl(SkillEnhancements.DEFENSE_EFFECT) * 0.1f).coerceAtLeast(0f)
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean = !player.isUsing()
 

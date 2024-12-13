@@ -55,8 +55,8 @@ interface SkillTrigger {
     }
 }
 
-inline fun <reified N : Number, T : FixedValueEnhancement> SkillTrigger.getEnhancedValue(
+inline fun <reified N : Number> SkillTrigger.getEnhancedValue(
     player: PlayerEntity,
-    type: SkillEnhancementType<T>,
+    type: SkillEnhancementType<FixedValueEnhancement>,
     value: N
 ): N = player.getEnhancement(type)?.applyMultiplier(value) ?: value

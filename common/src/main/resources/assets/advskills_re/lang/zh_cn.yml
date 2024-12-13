@@ -152,6 +152,7 @@ advskills_re:
     dash:
       name: 冲刺
       description: 向前冲刺
+      velocity: +%d%% 冲刺速度
     ground_whack:
       name: 地面重击
       description: 从空中砸向地面，免疫10格以下摔落伤害，10格以上摔落伤害减半
@@ -159,6 +160,7 @@ advskills_re:
     absolute_defense:
       name: 绝对防御
       description: 格挡一次任意伤害，持续30s
+      effect_count: +%d 格挡次数
     extreme_reflection:
       name: 极限反弹
       description: 以75%的概率在0.25秒内反弹首个任意伤害，反弹后立即重置冷却时间，免伤100%
@@ -202,6 +204,7 @@ advskills_re:
     agility:
       name: 身手敏捷
       description: 略微增加移动速度
+      movement_speed: +%d%% 移动速度
     resuscitation:
       name: 起死回生
       description: 抵挡致命伤害，触发后无敌2s，并获得30s生命恢复
@@ -236,12 +239,15 @@ advskills_re:
     absolute_domain:
       name: 绝对领域
       description: 将周围1格内方块击碎
+      range: +%d 范围半径
     charged_sweep:
       name: 蓄力横扫
       description: 蓄力后对前方扇形范围内实体造成伤害，伤害量取决于手持的物品
+      range: +%d 范围
     active_defense:
       name: 主动防御
       description: 长按使用时减伤20%
+      defense_effect: +%d%% 减伤
     self_repair:
       name: 自我修复
       description: 自动修复身上装备，最高修复至50%
@@ -289,6 +295,7 @@ advskills_re:
     automatic_uphill:
       name: 自动上坡
       description: 可以自动爬上方块
+      effect_value: +%d 最大高度
     water_breathing:
       name: 水下呼吸
       description: 你可以在水中呼吸
@@ -301,6 +308,8 @@ advskills_re:
     danger_perception:
       name: 危险感知
       description: 遇到危险时临时获得加速
+      movement_speed: +%d%% 加速量
+      range: +%d 判定范围半径
     rising_shock:
       name: 上升冲击
       description: 向上升起一段距离，同时将身边的生物一起带飞
@@ -309,9 +318,11 @@ advskills_re:
       description: 蓄力然后弹出去并使用鞘翅滑翔
       failed: 你没有鞘翅或者已损坏
       fallFlying: 无法在滑翔时使用
+      velocity: +%d%% 弹出速度
     charged_dash:
       name: 蓄力冲刺
       description: 蓄力然后弹出去，可用于滑翔
+      velocity: +%d%% 弹出速度
     laser_eye:
       name: 激光眼
       description: 发射一束激光，对路径上的所有生物造成伤害
@@ -361,6 +372,9 @@ advskills_re:
     counterblast:
       name: 蓄势爆发
       description: 被攻击时有一定概率击退周围生物，次数越多，概率越高
+      range: +%d 击退范围半径
+      power: +%d%% 击退力量
+      chance: +%d%% 击退概率
     time_rewind:
       name: 时间倒流
       description: 回溯坐标和血量，蓄力时死亡将立刻回溯
@@ -372,6 +386,7 @@ advskills_re:
       description: 封印生物的治疗效果
       interrupt: 蓄力中断
       failed: 未选中目标
+      distance: +%d 判定距离
     sword_soul_guarding:
       name: 剑魂守护
       description: 召唤附魔剑跟随作战，攻击时有概率发动追加攻击，受伤时必定触发追加攻击
@@ -396,6 +411,9 @@ advskills_re:
     arrow_rain:
       name: 箭雨
       description: 在目标上方随机召唤数根箭
+      launch_count: +%d 召唤波次
+      range: +%d 召唤范围半径
+      summon_amount: +%d 箭数量/波次
     weed_cleaner:
       name: 杂草清理者
       description: 扫除周围杂草
@@ -405,6 +423,7 @@ advskills_re:
     damage_absorption:
       name: 伤害吸收
       description: 一定时间内，吸收一次伤害，并根据其伤害量回复自身血量
+      effect_count: +%d 吸收次数
     disguise:
       name: 伪装术
       description: 伪装成脚下的方块，释放任意技能时失效
@@ -424,6 +443,7 @@ advskills_re:
     armor_shatterer:
       name: 破甲者
       description: 发射一个以80%概率给予周围生物易伤效果的能量球，使其受到的伤害增加
+      launch_count: +%d 发射次数
     death_archive:
       name: 死亡存档
       description: 使用后记录坐标，死亡时触发技能，阻止此次死亡，并回满血然后传送回记录的坐标，同时给予5秒无敌
@@ -438,7 +458,7 @@ advskills_re:
       failed: 没有催熟任何农作物
     space_blast:
       name: 空间爆破
-      description: 在前方的区域产生爆炸，摧毁全部方块，并对区域内的生物造成大量伤害
+      description: 对前方区域进行爆破，直接摧毁全部可破坏方块，并对区域内的生物造成大量伤害
   skillType:
     attack: 攻击
     defense: 防御
@@ -599,7 +619,7 @@ advskills_re:
       description: +%d%% 效果持续时间
     status_effect_amplifier:
       name: 状态效果增幅
-      description: +%d 状态效果
+      description: 效果等级++
     velocity:
       name: 速度增幅
       description: 速度++

@@ -28,6 +28,10 @@ class BloodSealSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger, DangerTrigger {
 
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.DISTANCE) { it.level }
+    }
+
     override fun getMaxPressTime(): Int = 5 * 20
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
@@ -71,7 +75,7 @@ class BloodSealSkill : LongPressSkill(
     }
 
     private fun PlayerEntity.getRaycastDistance() =
-        5.0 + getEnhancementLvl(SkillEnhancements.DISTANCE)
+        5.0 + this.getEnhancementLvl(SkillEnhancements.DISTANCE)
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(10)

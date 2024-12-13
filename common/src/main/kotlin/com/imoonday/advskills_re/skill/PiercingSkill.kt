@@ -52,9 +52,9 @@ class PiercingSkill : Skill(
         }
         val damage = getEnhancedValue(player, SkillEnhancements.DAMAGE, 6.0f)
         val velocity = 1.5 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1
-        player.world.getNonSpectatingEntities(
-            LivingEntity::class.java, player.boundingBox
-        ).filterNot { it === player }.forEach {
+        player.world.getOtherEntities(
+            player, player.boundingBox
+        ) { it is LivingEntity }.forEach {
             it.damage(player.damageSources.playerAttack(player), damage)
             it.addVelocity(it.pos.subtract(player.pos).normalize().multiply(velocity).withAxis(Direction.Axis.Y, 1.0))
             it.velocityDirty = true

@@ -1,8 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.network.*
-import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -53,7 +51,8 @@ class LaserEyeSkill : Skill(
             )
             offset += 0.1
         }
-        Channels.SPAWN_PARTICLES_S2C.sendToPlayer(player, SpawnParticlesS2CPacket(particles))
+        player.serverWorld.players.forEach { it.sendPacket(BundleS2CPacket(particles)) }
+
         player.playSound(ModSounds.LASER.get())
         val entities: MutableList<LivingEntity> = mutableListOf()
         while (true) {

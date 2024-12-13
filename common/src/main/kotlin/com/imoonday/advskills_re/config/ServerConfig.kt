@@ -13,7 +13,12 @@ import java.nio.file.*
 
 @Serializable
 data class ServerConfig(
-    var disableSkillFruitGeneration: Boolean = false
+    var disableSkillFruitGeneration: Boolean = false,
+    var oakLeavesDropChance: Float = 0.005f,
+    var darkOakLeavesDropChance: Float = 0.005f,
+    var ancientCityChestGenerationChance: Float = 0.25f,
+    var buriedTreasureChestGenerationChance: Float = 0.25f,
+    var endCityTreasureChestGenerationChance: Float = 0.25f,
 ) {
 
     fun toJson(): String = JSON.encodeToString(serializer(), this)
@@ -28,6 +33,7 @@ data class ServerConfig(
         }
         private val SERVER_CONFIG: WorldSavePath = WorldSavePath("serverconfig")
         private lateinit var file: File
+        private val DEFAULT_INSTANCE = ServerConfig()
 
         private var instance = ServerConfig()
 
@@ -36,7 +42,9 @@ data class ServerConfig(
         fun init(server: MinecraftServer) {
             file = File(getServerConfigPath(server).toFile(), "$MOD_ID-server.json")
             load()
-            tryReloadDataPacks(server)
+            if (instance != DEFAULT_INSTANCE) {
+                tryReloadDataPacks(server)
+            }
         }
 
         fun load() {

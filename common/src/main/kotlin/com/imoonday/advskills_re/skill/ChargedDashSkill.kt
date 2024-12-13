@@ -22,6 +22,10 @@ class ChargedDashSkill : LongPressSkill(
     )
 ), AttributeTrigger {
 
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.VELOCITY) { it.level * 20 }
+    }
+
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Charged Dash Charging"),

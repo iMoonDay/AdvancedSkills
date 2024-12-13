@@ -1,8 +1,8 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
-import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
@@ -12,12 +12,14 @@ class TeleportSkill : Skill(
     id = "teleport",
     types = listOf(SkillType.MOVEMENT),
     cooldown = 2,
-    rarity = SkillRarity.UNCOMMON
+    rarity = SkillRarity.UNCOMMON,
+    enhancements = setOf(SkillEnhancements.DISTANCE),
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
-            val offset = rotationVector.withAxis(Direction.Axis.Y, 0.0).normalize().multiply(2.0)
+            val distance = 2.0 + user.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.5
+            val offset = rotationVector.withAxis(Direction.Axis.Y, 0.0).normalize().multiply(distance)
             val collisions = world.getBlockCollisions(this, boundingBox.offset(offset))
             if (!collisions.all { it.isEmpty }) {
                 return UseResult.fail(message("collide"))

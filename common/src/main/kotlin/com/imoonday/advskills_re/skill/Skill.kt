@@ -241,5 +241,5 @@ abstract class Skill(
         availableEnhancements.contains(enhancement.type)
 
     fun isAvailableFor(player: PlayerEntity, enhancement: SkillEnhancement): Boolean =
-        isAvailable(enhancement) && !player.hasEnhancement(enhancement.type)
+        isAvailable(enhancement) && player.getEnhancement(enhancement.type)?.let { enhancement.level > it.level } != false
 }

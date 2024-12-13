@@ -16,7 +16,12 @@ class SwordSoulGuardingSkill : Skill(
     types = listOf(SkillType.SUMMON, SkillType.ATTACK),
     cooldown = 30,
     rarity = SkillRarity.LEGENDARY,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    enhancements = setOf(
+        SkillEnhancements.PERSISTENT_TIME,
+        SkillEnhancements.CHANCE,
+        SkillEnhancements.SUMMON_AMOUNT,
+        SkillEnhancements.EFFECT_FREQUENCY
+    )
 ), PostAttackTrigger, PostAttackedTrigger, AutoStopTrigger, UsingRenderTrigger, DangerTrigger {
 
     override val persistTime: Int = 20 * 20
@@ -25,7 +30,8 @@ class SwordSoulGuardingSkill : Skill(
 
     override fun postAttack(source: DamageSource, player: ServerPlayerEntity, target: LivingEntity) {
         super.postAttack(source, player, target)
-        if (player.isUsing() && source.source !is EnchantedSwordEntity && player.random.nextFloat() < 0.3) {
+        val extraChance = player.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.1
+        if (player.isUsing() && source.source !is EnchantedSwordEntity && player.random.nextFloat() < 0.3 + extraChance) {
             spawnSword(player, target)
         }
     }
@@ -49,16 +55,22 @@ class SwordSoulGuardingSkill : Skill(
         target: LivingEntity,
     ) {
         if (target.isRemoved) return
-        player.world.spawnEntity(EnchantedSwordEntity(player.world, player, target).apply {
-            setPosition(player.eyePos - player.rotationVector)
-        })
-        player.playSound(SoundEvents.ENTITY_ARROW_SHOOT)
+        val summonAmount = player.getEnhancementLvl(SkillEnhancements.SUMMON_AMOUNT)
+        player.executeAndAddTask(5, summonAmount) {
+            player.world.spawnEntity(EnchantedSwordEntity(player.world, player, target).apply {
+                setPosition(player.eyePos - player.rotationVector)
+            })
+            player.playSound(SoundEvents.ENTITY_ARROW_SHOOT)
+            true
+        }
     }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
-        if (player.isUsing() && usedTime % 25 == 0) {
+        super.serverTick(player, usedTime)
+        if (!player.isUsing()) return
+        val frequency = (25 - player.getEnhancementLvl(SkillEnhancements.EFFECT_FREQUENCY) * 4).coerceAtLeast(1)
+        if (usedTime % frequency == 0) {
             player.attacking?.let { spawnSword(player, it) } ?: player.attacker?.let { spawnSword(player, it) }
         }
-        super.serverTick(player, usedTime)
     }
 }

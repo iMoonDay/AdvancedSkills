@@ -18,7 +18,7 @@ class InstantExplosiveSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
-            val times = getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
+            val times = this.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
             executeAndAddTask(5, times) { spawnTnt() }
         }
         return UseResult.success()

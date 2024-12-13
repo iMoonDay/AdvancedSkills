@@ -4,6 +4,7 @@ import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
+import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
@@ -23,6 +24,12 @@ class ArrowRainSkill : Skill(
         SkillEnhancements.SUMMON_AMOUNT
     )
 ) {
+
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.LAUNCH_COUNT) { it.level }
+        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level * 2 }
+        addEnhancementTooltipWithArg(SkillEnhancements.SUMMON_AMOUNT) { it.level * 10 }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val enhancement = user.getEnhancement(SkillEnhancements.DAMAGE)
@@ -49,8 +56,10 @@ class ArrowRainSkill : Skill(
         val amount = random.nextInt(51) + 50 + extraAmount
         val range = (amount - extraAmount) * 0.25 + extraRange
 
+        var result = false
+        val particles: MutableList<ParticleS2CPacket> = mutableListOf()
         for (j in 0 until amount) {
-            val result = user.world.spawnEntity(
+            user.world.spawnEntity(
                 UngroundedArrowEntity(
                     user.world,
                     center.x + random.nextDouble() * range - range / 2,
@@ -61,10 +70,17 @@ class ArrowRainSkill : Skill(
                     pitch = -90f
                     damageModifier?.let { damage = it(damage) }
                 }.also {
-                    user.spawnParticles(ParticleTypes.CLOUD, false, it.pos, 5, 1.0, 0.0, 1.0, 0.0)
-                })
-            if (!result) return false
+                    particles.add(ParticleS2CPacket(ParticleTypes.CLOUD, false, it.x, it.y, it.z, 1f, 0f, 1f, 0f, 5))
+                    //                    user.spawnParticles(ParticleTypes.CLOUD, false, it.pos, 5, 1.0, 0.0, 1.0, 0.0)
+                }).also {
+                if (it && !result) {
+                    result = true
+                }
+            }
         }
-        return true
+        if (particles.isNotEmpty()) {
+            user.sendPacket(BundleS2CPacket(particles))
+        }
+        return result
     }
 }

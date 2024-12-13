@@ -58,7 +58,7 @@ abstract class ReflectionSkill(
         attacker: LivingEntity?,
         amount: Float,
     ): Boolean {
-        val extraChance = getEnhancementLvl(SkillEnhancements.CHANCE) * 0.05f
+        val extraChance = this.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.05f
         return if (random.nextFloat() < chance + extraChance) {
             reflect(this, attacker, amount)
             true

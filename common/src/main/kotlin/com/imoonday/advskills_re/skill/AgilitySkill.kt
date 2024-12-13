@@ -11,6 +11,10 @@ class AgilitySkill : PassiveSkill(
     enhancements = setOf(SkillEnhancements.MOVEMENT_SPEED),
 ) {
 
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.MOVEMENT_SPEED) { it.level * 4 }
+    }
+
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Agility"),

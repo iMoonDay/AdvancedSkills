@@ -19,6 +19,7 @@ import net.minecraft.loot.function.*
 import net.minecraft.loot.provider.number.*
 import net.minecraft.nbt.*
 import net.minecraft.registry.tag.*
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.*
 
 object EventHandler {
@@ -59,7 +60,7 @@ object EventHandler {
         PlayerEvent.PLAYER_RESPAWN.register { player, _ ->
             player.usingSkills
                 .filterNot { it is RespawnTrigger && it.keepUsingAfterRespawn(player) }
-                .forEach { player.stopUsing(it) }
+                .forEach { player.stopAndCooldown(it) }
             player.forEachTrigger<RespawnTrigger> { it.afterRespawn(player) }
         }
         PlayerEvent.ATTACK_ENTITY.register { player, _, _, _, _ ->
@@ -90,29 +91,32 @@ object EventHandler {
     }
 
     private fun registerLootTables() {
-        val blockLootTables = mapOf(
-            Blocks.OAK_LEAVES.lootTableId to 0.005f,
-            Blocks.DARK_OAK_LEAVES.lootTableId to 0.005f
-        )
         val fishingLootTables = listOf(
             LootTables.FISHING_TREASURE_GAMEPLAY
         )
-        val chestLootTables = mapOf(
-            LootTables.ANCIENT_CITY_CHEST to 0.25f,
-            LootTables.BURIED_TREASURE_CHEST to 0.25f,
-            LootTables.END_CITY_TREASURE_CHEST to 0.25f
-        )
         val spawnBonusChest = LootTables.SPAWN_BONUS_CHEST
-        val builder = {
-            var builder = LootPool.builder()
-            ModItems.FRUITS.forEach {
-                val item = it.get()
-                builder = builder.with(ItemEntry.builder(item).weight(item.rarity.weight))
-            }
-            builder
-        }
+
         LootEvent.MODIFY_LOOT_TABLE.register { _, id, context, builtin ->
-            if (!ServerConfig.get().disableSkillFruitGeneration && builtin) {
+            val config = ServerConfig.get()
+            if (!config.disableSkillFruitGeneration && builtin) {
+                val blockLootTables = mapOf(
+                    Blocks.OAK_LEAVES.lootTableId to config.oakLeavesDropChance,
+                    Blocks.DARK_OAK_LEAVES.lootTableId to config.darkOakLeavesDropChance
+                )
+                val chestLootTables = mapOf(
+                    LootTables.ANCIENT_CITY_CHEST to config.ancientCityChestGenerationChance,
+                    LootTables.BURIED_TREASURE_CHEST to config.buriedTreasureChestGenerationChance,
+                    LootTables.END_CITY_TREASURE_CHEST to config.endCityTreasureChestGenerationChance
+                )
+                val builder = {
+                    var builder = LootPool.builder()
+                    ModItems.FRUITS.forEach {
+                        val item = it.get()
+                        builder = builder.with(ItemEntry.builder(item).weight(item.rarity.weight))
+                    }
+                    builder
+                }
+
                 when {
                     blockLootTables.containsKey(id) -> context.addPool(
                         builder().apply(ApplyBonusLootFunction.uniformBonusCount(Enchantments.FORTUNE))

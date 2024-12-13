@@ -3,7 +3,6 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
-import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
@@ -15,6 +14,10 @@ class DashSkill : Skill(
     sound = ModSounds.DASH,
     enhancements = setOf(SkillEnhancements.VELOCITY)
 ) {
+
+    init {
+        addEnhancementTooltipWithArg(SkillEnhancements.VELOCITY) { it.level * 10 }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
