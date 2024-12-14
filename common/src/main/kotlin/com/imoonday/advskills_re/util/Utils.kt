@@ -171,8 +171,10 @@ inline fun <reified T : Number> Number.toNumber(): T {
     }
 }
 
-fun ServerWorld.addTask(interval: Int, repeat: Int, task: () -> Boolean) =
+fun ServerWorld.addTask(interval: Int, repeat: Int, task: () -> Boolean) {
+    if (repeat <= 0) return
     (this as TaskHandler).addTask(LoopTask(interval, repeat, task))
+}
 
 fun ServerWorld.executeAndAddTask(interval: Int, repeat: Int, task: () -> Boolean) {
     task()

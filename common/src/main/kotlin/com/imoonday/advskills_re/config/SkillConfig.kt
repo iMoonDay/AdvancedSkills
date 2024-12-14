@@ -14,7 +14,6 @@ class SkillConfig {
     var skillXpMultiplier: Double = 1.0
     val skillModifier: MutableMap<String, SkillModifier> = mutableMapOf()
     val skillBlackList: MutableSet<String> = mutableSetOf()
-    val defaultSkillSlots: MutableMap<String, Int> = SkillContainer.DEFAULT_SLOTS.toMutableMap()
 
     fun getModifier(id: Identifier): SkillModifier? = skillModifier[id.toString()]
 
@@ -30,24 +29,6 @@ class SkillConfig {
     }
 
     fun removeBlackList(id: Identifier): Boolean = skillBlackList.remove(id.toString())
-
-    fun getDefaultSkillSlots(slot: String): Int = defaultSkillSlots[slot] ?: 0
-
-    fun setDefaultSkillSlot(slot: String, count: Int) {
-        defaultSkillSlots[slot] = count
-    }
-
-    fun setDefaultActiveSkillSlot(count: Int) {
-        defaultSkillSlots["active"] = count
-    }
-
-    fun setDefaultGenericSkillSlot(count: Int) {
-        defaultSkillSlots["generic"] = count
-    }
-
-    fun setDefaultPassiveSkillSlot(count: Int) {
-        defaultSkillSlots["passive"] = count
-    }
 
     fun load(tag: NbtCompound) {
         if (tag.contains("skillModifier")) {
@@ -69,15 +50,6 @@ class SkillConfig {
             }
         }
 
-        if (tag.contains("defaultSkillSlots")) {
-            defaultSkillSlots.clear()
-
-            val defaultSkillSlotsTag = tag.getCompound("defaultSkillSlots")
-            for (namespace in defaultSkillSlotsTag.keys) {
-                defaultSkillSlots[namespace] = defaultSkillSlotsTag.getInt(namespace)
-            }
-        }
-
         if (tag.contains("skillCooldownMultiplier")) {
             skillCooldownMultiplier = tag.getDouble("skillCooldownMultiplier")
         }
@@ -96,11 +68,6 @@ class SkillConfig {
         put("skillBlackList", NbtList().apply {
             skillBlackList.forEach { add(NbtString.of(it)) }
         })
-        put("defaultSkillSlots", NbtCompound().apply {
-            for ((slot, count) in defaultSkillSlots) {
-                putInt(slot, count)
-            }
-        })
         putDouble("skillCooldownMultiplier", skillCooldownMultiplier)
         putDouble("skillXpMultiplier", skillXpMultiplier)
     }
@@ -108,8 +75,6 @@ class SkillConfig {
     fun reset() {
         skillModifier.clear()
         skillBlackList.clear()
-        defaultSkillSlots.clear()
-        defaultSkillSlots.putAll(SkillContainer.DEFAULT_SLOTS)
         skillCooldownMultiplier = 1.0
         skillXpMultiplier = 1.0
     }

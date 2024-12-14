@@ -65,6 +65,7 @@ class SkillEnhancementScreen(
             ButtonWidget.builder(translate("screen.learn.refresh")) { player.refreshSkillChoice(RefreshChoiceC2SRequest.Type.ENHANCEMENT) }
                 .dimensions(width / 3 - 25, buttonY, 50, 20)
                 .build()
+                .apply { active = player.canFreshChoice(RefreshChoiceC2SRequest.Type.ENHANCEMENT) }
                 .also(::addDrawableChild)
         enhanceButton = ButtonWidget.builder(translate("screen.enhance.enhance")) { selectedBox?.choose() }
             .dimensions(width / 3 * 2 - 25, buttonY, 50, 20)

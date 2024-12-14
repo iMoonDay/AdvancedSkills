@@ -44,6 +44,9 @@ class DamageAbsorptionSkill : Skill(
         val data = player.getActiveData()
         val remaining = data.getInt(REMAINING_EFFECTS)
         if (remaining <= 0) {
+            if (player.hasEnhancement(SkillEnhancements.EFFECT_COUNT)) {
+                player.playSound(SoundEvents.ITEM_SHIELD_BREAK)
+            }
             player.stopAndCooldown()
         } else {
             data.putInt(REMAINING_EFFECTS, remaining - 1)

@@ -19,7 +19,6 @@ import net.minecraft.loot.function.*
 import net.minecraft.loot.provider.number.*
 import net.minecraft.nbt.*
 import net.minecraft.registry.tag.*
-import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.*
 
 object EventHandler {
@@ -76,9 +75,6 @@ object EventHandler {
         PlayerEvent.PLAYER_JOIN.register {
             Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(SkillConfig.get().save(NbtCompound())))
         }
-        LifecycleEvent.SERVER_BEFORE_START.register {
-            ServerConfig.init(it)
-        }
         LifecycleEvent.SERVER_STARTED.register {
             SkillConfig.get().connectToServer(it)
         }
@@ -91,13 +87,10 @@ object EventHandler {
     }
 
     private fun registerLootTables() {
-        val fishingLootTables = listOf(
-            LootTables.FISHING_TREASURE_GAMEPLAY
-        )
-        val spawnBonusChest = LootTables.SPAWN_BONUS_CHEST
+        val fishingLootTable = LootTables.FISHING_TREASURE_GAMEPLAY
 
         LootEvent.MODIFY_LOOT_TABLE.register { _, id, context, builtin ->
-            val config = ServerConfig.get()
+            val config = GlobalConfig.get()
             if (!config.disableSkillFruitGeneration && builtin) {
                 val blockLootTables = mapOf(
                     Blocks.OAK_LEAVES.lootTableId to config.oakLeavesDropChance,
@@ -108,6 +101,8 @@ object EventHandler {
                     LootTables.BURIED_TREASURE_CHEST to config.buriedTreasureChestGenerationChance,
                     LootTables.END_CITY_TREASURE_CHEST to config.endCityTreasureChestGenerationChance
                 )
+                val spawnBonusChest = LootTables.SPAWN_BONUS_CHEST to config.spawnBonusChestGenerationChance
+
                 val builder = {
                     var builder = LootPool.builder()
                     ModItems.FRUITS.forEach {
@@ -125,13 +120,16 @@ object EventHandler {
                             .conditionally(RandomChanceLootCondition.builder(blockLootTables[id]!!))
                     )
 
-                    fishingLootTables.contains(id) -> context.addPool(builder())
+                    id == fishingLootTable -> context.addPool(builder())
 
                     chestLootTables.containsKey(id) -> context.addPool(
                         builder().conditionally(RandomChanceLootCondition.builder(chestLootTables[id]!!))
                     )
 
-                    id == spawnBonusChest -> context.addPool(builder().rolls(UniformLootNumberProvider.create(1f, 6f)))
+                    id == spawnBonusChest.first -> context.addPool(
+                        builder().rolls(UniformLootNumberProvider.create(1f, 6f))
+                            .conditionally(RandomChanceLootCondition.builder(spawnBonusChest.second))
+                    )
                 }
             }
         }

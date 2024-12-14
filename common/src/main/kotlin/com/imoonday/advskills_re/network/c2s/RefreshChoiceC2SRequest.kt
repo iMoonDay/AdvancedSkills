@@ -16,16 +16,9 @@ class RefreshChoiceC2SRequest(val type: Type) : NetworkPacket {
 
     override fun apply(context: NetworkManager.PacketContext) {
         val player = context.player as? ServerPlayerEntity ?: return
-        val notEmpty = if (type == Type.SKILL) {
-            !player.learnableData.isEmpty()
-        } else {
-            !player.enhancementData.isEmpty()
-        }
-        if (notEmpty) {
-            player.refreshSkillChoice(type, true)
-        } else if (player.canFreshChoice(type)) {
-            player.refreshSkillChoice(type)
-        }
+        if (!player.canFreshChoice(type)) return
+
+        player.refreshSkillChoice(type)
     }
 
     enum class Type {

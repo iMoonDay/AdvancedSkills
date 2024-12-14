@@ -10,7 +10,6 @@ import net.minecraft.enchantment.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.player.*
-import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.util.*

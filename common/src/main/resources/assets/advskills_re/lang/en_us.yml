@@ -446,7 +446,7 @@ advskills_re:
       failed: No crops are ripened
     space_blast:
       name: Space Blast
-      description: Blast the area ahead, destroying all destructible blocks and causing massive damage to creatures in the area
+      description: Blast the area ahead, destroying all destructible blocks and causing massive damage to entities in the area
   skillType:
     attack: Attack
     defense: Defense
@@ -485,6 +485,7 @@ advskills_re:
     no_cooling: No Cooling
     long_press: Long Press
     active: Active
+    enhanced: Enhanced
   rarityFilter:
     none: All
   screen:
@@ -546,6 +547,21 @@ advskills_re:
       invalidLayout: "Wrong input! Can only contain 1-10 and the delimiter ','"
       incompleteLayout: "Wrong input! Missing slots: %s"
       redundantNumbers: "Wrong input! Redundant numbers: %s"
+      defaultSkillSlots:
+        subCategory: Default number of skill slots
+        active: Active
+        generic: Generic
+        passive: Passive
+      skillFruitGeneration: Skill Fruit Generation
+      disableSkillFruitGeneration: Disable Skill Fruit Generation
+      generationChance: Drop / Generation Probability
+      oakLeavesDropChance: Oak Leaves
+      darkOakLeavesDropChance: Dark Oak Leaves
+      ancientCityChestGenerationChance: Ancient City Chest
+      buriedTreasureChestGenerationChance: Buried Treasure Chest
+      endCityTreasureChestGenerationChance: End City Treasure Chest
+      spawnBonusChestGenerationChance: Spawn Bonus Chest
+      skillRarityWeights: Skill Rarity Weights
   skillSlot:
     generic: 'Generic Skill Slot %d'
     active: 'Active Skill Slot %d'
@@ -620,6 +636,9 @@ advskills_re:
     use_cost:
       name: Use Cost Enhancement
       description: Use Cost--
+    effect_frequency:
+      name: Effect Frequency Enhancement
+      description: Effect Frequency++
 item:
   advskills_re:
     skill_fruit: Skill Fruit

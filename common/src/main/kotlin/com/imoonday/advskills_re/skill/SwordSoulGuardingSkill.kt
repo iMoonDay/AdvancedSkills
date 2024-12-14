@@ -54,7 +54,7 @@ class SwordSoulGuardingSkill : Skill(
         player: ServerPlayerEntity,
         target: LivingEntity,
     ) {
-        if (target.isRemoved) return
+        if (target.isRemoved || target.isDead) return
         val summonAmount = player.getEnhancementLvl(SkillEnhancements.SUMMON_AMOUNT)
         player.executeAndAddTask(5, summonAmount) {
             player.world.spawnEntity(EnchantedSwordEntity(player.world, player, target).apply {
@@ -68,7 +68,7 @@ class SwordSoulGuardingSkill : Skill(
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (!player.isUsing()) return
-        val frequency = (25 - player.getEnhancementLvl(SkillEnhancements.EFFECT_FREQUENCY) * 4).coerceAtLeast(1)
+        val frequency = (25 - player.getEnhancementLvl(SkillEnhancements.EFFECT_FREQUENCY) * 2).coerceAtLeast(1)
         if (usedTime % frequency == 0) {
             player.attacking?.let { spawnSword(player, it) } ?: player.attacker?.let { spawnSword(player, it) }
         }

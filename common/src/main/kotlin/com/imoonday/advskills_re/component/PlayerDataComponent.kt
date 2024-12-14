@@ -57,12 +57,12 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
         if (entity is ServerPlayerEntity) {
             if (entity.hasLearnedAll()) {
                 if (learnable.count > 0) {
-                    enhancements.count += learnable.count
+                    enhancements.count += learnable.count * 3
                     learnable.reset()
                     dirty = true
                 }
             } else if (enhancements.count > 0) {
-                learnable.count += enhancements.count
+                learnable.count += enhancements.count / 3
                 enhancements.reset()
                 dirty = true
             }

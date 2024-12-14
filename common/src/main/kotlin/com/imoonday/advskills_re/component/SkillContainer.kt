@@ -217,7 +217,7 @@ class SkillContainer(
         fun createDefaultSlots(): MutableMap<Int, SkillSlot> =
             mutableMapOf<Int, SkillSlot>().apply {
                 var index = 1
-                val slots = SkillConfig.get().defaultSkillSlots
+                val slots = GlobalConfig.get().defaultSkillSlots
                 slots["active"]?.takeIf { it > 0 }?.let {
                     repeat(it) {
                         put(index, SkillSlot.Active(index))

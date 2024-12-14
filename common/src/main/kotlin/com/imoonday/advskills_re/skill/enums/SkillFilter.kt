@@ -3,24 +3,29 @@ package com.imoonday.advskills_re.skill.enums
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
+import net.minecraft.entity.player.*
 import net.minecraft.text.*
 
-enum class SkillFilter : (Skill) -> Boolean {
+enum class SkillFilter : (PlayerEntity, Skill) -> Boolean {
     NONE {
 
-        override fun invoke(skill: Skill): Boolean = true
+        override fun invoke(player: PlayerEntity, skill: Skill): Boolean = true
     },
     NO_COOLING {
 
-        override fun invoke(skill: Skill): Boolean = skill.cooldown <= 0
+        override fun invoke(player: PlayerEntity, skill: Skill): Boolean = skill.cooldown <= 0
     },
     LONG_PRESS {
 
-        override fun invoke(skill: Skill): Boolean = skill is LongPressTrigger
+        override fun invoke(player: PlayerEntity, skill: Skill): Boolean = skill is LongPressTrigger
     },
     ACTIVE {
 
-        override fun invoke(skill: Skill): Boolean = SkillType.PASSIVE !in skill.types
+        override fun invoke(player: PlayerEntity, skill: Skill): Boolean = SkillType.PASSIVE !in skill.types
+    },
+    ENHANCED {
+
+        override fun invoke(player: PlayerEntity, skill: Skill): Boolean = player.getEnhancements(skill).isNotEmpty()
     };
 
     val displayName: Text = translate("skillFilter.${name.lowercase()}")

@@ -52,6 +52,7 @@ class SkillLearningScreen(
             ButtonWidget.builder(translate("screen.learn.refresh")) { player.refreshSkillChoice(RefreshChoiceC2SRequest.Type.SKILL) }
                 .dimensions(width / 3 - 25, buttonY, 50, 20)
                 .build()
+                .apply { active = player.canFreshChoice(RefreshChoiceC2SRequest.Type.SKILL) }
                 .also(::addDrawableChild)
         learnButton = ButtonWidget.builder(translate("screen.learn.learn")) { selectedBox?.choose() }
             .dimensions(width / 3 * 2 - 25, buttonY, 50, 20)

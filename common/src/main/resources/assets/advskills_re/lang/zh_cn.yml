@@ -458,7 +458,7 @@ advskills_re:
       failed: 没有催熟任何农作物
     space_blast:
       name: 空间爆破
-      description: 对前方区域进行爆破，直接摧毁全部可破坏方块，并对区域内的生物造成大量伤害
+      description: 对前方区域进行爆破，直接摧毁全部可破坏方块，并对区域内的实体造成大量伤害
   skillType:
     attack: 攻击
     defense: 防御
@@ -497,6 +497,7 @@ advskills_re:
     no_cooling: 无冷却
     long_press: 长按
     active: 主动释放
+    enhanced: 已强化
   rarityFilter:
     none: 全部
   screen:
@@ -548,6 +549,7 @@ advskills_re:
       category:
         render: 渲染
         general: 通用
+        global: 全局
       uiOffsetX: 技能栏X偏移量
       uiOffsetY: 技能栏Y偏移量
       skillSorter: 技能排序方式
@@ -558,6 +560,21 @@ advskills_re:
       invalidLayout: "错误输入! 只能包含1-10和分隔符','"
       incompleteLayout: "错误输入! 缺少栏位：%s"
       redundantNumbers: "错误输入! 栏位不能重复：%s"
+      defaultSkillSlots:
+        subCategory: 默认技能栏数量
+        active: 主动
+        generic: 通用
+        passive: 被动
+      skillFruitGeneration: 技能果实生成
+      disableSkillFruitGeneration: 禁用技能果实生成
+      generationChance: 掉落/生成概率
+      oakLeavesDropChance: 橡树树叶
+      darkOakLeavesDropChance: 深色橡树树叶
+      ancientCityChestGenerationChance: 远古城市宝箱
+      buriedTreasureChestGenerationChance: 埋藏的宝藏
+      endCityTreasureChestGenerationChance: 末地城宝箱
+      spawnBonusChestGenerationChance: 开局奖励箱
+      skillRarityWeights: 稀有度权重
   skillSlot:
     generic: '通用技能槽 %d'
     active: '主动技能槽 %d'
@@ -632,6 +649,9 @@ advskills_re:
     use_cost:
       name: 使用成本增幅
       description: 使用成本--
+    effect_frequency:
+      name: 效果频率增幅
+      description: 效果频率++
 item:
   advskills_re:
     skill_fruit: 技能果实

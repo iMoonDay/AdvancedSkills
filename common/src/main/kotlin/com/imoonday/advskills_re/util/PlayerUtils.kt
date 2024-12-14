@@ -214,7 +214,7 @@ val PlayerEntity.enhancementData: LearnableEnhancementData
 
 fun ServerPlayerEntity.addChoice() {
     if (hasLearnedAll()) {
-        enhancementData.count++
+        enhancementData.count += 3
     } else {
         learnableData.count++
     }
@@ -242,8 +242,8 @@ fun PlayerEntity.refreshSkillChoice(type: RefreshChoiceC2SRequest.Type, force: B
 
 fun PlayerEntity.canFreshChoice(type: RefreshChoiceC2SRequest.Type): Boolean =
     when (type) {
-        RefreshChoiceC2SRequest.Type.SKILL -> SkillChoice.canGenerate(learnedSkills) && !learnableData.refreshed
-        RefreshChoiceC2SRequest.Type.ENHANCEMENT -> EnhancementChoice.canGenerate(this) && !enhancementData.refreshed
+        RefreshChoiceC2SRequest.Type.SKILL -> !learnableData.isEmpty() && SkillChoice.canGenerate(learnedSkills) && !learnableData.refreshed
+        RefreshChoiceC2SRequest.Type.ENHANCEMENT -> !enhancementData.isEmpty() && EnhancementChoice.canGenerate(this) && !enhancementData.refreshed
     }
 
 fun PlayerEntity.choose(id: Int): Boolean = when (id) {
@@ -304,19 +304,17 @@ fun PlayerEntity.enhance(skill: Skill, enhancement: SkillEnhancement): Boolean {
     return true
 }
 
-fun PlayerEntity.enhanceAll(skill: Skill): Boolean {
-    return getData(skill)?.run {
-        skill.availableEnhancements.forEach {
-            enhancements[it]?.let { enhancement ->
-                enhancement.level = enhancement.type.maxLevel
-            } ?: run {
-                enhancements[it] = it.createMax()
-            }
+fun PlayerEntity.enhanceAll(skill: Skill): Boolean = getData(skill)?.run {
+    skill.availableEnhancements.forEach {
+        enhancements[it]?.let { enhancement ->
+            enhancement.level = enhancement.type.maxLevel
+        } ?: run {
+            enhancements[it] = it.createMax()
         }
-        syncData()
-        true
-    } ?: false
-}
+    }
+    syncData()
+    true
+} ?: false
 
 fun PlayerEntity.deEnhance(skill: Skill, type: SkillEnhancementType<*>): Boolean {
     getData(skill)?.enhancements?.remove(type) ?: return false
@@ -325,13 +323,11 @@ fun PlayerEntity.deEnhance(skill: Skill, type: SkillEnhancementType<*>): Boolean
     return true
 }
 
-fun PlayerEntity.deEnhanceAll(skill: Skill): Boolean {
-    return getData(skill)?.run {
-        enhancements.clear()
-        syncData()
-        true
-    } ?: false
-}
+fun PlayerEntity.deEnhanceAll(skill: Skill): Boolean = getData(skill)?.run {
+    enhancements.clear()
+    syncData()
+    true
+} ?: false
 
 fun PlayerEntity.chooseFirst(): Boolean = if (this is ServerPlayerEntity) choose(0) else {
     Channels.CHOOSE_SKILL_C2S.sendToServer(ChooseSkillC2SRequest(0))

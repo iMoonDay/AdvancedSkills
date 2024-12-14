@@ -45,8 +45,7 @@ class SkillInventoryScreen(
             .asSequence()
             .filterNot(player::hasEquipped)
             .filter { (selectedTab?.type ?: return@filter true) in it.types }
-            .filter(skillFilter)
-            .filter(rarityFilter)
+            .filter { skillFilter(player, it) && rarityFilter(it) }
             .sortedWith(ClientConfig.get().skillSorter)
             .toList()
     var bgWidth: Int = width

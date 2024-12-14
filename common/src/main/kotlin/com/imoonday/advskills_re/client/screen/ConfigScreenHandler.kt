@@ -2,6 +2,8 @@ package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.ClientConfig.Companion.DEFAULT_LAYOUT_STRING_LIST
+import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
@@ -22,101 +24,269 @@ object ConfigScreenHandler {
                 .setTitle(translate("screen.config.title"))
                 .setSavingRunnable { ClientConfig.get().save() }
 
-            val config = ClientConfig.get()
+            val inGame = client?.world != null
 
-            val render = builder.getOrCreateCategory(translate("screen.config.category.render"))
+            val config = ClientConfig.get()
+            val globalConfig = GlobalConfig.get()
 
             val entryBuilder = builder.entryBuilder()
 
-            render.run {
-                addEntry(
-                    entryBuilder.startIntField(translate("screen.config.uiOffsetX"), config.uiOffsetX)
-                        .setDefaultValue(0)
-                        .setSaveConsumer { config.uiOffsetX = it }
-                        .build()
-                )
-
-                addEntry(
-                    entryBuilder.startIntField(translate("screen.config.uiOffsetY"), config.uiOffsetY)
-                        .setDefaultValue(0)
-                        .setSaveConsumer { config.uiOffsetY = it }
-                        .build()
-                )
-
-                addEntry(
-                    entryBuilder.startEnumSelector(
-                        translate("screen.config.skillSorter"),
-                        SkillSorter::class.java,
-                        config.skillSorter
-                    ).setDefaultValue(SkillSorter.DEFAULT)
-                        .setEnumNameProvider { (it as SkillSorter).displayName }
-                        .setSaveConsumer { config.skillSorter = it }
-                        .build()
-                )
-
-                addEntry(
-                    entryBuilder.startStrList(translate("screen.config.layout"), config.getLayoutOfStringList())
-                        .setDefaultValue(DEFAULT_LAYOUT_STRING_LIST)
-                        .setCellErrorSupplier {
-                            if (ClientConfig.isValidStringLayout(it)) Optional.empty()
-                            else Optional.of(translate("screen.config.invalidLayout"))
-                        }.setErrorSupplier {
-                            val missingNumbers = ClientConfig.findMissingNumbersFromStringList(it)
-                            if (missingNumbers.isEmpty()) {
-                                val redundantNumbers = ClientConfig.findRedundantNumbersFromStringList(it)
-                                if (redundantNumbers.isEmpty()) Optional.empty()
-                                else Optional.of(
-                                    translate(
-                                        "screen.config.redundantNumbers",
-                                        redundantNumbers.joinToString(", ")
-                                    )
-                                )
-                            } else Optional.of(
-                                translate(
-                                    "screen.config.incompleteLayout",
-                                    missingNumbers.joinToString(", ")
-                                )
-                            )
-                        }.setSaveConsumer { config.setLayoutFromStringList(it) }.build()
-                )
-
-                addEntry(
-                    entryBuilder.startBooleanToggle(
-                        translate("screen.config.hideSkillCrosshair"),
-                        config.hideSkillCrosshair
-                    ).setDefaultValue(false)
-                        .setSaveConsumer { config.hideSkillCrosshair = it }
-                        .build()
-                )
-
-                addEntry(
-                    entryBuilder.startBooleanToggle(
-                        translate("screen.config.hideSkillInfo"),
-                        config.hideSkillInfo
-                    ).setDefaultValue(false)
-                        .setSaveConsumer { config.hideSkillInfo = it }
-                        .build()
-                )
-            }
-
-            val general = builder.getOrCreateCategory(translate("screen.config.category.general"))
-
-            general.run {
-                addEntry(
-                    entryBuilder.startIntField(
-                        translate("screen.config.quickCastWheelHoldTime"),
-                        config.quickCastWheelHoldTime
-                    ).setDefaultValue(250)
-                        .setMin(0)
-                        .setSaveConsumer { config.quickCastWheelHoldTime = it }
-                        .build()
-                )
-            }
+            addRenderCategory(builder, entryBuilder, config)
+            addGeneralCategory(builder, entryBuilder, config)
+            addGlobalCategory(builder, entryBuilder, globalConfig, inGame)
 
             return builder.build()
         } catch (e: Exception) {
             LOGGER.error("Error while creating config screen", e)
             return parent
+        }
+    }
+
+    private fun addGlobalCategory(
+        builder: ConfigBuilder,
+        entryBuilder: ConfigEntryBuilder,
+        globalConfig: GlobalConfig,
+        inGame: Boolean
+    ) {
+        builder.getOrCreateCategory(translate("screen.config.category.global")).run {
+
+            val defaultSlots =
+                entryBuilder.startSubCategory(translate("screen.config.defaultSkillSlots.subCategory"))
+
+            defaultSlots.add(
+                entryBuilder.startIntSlider(
+                    translate("screen.config.defaultSkillSlots.active"),
+                    globalConfig.defaultSkillSlots.getOrDefault("active", 0),
+                    0, 10
+                ).setDefaultValue(SkillContainer.DEFAULT_SLOTS["active"])
+                    .setSaveConsumer { globalConfig.setDefaultSkillSlot("active", it) }
+                    .build()
+            )
+
+            defaultSlots.add(
+                entryBuilder.startIntSlider(
+                    translate("screen.config.defaultSkillSlots.generic"),
+                    globalConfig.defaultSkillSlots.getOrDefault("generic", 0),
+                    0, 10
+                ).setDefaultValue(SkillContainer.DEFAULT_SLOTS["generic"])
+                    .setSaveConsumer { globalConfig.setDefaultSkillSlot("generic", it) }
+                    .build()
+            )
+
+            defaultSlots.add(
+                entryBuilder.startIntSlider(
+                    translate("screen.config.defaultSkillSlots.passive"),
+                    globalConfig.defaultSkillSlots.getOrDefault("passive", 0),
+                    0, 10
+                ).setDefaultValue(SkillContainer.DEFAULT_SLOTS["passive"])
+                    .setSaveConsumer { globalConfig.setDefaultSkillSlot("passive", it) }
+                    .build()
+            )
+
+            addEntry(defaultSlots.build())
+
+            val skillFruitGeneration =
+                entryBuilder.startSubCategory(translate("screen.config.skillFruitGeneration"))
+
+            skillFruitGeneration.add(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.disableSkillFruitGeneration"),
+                    globalConfig.disableSkillFruitGeneration
+                ).setDefaultValue(false)
+                    .setSaveConsumer { globalConfig.disableSkillFruitGeneration = it }
+                    .build()
+            )
+
+            skillFruitGeneration.add(
+                entryBuilder.startTextDescription(translate("screen.config.generationChance"))
+                    .build()
+            )
+
+            skillFruitGeneration.add(
+                entryBuilder.startFloatField(
+                    translate("screen.config.oakLeavesDropChance"),
+                    globalConfig.oakLeavesDropChance,
+                ).setDefaultValue(0.005f)
+                    .setMin(0f)
+                    .setMax(1f)
+                    .setSaveConsumer { globalConfig.oakLeavesDropChance = it }
+                    .build()
+            )
+
+            skillFruitGeneration.add(
+                entryBuilder.startFloatField(
+                    translate("screen.config.darkOakLeavesDropChance"),
+                    globalConfig.darkOakLeavesDropChance,
+                ).setDefaultValue(0.005f)
+                    .setMin(0f)
+                    .setMax(1f)
+                    .setSaveConsumer { globalConfig.darkOakLeavesDropChance = it }
+                    .build()
+            )
+
+            skillFruitGeneration.add(
+                entryBuilder.startFloatField(
+                    translate("screen.config.ancientCityChestGenerationChance"),
+                    globalConfig.ancientCityChestGenerationChance,
+                ).setDefaultValue(0.25f)
+                    .setMin(0f)
+                    .setMax(1f)
+                    .setSaveConsumer { globalConfig.ancientCityChestGenerationChance = it }
+                    .build()
+            )
+
+            skillFruitGeneration.add(
+                entryBuilder.startFloatField(
+                    translate("screen.config.buriedTreasureChestGenerationChance"),
+                    globalConfig.buriedTreasureChestGenerationChance,
+                ).setDefaultValue(0.25f)
+                    .setMin(0f)
+                    .setMax(1f)
+                    .setSaveConsumer { globalConfig.buriedTreasureChestGenerationChance = it }
+                    .build()
+            )
+
+            skillFruitGeneration.add(
+                entryBuilder.startFloatField(
+                    translate("screen.config.endCityTreasureChestGenerationChance"),
+                    globalConfig.endCityTreasureChestGenerationChance,
+                ).setDefaultValue(0.25f)
+                    .setMin(0f)
+                    .setMax(1f)
+                    .setSaveConsumer { globalConfig.endCityTreasureChestGenerationChance = it }
+                    .build()
+            )
+
+            skillFruitGeneration.add(
+                entryBuilder.startFloatField(
+                    translate("screen.config.spawnBonusChestGenerationChance"),
+                    globalConfig.spawnBonusChestGenerationChance,
+                ).setDefaultValue(1f)
+                    .setMin(0f)
+                    .setMax(1f)
+                    .setSaveConsumer { globalConfig.spawnBonusChestGenerationChance = it }
+                    .build()
+            )
+
+            if (inGame) {
+                skillFruitGeneration.forEach { it.isRequiresRestart = true }
+            }
+
+            addEntry(skillFruitGeneration.build())
+
+            val skillRarityWeights = entryBuilder.startSubCategory(translate("screen.config.skillRarityWeights"))
+
+            SkillRarity.DEFAULT_WEIGHTS.forEach { (rarity, weight) ->
+                skillRarityWeights.add(
+                    entryBuilder.startIntField(rarity.displayName, rarity.weight)
+                        .setDefaultValue(weight)
+                        .setMin(0)
+                        .setSaveConsumer { rarity.weight = it }
+                        .build()
+                        .apply {
+                            if (inGame) {
+                                isRequiresRestart = true
+                            }
+                        }
+                )
+            }
+
+            addEntry(skillRarityWeights.build())
+        }
+    }
+
+    private fun addGeneralCategory(
+        builder: ConfigBuilder,
+        entryBuilder: ConfigEntryBuilder,
+        config: ClientConfig
+    ) {
+        builder.getOrCreateCategory(translate("screen.config.category.general")).run {
+            addEntry(
+                entryBuilder.startIntField(
+                    translate("screen.config.quickCastWheelHoldTime"),
+                    config.quickCastWheelHoldTime
+                ).setDefaultValue(250)
+                    .setMin(0)
+                    .setSaveConsumer { config.quickCastWheelHoldTime = it }
+                    .build()
+            )
+        }
+    }
+
+    private fun addRenderCategory(
+        builder: ConfigBuilder,
+        entryBuilder: ConfigEntryBuilder,
+        config: ClientConfig
+    ) {
+        builder.getOrCreateCategory(translate("screen.config.category.render")).run {
+            addEntry(
+                entryBuilder.startIntField(translate("screen.config.uiOffsetX"), config.uiOffsetX)
+                    .setDefaultValue(0)
+                    .setSaveConsumer { config.uiOffsetX = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startIntField(translate("screen.config.uiOffsetY"), config.uiOffsetY)
+                    .setDefaultValue(0)
+                    .setSaveConsumer { config.uiOffsetY = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startEnumSelector(
+                    translate("screen.config.skillSorter"),
+                    SkillSorter::class.java,
+                    config.skillSorter
+                ).setDefaultValue(SkillSorter.DEFAULT)
+                    .setEnumNameProvider { (it as SkillSorter).displayName }
+                    .setSaveConsumer { config.skillSorter = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startStrList(translate("screen.config.layout"), config.getLayoutOfStringList())
+                    .setDefaultValue(DEFAULT_LAYOUT_STRING_LIST)
+                    .setCellErrorSupplier {
+                        if (ClientConfig.isValidStringLayout(it)) Optional.empty()
+                        else Optional.of(translate("screen.config.invalidLayout"))
+                    }.setErrorSupplier {
+                        val missingNumbers = ClientConfig.findMissingNumbersFromStringList(it)
+                        if (missingNumbers.isEmpty()) {
+                            val redundantNumbers = ClientConfig.findRedundantNumbersFromStringList(it)
+                            if (redundantNumbers.isEmpty()) Optional.empty()
+                            else Optional.of(
+                                translate(
+                                    "screen.config.redundantNumbers",
+                                    redundantNumbers.joinToString(", ")
+                                )
+                            )
+                        } else Optional.of(
+                            translate(
+                                "screen.config.incompleteLayout",
+                                missingNumbers.joinToString(", ")
+                            )
+                        )
+                    }.setSaveConsumer { config.setLayoutFromStringList(it) }.build()
+            )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.hideSkillCrosshair"),
+                    config.hideSkillCrosshair
+                ).setDefaultValue(false)
+                    .setSaveConsumer { config.hideSkillCrosshair = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.hideSkillInfo"),
+                    config.hideSkillInfo
+                ).setDefaultValue(false)
+                    .setSaveConsumer { config.hideSkillInfo = it }
+                    .build()
+            )
         }
     }
 }

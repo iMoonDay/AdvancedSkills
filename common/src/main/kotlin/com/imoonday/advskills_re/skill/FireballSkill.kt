@@ -7,6 +7,7 @@ import net.minecraft.entity.projectile.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
+//TODO 不要对使用者有碰撞
 class FireballSkill : Skill(
     id = "fireball",
     types = listOf(SkillType.DESTRUCTION),

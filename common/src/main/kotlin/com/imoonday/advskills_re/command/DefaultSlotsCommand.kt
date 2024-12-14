@@ -41,20 +41,19 @@ object DefaultSlotsCommand : BaseCommand("slots") {
 
     private fun setSlot(context: CommandContext<ServerCommandSource>, slotType: String): Int {
         val slot = IntegerArgumentType.getInteger(context, "slot")
-        SkillConfig.get().setDefaultSkillSlot(slotType, slot)
-        context.syncConfig()
+        GlobalConfig.get().setDefaultSkillSlot(slotType, slot)
         context.sendFeedback("defaultSlots.$slotType.set", slot)
         return 1
     }
 
     private fun querySlot(context: CommandContext<ServerCommandSource>, slotType: String): Int {
-        val slot = SkillConfig.get().getDefaultSkillSlots(slotType)
+        val slot = GlobalConfig.get().getDefaultSkillSlots(slotType)
         context.sendMessage(translate("defaultSlots.$slotType.query", slot))
         return 1
     }
 
     private fun querySlots(context: CommandContext<ServerCommandSource>): Int {
-        val slots = SkillConfig.get().defaultSkillSlots
+        val slots = GlobalConfig.get().defaultSkillSlots
         var text = Text.empty()
         for ((slotType, slot) in slots) {
             text = text.append(translate("defaultSlots.$slotType.query", slot)).append(" ")
@@ -64,10 +63,11 @@ object DefaultSlotsCommand : BaseCommand("slots") {
     }
 
     private fun resetSlots(context: CommandContext<ServerCommandSource>): Int {
-        val slots = SkillConfig.get().defaultSkillSlots
+        val config = GlobalConfig.get()
+        val slots = config.defaultSkillSlots
         slots.clear()
         slots.putAll(SkillContainer.DEFAULT_SLOTS)
-        context.syncConfig()
+        config.save()
         context.sendFeedback("defaultSlots.reset")
         return 1
     }
