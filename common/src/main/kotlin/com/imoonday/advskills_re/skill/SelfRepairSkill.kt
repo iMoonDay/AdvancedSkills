@@ -6,6 +6,7 @@ import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.item.*
+import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
 class SelfRepairSkill : Skill(
@@ -24,9 +25,19 @@ class SelfRepairSkill : Skill(
         player.armorItems.filter { it.isDamaged }.any { it.damage > getMaxRepairLimit(player, it) }
 
     override fun onStop(player: ServerPlayerEntity) {
-        player.armorItems.filter { it.isDamaged && it.damage > getMaxRepairLimit(player, it) }
-            .forEach { it.damage -= 1 }
         super.onStop(player)
+        val repaired = player.armorItems.filter { it.isDamaged && it.damage > getMaxRepairLimit(player, it) }
+            .count {
+                it.damage -= 1
+                true
+            }
+        if (repaired > 0) {
+            player.spawnParticles(
+                ParticleTypes.COMPOSTER,
+                false, player.centerPos, repaired,
+                0.5, 0.5, 0.5, 0.1
+            )
+        }
     }
 
     fun getMaxRepairLimit(player: PlayerEntity, stack: ItemStack): Int =

@@ -15,6 +15,7 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.text.*
 import net.minecraft.util.*
+import java.awt.SystemColor.*
 import java.util.*
 import java.util.function.*
 
@@ -32,10 +33,12 @@ abstract class Skill(
 ) : SkillTrigger {
 
     val invalid: Boolean = invalid
-        get() = field || SkillConfig.get().isInBlackList(id)
+        get() = field || SkillConfig.get().isInBlackList(id) || GlobalConfig.get().skillConfig.isInBlackList(id)
 
     val rarity: SkillRarity = rarity
-        get() = SkillConfig.get().getModifier(id)?.rarity ?: field
+        get() = SkillConfig.get().getModifier(id)?.rarity
+            ?: GlobalConfig.get().skillConfig.getModifier(id)?.rarity
+            ?: field
 
     open val weight: Int
         get() = rarity.weight
@@ -61,21 +64,21 @@ abstract class Skill(
     val cooldown: Int
         get() {
             val config = SkillConfig.get()
-            val cooldown = config.getModifier(id)?.cooldown ?: defaultCooldown
+            val globalConfig = GlobalConfig.get()
+            val cooldown = config.getModifier(id)?.cooldown
+                ?: globalConfig.skillConfig.getModifier(id)?.cooldown
+                ?: defaultCooldown
             val multiplier = config.skillCooldownMultiplier
+                ?: globalConfig.skillConfig.skillCooldownMultiplier
+                ?: return cooldown
             return (cooldown * multiplier).toInt()
         }
 
     val cooldownText: MutableText
-        get() = if (cooldown <= 0) {
-            translate("cooldown.none")
-        } else {
-            val text = (cooldown / 20.0).toString()
-            translate(
-                "cooldown.seconds",
-                if (text.endsWith(".0")) text.substring(0, text.length - 2) else text
-            )
-        }
+        get() = getCooldownText(cooldown)
+
+    val defaultCooldownText: MutableText
+        get() = getCooldownText(defaultCooldown)
 
     val availableEnhancements: Set<SkillEnhancementType<*>> =
         if (defaultCooldown > 0) enhancements + SkillEnhancements.COOLDOWN
@@ -241,5 +244,16 @@ abstract class Skill(
         availableEnhancements.contains(enhancement.type)
 
     fun isAvailableFor(player: PlayerEntity, enhancement: SkillEnhancement): Boolean =
-        isAvailable(enhancement) && player.getEnhancement(enhancement.type)?.let { enhancement.level > it.level } != false
+        isAvailable(enhancement) && player.getEnhancement(enhancement.type)
+            ?.let { enhancement.level > it.level } != false
+
+    fun getCooldownText(cooldown: Int) = if (cooldown <= 0) {
+        translate("cooldown.none")
+    } else {
+        val text = (cooldown / 20.0).toString()
+        translate(
+            "cooldown.seconds",
+            if (text.endsWith(".0")) text.substring(0, text.length - 2) else text
+        )
+    }
 }

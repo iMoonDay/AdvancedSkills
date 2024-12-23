@@ -5,6 +5,7 @@ import com.imoonday.advskills_re.client.render.entity.*
 import com.imoonday.advskills_re.client.render.entity.feature.*
 import com.imoonday.advskills_re.client.render.entity.model.*
 import com.imoonday.advskills_re.client.render.skill.*
+import com.imoonday.advskills_re.client.screen.*
 import com.imoonday.advskills_re.init.ModEntities.CLONE_PLAYER
 import com.imoonday.advskills_re.init.ModEntities.ENCHANTED_SWORD
 import com.imoonday.advskills_re.init.ModEntities.FREEZE_ENERGY_BALL
@@ -81,6 +82,7 @@ object ClientRegistry {
         ClientGuiEvent.RENDER_HUD.register { context, _ ->
             SkillRendererHandler.renderOverlay(context)
             SkillSlotRenderer.render(context)
+            SkillSlotRenderer.renderSelectedSkill(context)
             SkillRendererHandler.renderHud(context)
             SkillRendererHandler.renderCrosshair(context)
         }
@@ -101,6 +103,7 @@ object ClientRegistry {
         WorldRenderEvents.AFTER_ENTITIES.register(SkillRendererHandler::renderAfterEntities)
         WorldRenderEvents.LAST.register(SkillRendererHandler::renderLast)
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register {
+            SkillWheelScreen.quickCastSlot = null
             Channels.REQUEST_SYNC_COMPONENT_C2S.sendToServer(
                 RequestSyncComponentC2SRequest(
                     it.id,

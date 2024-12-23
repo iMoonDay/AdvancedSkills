@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.*
+import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
@@ -47,6 +48,41 @@ class ClientConfig {
             save()
         }
     var hideSkillInfo: Boolean = false
+        set(value) {
+            field = value
+            save()
+        }
+    var hideSkillSlotBackground: Boolean = false
+        set(value) {
+            field = value
+            save()
+        }
+    var dynamicallyHideSkillSlots = true
+        set(value) {
+            field = value
+            save()
+        }
+    var hideEdge: SkillSlotRenderer.AnimationDirection = SkillSlotRenderer.AnimationDirection.RIGHT
+        set(value) {
+            field = value
+            save()
+        }
+    var displaySelectedSkillSlot: Boolean = true
+        set(value) {
+            field = value
+            save()
+        }
+    var selectedSlotPosition: SkillSlotRenderer.SlotPosition = SkillSlotRenderer.SlotPosition.LEFT_OF_INVENTORY
+        set(value) {
+            field = value
+            save()
+        }
+    var selectedSlotOffsetX: Int = 0
+        set(value) {
+            field = value
+            save()
+        }
+    var selectedSlotOffsetY: Int = 0
         set(value) {
             field = value
             save()
@@ -154,7 +190,7 @@ class ClientConfig {
         @JvmStatic
         fun isValidStringLayout(str: String): Boolean = str.replace(" ", "").split(",").all {
             val value = it.toIntOrNull()
-            value != null && value in 1..10
+            value != null && value in 0..10
         }
 
         @JvmStatic
@@ -177,7 +213,7 @@ class ClientConfig {
             for (row in layoutStringList) {
                 for (num in row.replace(" ", "").split(",")) {
                     val value = num.toIntOrNull()
-                    if (value != null) {
+                    if (value != null && value != 0) {
                         numbers[value] = numbers.getOrDefault(value, 0) + 1
                     }
                 }

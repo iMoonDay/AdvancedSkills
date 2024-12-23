@@ -12,11 +12,13 @@ import net.minecraft.world.*
 import kotlin.math.*
 
 private const val EFFECT_RANGE_KEY = "EffectRange"
+private const val IGNORE_OWNER_KEY = "IgnoreOwner"
 
 abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBallEntity>, world: World) :
     ExplosiveProjectileEntity(entityType, world) {
 
     abstract var range: Double
+    var ignoreOwner: Boolean = false
 
     abstract fun getEffects(): Map<StatusEffectInstance, Float>
 
@@ -48,7 +50,10 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
         if (world.isClient) return
         val effects = getEffects()
         if (effects.isNotEmpty()) {
-            world.getOtherEntities(null, this.boundingBox.expand(range)) { it is LivingEntity }
+            world.getOtherEntities(
+                if (ignoreOwner) owner else null,
+                this.boundingBox.expand(range)
+            ) { it is LivingEntity }
                 .filterIsInstance<LivingEntity>().forEach {
                     for (entry in effects) {
                         val effect = entry.key
@@ -82,12 +87,16 @@ abstract class EffectEnergyBallEntity(entityType: EntityType<out EffectEnergyBal
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
         nbt.putDouble(EFFECT_RANGE_KEY, range)
+        nbt.putBoolean(IGNORE_OWNER_KEY, ignoreOwner)
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         super.readCustomDataFromNbt(nbt)
         if (nbt.contains(EFFECT_RANGE_KEY, NbtElement.NUMBER_TYPE.toInt())) {
             range = nbt.getDouble(EFFECT_RANGE_KEY)
+        }
+        if (nbt.contains(IGNORE_OWNER_KEY, NbtElement.BYTE_TYPE.toInt())) {
+            ignoreOwner = nbt.getBoolean(IGNORE_OWNER_KEY)
         }
     }
 

@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.command
 
-import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
@@ -21,42 +20,90 @@ object ModifySkillCommand : BaseCommand("modify") {
                         .then(
                             literal("set")
                                 .then(
-                                    argument("seconds", IntegerArgumentType.integer(0))
-                                        .executes(::setCooldown)
+                                    literal("local")
+                                        .then(
+                                            argument("seconds", IntegerArgumentType.integer(0))
+                                                .executes { setCooldown(it, false) }
+                                        )
+                                )
+                                .then(
+                                    literal("global")
+                                        .then(
+                                            argument("seconds", IntegerArgumentType.integer(0))
+                                                .executes { setCooldown(it, true) }
+                                        )
                                 )
                         )
-                        .then(literal("reset").executes(::resetCooldown))
+                        .then(
+                            literal("reset")
+                                .then(literal("local").executes { resetCooldown(it, false) })
+                                .then(literal("global").executes { resetCooldown(it, true) })
+                        )
                 )
                 .then(
                     literal("rarity")
                         .then(
                             literal("set")
                                 .then(
-                                    argument("rarity", StringArgumentType.word())
-                                        .suggests { _, builder1 -> suggestRarity(builder1) }
-                                        .executes(::setRarity)
+                                    literal("local")
+                                        .then(
+                                            argument("rarity", StringArgumentType.word())
+                                                .suggests { _, builder1 -> suggestRarity(builder1) }
+                                                .executes { setRarity(it, false) }
+                                        )
+                                )
+                                .then(
+                                    literal("global")
+                                        .then(
+                                            argument("rarity", StringArgumentType.word())
+                                                .suggests { _, builder1 -> suggestRarity(builder1) }
+                                                .executes { setRarity(it, true) }
+                                        )
                                 )
                         )
-                        .then(literal("reset").executes(::resetRarity))
+                        .then(
+                            literal("reset")
+                                .then(literal("local").executes { resetRarity(it, false) })
+                                .then(literal("global").executes { resetRarity(it, true) })
+                        )
                 )
                 .then(
                     literal("time")
                         .then(
                             literal("set")
                                 .then(
-                                    argument("seconds", IntegerArgumentType.integer(0))
-                                        .executes(::setTime)
+                                    literal("local")
+                                        .then(
+                                            argument("seconds", IntegerArgumentType.integer(0))
+                                                .executes { setTime(it, false) }
+                                        )
+                                )
+                                .then(
+                                    literal("global")
+                                        .then(
+                                            argument("seconds", IntegerArgumentType.integer(0))
+                                                .executes { setTime(it, true) }
+                                        )
                                 )
                         )
-                        .then(literal("reset").executes(::resetTime))
+                        .then(
+                            literal("reset")
+                                .then(literal("local").executes { resetTime(it, false) })
+                                .then(literal("global").executes { resetTime(it, true) })
+                        )
                 )
-        ).then(literal("reset").executes(::resetAll))
+        ).then(
+            literal("reset")
+                .then(literal("local").executes { resetAll(it, false) })
+                .then(literal("global").executes { resetAll(it, true) })
+        )
 
-    private fun setTime(context: CommandContext<ServerCommandSource>): Int {
+    private fun setTime(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
         val skill = context.getSkill()
         val seconds = IntegerArgumentType.getInteger(context, "seconds")
-        SkillConfig.get().getOrCreateModifier(skill.id).time = seconds * 20
-        context.syncConfig()
+        getSkillConfig(global).getOrCreateModifier(skill.id).time = seconds * 20
+        trySave(global)
+        context.syncConfig(global)
         context.sendFeedback(
             "time.set",
             skill.name,
@@ -65,16 +112,17 @@ object ModifySkillCommand : BaseCommand("modify") {
         return 1
     }
 
-    private fun resetTime(context: CommandContext<ServerCommandSource>): Int {
+    private fun resetTime(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
         val skill = context.getSkill()
         val id = skill.id
-        val config = SkillConfig.get()
+        val config = getSkillConfig(global)
         config.getModifier(id)?.run {
             time = null
             if (isEmpty) {
                 config.removeModifier(id)
             }
-            context.syncConfig()
+            trySave(global)
+            context.syncConfig(global)
         }
         context.sendFeedback(
             "time.reset",
@@ -83,16 +131,17 @@ object ModifySkillCommand : BaseCommand("modify") {
         return 1
     }
 
-    private fun resetRarity(context: CommandContext<ServerCommandSource>): Int {
+    private fun resetRarity(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
         val skill = context.getSkill()
         val id = skill.id
-        val config = SkillConfig.get()
+        val config = getSkillConfig(global)
         config.getModifier(id)?.run {
             rarity = null
             if (isEmpty) {
                 config.removeModifier(id)
             }
-            context.syncConfig()
+            trySave(global)
+            context.syncConfig(global)
         }
         context.sendFeedback(
             "rarity.reset",
@@ -101,7 +150,7 @@ object ModifySkillCommand : BaseCommand("modify") {
         return 1
     }
 
-    private fun setRarity(context: CommandContext<ServerCommandSource>): Int {
+    private fun setRarity(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
         val skill = context.getSkill()
         val rarityStr = StringArgumentType.getString(context, "rarity")
         val rarity = SkillRarity.fromId(rarityStr)
@@ -112,8 +161,9 @@ object ModifySkillCommand : BaseCommand("modify") {
             )
             0
         } else {
-            SkillConfig.get().getOrCreateModifier(skill.id).rarity = rarity
-            context.syncConfig()
+            getSkillConfig(global).getOrCreateModifier(skill.id).rarity = rarity
+            trySave(global)
+            context.syncConfig(global)
             context.sendFeedback(
                 "rarity.set",
                 skill.name,
@@ -131,16 +181,17 @@ object ModifySkillCommand : BaseCommand("modify") {
             SkillRarity::displayName
         )
 
-    private fun resetCooldown(context: CommandContext<ServerCommandSource>): Int {
+    private fun resetCooldown(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
         val skill = context.getSkill()
         val id = skill.id
-        val config = SkillConfig.get()
+        val config = getSkillConfig(global)
         config.getModifier(id)?.run {
             cooldown = null
             if (isEmpty) {
                 config.removeModifier(id)
             }
-            context.syncConfig()
+            trySave(global)
+            context.syncConfig(global)
         }
         context.sendFeedback(
             "cooldown.reset",
@@ -149,11 +200,12 @@ object ModifySkillCommand : BaseCommand("modify") {
         return 1
     }
 
-    private fun setCooldown(context: CommandContext<ServerCommandSource>): Int {
+    private fun setCooldown(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
         val skill = context.getSkill()
         val seconds = IntegerArgumentType.getInteger(context, "seconds")
-        SkillConfig.get().getOrCreateModifier(skill.id).cooldown = seconds * 20
-        context.syncConfig()
+        getSkillConfig(global).getOrCreateModifier(skill.id).cooldown = seconds * 20
+        trySave(global)
+        context.syncConfig(global)
         context.sendFeedback(
             "cooldown.set",
             skill.name,
@@ -162,10 +214,10 @@ object ModifySkillCommand : BaseCommand("modify") {
         return 1
     }
 
-    private fun resetAll(context: CommandContext<ServerCommandSource>): Int {
-        val config = SkillConfig.get()
-        config.skillModifier.clear()
-        context.syncConfig()
+    private fun resetAll(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
+        getSkillConfig(global).skillModifier.clear()
+        trySave(global)
+        context.syncConfig(global)
         context.sendFeedback("resetModifiers")
         return 1
     }

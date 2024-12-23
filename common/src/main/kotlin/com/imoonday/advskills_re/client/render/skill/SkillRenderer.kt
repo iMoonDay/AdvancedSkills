@@ -6,8 +6,12 @@ import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.blaze3d.systems.*
+import net.minecraft.client.*
 import net.minecraft.client.gui.*
+import net.minecraft.client.gui.tooltip.*
 import net.minecraft.entity.player.*
+import net.minecraft.text.*
+import net.minecraft.util.*
 import java.awt.*
 import kotlin.math.*
 
@@ -113,5 +117,41 @@ object SkillRenderer {
             context.drawText(textRenderer, time, 0, 0, 0xFFFFFF, false)
             context.matrices.pop()
         }
+    }
+
+    @JvmStatic
+    fun renderTooltip(
+        client: MinecraftClient,
+        skill: Skill,
+        context: DrawContext,
+        x: Int,
+        y: Int,
+        player: PlayerEntity,
+    ) {
+        val orderedList = getTooltip(client, skill, player)
+        context.drawOrderedTooltip(client.textRenderer, orderedList, x, y)
+    }
+
+    @JvmStatic
+    fun getTooltip(
+        client: MinecraftClient,
+        skill: Skill,
+        player: PlayerEntity
+    ): MutableList<OrderedText> {
+        val list = skill.getItemTooltips(displayName = true)
+        val tooltips = skill.getEnhancementTooltips(player)
+        if (tooltips.isNotEmpty()) {
+            list.add(Text.empty())
+            list.add(translate("screen.inventory.enhance").formatted(Formatting.GRAY))
+            list.addAll(tooltips)
+        }
+        list.add(skill.id.toString().toText().formatted(Formatting.DARK_GRAY))
+        val orderedList = list.map(Text::asOrderedText).toMutableList()
+        val lines = Tooltip.wrapLines(client, list[1])
+        if (lines.size > 1) {
+            orderedList.removeAt(1)
+            orderedList.addAll(1, lines)
+        }
+        return orderedList
     }
 }

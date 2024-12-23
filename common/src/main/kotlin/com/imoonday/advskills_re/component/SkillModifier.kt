@@ -4,6 +4,7 @@ import com.imoonday.advskills_re.skill.enums.*
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.*
 import net.minecraft.nbt.*
 
 @Serializable(with = SkillModifier.Serializer::class)

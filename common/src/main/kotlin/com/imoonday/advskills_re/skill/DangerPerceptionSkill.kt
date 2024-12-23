@@ -31,7 +31,7 @@ class DangerPerceptionSkill : Skill(
 
     init {
         addEnhancementTooltipWithArg(SkillEnhancements.MOVEMENT_SPEED) { it.level * 6 }
-        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level * 0.4 }
+        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level * 0.4f }
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)

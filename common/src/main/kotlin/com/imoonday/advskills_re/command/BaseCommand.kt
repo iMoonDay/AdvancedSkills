@@ -9,7 +9,6 @@ import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.*
 import com.mojang.brigadier.context.*
 import net.minecraft.command.*
-import net.minecraft.nbt.*
 import net.minecraft.server.command.*
 import net.minecraft.text.*
 
@@ -32,6 +31,7 @@ abstract class BaseCommand(
     }
 
     protected fun literal(name: String): LiteralArgumentBuilder<ServerCommandSource> = CommandManager.literal(name)
+
     protected fun <T> argument(name: String, type: ArgumentType<T>): RequiredArgumentBuilder<ServerCommandSource, T> =
         CommandManager.argument(name, type)
 
@@ -46,11 +46,25 @@ abstract class BaseCommand(
     ) = source.sendError(translate(key, *args))
 
     protected fun CommandContext<ServerCommandSource>.sendMessage(message: Text) = source.sendMessage(message)
-    protected fun CommandContext<ServerCommandSource>.syncConfig() {
+
+    protected fun CommandContext<ServerCommandSource>.syncConfig(global: Boolean) {
         val server = source.server
         Channels.SYNC_CONFIG_S2C.sendToPlayers(
             server.playerManager.playerList,
-            SyncConfigS2CPacket(SkillConfig.get().save(NbtCompound()))
+            if (global) SyncConfigS2CPacket(
+                GlobalConfig.get().getSkillConfigNbt(),
+                SyncConfigS2CPacket.ConfigType.GLOBAL
+            ) else SyncConfigS2CPacket(
+                SkillConfig.get().save(),
+                SyncConfigS2CPacket.ConfigType.LOCAL
+            )
         )
+    }
+
+    protected fun getSkillConfig(global: Boolean): SkillConfig =
+        if (global) GlobalConfig.get().skillConfig else SkillConfig.get()
+
+    protected fun trySave(global: Boolean) {
+        if (global) GlobalConfig.get().save()
     }
 }

@@ -72,11 +72,15 @@ advskills_re:
     set: Time of %s has been set to %s seconds
     reset: Time of %s has been reset
   cooldownMultiplier:
-    set: Global skill cooldown multiplier has been set to %d
-    value: Global skill cooldown multiplier is %d
+    set: 'Global skill cooldown multiplier has been set to %d'
+    value: 'Global skill cooldown multiplier is %d'
+    none: Global skill cooldown multiplier is not set
+    reset: Global skill cooldown multiplier has been reset
   xpMultiplier:
-    set: Experience gain multiplier has been set to %d
-    value: Experience gain multiplier is %d
+    set: 'Experience gain multiplier has been set to %d'
+    value: 'Experience gain multiplier is %d'
+    none: The experience gain multiplier is not set
+    reset: The experience gain multiplier has been reset
   blacklist:
     add: '%s has been added to the blacklist'
     remove: '%s has been removed from the blacklist'
@@ -273,7 +277,7 @@ advskills_re:
       notOwner: You are not the owner of the horse
       dead: You exclusive horse is dead at %d %d %d. You can summon it again after the cooldown
       killed: Your exclusive horse is killed by %s at %d %d %d. You can summon it again after the cooldown
-      inventory: You can't open the inventory of your exclusive mount
+      inventory: You can't open the inventory of exclusive mount
     night_vision:
       name: Night Vision
       description: Night vision effect
@@ -496,6 +500,7 @@ advskills_re:
         type: 'Type: %s'
         description: 'Description: %s'
         cooldown: 'Cooldown: %s'
+        cooldown_with_default: 'Cooldown: %s (default: %s)'
         rarity: 'Rarity: %s'
       suggestion: Have a new skill suggestion? Click to go to github to submit an issue or PR!
     list:
@@ -532,11 +537,13 @@ advskills_re:
     enhance:
       enhance: Enhance
       count: 'Remaining Enhancements: %d'
+      new: 'New'
     config:
       title: 'Advanced Skills: Remastered'
       category:
         render: Render
         general: General
+        global: Global
       uiOffsetX: Skill Slot X Offset
       uiOffsetY: Skill Slot Y Offset
       skillSorter: Skill Sorter
@@ -544,6 +551,9 @@ advskills_re:
       quickCastWheelHoldTime: Hold time for Quick Cast Wheel (ms)
       hideSkillCrosshair: Hide Skill Crosshair
       hideSkillInfo: Hide skill information by default (Shift-display)
+      hideSkillSlotBackground: Hide skill slot background
+      dynamicallyHideSkillSlots: Dynamically hide skill slots
+      hideEdge: The direction to hide the skill slots
       invalidLayout: "Wrong input! Can only contain 1-10 and the delimiter ','"
       incompleteLayout: "Wrong input! Missing slots: %s"
       redundantNumbers: "Wrong input! Redundant numbers: %s"
@@ -562,6 +572,10 @@ advskills_re:
       endCityTreasureChestGenerationChance: End City Treasure Chest
       spawnBonusChestGenerationChance: Spawn Bonus Chest
       skillRarityWeights: Skill Rarity Weights
+      skillConfig: Global Skill Config
+      skillCooldownMultiplier: Skill Cooldown Multiplier
+      skillXpMultiplier: Skill Xp Multiplier
+      skillBlackList: Skill Black List
   skillSlot:
     generic: 'Generic Skill Slot %d'
     active: 'Active Skill Slot %d'
@@ -639,6 +653,12 @@ advskills_re:
     effect_frequency:
       name: Effect Frequency Enhancement
       description: Effect Frequency++
+    self_immune:
+      name: Self Immune Enhancement
+      description: Immune to Negative Effects
+    experience_orb:
+      name: Experience Orb Enhancement
+      description: Treat experience orbs as items
 item:
   advskills_re:
     skill_fruit: Skill Fruit
@@ -682,3 +702,4 @@ subtitles:
     fire: Fire
     laser: Laser
     return: Return
+    enhance: Enhance

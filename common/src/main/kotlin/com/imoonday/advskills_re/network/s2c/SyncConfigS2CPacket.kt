@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.network.s2c
 
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.network.*
+import com.imoonday.advskills_re.network.s2c.SyncConfigS2CPacket.ConfigType.*
 import dev.architectury.networking.*
 import net.fabricmc.api.*
 import net.minecraft.nbt.*
@@ -9,16 +10,29 @@ import net.minecraft.network.*
 
 class SyncConfigS2CPacket(
     val tag: NbtCompound,
+    val type: ConfigType,
 ) : NetworkPacket {
 
-    constructor(buf: PacketByteBuf) : this(buf.readNbt()!!)
+    constructor(buf: PacketByteBuf) : this(buf.readNbt()!!, buf.readEnumConstant(ConfigType::class.java))
 
     override fun encode(buf: PacketByteBuf) {
         buf.writeNbt(tag)
+        buf.writeEnumConstant(type)
     }
 
     override fun apply(context: NetworkManager.PacketContext) {
         if (context.env != EnvType.CLIENT) return
-        SkillConfig.get().load(tag)
+        when (type) {
+            GLOBAL -> GlobalConfig.get().loadFromNbt(tag)
+            LOCAL -> SkillConfig.get().load(tag)
+            BOTH -> {
+                GlobalConfig.get().loadFromNbt(tag)
+                SkillConfig.get().load(tag)
+            }
+        }
+    }
+
+    enum class ConfigType {
+        GLOBAL, LOCAL, BOTH
     }
 }

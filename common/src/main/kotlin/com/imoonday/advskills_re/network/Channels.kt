@@ -19,6 +19,7 @@ object Channels {
     val SYNC_PLAYER_DATA_S2C: NetworkChannel = registerChannel("sync_player_data_s2c")
     val REQUEST_SYNC_COMPONENT_C2S: NetworkChannel = registerChannel("request_sync_component_c2s")
     val UPDATE_ORE_CACHE_S2C: NetworkChannel = registerChannel("update_ore_cache_s2c")
+    val ENHANCE_SKILL_S2C: NetworkChannel = registerChannel("enhance_skill_s2c")
 
     fun register() {
         USE_SKILL_C2S.register(::UseSkillC2SRequest)
@@ -32,6 +33,7 @@ object Channels {
         SYNC_PLAYER_DATA_S2C.register(::SyncPlayerDataS2CPacket)
         REQUEST_SYNC_COMPONENT_C2S.register(::RequestSyncComponentC2SRequest)
         UPDATE_ORE_CACHE_S2C.register(::UpdateOreCacheS2CPacket)
+        ENHANCE_SKILL_S2C.register { EnhanceSkillS2CPacket() }
     }
 
     private fun registerChannel(name: String) = NetworkChannel.create(id(name))

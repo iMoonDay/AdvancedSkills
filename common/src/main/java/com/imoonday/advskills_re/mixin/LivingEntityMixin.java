@@ -101,13 +101,13 @@ public abstract class LivingEntityMixin extends EntityMixin {
         }
     }
 
-    @Inject(method = "tickMovement", at = @At("HEAD"), cancellable = true)
-    private void advskills_re$tickMovement(CallbackInfo ci) {
-        LivingEntity entity = (LivingEntity) (Object) this;
-        if (ModEffectsKt.isForceFrozen(entity) || ModEffectsKt.isConfined(entity)) {
-            ci.cancel();
-        }
-    }
+//    @Inject(method = "tickMovement", at = @At("HEAD"), cancellable = true)
+//    private void advskills_re$tickMovement(CallbackInfo ci) {
+//        LivingEntity entity = (LivingEntity) (Object) this;
+//        if (ModEffectsKt.isForceFrozen(entity) || ModEffectsKt.isConfined(entity)) {
+//            ci.cancel();
+//        }
+//    }
 
     @Inject(method = "setHeadYaw", at = @At("HEAD"), cancellable = true)
     public void advskills_re$setHeadYaw(float headYaw, CallbackInfo ci) {

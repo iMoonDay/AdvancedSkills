@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.client
 
+import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
@@ -71,6 +72,7 @@ fun ClientPlayerEntity.requestUse(
             }
         )
     )
+    SkillSlotRenderer.lastUseTime = System.currentTimeMillis()
 }
 
 val Skill.modelId

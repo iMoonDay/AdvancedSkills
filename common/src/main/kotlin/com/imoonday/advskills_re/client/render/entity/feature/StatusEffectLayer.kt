@@ -36,17 +36,17 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
             renderEffects(matrices, vertexConsumers, entity, delta, silenceModelId, horizonOffset, 4)
             horizonOffset += 0.5f
         }
-        delta -= 10
+        delta -= 45
         if (entity.isDisarmed) {
             renderEffects(matrices, vertexConsumers, entity, delta, disarmModelId, horizonOffset, 4)
             horizonOffset += 0.5f
         }
-        delta -= 10
+        delta -= 45
         if (entity.isConfined) {
             renderEffects(matrices, vertexConsumers, entity, delta, confinementModelId, horizonOffset, 4)
             horizonOffset += 0.5f
         }
-        delta -= 10
+        delta -= 45
         if (entity.isVulnerable) {
             renderEffects(
                 matrices,
@@ -55,7 +55,7 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
                 delta,
                 vulnerableModelId,
                 horizonOffset,
-                entity.vulnerableLevel.coerceAtMost(4)
+                entity.vulnerableLevel.coerceAtMost((4 + horizonOffset * 4).toInt())
             )
         }
     }
@@ -69,20 +69,20 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
         horizonOffset: Float,
         count: Int,
     ) {
-        val age: Float = entity.age + tickDelta
-        val rotateAngleY = age / -20.0f
+        val rotateAngleY = (entity.age + tickDelta) / 20.0f
 
-        stack.pop()
         val model = context.modelManager.getModel(modelIdentifier)
-        val scale = (entity.width * 1.2f).coerceAtMost(1.0f)
         for (c in 0 until count) {
             stack.push()
-            stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotateAngleY * (180f / Math.PI.toFloat()) + (c * (360f / count))))
-            stack.translate(-0.5, (entity.height - scale) * 0.5, -0.5)
-            stack.translate(0f, 0f, (entity.width).coerceAtLeast(0.75f) + horizonOffset)
-            stack.scale(scale, scale, scale)
 
-            for (dir in Direction.entries) {
+            stack.translate(-0.5, 0.5, -0.5)
+            stack.scale(-1f, -1f, 1f)
+            stack.translate(-0.5, -0.5, 0.5)
+            stack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotateAngleY * (180f / Math.PI.toFloat()) + (c * (360f / count))))
+            stack.translate(-0.5, -0.5, 0.0)
+            stack.translate(0f, 0f, 0.5f + horizonOffset)
+
+            for (dir in directions) {
                 context.itemRenderer.renderBakedItemQuads(
                     stack,
                     provider.getBuffer(TexturedRenderLayers.getEntityTranslucentCull()),
@@ -96,10 +96,11 @@ class StatusEffectLayer<T : LivingEntity, M : EntityModel<T>>(
             }
             stack.pop()
         }
-        stack.push()
     }
 
     companion object {
+
+        private val directions = Direction.entries
 
         val silenceModelId = Skills.PRIMARY_SILENCE.modelId
         val disarmModelId = Skills.DISARM.modelId

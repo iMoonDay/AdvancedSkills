@@ -80,6 +80,12 @@ object SkillEnhancements {
     @JvmStatic
     val EFFECT_FREQUENCY = register("effect_frequency", ::SkillEnhancement)
 
+    @JvmStatic
+    val SELF_IMMUNE = register("self_immune", 1, ::SkillEnhancement)
+
+    @JvmStatic
+    val EXPERIENCE_ORB = register("experience_orb", 1, ::SkillEnhancement)
+
     fun init() = Unit
 
     @JvmStatic

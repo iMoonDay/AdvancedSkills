@@ -187,6 +187,20 @@ public abstract class EntityMixin implements Propertied, ICollisionRecorder {
         }
     }
 
+    @Inject(method = "canMoveVoluntarily", at = @At("HEAD"), cancellable = true)
+    private void advskills_re$canMoveVoluntarily(CallbackInfoReturnable<Boolean> cir) {
+        if ((Entity) (Object) this instanceof LivingEntity entity && (ModEffectsKt.isForceFrozen(entity) || ModEffectsKt.isConfined(entity))) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "getVelocity", at = @At("HEAD"), cancellable = true)
+    private void advskills_re$getVelocity(CallbackInfoReturnable<Vec3d> cir) {
+        if ((Entity) (Object) this instanceof LivingEntity entity && (ModEffectsKt.isForceFrozen(entity) || ModEffectsKt.isConfined(entity))) {
+            cir.setReturnValue(Vec3d.ZERO);
+        }
+    }
+
     @Inject(method = "readNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     private void advskills_re$readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if (nbt.contains("entityPropertyComponent")) {

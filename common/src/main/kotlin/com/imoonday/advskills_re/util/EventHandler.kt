@@ -17,7 +17,6 @@ import net.minecraft.loot.condition.*
 import net.minecraft.loot.entry.*
 import net.minecraft.loot.function.*
 import net.minecraft.loot.provider.number.*
-import net.minecraft.nbt.*
 import net.minecraft.registry.tag.*
 import net.minecraft.server.network.*
 
@@ -73,7 +72,12 @@ object EventHandler {
         }
         registerLootTables()
         PlayerEvent.PLAYER_JOIN.register {
-            Channels.SYNC_CONFIG_S2C.sendToPlayer(it, SyncConfigS2CPacket(SkillConfig.get().save(NbtCompound())))
+            Channels.SYNC_CONFIG_S2C.sendToPlayer(
+                it, SyncConfigS2CPacket(
+                    SkillConfig.get().save(GlobalConfig.get().toNbt()),
+                    SyncConfigS2CPacket.ConfigType.BOTH
+                )
+            )
         }
         LifecycleEvent.SERVER_STARTED.register {
             SkillConfig.get().connectToServer(it)

@@ -289,7 +289,7 @@ object Skills {
 
     @JvmField
     val FORCED_GROWTH = register(ForcedGrowthSkill())
-    
+
     @JvmField
     val SPACE_BLAST = register(SpaceBlastSkill())
 
@@ -316,11 +316,13 @@ object Skills {
 
     fun fromId(id: Identifier): Skill = skills.getOrDefault(id, EMPTY)
 
-    fun fromId(id: String): Skill = id.toIdentifier()?.let { fromId(it) } ?: EMPTY
+    fun fromId(id: String): Skill =
+        if (id.contains(":")) id.toIdentifier()?.let { fromId(it) } ?: EMPTY else fromId(id(id))
 
     fun fromIdNullable(id: Identifier?): Skill? = skills[id]
 
-    fun fromIdNullable(id: String?): Skill? = fromIdNullable(id?.toIdentifier())
+    fun fromIdNullable(id: String?): Skill? =
+        fromIdNullable(id?.let { if (it.contains(":")) it.toIdentifier() else id(it) })
 
     inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> =
         getSkills().filterIsInstance<T>().filter(predicate)

@@ -52,5 +52,11 @@
     "sounds": [
       "advskills_re:return"
     ]
+  },
+  "enhance": {
+    "subtitle": "subtitles.advskills_re.enhance",
+    "sounds": [
+      "advskills_re:enhance"
+    ]
   }
 }

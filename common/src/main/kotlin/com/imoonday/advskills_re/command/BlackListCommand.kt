@@ -15,36 +15,86 @@ object BlackListCommand : BaseCommand("blacklist") {
         return builder.then(
             literal("add")
                 .then(
-                    argument("skill", SkillArgumentType.skill())
-                        .executes(::addSkill)
+                    literal("local")
+                        .then(
+                            argument("skill", SkillArgumentType.skill())
+                                .executes { addSkill(it, false) }
+                        )
                 )
-        ).then(
-            literal("remove")
                 .then(
-                    argument("id", StringArgumentType.string())
-                        .suggests { _, builder1 ->
-                            CommandSource.suggestMatching(SkillConfig.get().skillBlackList.map {
-                                it.replace(":", ".")
-                            }, builder1)
-                        }.executes(::removeSkill)
+                    literal("global")
+                        .then(
+                            argument("skill", SkillArgumentType.skill())
+                                .executes { addSkill(it, true) }
+                        )
                 )
-        ).then(literal("list").executes(::queryBlackList))
-            .then(literal("clear").executes(::clearBlackList))
+        )
+            .then(
+                literal("remove")
+                    .then(
+                        literal("local")
+                            .then(
+                                argument("id", StringArgumentType.string())
+                                    .suggests { _, builder1 ->
+                                        CommandSource.suggestMatching(SkillConfig.get().skillBlackList.map {
+                                            it.replace(":", ".")
+                                        }, builder1)
+                                    }
+                                    .executes { removeSkill(it, false) }
+                            )
+                    )
+                    .then(
+                        literal("global")
+                            .then(
+                                argument("id", StringArgumentType.string())
+                                    .suggests { _, builder1 ->
+                                        CommandSource.suggestMatching(GlobalConfig.get().skillConfig.skillBlackList.map {
+                                            it.replace(":", ".")
+                                        }, builder1)
+                                    }
+                                    .executes { removeSkill(it, true) }
+                            )
+                    )
+            )
+            .then(
+                literal("list")
+                    .then(
+                        literal("local")
+                            .executes { queryBlackList(it, false) }
+                    )
+                    .then(
+                        literal("global")
+                            .executes { queryBlackList(it, true) }
+                    )
+            )
+            .then(
+                literal("clear")
+                    .then(
+                        literal("local")
+                            .executes { clearBlackList(it, false) }
+                    )
+                    .then(
+                        literal("global")
+                            .executes { clearBlackList(it, true) }
+                    )
+            )
     }
 
-    private fun addSkill(context: CommandContext<ServerCommandSource>): Int {
+    private fun addSkill(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
         val skill = SkillArgumentType.getSkill(context)
-        SkillConfig.get().addBlackList(skill.id)
-        context.syncConfig()
+        getSkillConfig(global).addBlackList(skill.id)
+        trySave(global)
+        context.syncConfig(global)
         context.sendFeedback("blacklist.add", skill.name)
         return 1
     }
 
-    private fun removeSkill(context: CommandContext<ServerCommandSource>): Int {
+    private fun removeSkill(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
         val idStr = StringArgumentType.getString(context, "id").replace(".", ":")
         val id = idStr.toIdentifier()
-        return if (id != null && SkillConfig.get().removeBlackList(id)) {
-            context.syncConfig()
+        return if (id != null && getSkillConfig(global).removeBlackList(id)) {
+            trySave(global)
+            context.syncConfig(global)
             context.sendFeedback("blacklist.remove", Skills.fromIdNullable(id)?.name ?: idStr)
             1
         } else {
@@ -53,8 +103,8 @@ object BlackListCommand : BaseCommand("blacklist") {
         }
     }
 
-    private fun queryBlackList(context: CommandContext<ServerCommandSource>): Int {
-        val blackList = SkillConfig.get().skillBlackList
+    private fun queryBlackList(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
+        val blackList = getSkillConfig(global).skillBlackList
         if (blackList.isEmpty()) {
             context.sendFeedback("blacklist.empty")
             return 0
@@ -68,9 +118,10 @@ object BlackListCommand : BaseCommand("blacklist") {
         return blackList.size
     }
 
-    private fun clearBlackList(context: CommandContext<ServerCommandSource>): Int {
-        SkillConfig.get().skillBlackList.clear()
-        context.syncConfig()
+    private fun clearBlackList(context: CommandContext<ServerCommandSource>, global: Boolean): Int {
+        getSkillConfig(global).skillBlackList.clear()
+        trySave(global)
+        context.syncConfig(global)
         context.sendFeedback("blacklist.clear")
         return 1
     }

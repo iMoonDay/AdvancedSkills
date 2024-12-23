@@ -72,11 +72,15 @@ advskills_re:
     set: 已将 %s 的持续(蓄力)时间设置为 %d 秒
     reset: 已重置 %s 的持续(蓄力)时间
   cooldownMultiplier:
-    set: 全局技能冷却倍率已设置为 %d
-    value: 当前全局技能冷却倍率为 %d
+    set: '全局技能冷却倍率已设置为 %d'
+    value: '当前全局技能冷却倍率为 %d'
+    none: 全局技能冷却倍率未设置
+    reset: 已重置全局技能冷却倍率
   xpMultiplier:
-    set: 经验获取倍率已设置为 %d
-    value: 当前经验获取倍率为 %d
+    set: '经验获取倍率已设置为 %d'
+    value: '当前经验获取倍率为 %d'
+    none: 经验获取倍率未设置
+    reset: 已重置经验获取倍率
   blacklist:
     add: '%s 已添加到黑名单'
     remove: '%s 已从黑名单中删除'
@@ -508,6 +512,7 @@ advskills_re:
         type: '类型：%s'
         description: '描述：%s'
         cooldown: '冷却：%s'
+        cooldown_with_default: '冷却：%s (默认：%s)'
         rarity: '稀有度：%s'
       suggestion: "有新的技能建议?点击前往github提交issue或PR!"
     list:
@@ -544,6 +549,7 @@ advskills_re:
     enhance:
       enhance: 强化
       count: '剩余强化数：%d'
+      new: '新'
     config:
       title: 进阶技能：重制版
       category:
@@ -557,6 +563,9 @@ advskills_re:
       quickCastWheelHoldTime: 快捷施法轮盘长按时间 (ms)
       hideSkillCrosshair: 隐藏技能准星
       hideSkillInfo: 默认隐藏技能信息 (按住Shift显示)
+      hideSkillSlotBackground: 隐藏技能栏背景
+      dynamicallyHideSkillSlots: 动态隐藏技能栏
+      hideEdge: 隐藏边缘方向
       invalidLayout: "错误输入! 只能包含1-10和分隔符','"
       incompleteLayout: "错误输入! 缺少栏位：%s"
       redundantNumbers: "错误输入! 栏位不能重复：%s"
@@ -575,6 +584,10 @@ advskills_re:
       endCityTreasureChestGenerationChance: 末地城宝箱
       spawnBonusChestGenerationChance: 开局奖励箱
       skillRarityWeights: 稀有度权重
+      skillConfig: 全局技能配置
+      skillCooldownMultiplier: 技能冷却倍率
+      skillXpMultiplier: 技能经验倍率
+      skillBlackList: 技能黑名单
   skillSlot:
     generic: '通用技能槽 %d'
     active: '主动技能槽 %d'
@@ -652,6 +665,12 @@ advskills_re:
     effect_frequency:
       name: 效果频率增幅
       description: 效果频率++
+    self_immune:
+      name: 自我免疫增幅
+      description: 免疫负面效果
+    experience_orb:
+      name: 经验球增幅
+      description: 将经验球视为物品
 item:
   advskills_re:
     skill_fruit: 技能果实
@@ -695,6 +714,7 @@ subtitles:
     fire: 发射
     laser: 激光
     return: 回城
+    enhance: 强化
 modmenu:
   nameTranslation:
     advskills_re: 进阶技能：重制版

@@ -152,7 +152,11 @@ class SkillListScreen(
         val gap = 5
         var currentX = x + gap * 2
 
-        SkillRenderer.renderIcon(skill, context, currentX, y + (height - 16) / 2)
+        val iconY = y + (height - 16) / 2
+        SkillRenderer.renderIcon(skill, context, currentX, iconY)
+        if (mouseX in currentX..currentX + 16 && mouseY in iconY..iconY + 16) {
+            setTooltip(SkillRenderer.getTooltip(client!!, skill, player))
+        }
 
         currentX += 16 + gap
         val name = skill.formattedName
@@ -166,18 +170,13 @@ class SkillListScreen(
             0xBDBDBD,
             false
         )
-        val description = skill.description
-        val descriptionY = y + height / 2 + 1
         val hasValidSlot = getValidSlot(skill) != null
-        renderDescription(context, currentX, descriptionY, equipX, description, hasValidSlot)
+        renderDescription(context, currentX, y + height / 2 + 1, equipX, skill.description, hasValidSlot)
         if (hasValidSlot) {
             if (mouseX in equipX..<right && mouseY in y..<y + height) {
                 context.overlayHighlight(equipX, y, right, y + height, false)
             }
-            context.drawTexture(equipTexture, equipX, y + (height - 16) / 2, 0f, 0f, 16, 16, 16, 16)
-        }
-        if (hovered && hasShiftDown()) {
-            setTooltip(description)
+            context.drawTexture(equipTexture, equipX, iconY, 0f, 0f, 16, 16, 16, 16)
         }
     }
 
@@ -347,14 +346,20 @@ class SkillListScreen(
             }
             val skill = skill
             if (!skill.invalid) {
-                SkillRenderer.renderIcon(skill, context, x + 8, y + (height - 16) / 2)
+                val iconX = x + 8
+                val iconY = y + (height - 16) / 2
+                SkillRenderer.renderIcon(skill, context, iconX, iconY)
+                if (mouseX in iconX..iconX + 16 && mouseY in iconY..iconY + 16) {
+                    setTooltip(SkillRenderer.getTooltip(client!!, skill, player))
+                }
+
                 val topY = y + (height - textRenderer.fontHeight) / 2 + 1
                 context.drawScrollableText(
                     textRenderer,
                     skill.formattedName,
-                    x + 24 + 3,
+                    iconX + 24 + 3,
                     topY,
-                    x + width - 16,
+                    iconX + width - 16,
                     topY + textRenderer.fontHeight,
                     0xFFFFFF,
                     shadow = false,

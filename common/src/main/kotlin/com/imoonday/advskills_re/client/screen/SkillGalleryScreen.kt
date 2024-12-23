@@ -185,7 +185,14 @@ class SkillGalleryScreen(
 
             context.drawText(
                 textRenderer,
-                translate("screen.gallery.info.cooldown", skill.cooldownText),
+                if (skill.cooldown == skill.defaultCooldown) translate(
+                    "screen.gallery.info.cooldown",
+                    skill.cooldownText
+                ) else translate(
+                    "screen.gallery.info.cooldown_with_default",
+                    skill.cooldownText,
+                    skill.defaultCooldownText
+                ),
                 xOffset,
                 yOffset,
                 0x81C784,

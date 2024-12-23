@@ -11,7 +11,12 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
     val persistTime: Int
 
     fun getModifiedPersistTime(player: PlayerEntity): Int =
-        applyPersistTimeEnhancements(player, SkillConfig.get().getModifier(getAsSkill().id)?.time ?: persistTime)
+        applyPersistTimeEnhancements(
+            player,
+            SkillConfig.get().getModifier(getAsSkill().id)?.time
+                ?: GlobalConfig.get().skillConfig.getModifier(getAsSkill().id)?.time
+                ?: persistTime,
+        )
 
     fun applyPersistTimeEnhancements(player: PlayerEntity, time: Int): Int {
         val enhancements = getAsSkill().availableEnhancements
@@ -52,7 +57,7 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
     }
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
-        onStop(player)
         super.postUnequipped(player, slot)
+        onStop(player)
     }
 }

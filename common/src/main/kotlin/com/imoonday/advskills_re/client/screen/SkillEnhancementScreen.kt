@@ -10,7 +10,9 @@ import net.minecraft.client.gui.screen.*
 import net.minecraft.client.gui.screen.narration.*
 import net.minecraft.client.gui.widget.*
 import net.minecraft.entity.player.*
+import net.minecraft.sound.SoundEvents
 import net.minecraft.text.*
+import net.minecraft.util.*
 
 class SkillEnhancementScreen(
     val player: PlayerEntity,
@@ -31,11 +33,17 @@ class SkillEnhancementScreen(
         val spacing = ((width - 3 * boxWidth) / 5).coerceAtLeast(5)
         val totalWidth = boxWidth * 3 + spacing * 2
         val startX = (width - totalWidth) / 2
-        SkillEnhancementBox({ choice.first }, player::chooseFirst, startX, 40, boxWidth, boxHeight)
-            .also {
-                skillEnhancementBoxes += it
-                addDrawableChild(it)
-            }
+        SkillEnhancementBox(
+            { choice.first },
+            player::chooseFirst,
+            startX,
+            40,
+            boxWidth,
+            boxHeight
+        ).also {
+            skillEnhancementBoxes += it
+            addDrawableChild(it)
+        }
         SkillEnhancementBox(
             { choice.second },
             player::chooseSecond,
@@ -43,11 +51,10 @@ class SkillEnhancementScreen(
             40,
             boxWidth,
             boxHeight
-        )
-            .also {
-                skillEnhancementBoxes += it
-                addDrawableChild(it)
-            }
+        ).also {
+            skillEnhancementBoxes += it
+            addDrawableChild(it)
+        }
         SkillEnhancementBox(
             { choice.third },
             player::chooseThird,
@@ -55,11 +62,10 @@ class SkillEnhancementScreen(
             40,
             boxWidth,
             boxHeight
-        )
-            .also {
-                skillEnhancementBoxes += it
-                addDrawableChild(it)
-            }
+        ).also {
+            skillEnhancementBoxes += it
+            addDrawableChild(it)
+        }
         val buttonY = (40 + boxHeight + height) / 2 - 10
         refreshButton =
             ButtonWidget.builder(translate("screen.learn.refresh")) { player.refreshSkillChoice(RefreshChoiceC2SRequest.Type.ENHANCEMENT) }
@@ -119,6 +125,10 @@ class SkillEnhancementScreen(
         var maxScrollAmount: Int? = null
 
         override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+            val skill = pair.skill
+            val enhancement = pair.enhancement
+            val currentEnhancement = player.getEnhancement(skill, enhancement.type)
+
             val selected = selectedBox == this
             if (selected || hovered) {
                 val light = if (selected) 0.45f else 0.35f
@@ -133,24 +143,27 @@ class SkillEnhancementScreen(
             val x = x + 8
             var y = y + gap
 
-            val skill = pair.skill
-            val enhancement = pair.enhancement
+            val iconX = this.x + (width - 32) / 2
+            SkillRenderer.renderIcon(skill, context, iconX, y, 32)
+            if (mouseX in iconX..iconX + 32 && mouseY in y..y + 32) {
+                setTooltip(SkillRenderer.getTooltip(client!!, skill, player))
+            }
 
-            val levelText = enhancement.level.toString().toText()
-            context.drawText(
-                textRenderer,
-                levelText,
-                x + width - 15 - textRenderer.getWidth(levelText),
-                y + 2,
-                skill.rarity.color,
-                false
-            )
+            if (currentEnhancement == null) {
+                val new = translate("screen.enhance.new")
+                context.drawText(
+                    textRenderer,
+                    new,
+                    this.x + width - textRenderer.getWidth(new) - 5,
+                    y + 1,
+                    0xFFFFFF,
+                    false
+                )
+            }
 
-            SkillRenderer.renderIcon(skill, context, this.x + (width - 32) / 2, y, 32)
             y += 32 + 3
             val textBottomY = this.y + height - gap
-            context.enableScissor(x, y, x + width - 15, textBottomY)
-            y -= scrollAmount
+
             context.drawScrollableText(
                 textRenderer,
                 skill.formattedName,
@@ -160,7 +173,7 @@ class SkillEnhancementScreen(
             )
             y += textRenderer.fontHeight + 2
 
-            y += textRenderer.fontHeight + 2
+            y += (textRenderer.fontHeight + 2) / 2
             context.drawScrollableText(
                 textRenderer,
                 enhancement.name,
@@ -170,20 +183,65 @@ class SkillEnhancementScreen(
             )
             y += textRenderer.fontHeight + 2
 
-            textRenderer.wrapLines(skill.getEnhancementTooltip(enhancement), width - 15).forEach { text ->
+            y += (textRenderer.fontHeight + 2) / 2
+
+            context.enableScissor(x, y, x + width - 15, textBottomY)
+            y -= scrollAmount
+
+            currentEnhancement?.run {
+                val tooltip = skill.getEnhancementTooltip(this)
+                textRenderer.wrapLines(tooltip, width - 15).forEach { text ->
+                    context.drawText(
+                        textRenderer,
+                        text,
+                        (x + x + width - 15 - textRenderer.getWidth(text)) / 2,
+                        y,
+                        0xBDBDBD,
+                        false
+                    )
+                    y += textRenderer.fontHeight + 3
+                }
+
+                val arrow = "↓"
+                context.drawText(
+                    textRenderer,
+                    arrow,
+                    (x + x + width - 15 - textRenderer.getWidth(arrow)) / 2,
+                    y,
+                    0xFFFFFF,
+                    false
+                )
+                y += textRenderer.fontHeight + 3
+            }
+
+            val tooltip = skill.getEnhancementTooltip(enhancement)
+            textRenderer.wrapLines(tooltip, width - 15).forEach { text ->
                 context.drawText(
                     textRenderer,
                     text,
                     (x + x + width - 15 - textRenderer.getWidth(text)) / 2,
                     y,
-                    0xBDBDBD,
+                    0x00FF00,
                     false
                 )
                 y += textRenderer.fontHeight + 3
             }
-            y -= 2
 
             context.disableScissor()
+
+            currentEnhancement?.run {
+                val levelText = currentEnhancement.level.toString().toText().formatted(Formatting.GRAY)
+                    .append(" → ".toText().formatted(Formatting.WHITE))
+                    .append(enhancement.level.toString().toText().formatted(Formatting.GREEN))
+                context.drawText(
+                    textRenderer,
+                    levelText,
+                    (x + x + width - 15 - textRenderer.getWidth(levelText)) / 2,
+                    this@SkillEnhancementBox.y + height - textRenderer.fontHeight - 5,
+                    0xFFFFFF,
+                    false
+                )
+            }
 
             if (maxScrollAmount == null) {
                 maxScrollAmount = if (y - textBottomY > 0 && y - 3 - textBottomY <= 0) 0
@@ -196,10 +254,11 @@ class SkillEnhancementScreen(
         override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean {
             val max = maxScrollAmount ?: 0
             if (max > 0) {
+                val step = max / 5
                 if (amount > 0) {
-                    scrollAmount = (scrollAmount - 5).coerceAtLeast(0)
+                    scrollAmount = (scrollAmount - step).coerceAtLeast(0)
                 } else if (amount < 0) {
-                    scrollAmount = (scrollAmount + 5).coerceAtMost(max)
+                    scrollAmount = (scrollAmount + step).coerceAtMost(max)
                 }
             }
             return super.mouseScrolled(mouseX, mouseY, amount)

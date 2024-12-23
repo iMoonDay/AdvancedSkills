@@ -300,6 +300,9 @@ fun PlayerEntity.enhance(skill: Skill, enhancement: SkillEnhancement): Boolean {
         }
     } ?: return false
 
+    if (this is ServerPlayerEntity) {
+        Channels.ENHANCE_SKILL_S2C.sendToPlayer(this, EnhanceSkillS2CPacket())
+    }
     syncData()
     return true
 }
@@ -311,6 +314,10 @@ fun PlayerEntity.enhanceAll(skill: Skill): Boolean = getData(skill)?.run {
         } ?: run {
             enhancements[it] = it.createMax()
         }
+    }
+
+    if (this@enhanceAll is ServerPlayerEntity) {
+        Channels.ENHANCE_SKILL_S2C.sendToPlayer(this@enhanceAll, EnhanceSkillS2CPacket())
     }
     syncData()
     true

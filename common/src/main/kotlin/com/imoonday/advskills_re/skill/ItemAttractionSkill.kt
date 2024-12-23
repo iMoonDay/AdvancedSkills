@@ -15,7 +15,12 @@ class ItemAttractionSkill : LongPressSkill(
     types = listOf(SkillType.UTILITY),
     cooldown = 15,
     rarity = SkillRarity.SUPERB,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.RANGE, SkillEnhancements.VELOCITY)
+    enhancements = setOf(
+        SkillEnhancements.PERSISTENT_TIME,
+        SkillEnhancements.RANGE,
+        SkillEnhancements.VELOCITY,
+        SkillEnhancements.EXPERIENCE_ORB
+    )
 ), UsingRenderTrigger, GlowingTrigger {
 
     override fun getMaxPressTime(): Int = 10 * 20
@@ -35,7 +40,7 @@ class ItemAttractionSkill : LongPressSkill(
         world.getOtherEntities(
             player,
             player.boundingBox.expand(range)
-        ) { it is ItemEntity && !it.cannotPickup() }.forEach {
+        ) { checkAttractiveEntity(player, it) }.forEach {
             if (world.isClient) {
                 it.world.addParticle(
                     ParticleTypes.ENCHANT,
@@ -54,10 +59,13 @@ class ItemAttractionSkill : LongPressSkill(
         }
     }
 
+    private fun checkAttractiveEntity(player: PlayerEntity, entity: Entity) =
+        entity is ItemEntity && !entity.cannotPickup() || player.hasEnhancement(SkillEnhancements.EXPERIENCE_ORB) && entity is ExperienceOrbEntity
+
     private fun getRange(player: PlayerEntity) =
         15.0 + player.getEnhancementLvl(SkillEnhancements.RANGE) * 3.0
 
     override fun isGlowing(entity: Entity, clientPlayer: PlayerEntity): Boolean =
-        (clientPlayer.isUsing() && entity is ItemEntity && !entity.cannotPickup()
+        (clientPlayer.isUsing() && checkAttractiveEntity(clientPlayer, entity)
             && clientPlayer.boundingBox.expand(getRange(clientPlayer)).contains(entity.pos))
 }

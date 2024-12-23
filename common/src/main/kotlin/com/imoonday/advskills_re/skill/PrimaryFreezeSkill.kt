@@ -16,18 +16,20 @@ class PrimaryFreezeSkill : Skill(
     sound = ModSounds.FIRE,
     enhancements = setOf(
         SkillEnhancements.RANGE,
-        SkillEnhancements.LAUNCH_COUNT
+        SkillEnhancements.LAUNCH_COUNT,
+        SkillEnhancements.SELF_IMMUNE
     )
 ), SpecialStateRenderTrigger {
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val extraRange = user.getEnhancementLvl(SkillEnhancements.RANGE)
         val times = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
-        user.executeAndAddTask(5, times) { user.spawnEnergyBall(extraRange) }
+        val ignoreSelf = user.hasEnhancement(SkillEnhancements.SELF_IMMUNE)
+        user.executeAndAddTask(5, times) { user.spawnEnergyBall(extraRange, ignoreSelf) }
         return UseResult.success()
     }
 
-    private fun ServerPlayerEntity.spawnEnergyBall(extraRange: Int): Boolean {
+    private fun ServerPlayerEntity.spawnEnergyBall(extraRange: Int, ignoreSelf: Boolean): Boolean {
         val rotation = rotationVector.normalize().multiply(1.5)
         return world.spawnEntity(
             FreezeEnergyBallEntity(
@@ -39,6 +41,9 @@ class PrimaryFreezeSkill : Skill(
             ).apply {
                 setPosition(x + rotation.x, eyeY, z + rotation.z)
                 range += extraRange
+                if (ignoreSelf) {
+                    ignoreOwner = true
+                }
             }
         )
     }

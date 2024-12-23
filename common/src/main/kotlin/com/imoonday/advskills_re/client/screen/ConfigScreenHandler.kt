@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.ClientConfig.Companion.DEFAULT_LAYOUT_STRING_LIST
+import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.skill.enums.*
@@ -192,6 +193,56 @@ object ConfigScreenHandler {
             }
 
             addEntry(skillRarityWeights.build())
+
+            val skillConfigEntry =
+                entryBuilder.startSubCategory(translate("screen.config.skillConfig"))
+
+            val skillConfig = globalConfig.skillConfig
+
+            skillConfigEntry.add(
+                entryBuilder.startDoubleField(
+                    translate("screen.config.skillCooldownMultiplier"),
+                    skillConfig.skillCooldownMultiplier ?: 1.0
+                ).setDefaultValue(1.0)
+                    .setMin(0.0)
+                    .setSaveConsumer {
+                        skillConfig.skillCooldownMultiplier = it
+                        skillConfig.markDirty()
+                    }
+                    .build()
+            )
+
+            skillConfigEntry.add(
+                entryBuilder.startDoubleField(
+                    translate("screen.config.skillXpMultiplier"),
+                    skillConfig.skillXpMultiplier ?: 1.0
+                ).setDefaultValue(1.0)
+                    .setMin(0.0)
+                    .setSaveConsumer {
+                        skillConfig.skillXpMultiplier = it
+                        skillConfig.markDirty()
+                    }
+                    .build()
+            )
+
+            skillConfigEntry.add(
+                entryBuilder.startStrList(
+                    translate("screen.config.skillBlackList"),
+                    skillConfig.skillBlackList.toList()
+                ).setDefaultValue(emptyList())
+                    .setSaveConsumer {
+                        skillConfig.skillBlackList.clear()
+                        skillConfig.skillBlackList.addAll(it)
+                        skillConfig.markDirty()
+                    }
+                    .build()
+            )
+
+            if (inGame) {
+                skillConfigEntry.forEach { it.isRequiresRestart = true }
+            }
+
+            addEntry(skillConfigEntry.build())
         }
     }
 
@@ -285,6 +336,34 @@ object ConfigScreenHandler {
                     config.hideSkillInfo
                 ).setDefaultValue(false)
                     .setSaveConsumer { config.hideSkillInfo = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.hideSkillSlotBackground"),
+                    config.hideSkillSlotBackground
+                ).setDefaultValue(false)
+                    .setSaveConsumer { config.hideSkillSlotBackground = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.dynamicallyHideSkillSlots"),
+                    config.dynamicallyHideSkillSlots
+                ).setDefaultValue(true)
+                    .setSaveConsumer { config.dynamicallyHideSkillSlots = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startEnumSelector(
+                    translate("screen.config.hideEdge"),
+                    SkillSlotRenderer.AnimationDirection::class.java,
+                    config.hideEdge
+                ).setDefaultValue(SkillSlotRenderer.AnimationDirection.RIGHT)
+                    .setSaveConsumer { config.hideEdge = it }
                     .build()
             )
         }

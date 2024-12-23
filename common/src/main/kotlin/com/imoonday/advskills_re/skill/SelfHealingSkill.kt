@@ -6,6 +6,7 @@ import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
+import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
 class SelfHealingSkill : Skill(
@@ -24,6 +25,11 @@ class SelfHealingSkill : Skill(
     override fun onStop(player: ServerPlayerEntity) {
         val amount = getEnhancedValue(player, SkillEnhancements.HEALING_AMOUNT, 2.0f)
         player.heal(amount)
+        player.spawnParticles(
+            ParticleTypes.HEART,
+            false, player.centerPos, amount.toInt(),
+            0.5, 0.5, 0.5, 0.1
+        )
         super.onStop(player)
     }
 

@@ -132,8 +132,7 @@ class SkillLearningScreen(
             SkillRenderer.renderIcon(skill, context, this.x + (width - 32) / 2, y, 32)
             y += 32 + 3
             val textBottomY = this.y + height - gap
-            context.enableScissor(x, y, x + width - 15, textBottomY)
-            y -= scrollAmount
+
             context.drawScrollableText(
                 textRenderer,
                 skill.formattedName,
@@ -161,6 +160,9 @@ class SkillLearningScreen(
             )
             y += textRenderer.fontHeight + 5
 
+            context.enableScissor(x, y, x + width - 15, textBottomY)
+            y -= scrollAmount
+
             textRenderer.wrapLines(skill.description, width - 15).forEach { text ->
                 context.drawText(
                     textRenderer,
@@ -187,10 +189,11 @@ class SkillLearningScreen(
         override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean {
             val max = maxScrollAmount ?: 0
             if (max > 0) {
+                val step = max / 5
                 if (amount > 0) {
-                    scrollAmount = (scrollAmount - 5).coerceAtLeast(0)
+                    scrollAmount = (scrollAmount - step).coerceAtLeast(0)
                 } else if (amount < 0) {
-                    scrollAmount = (scrollAmount + 5).coerceAtMost(max)
+                    scrollAmount = (scrollAmount + step).coerceAtMost(max)
                 }
             }
             return super.mouseScrolled(mouseX, mouseY, amount)

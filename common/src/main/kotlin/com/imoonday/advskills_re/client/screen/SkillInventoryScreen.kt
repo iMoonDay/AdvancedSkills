@@ -355,21 +355,7 @@ class SkillInventoryScreen(
                 selectingSlot = if (!skill.invalid) {
                     if (selectedSlot == null) {
                         if (!ClientConfig.get().hideSkillInfo || hasShiftDown()) {
-                            val list = skill.getItemTooltips(displayName = true)
-                            val tooltips = skill.getEnhancementTooltips(player)
-                            if (tooltips.isNotEmpty()) {
-                                list.add(Text.empty())
-                                list.add(translate("screen.inventory.enhance").formatted(Formatting.GRAY))
-                                list.addAll(tooltips)
-                            }
-                            list.add(skill.id.toString().toText().formatted(Formatting.DARK_GRAY))
-                            val orderedList = list.map(Text::asOrderedText).toMutableList()
-                            val lines = Tooltip.wrapLines(client, list[1])
-                            if (lines.size > 1) {
-                                orderedList.removeAt(1)
-                                orderedList.addAll(1, lines)
-                            }
-                            setTooltip(orderedList)
+                            setTooltip(SkillRenderer.getTooltip(client!!, skill, player))
                         } else {
                             setTooltip(skill.formattedName)
                         }
@@ -385,6 +371,10 @@ class SkillInventoryScreen(
 
         override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
             if (!visible || button != 0 || !isMouseOver(mouseX, mouseY)) return false
+            return onClick()
+        }
+
+        private fun onClick(): Boolean {
             if (slot == null) {
                 if (hasShiftDown()) {
                     player.equip(skill)

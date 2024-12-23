@@ -13,7 +13,7 @@ class ArmorShattererSkill : Skill(
     types = listOf(SkillType.ATTACK),
     cooldown = 15,
     rarity = SkillRarity.EPIC,
-    enhancements = setOf(SkillEnhancements.LAUNCH_COUNT)
+    enhancements = setOf(SkillEnhancements.LAUNCH_COUNT, SkillEnhancements.SELF_IMMUNE)
 ), SpecialStateRenderTrigger {
 
     init {
@@ -23,12 +23,13 @@ class ArmorShattererSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             val count = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
-            user.executeAndAddTask(5, count) { spawnEnergyBall() }
+            val ignoreSelf = user.hasEnhancement(SkillEnhancements.SELF_IMMUNE)
+            user.executeAndAddTask(5, count) { spawnEnergyBall(ignoreSelf) }
         }
         return UseResult.success()
     }
 
-    private fun ServerPlayerEntity.spawnEnergyBall(): Boolean {
+    private fun ServerPlayerEntity.spawnEnergyBall(ignoreSelf: Boolean): Boolean {
         val rotation = rotationVector.normalize().multiply(1.5)
         return world.spawnEntity(
             VulnerableEnergyBallEntity(
@@ -39,6 +40,9 @@ class ArmorShattererSkill : Skill(
                 world
             ).apply {
                 setPosition(x + rotation.x, eyeY, z + rotation.z)
+                if (ignoreSelf) {
+                    ignoreOwner = true
+                }
             }.also {
                 playSound(ModSounds.FIRE.get())
             }
