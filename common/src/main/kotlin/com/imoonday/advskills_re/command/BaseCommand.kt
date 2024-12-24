@@ -55,7 +55,7 @@ abstract class BaseCommand(
                 GlobalConfig.get().getSkillConfigNbt(),
                 SyncConfigS2CPacket.ConfigType.GLOBAL
             ) else SyncConfigS2CPacket(
-                SkillConfig.get().save(),
+                SkillConfig.get().writeToNbt(),
                 SyncConfigS2CPacket.ConfigType.LOCAL
             )
         )
@@ -64,7 +64,5 @@ abstract class BaseCommand(
     protected fun getSkillConfig(global: Boolean): SkillConfig =
         if (global) GlobalConfig.get().skillConfig else SkillConfig.get()
 
-    protected fun trySave(global: Boolean) {
-        if (global) GlobalConfig.get().save()
-    }
+    protected fun trySave(global: Boolean) = if (global) GlobalConfig.get().save() else SkillConfig.get().save()
 }

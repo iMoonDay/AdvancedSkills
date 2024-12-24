@@ -658,7 +658,7 @@ class SkillInventoryScreen(
     companion object {
 
         private val tabTexture = Identifier("textures/gui/container/creative_inventory/tabs.png")
-        private val slotTexture = id("slot.png")
+        private val slotTexture = id("slots.png")
         private val sortTexture = id("sort.png")
         private val filterTexture = id("filter.png")
         private val rarityFilterTexture = id("rarity_filter.png")

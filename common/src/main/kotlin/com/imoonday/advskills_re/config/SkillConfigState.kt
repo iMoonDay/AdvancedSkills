@@ -5,13 +5,12 @@ import net.minecraft.world.*
 
 class SkillConfigState : PersistentState() {
 
-    val config: SkillConfig
-        get() = SkillConfig.get()
+    var config: SkillConfig = SkillConfig()
 
-    override fun writeNbt(nbt: NbtCompound): NbtCompound = config.save(nbt)
+    override fun writeNbt(nbt: NbtCompound): NbtCompound = nbt
 
     companion object {
 
-        fun fromNbt(nbt: NbtCompound): SkillConfigState = SkillConfigState().apply { config.load(nbt) }
+        fun fromNbt(nbt: NbtCompound): SkillConfigState = SkillConfigState().apply { config.loadFromNbt(nbt) }
     }
 }

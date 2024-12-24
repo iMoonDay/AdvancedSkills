@@ -74,19 +74,20 @@ object EventHandler {
         PlayerEvent.PLAYER_JOIN.register {
             Channels.SYNC_CONFIG_S2C.sendToPlayer(
                 it, SyncConfigS2CPacket(
-                    SkillConfig.get().save(GlobalConfig.get().toNbt()),
+                    SkillConfig.get().writeToNbt(GlobalConfig.get().toNbt()),
                     SyncConfigS2CPacket.ConfigType.BOTH
                 )
             )
         }
         LifecycleEvent.SERVER_STARTED.register {
-            SkillConfig.get().connectToServer(it)
+            SkillConfig.init(it)
         }
         LifecycleEvent.SERVER_STOPPING.register {
-            SkillConfig.get().markDirty()
+            SkillConfig.get().save()
         }
         LifecycleEvent.SERVER_STOPPED.register {
-            SkillConfig.get().disconnect()
+            SkillConfig.get().reset()
+            SkillConfig.resetFile()
         }
     }
 

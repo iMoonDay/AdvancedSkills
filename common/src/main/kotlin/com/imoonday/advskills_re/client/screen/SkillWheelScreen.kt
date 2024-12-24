@@ -44,10 +44,8 @@ class SkillWheelScreen : Screen(Text.empty()) {
                 val (x, y) = positions[i]
                 val startX = centerX + x - 8
                 val startY = centerY + y - 8
-                SkillRenderer.renderIcon(player.getSkill(i + 1), context, startX, startY, player)
-                if (selectingSlot == i + 1) {
-                    context.drawBorder(startX - 1, startY - 1, 16 + 2, 16 + 2, borderColor)
-                }
+                SkillSlotRenderer.renderSlot(context, startX - 2, startY - 2, i + 1 == selectingSlot)
+                SkillRenderer.renderIcon(player.getSkill(i + 1), context, startX, startY, null)
             }
         }
 

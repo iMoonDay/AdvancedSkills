@@ -22,11 +22,18 @@ class WallJumpSkill : PassiveSkill(
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = player.getPersistentData().getBoolean("jumped")
 
-    override fun shouldStop(player: ServerPlayerEntity): Boolean = player.isOnGround
+    override fun shouldStop(player: ServerPlayerEntity): Boolean {
+        if (player.abilities.flying) {
+            player.getPersistentData().remove("wallJumped")
+            return true
+        }
+        return player.isOnGround
+    }
 
     override fun tick(player: ServerPlayerEntity) {
         super.tick(player)
         if (!player.isUsing()) return
+
         if (shouldStart(player)) {
             val pos = player.eyePos.offset(player.horizontalFacing, player.width / 2.0 + 0.1).toBlockPos()
             val world = player.world
@@ -78,7 +85,7 @@ class WallJumpSkill : PassiveSkill(
 
     private fun hasJumped(player: PlayerEntity): Boolean {
         val pos = player.eyePos.offset(player.horizontalFacing, player.width / 2.0 + 0.1).toBlockPos()
-        val jumping = (player as LivingEntityAccessor).isJumping
+        val jumping = (player as LivingEntityAccessor).isJumping && !player.isOnGround && !player.abilities.flying
         val colliding = player.horizontalCollision && jumping &&
             (!player.world.getBlockState(pos).isAir || !player.world.getBlockState(pos.down()).isAir)
         val jumped = jumping && colliding

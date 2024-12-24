@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.screen.*
+import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.network.s2c.*
@@ -67,7 +68,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
                 dirty = true
             }
 
-            val result1 = learnable.correct(entity.learnedSkills)
+            val result1 = learnable.correct(entity.learnedSkills, GlobalConfig.get().getLearningFilter())
             val result2 = enhancements.correct(entity)
             if (dirty || result1 || result2) {
                 sync()

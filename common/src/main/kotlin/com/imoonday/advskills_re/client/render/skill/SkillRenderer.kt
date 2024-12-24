@@ -24,10 +24,14 @@ object SkillRenderer {
         x: Int,
         y: Int,
         player: PlayerEntity,
+        progressBarOffsetY: Int = 0,
+        noProgressBar: Boolean = false,
     ) {
         val endY = y + 16
         renderIcon(skill, context, x, y, player)
-        renderProgressBar(skill, context, x, endY - 1, 16, 1, player)
+        if (!noProgressBar) {
+            renderProgressBar(skill, context, x, endY - 1 + progressBarOffsetY, 16, 1, player)
+        }
         renderCooldownOverlay(skill, context, x, endY, 16, 16, player)
     }
 
@@ -37,9 +41,8 @@ object SkillRenderer {
         context: DrawContext,
         x: Int,
         y: Int,
-        player: PlayerEntity?,
+        player: PlayerEntity?
     ) {
-        context.fill(x, y, x + 16, y + 16, Color.LIGHT_GRAY.alpha(0.5).rgb)
         var flashed = false
         if (player != null && skill is AutoStopTrigger && skill.shouldFlashIcon(player)) {
             flashed = true
@@ -84,7 +87,7 @@ object SkillRenderer {
         ) {
             val progress = skill.getProgress(player).coerceIn(0.0, 1.0)
             val centerX = x + 1 + ((width - 1) * progress).toInt()
-            context.fill(x, y, centerX, y + height, 0xFF00BFFF.toInt())
+            context.fill(x, y, centerX, y + height, ClientConfig.get().progressBarColor)
             context.fill(centerX, y, x + width, y + height, Color.GRAY.rgb)
         }
     }
@@ -104,14 +107,17 @@ object SkillRenderer {
         val maxCooldown = skill.cooldown
         val progress = (cooldown.toDouble() / maxCooldown).coerceIn(0.0, 1.0)
         val startY = (endY - progress * maxHeight).toInt()
-        context.fill(startX, startY, startX + width, endY, Color.BLACK.alpha(0.25).rgb)
+
+        val overlayColor = Color.BLACK.alpha(0.25).rgb
+        context.fill(startX, endY - maxHeight, startX + width, endY, overlayColor)
+        context.fill(startX, startY, startX + width, endY, overlayColor)
         if (cooldown < 4 * 20) {
             val time = if (cooldown <= 20) String.format("%.1f", cooldown / 20.0) else (cooldown / 20).toString()
             val textRenderer = client!!.textRenderer
             context.matrices.push()
             context.matrices.translate(
                 startX + (width - textRenderer.getWidth(time)) / 2.0 + 0.5,
-                endY - width / 2.0,
+                endY - width / 2.0 + 1,
                 0.0
             )
             context.drawText(textRenderer, time, 0, 0, 0xFFFFFF, false)

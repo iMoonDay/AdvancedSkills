@@ -84,6 +84,10 @@ object ConfigScreenHandler {
                     .build()
             )
 
+            if (inGame) {
+                defaultSlots.forEach { it.isRequiresRestart = true }
+            }
+
             addEntry(defaultSlots.build())
 
             val skillFruitGeneration =
@@ -207,7 +211,7 @@ object ConfigScreenHandler {
                     .setMin(0.0)
                     .setSaveConsumer {
                         skillConfig.skillCooldownMultiplier = it
-                        skillConfig.markDirty()
+                        globalConfig.save()
                     }
                     .build()
             )
@@ -220,7 +224,7 @@ object ConfigScreenHandler {
                     .setMin(0.0)
                     .setSaveConsumer {
                         skillConfig.skillXpMultiplier = it
-                        skillConfig.markDirty()
+                        globalConfig.save()
                     }
                     .build()
             )
@@ -233,7 +237,7 @@ object ConfigScreenHandler {
                     .setSaveConsumer {
                         skillConfig.skillBlackList.clear()
                         skillConfig.skillBlackList.addAll(it)
-                        skillConfig.markDirty()
+                        globalConfig.save()
                     }
                     .build()
             )
@@ -340,30 +344,99 @@ object ConfigScreenHandler {
             )
 
             addEntry(
-                entryBuilder.startBooleanToggle(
-                    translate("screen.config.hideSkillSlotBackground"),
-                    config.hideSkillSlotBackground
-                ).setDefaultValue(false)
-                    .setSaveConsumer { config.hideSkillSlotBackground = it }
-                    .build()
-            )
-
-            addEntry(
-                entryBuilder.startBooleanToggle(
-                    translate("screen.config.dynamicallyHideSkillSlots"),
-                    config.dynamicallyHideSkillSlots
-                ).setDefaultValue(true)
-                    .setSaveConsumer { config.dynamicallyHideSkillSlots = it }
+                entryBuilder.startEnumSelector(
+                    translate("screen.config.hideSkillSlots"),
+                    SkillSlotRenderer.HideMode::class.java,
+                    config.hideSkillSlots
+                ).setDefaultValue(SkillSlotRenderer.HideMode.DYNAMICALLY_HIDE)
+                    .setEnumNameProvider { (it as SkillSlotRenderer.HideMode).displayName }
+                    .setSaveConsumer { config.hideSkillSlots = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startEnumSelector(
-                    translate("screen.config.hideEdge"),
+                    translate("screen.config.dynamicallyHideDirection"),
                     SkillSlotRenderer.AnimationDirection::class.java,
-                    config.hideEdge
+                    config.dynamicallyHideDirection
                 ).setDefaultValue(SkillSlotRenderer.AnimationDirection.RIGHT)
-                    .setSaveConsumer { config.hideEdge = it }
+                    .setEnumNameProvider { (it as SkillSlotRenderer.AnimationDirection).displayName }
+                    .setSaveConsumer { config.dynamicallyHideDirection = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startAlphaColorField(
+                    translate("screen.config.progressBarColor"),
+                    config.progressBarColor
+                ).setDefaultValue(0xFFFFEE58.toInt())
+                    .setAlphaMode(true)
+                    .setSaveConsumer { config.progressBarColor = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.displayProgressBarBelowCrosshair"),
+                    config.displayProgressBarBelowCrosshair
+                ).setDefaultValue(true)
+                    .setSaveConsumer { config.displayProgressBarBelowCrosshair = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startIntField(
+                    translate("screen.config.progressBarOffsetY"),
+                    config.progressBarOffsetY
+                ).setDefaultValue(0)
+                    .setSaveConsumer { config.progressBarOffsetY = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.displaySelectedSkillSlot"),
+                    config.displaySelectedSkillSlot
+                ).setDefaultValue(true)
+                    .setSaveConsumer { config.displaySelectedSkillSlot = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.displayQuickCastKey"),
+                    config.displayQuickCastKey
+                ).setDefaultValue(true)
+                    .setSaveConsumer { config.displayQuickCastKey = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startEnumSelector(
+                    translate("screen.config.selectedSlotPosition"),
+                    SkillSlotRenderer.SlotPosition::class.java,
+                    config.selectedSlotPosition
+                ).setDefaultValue(SkillSlotRenderer.SlotPosition.LEFT_OF_HOTBAR)
+                    .setEnumNameProvider { (it as SkillSlotRenderer.SlotPosition).displayName }
+                    .setSaveConsumer { config.selectedSlotPosition = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startIntField(
+                    translate("screen.config.selectedSlotOffsetX"),
+                    config.selectedSlotOffsetX
+                ).setDefaultValue(0)
+                    .setSaveConsumer { config.selectedSlotOffsetX = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startIntField(
+                    translate("screen.config.selectedSlotOffsetY"),
+                    config.selectedSlotOffsetY
+                ).setDefaultValue(0)
+                    .setSaveConsumer { config.selectedSlotOffsetY = it }
                     .build()
             )
         }

@@ -24,10 +24,10 @@ class SyncConfigS2CPacket(
         if (context.env != EnvType.CLIENT) return
         when (type) {
             GLOBAL -> GlobalConfig.get().loadFromNbt(tag)
-            LOCAL -> SkillConfig.get().load(tag)
+            LOCAL -> SkillConfig.get().loadFromNbt(tag)
             BOTH -> {
                 GlobalConfig.get().loadFromNbt(tag)
-                SkillConfig.get().load(tag)
+                SkillConfig.get().loadFromNbt(tag)
             }
         }
     }

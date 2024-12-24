@@ -16,6 +16,8 @@ advskills_re:
     useSkill8: 使用技能 8
     useSkill9: 使用技能 9
     useSkill10: 使用技能 10
+    switchPreviousSkill: 选择前一个技能
+    switchNextSkill: 选择后一个技能
   useSkill:
     cooling: '%s 正在冷却：%s'
     failed: 使用 %s 失败
@@ -564,8 +566,16 @@ advskills_re:
       hideSkillCrosshair: 隐藏技能准星
       hideSkillInfo: 默认隐藏技能信息 (按住Shift显示)
       hideSkillSlotBackground: 隐藏技能栏背景
-      dynamicallyHideSkillSlots: 动态隐藏技能栏
-      hideEdge: 隐藏边缘方向
+      hideSkillSlots: 隐藏技能栏
+      dynamicallyHideDirection: 动态隐藏方向
+      progressBarColor: 进度条颜色
+      displaySelectedSkillSlot: 额外显示选中技能槽
+      displayQuickCastKey: 显示快捷施法键
+      selectedSlotPosition: 选中技能槽位置
+      selectedSlotOffsetX: 选中技能槽X偏移量
+      selectedSlotOffsetY: 选中技能槽Y偏移量
+      displayProgressBarBelowCrosshair: 在准星下方显示选中技能的进度条
+      progressBarOffsetY: 进度条Y偏移量
       invalidLayout: "错误输入! 只能包含1-10和分隔符','"
       incompleteLayout: "错误输入! 缺少栏位：%s"
       redundantNumbers: "错误输入! 栏位不能重复：%s"
@@ -671,6 +681,28 @@ advskills_re:
     experience_orb:
       name: 经验球增幅
       description: 将经验球视为物品
+  animationDirection:
+    up: 上
+    down: 下
+    left: 左
+    right: 右
+  slotPosition:
+    left_bottom: 左下
+    left_of_hotbar: 物品栏左侧
+    right_of_hotbar: 物品栏右侧
+    right_bottom: 右下
+    center: 中心
+    left_center: 左侧中部
+    right_center: 右侧中部
+    top_center: 顶部中部
+    left_top: 左上
+    right_top: 右上
+    custom: 自定义
+    custom_percent: 自定义 (百分比)
+  hideMode:
+    hide: 隐藏
+    show: 显示
+    dynamically_hide: 动态隐藏
 item:
   advskills_re:
     skill_fruit: 技能果实

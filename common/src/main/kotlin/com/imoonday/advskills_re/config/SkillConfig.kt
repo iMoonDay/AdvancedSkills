@@ -2,16 +2,18 @@ package com.imoonday.advskills_re.config
 
 import com.imoonday.advskills_re.*
 import com.imoonday.advskills_re.component.*
-import kotlinx.serialization.*
+import com.mojang.logging.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.*
 import net.minecraft.nbt.*
 import net.minecraft.server.*
 import net.minecraft.util.*
+import org.slf4j.*
+import java.io.*
+import java.nio.file.*
 
 @Serializable
 class SkillConfig {
-
-    @Transient
-    private var saveAction: (() -> Unit)? = null
 
     var skillCooldownMultiplier: Double? = null
     var skillXpMultiplier: Double? = null
@@ -43,7 +45,37 @@ class SkillConfig {
         return result1 || result2
     }
 
-    fun load(tag: NbtCompound) {
+    fun toJson(): String = JSON.encodeToString(serializer(), this)
+
+    fun load() {
+        val file = file ?: return
+
+        LOGGER.info("Loading $MOD_ID-server configuration file")
+        try {
+            if (!file.exists()) {
+                save()
+            } else {
+                instance = fromJson(file.readText(Charsets.UTF_8))
+            }
+        } catch (e: Exception) {
+            LOGGER.error(
+                "Read $MOD_ID-server configuration failed. Try to save the current configuration", e
+            )
+            save()
+        }
+    }
+
+    fun save() {
+        val file = file ?: return
+
+        try {
+            file.writeText(instance.toJson(), Charsets.UTF_8)
+        } catch (e: Exception) {
+            LOGGER.error("Couldn't save $MOD_ID-server configuration file", e)
+        }
+    }
+
+    fun loadFromNbt(tag: NbtCompound) {
         if (tag.contains("skillModifier")) {
             skillModifier.clear()
 
@@ -72,7 +104,7 @@ class SkillConfig {
         }
     }
 
-    fun save(tag: NbtCompound = NbtCompound()): NbtCompound = tag.apply {
+    fun writeToNbt(tag: NbtCompound = NbtCompound()): NbtCompound = tag.apply {
         put("skillModifier", NbtCompound().apply {
             for ((id, modifier) in skillModifier) {
                 put(id, modifier.toNbt())
@@ -96,35 +128,50 @@ class SkillConfig {
         skillXpMultiplier = null
     }
 
-    fun markDirty() {
-        saveAction?.invoke()
-    }
-
-    fun setSaveAction(action: (() -> Unit)?) {
-        saveAction = action
-    }
-
-    fun connectToServer(server: MinecraftServer) {
-        server.overworld.persistentStateManager
-            .getOrCreate(SkillConfigState.Companion::fromNbt, ::SkillConfigState, MOD_ID)
-            .run {
-                markDirty()
-                setSaveAction(::markDirty)
-            }
-    }
-
-    fun disconnect() = instance.run {
-        reset()
-        setSaveAction(null)
-    }
-
-    fun isConnected(): Boolean = saveAction != null
-
     companion object {
 
-        private val instance = SkillConfig()
+        private val LOGGER: Logger = LogUtils.getLogger()
+        private val JSON = Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
+        private val serverConfig: WorldSavePath = WorldSavePath("serverconfig")
+        private var file: File? = null
+        private var instance = SkillConfig()
 
         @JvmStatic
-        fun get(): SkillConfig = instance.apply(SkillConfig::markDirty)
+        fun get(): SkillConfig = instance
+
+        @JvmStatic
+        fun fromJson(json: String): SkillConfig = JSON.decodeFromString(serializer(), json)
+
+        @JvmStatic
+        fun init(server: MinecraftServer) {
+            server.overworld.persistentStateManager
+                .get(SkillConfigState.Companion::fromNbt, MOD_ID)
+                ?.let { instance.loadFromNbt(it.config.writeToNbt()) }
+
+            file = getServerConfigPath(server).resolve("$MOD_ID-server.json").toFile()
+
+            instance.load()
+        }
+
+        @JvmStatic
+        fun resetFile() {
+            file = null
+        }
+
+        private fun getServerConfigPath(server: MinecraftServer): Path {
+            val serverConfig = server.getSavePath(serverConfig)
+            if (!Files.isDirectory(serverConfig)) {
+                try {
+                    Files.createDirectories(serverConfig)
+                } catch (e: IOException) {
+                    throw RuntimeException(e)
+                }
+            }
+            return serverConfig
+        }
     }
 }

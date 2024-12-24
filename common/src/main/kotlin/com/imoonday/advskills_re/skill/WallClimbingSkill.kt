@@ -63,7 +63,9 @@ class WallClimbingSkill : PassiveSkill(
         player is ServerPlayerEntity || player.horizontalCollision != player.wasHorizontalCollision
 
     private fun PlayerEntity.shouldClimb(): Boolean =
-        (horizontalCollision || getPersistentData().getBoolean(HORIZONTAL_COLLISION_KEY)) && !abilities.flying
+        (horizontalCollision || getPersistentData().getBoolean(HORIZONTAL_COLLISION_KEY))
+            && !abilities.flying
+            && (!hasEquipped(Skills.WALL_JUMP) || isOnGround || isUsing())
 
     companion object {
 

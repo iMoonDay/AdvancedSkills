@@ -2,7 +2,9 @@ package com.imoonday.advskills_re.config
 
 import com.imoonday.advskills_re.*
 import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
 import kotlinx.serialization.*
@@ -22,37 +24,37 @@ class GlobalConfig {
     var disableSkillFruitGeneration: Boolean = false
         set(value) {
             field = value
-            save()
+            if (!loading) save()
         }
     var oakLeavesDropChance: Float = 0.005f
         set(value) {
             field = value
-            save()
+            if (!loading) save()
         }
     var darkOakLeavesDropChance: Float = 0.005f
         set(value) {
             field = value
-            save()
+            if (!loading) save()
         }
     var ancientCityChestGenerationChance: Float = 0.25f
         set(value) {
             field = value
-            save()
+            if (!loading) save()
         }
     var buriedTreasureChestGenerationChance: Float = 0.25f
         set(value) {
             field = value
-            save()
+            if (!loading) save()
         }
     var endCityTreasureChestGenerationChance: Float = 0.25f
         set(value) {
             field = value
-            save()
+            if (!loading) save()
         }
     var spawnBonusChestGenerationChance: Float = 1f
         set(value) {
             field = value
-            save()
+            if (!loading) save()
         }
     private val skillRarityWeights: MutableMap<String, Int> =
         SkillRarity.DEFAULT_WEIGHTS.mapKeys { it.key.id }.toMutableMap()
@@ -62,8 +64,8 @@ class GlobalConfig {
         this.skillModifier["$MOD_ID:example ($MOD_ID can ignore, fields of modifier can ignore too)"] =
             SkillModifier(20, SkillRarity.EPIC, 100)
         this.skillBlackList += "$MOD_ID:example ($MOD_ID can ignore)"
-        this.initSkillConfig()
     }
+    val learningBlacklist: MutableSet<String> = mutableSetOf()
 
     fun getDefaultSkillSlots(slot: String): Int = defaultSkillSlots[slot] ?: 0
 
@@ -79,36 +81,39 @@ class GlobalConfig {
         save()
     }
 
-    private fun SkillConfig.initSkillConfig() {
-        this.setSaveAction { this@GlobalConfig.save() }
-    }
+    fun getLearningFilter(): (Skill) -> Boolean =
+        { learningBlacklist.isEmpty() || it.id.toString() !in learningBlacklist }
 
     fun toJson(): String = JSON.encodeToString(serializer(), this)
 
     fun load() {
-        LOGGER.info("Loading $MOD_ID-global configuration file")
+        LOGGER.info("Loading $MOD_ID-common configuration file")
         try {
-            if (!file.exists()) {
-                save()
-            } else {
-                instance = fromJson(file.readText(Charsets.UTF_8)).apply {
-                    this.skillConfig.initSkillConfig()
+            if (file.exists()) {
+                instance = fromJson(file.readText(Charsets.UTF_8))
+            } else if (oldFile.exists()) {
+                instance = fromJson(oldFile.readText(Charsets.UTF_8))
+                try {
+                    oldFile.renameTo(file)
+                } catch (ignore: Exception) {
+                    save()
                 }
+            } else {
+                save()
             }
         } catch (e: Exception) {
             LOGGER.error(
-                "Read $MOD_ID-global configuration failed. Try to save the current configuration", e
+                "Read $MOD_ID-common configuration failed. Try to save the current configuration", e
             )
             save()
         }
     }
 
     fun save() {
-        if (loading) return
         try {
             file.writeText(instance.toJson(), Charsets.UTF_8)
         } catch (e: Exception) {
-            LOGGER.error("Couldn't save $MOD_ID-global configuration file", e)
+            LOGGER.error("Couldn't save $MOD_ID-common configuration file", e)
         }
     }
 
@@ -126,11 +131,12 @@ class GlobalConfig {
         put("skillRarityWeights", NbtCompound().apply {
             skillRarityWeights.forEach { (k, v) -> putInt(k, v) }
         })
-        put("skillConfig", skillConfig.save())
+        put("skillConfig", skillConfig.writeToNbt())
+        put("learningBlacklist", learningBlacklist.toNbtStringList())
     }
 
     fun getSkillConfigNbt(): NbtCompound = NbtCompound().apply {
-        put("skillConfig", skillConfig.save())
+        put("skillConfig", skillConfig.writeToNbt())
     }
 
     fun loadFromNbt(nbt: NbtCompound) {
@@ -172,7 +178,11 @@ class GlobalConfig {
             }
         }
         if (nbt.contains("skillConfig")) {
-            skillConfig.load(nbt.getCompound("skillConfig"))
+            skillConfig.loadFromNbt(nbt.getCompound("skillConfig"))
+        }
+        if (nbt.contains("learningBlacklist")) {
+            learningBlacklist.clear()
+            learningBlacklist.addAll(nbt.getList("learningBlacklist", NbtElement.STRING_TYPE.toInt()).toStringList())
         }
 
         loading = false
@@ -186,7 +196,8 @@ class GlobalConfig {
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
-        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID-global.json").toFile()
+        private var oldFile: File = Platform.getConfigFolder().resolve("$MOD_ID-global.json").toFile()
+        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID-common.json").toFile()
         private var instance = GlobalConfig()
 
         @JvmStatic

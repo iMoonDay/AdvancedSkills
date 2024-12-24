@@ -80,8 +80,12 @@ object ClientRegistry {
 
     private fun registerClientEvents() {
         ClientGuiEvent.RENDER_HUD.register { context, _ ->
+            if (client?.options?.hudHidden == true) return@register
+
             SkillRendererHandler.renderOverlay(context)
-            SkillSlotRenderer.render(context)
+            if (ClientConfig.get().hideSkillSlots != SkillSlotRenderer.HideMode.HIDE) {
+                SkillSlotRenderer.render(context)
+            }
             SkillSlotRenderer.renderSelectedSkill(context)
             SkillRendererHandler.renderHud(context)
             SkillRendererHandler.renderCrosshair(context)

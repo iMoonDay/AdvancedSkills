@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.util
 import com.imoonday.advskills_re.api.*
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
@@ -228,7 +229,7 @@ fun PlayerEntity.refreshSkillChoice(type: RefreshChoiceC2SRequest.Type, force: B
     if (this is ServerPlayerEntity) {
         when (type) {
             RefreshChoiceC2SRequest.Type.SKILL -> {
-                learnableData.refresh(force, learnedSkills)
+                learnableData.refresh(force, learnedSkills, GlobalConfig.get().getLearningFilter())
             }
 
             RefreshChoiceC2SRequest.Type.ENHANCEMENT -> {
@@ -262,12 +263,13 @@ private fun ServerPlayerEntity.choose(index: Int): Boolean {
                 2 -> third
                 else -> return false
             }
+            val filter = GlobalConfig.get().getLearningFilter()
             if (skill.invalid) {
-                correct(learnedSkills)
+                correct(learnedSkills, filter)
                 return false
             }
             learn(skill)
-            next(learnedSkills)
+            next(learnedSkills, filter)
             syncData()
         }
         return true

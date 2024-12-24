@@ -52,17 +52,17 @@ class ClientConfig {
             field = value
             save()
         }
-    var hideSkillSlotBackground: Boolean = false
+    var hideSkillSlots: SkillSlotRenderer.HideMode = SkillSlotRenderer.HideMode.DYNAMICALLY_HIDE
         set(value) {
             field = value
             save()
         }
-    var dynamicallyHideSkillSlots = true
+    var dynamicallyHideDirection: SkillSlotRenderer.AnimationDirection = SkillSlotRenderer.AnimationDirection.RIGHT
         set(value) {
             field = value
             save()
         }
-    var hideEdge: SkillSlotRenderer.AnimationDirection = SkillSlotRenderer.AnimationDirection.RIGHT
+    var progressBarColor: Int = 0xFFFFEE58.toInt()
         set(value) {
             field = value
             save()
@@ -72,7 +72,12 @@ class ClientConfig {
             field = value
             save()
         }
-    var selectedSlotPosition: SkillSlotRenderer.SlotPosition = SkillSlotRenderer.SlotPosition.LEFT_OF_INVENTORY
+    var displayQuickCastKey: Boolean = true
+        set(value) {
+            field = value
+            save()
+        }
+    var selectedSlotPosition: SkillSlotRenderer.SlotPosition = SkillSlotRenderer.SlotPosition.LEFT_OF_HOTBAR
         set(value) {
             field = value
             save()
@@ -87,6 +92,16 @@ class ClientConfig {
             field = value
             save()
         }
+    var displayProgressBarBelowCrosshair: Boolean = true
+        set(value) {
+            field = value
+            save()
+        }
+    var progressBarOffsetY: Int = 0
+        set(value) {
+            field = value
+            save()
+        }
     var displayedSkills: MutableSet<String> = mutableSetOf()
         set(value) {
             field = value
@@ -96,16 +111,23 @@ class ClientConfig {
     fun toJson(): String = JSON.encodeToString(serializer(), this)
 
     fun load() {
-        LOGGER.info("Loading $MOD_ID configuration file")
+        LOGGER.info("Loading $MOD_ID-client configuration file")
         try {
-            if (!file.exists()) {
-                save()
-            } else {
+            if (file.exists()) {
                 instance = fromJson(file.readText(Charsets.UTF_8))
+            } else if (oldFile.exists()) {
+                instance = fromJson(oldFile.readText(Charsets.UTF_8))
+                try {
+                    oldFile.renameTo(file)
+                } catch (ignore: Exception) {
+                    save()
+                }
+            } else {
+                save()
             }
         } catch (e: Exception) {
             LOGGER.error(
-                "Read $MOD_ID configuration failed. Try to save the current configuration", e
+                "Read $MOD_ID-client configuration failed. Try to save the current configuration", e
             )
             save()
         }
@@ -135,7 +157,7 @@ class ClientConfig {
         try {
             file.writeText(instance.toJson(), Charsets.UTF_8)
         } catch (e: Exception) {
-            LOGGER.error("Couldn't save $MOD_ID configuration file", e)
+            LOGGER.error("Couldn't save $MOD_ID-client configuration file", e)
         }
     }
 
@@ -147,6 +169,7 @@ class ClientConfig {
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
+        private var oldFile: File = Platform.getConfigFolder().resolve("$MOD_ID.json").toFile()
         private var file: File = Platform.getConfigFolder().resolve("$MOD_ID-client.json").toFile()
         private var instance = ClientConfig()
 

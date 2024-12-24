@@ -16,6 +16,8 @@ advskills_re:
     useSkill8: Use Skill 8
     useSkill9: Use Skill 9
     useSkill10: Use Skill 10
+    switchPreviousSkill: Switch to Previous Skill
+    switchNextSkill: Switch to Next Skill
   useSkill:
     cooling: '%s is cooling: %s'
     failed: Use %s failed
@@ -552,8 +554,16 @@ advskills_re:
       hideSkillCrosshair: Hide Skill Crosshair
       hideSkillInfo: Hide skill information by default (Shift-display)
       hideSkillSlotBackground: Hide skill slot background
-      dynamicallyHideSkillSlots: Dynamically hide skill slots
-      hideEdge: The direction to hide the skill slots
+      hideSkillSlots: Hide skill slots
+      dynamicallyHideDirection: Animation Direction of Hiding Skill Slots
+      progressBarColor: Progress Bar Color
+      displaySelectedSkillSlot: Display the selected skill slots additionally
+      displayQuickCastKey: Display the Quick Cast Key
+      selectedSlotPosition: Selected Slot Position
+      selectedSlotOffsetX: Selected Slot X Offset
+      selectedSlotOffsetY: Selected Slot Y Offset
+      displayProgressBarBelowCrosshair: Display progress bar below crosshair
+      progressBarOffsetY: Progress Bar Y Offset
       invalidLayout: "Wrong input! Can only contain 1-10 and the delimiter ','"
       incompleteLayout: "Wrong input! Missing slots: %s"
       redundantNumbers: "Wrong input! Redundant numbers: %s"
@@ -659,6 +669,28 @@ advskills_re:
     experience_orb:
       name: Experience Orb Enhancement
       description: Treat experience orbs as items
+  animationDirection:
+    up: Up
+    down: Down
+    left: Left
+    right: Right
+  slotPosition:
+    left_bottom: Left Bottom
+    left_of_hotbar: Left of Hotbar
+    right_of_hotbar: Right of Hotbar
+    right_bottom: Right Bottom
+    center: Center
+    left_center: Left Center
+    right_center: Right Center
+    top_center: Top Center
+    left_top: Top Left
+    right_top: Top Right
+    custom: Custom
+    custom_percent: Custom (Percent)
+  hideMode:
+    hide: Hide
+    show: Show
+    dynamically_hide: Dynamically Hide
 item:
   advskills_re:
     skill_fruit: Skill Fruit

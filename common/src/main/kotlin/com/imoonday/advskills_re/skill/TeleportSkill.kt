@@ -18,11 +18,22 @@ class TeleportSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
-            val distance = 2.0 + user.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.5
-            val offset = rotationVector.withAxis(Direction.Axis.Y, 0.0).normalize().multiply(distance)
-            val collisions = world.getBlockCollisions(this, boundingBox.offset(offset))
-            if (!collisions.all { it.isEmpty }) {
-                return UseResult.fail(message("collide"))
+            var distance = 2.0 + user.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.5
+            val rotation = horizontalRotationVector.normalize()
+            var offset = rotation.multiply(distance)
+            var collisions = world.getBlockCollisions(this, boundingBox.offset(offset))
+            while (!collisions.all { it.isEmpty }) {
+                distance -= 0.1
+                if (distance <= 0.0) {
+                    return UseResult.fail(message("collide"))
+                }
+                offset = rotation.multiply(distance)
+                collisions = world.getBlockCollisions(this, boundingBox.offset(offset))
+                while (!collisions.all { it.isEmpty }) {
+                    offset = offset.offset(Direction.UP, 0.05)
+                    if (offset.y > 0.5) break
+                    collisions = world.getBlockCollisions(this, boundingBox.offset(offset))
+                }
             }
             val velocity = velocity
             val prevPos = centerPos

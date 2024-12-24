@@ -15,7 +15,6 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.text.*
 import net.minecraft.util.*
-import java.awt.SystemColor.*
 import java.util.*
 import java.util.function.*
 
@@ -185,6 +184,7 @@ abstract class Skill(
     fun tryUse(player: ServerPlayerEntity, keyState: UseSkillC2SRequest.KeyState) {
         if (invalid) return
         if ((this !is LongPressTrigger || !player.isUsing()) && keyState == UseSkillC2SRequest.KeyState.RELEASE) return
+        if (this is LongPressTrigger && player.isUsing() && keyState == UseSkillC2SRequest.KeyState.PRESS) return
         if (player.isSilenced) {
             player.sendMessage(translate("useSkill.silenced"), true)
             return

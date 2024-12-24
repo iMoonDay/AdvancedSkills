@@ -33,8 +33,8 @@ class SkillSlotScreen : Screen(translate("screen.slot.title")) {
             val layout = SkillSlotRenderer.getValidLayout(clientPlayer!!.skillContainer.slotSize)
             if (layout.isEmpty()) return false
             val config = ClientConfig.get()
-            config.uiOffsetX = client!!.window.scaledWidth - mouseX.toInt() - 18 * layout.maxOf { it.size } - 2
-            config.uiOffsetY = mouseY.toInt() - client!!.window.scaledHeight / 2 + (9 * layout.size) + 2
+            config.uiOffsetX = client!!.window.scaledWidth - mouseX.toInt() - 22 * layout.maxOf { it.size }
+            config.uiOffsetY = mouseY.toInt() - client!!.window.scaledHeight / 2 + (11 * layout.size)
             true
         } else false
     }

@@ -72,7 +72,7 @@ class NbtUtils {
     }
 }
 
-inline fun <reified T : Number> List<T>.toNbtNumberList(): NbtList = NbtList().apply {
+inline fun <reified T : Number> Collection<T>.toNbtNumberList(): NbtList = NbtList().apply {
     when (T::class) {
         Int::class -> addAll(this@toNbtNumberList.map { NbtInt.of(it.toInt()) })
         Float::class -> addAll(this@toNbtNumberList.map { NbtFloat.of(it.toFloat()) })
@@ -84,31 +84,31 @@ inline fun <reified T : Number> List<T>.toNbtNumberList(): NbtList = NbtList().a
     }
 }
 
-fun List<Boolean>.toNbtBooleanList(): NbtList = NbtList().apply {
+fun Collection<Boolean>.toNbtBooleanList(): NbtList = NbtList().apply {
     addAll(this@toNbtBooleanList.map { NbtByte.of(it) })
 }
 
-fun List<String>.toNbtStringList(): NbtList = NbtList().apply {
+fun Collection<String>.toNbtStringList(): NbtList = NbtList().apply {
     addAll(this@toNbtStringList.map { NbtString.of(it) })
 }
 
-fun List<ByteArray>.toNbtByteArrayList(): NbtList = NbtList().apply {
+fun Collection<ByteArray>.toNbtByteArrayList(): NbtList = NbtList().apply {
     addAll(this@toNbtByteArrayList.map { NbtByteArray(it) })
 }
 
-fun List<IntArray>.toNbtIntArrayList(): NbtList = NbtList().apply {
+fun Collection<IntArray>.toNbtIntArrayList(): NbtList = NbtList().apply {
     addAll(this@toNbtIntArrayList.map { NbtIntArray(it) })
 }
 
-fun List<LongArray>.toNbtLongArrayList(): NbtList = NbtList().apply {
+fun Collection<LongArray>.toNbtLongArrayList(): NbtList = NbtList().apply {
     addAll(this@toNbtLongArrayList.map { NbtLongArray(it) })
 }
 
-fun List<UUID>.toNbtUUIDList(): NbtList = NbtList().apply {
+fun Collection<UUID>.toNbtUUIDList(): NbtList = NbtList().apply {
     addAll(this@toNbtUUIDList.map { NbtHelper.fromUuid(it) })
 }
 
-fun List<NbtCompound>.toNbtCompoundList(): NbtList = NbtList().apply {
+fun Collection<NbtCompound>.toNbtCompoundList(): NbtList = NbtList().apply {
     addAll(this@toNbtCompoundList.map { it })
 }
 
