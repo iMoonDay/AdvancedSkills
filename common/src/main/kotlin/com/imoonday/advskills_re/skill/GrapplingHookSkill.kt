@@ -43,9 +43,7 @@ class GrapplingHookSkill : LongPressSkill(
                 if (player.blockPos.down() == toBlockPos()
                     || player.calculateAngle(this) > PI / 4.5
                 ) {
-                    if (!player.world.isClient) {
-                        player.stopAndCooldown()
-                    }
+                    player.stopAndCooldown()
                     return@run
                 }
                 val rotation = player.rotationVector

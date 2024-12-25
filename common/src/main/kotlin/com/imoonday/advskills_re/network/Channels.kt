@@ -8,18 +8,44 @@ import net.minecraft.network.*
 
 object Channels {
 
+    @JvmStatic
     val USE_SKILL_C2S: NetworkChannel = registerChannel("use_skill_c2s")
+
+    @JvmStatic
     val EQUIP_SKILL_C2S: NetworkChannel = registerChannel("equip_skill_c2s")
+
+    @JvmStatic
     val SEND_PLAYER_DATA_C2S: NetworkChannel = registerChannel("send_player_data_c2s")
+
+    @JvmStatic
     val CHOOSE_SKILL_C2S: NetworkChannel = registerChannel("choose_skill_c2s")
+
+    @JvmStatic
     val REFRESH_CHOICE_C2S: NetworkChannel = registerChannel("refresh_choice_c2s")
+
+    @JvmStatic
     val SYNC_CONFIG_S2C: NetworkChannel = registerChannel("sync_config_s2c")
+
+    @JvmStatic
     val LEARN_SKILL_S2C: NetworkChannel = registerChannel("learn_skill_s2c")
+
+    @JvmStatic
     val SYNC_PROPERTIES_S2C: NetworkChannel = registerChannel("sync_properties_s2c")
+
+    @JvmStatic
     val SYNC_PLAYER_DATA_S2C: NetworkChannel = registerChannel("sync_player_data_s2c")
+
+    @JvmStatic
     val REQUEST_SYNC_COMPONENT_C2S: NetworkChannel = registerChannel("request_sync_component_c2s")
+
+    @JvmStatic
     val UPDATE_ORE_CACHE_S2C: NetworkChannel = registerChannel("update_ore_cache_s2c")
+
+    @JvmStatic
     val ENHANCE_SKILL_S2C: NetworkChannel = registerChannel("enhance_skill_s2c")
+
+    @JvmStatic
+    val UPDATE_JUMPING_C2S: NetworkChannel = registerChannel("update_jumping_c2s")
 
     fun register() {
         USE_SKILL_C2S.register(::UseSkillC2SRequest)
@@ -34,6 +60,7 @@ object Channels {
         REQUEST_SYNC_COMPONENT_C2S.register(::RequestSyncComponentC2SRequest)
         UPDATE_ORE_CACHE_S2C.register(::UpdateOreCacheS2CPacket)
         ENHANCE_SKILL_S2C.register { EnhanceSkillS2CPacket() }
+        UPDATE_JUMPING_C2S.register(::UpdateJumpingC2SPacket)
     }
 
     private fun registerChannel(name: String) = NetworkChannel.create(id(name))

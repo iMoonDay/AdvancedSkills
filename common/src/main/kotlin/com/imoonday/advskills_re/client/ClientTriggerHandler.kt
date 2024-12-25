@@ -63,4 +63,8 @@ object ClientTriggerHandler {
                 )
             )
         }
+
+    @JvmStatic
+    fun shouldSyncJumpState(player: PlayerEntity): Boolean =
+        player.anyTrigger<JumpStateTrigger> { it.shouldSyncJumpState(player) }
 }

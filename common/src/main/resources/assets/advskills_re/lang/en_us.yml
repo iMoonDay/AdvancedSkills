@@ -453,6 +453,9 @@ advskills_re:
     space_blast:
       name: Space Blast
       description: Blast the area ahead, destroying all destructible blocks and causing massive damage to entities in the area
+    gliding:
+      name: Gliding
+      description: Can glide through the air for a while
   skillType:
     attack: Attack
     defense: Defense

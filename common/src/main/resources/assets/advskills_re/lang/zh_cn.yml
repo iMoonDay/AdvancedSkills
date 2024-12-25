@@ -465,6 +465,9 @@ advskills_re:
     space_blast:
       name: 空间爆破
       description: 对前方区域进行爆破，直接摧毁全部可破坏方块，并对区域内的实体造成大量伤害
+    gliding:
+      name: 滑翔
+      description: 可以在空中滑翔一段时间
   skillType:
     attack: 攻击
     defense: 防御

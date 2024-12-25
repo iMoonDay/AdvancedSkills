@@ -49,6 +49,7 @@ object SkillRendererHandler {
     @JvmStatic
     fun renderCrosshair(context: DrawContext) {
         if (ClientConfig.get().hideSkillCrosshair) return
+        if (client?.entityRenderDispatcher?.camera?.isThirdPerson == true) return
 
         val filteredRenderers = crosshairRenderers.filter { (skill, renderer) ->
             renderer.shouldRenderCrosshair(skill)

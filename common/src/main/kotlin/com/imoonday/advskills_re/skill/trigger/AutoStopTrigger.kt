@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.skill.trigger
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.skill.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
@@ -11,12 +12,7 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
     val persistTime: Int
 
     fun getModifiedPersistTime(player: PlayerEntity): Int =
-        applyPersistTimeEnhancements(
-            player,
-            SkillConfig.get().getModifier(getAsSkill().id)?.time
-                ?: GlobalConfig.get().skillConfig.getModifier(getAsSkill().id)?.time
-                ?: persistTime,
-        )
+        applyPersistTimeEnhancements(player, getPersistTimeOrDefault(getAsSkill(), persistTime))
 
     fun applyPersistTimeEnhancements(player: PlayerEntity, time: Int): Int {
         val enhancements = getAsSkill().availableEnhancements
@@ -59,5 +55,12 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
         super.postUnequipped(player, slot)
         onStop(player)
+    }
+
+    companion object {
+
+        fun getPersistTimeOrDefault(skill: Skill, time: Int) = (SkillConfig.get().getModifier(skill.id)?.time
+            ?: GlobalConfig.get().skillConfig.getModifier(skill.id)?.time
+            ?: time)
     }
 }

@@ -293,6 +293,9 @@ object Skills {
     @JvmField
     val SPACE_BLAST = register(SpaceBlastSkill())
 
+    @JvmField
+    val GLIDING = register(GlidingSkill())
+
     fun init() = Unit
 
     fun <T : Skill> register(skill: T): T {

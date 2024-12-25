@@ -9,4 +9,7 @@ public interface LivingEntityAccessor {
 
     @Accessor
     boolean isJumping();
+
+    @Accessor
+    void setJumping(boolean jumping);
 }

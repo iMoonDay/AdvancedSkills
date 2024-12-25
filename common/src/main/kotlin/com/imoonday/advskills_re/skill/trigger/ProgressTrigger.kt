@@ -5,6 +5,10 @@ import net.minecraft.entity.player.*
 interface ProgressTrigger : SkillTrigger {
 
     fun shouldDisplay(player: PlayerEntity): Boolean = false
+
     fun getProgress(player: PlayerEntity): Double
+
     fun shouldFlashIcon(player: PlayerEntity): Boolean = player.isUsing()
+
+    fun canBeEmpty(player: PlayerEntity): Boolean = false
 }

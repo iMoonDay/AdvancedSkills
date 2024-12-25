@@ -86,7 +86,8 @@ object SkillRenderer {
             && (player.isUsing(skill) || skill !is UsingProgressTrigger)
         ) {
             val progress = skill.getProgress(player).coerceIn(0.0, 1.0)
-            val centerX = x + 1 + ((width - 1) * progress).toInt()
+            val centerX =
+                if (skill.canBeEmpty(player)) x + (width * progress).toInt() else x + 1 + ((width - 1) * progress).toInt()
             context.fill(x, y, centerX, y + height, ClientConfig.get().progressBarColor)
             context.fill(centerX, y, x + width, y + height, Color.GRAY.rgb)
         }
