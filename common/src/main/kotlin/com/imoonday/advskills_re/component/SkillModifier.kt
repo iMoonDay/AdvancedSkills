@@ -2,12 +2,9 @@ package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.skill.enums.*
 import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
-import kotlinx.serialization.json.*
 import net.minecraft.nbt.*
 
-@Serializable(with = SkillModifier.Serializer::class)
+@Serializable
 data class SkillModifier(
     var cooldown: Int?,
     var rarity: SkillRarity?,
@@ -27,46 +24,6 @@ data class SkillModifier(
         if (time != null) {
             putInt("time", time!!)
         }
-    }
-
-    class Serializer : KSerializer<SkillModifier> {
-
-        override val descriptor: SerialDescriptor =
-            buildClassSerialDescriptor("SkillModifier") {
-                element<Int?>("cooldown")
-                element<Int?>("rarity")
-                element<Int?>("time")
-            }
-
-        override fun deserialize(decoder: Decoder): SkillModifier =
-            decoder.decodeStructure(descriptor) {
-                var cooldown: Int? = null
-                var rarity: SkillRarity? = null
-                var time: Int? = null
-                while (true) {
-                    when (val index = decodeElementIndex(descriptor)) {
-                        0 -> cooldown = decodeIntElement(descriptor, 0)
-                        1 -> rarity = SkillRarity.fromId(decodeStringElement(descriptor, 1))
-                        2 -> time = decodeIntElement(descriptor, 2)
-                        CompositeDecoder.DECODE_DONE -> break
-                        else -> error("Unexpected index: $index")
-                    }
-                }
-                SkillModifier(cooldown, rarity, time)
-            }
-
-        override fun serialize(encoder: Encoder, value: SkillModifier) =
-            encoder.encodeStructure(descriptor) {
-                if (value.cooldown != null) {
-                    encodeIntElement(descriptor, 0, value.cooldown!!)
-                }
-                if (value.rarity != null) {
-                    encodeStringElement(descriptor, 1, value.rarity!!.id)
-                }
-                if (value.time != null) {
-                    encodeIntElement(descriptor, 2, value.time!!)
-                }
-            }
     }
 
     companion object {

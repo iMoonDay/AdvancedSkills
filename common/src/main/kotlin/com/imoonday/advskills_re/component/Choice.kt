@@ -1,36 +1,42 @@
 package com.imoonday.advskills_re.component
 
+import com.imoonday.advskills_re.component.choice.*
+import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 
-abstract class Choice<T>(
-    val first: T,
-    val second: T,
-    val third: T,
+class Choice(
+    val first: Choosable,
+    val second: Choosable,
+    val third: Choosable,
 ) {
-
-    abstract fun create(first: T, second: T, third: T): Choice<T>
-
-    abstract fun isEmpty(item: T): Boolean
-
-    abstract val emptyChoice: Choice<T>
-
-    abstract val emptyItem: T
-
-    fun isEmpty(): Boolean = this === emptyChoice || choices.all { isEmpty(it) }
-
-    fun hasEmpty(): Boolean = this === emptyChoice || choices.any { isEmpty(it) }
-
-    open fun hasDuplicates() = !isEmpty() && choices.distinct().size < choices.size
 
     val choices = listOf(first, second, third)
 
-    fun withFirst(item: T): Choice<T> = create(item, second, third)
+    fun isEmpty(): Boolean = this === EMPTY || choices.all { it.isEmpty() }
 
-    fun withSecond(item: T): Choice<T> = create(first, item, third)
+    fun hasEmpty(): Boolean = this === EMPTY || choices.any { it.isEmpty() }
 
-    fun withThird(item: T): Choice<T> = create(first, second, item)
+    fun hasDuplicates(): Boolean {
+        if (isEmpty()) return false
 
-    fun replaceWith(filter: (T) -> Boolean, generator: (except: MutableSet<T>) -> T): Choice<T> {
+        for (i in choices.indices) {
+            for (j in i + 1 until choices.size) {
+                if (!areCompatible(choices[i], choices[j])) {
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
+    fun withFirst(item: Choosable): Choice = Choice(item, second, third)
+
+    fun withSecond(item: Choosable): Choice = Choice(first, item, third)
+
+    fun withThird(item: Choosable): Choice = Choice(first, second, item)
+
+    fun replaceWith(filter: (Choosable) -> Boolean, generator: (except: MutableSet<Choosable>) -> Choosable): Choice {
         var choice = this
         val except = choices.toMutableSet()
         if (filter(first)) choice = choice.withFirst(generator(except))
@@ -39,11 +45,15 @@ abstract class Choice<T>(
         return choice
     }
 
-    abstract fun toNbt(): NbtCompound
+    fun toNbt(): NbtCompound = NbtCompound().apply {
+        put("1", first.toNbt())
+        put("2", second.toNbt())
+        put("3", third.toNbt())
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Choice<*>) return false
+        if (other !is Choice) return false
 
         if (first != other.first) return false
         if (second != other.second) return false
@@ -59,13 +69,57 @@ abstract class Choice<T>(
         return result
     }
 
-    open fun removeDuplicates(): Choice<T> {
-        if (!hasDuplicates()) return this
-        val distinctSkills = choices.distinct()
-        return when (distinctSkills.size) {
-            1 -> create(distinctSkills[0], emptyItem, emptyItem)
-            2 -> create(distinctSkills[0], distinctSkills[1], emptyItem)
-            else -> this
+    fun removeDuplicates(): Choice {
+        if (isEmpty()) return this
+
+        val unique = mutableListOf<Choosable>()
+        for (choice in choices) {
+            if (unique.none { it.compatibleWith(choice) }) {
+                unique.add(choice)
+            }
+        }
+
+        return when (unique.size) {
+            0 -> EMPTY
+            1 -> Choice(unique.first(), Choosable.EMPTY, Choosable.EMPTY)
+            2 -> Choice(unique.first(), unique.last(), Choosable.EMPTY)
+            3 -> Choice(unique.first(), unique[1], unique.last())
+            else -> throw IllegalStateException("Choice has more than 3 items")
+        }
+    }
+
+    fun areCompatible(choosable: Choosable, another: Choosable): Boolean =
+        choosable.compatibleWith(another) && another.compatibleWith(choosable)
+
+    companion object {
+
+        val EMPTY: Choice = Choice(Choosable.EMPTY, Choosable.EMPTY, Choosable.EMPTY)
+
+        @JvmStatic
+        fun fromNbt(nbt: NbtCompound): Choice = Choice(
+            parseChoosable(nbt.getCompound("1")),
+            parseChoosable(nbt.getCompound("2")),
+            parseChoosable(nbt.getCompound("3")),
+        )
+
+        @JvmStatic
+        fun parseChoosable(nbt: NbtCompound): Choosable {
+            val type = Choosable.Type.entries.getOrNull(nbt.getInt("type")) ?: return Choosable.EMPTY
+            return when (type) {
+                Choosable.Type.EMPTY -> Choosable.EMPTY
+                Choosable.Type.SKILL -> SkillChoice.fromNbt(nbt)
+                Choosable.Type.ENHANCEMENT -> EnhancementChoice.fromNbt(nbt)
+            }
+        }
+
+        @JvmStatic
+        fun canGenerate(player: PlayerEntity): Boolean {
+            TODO()
+        }
+
+        @JvmStatic
+        fun generate(player: PlayerEntity): Choice {
+            TODO()
         }
     }
 }

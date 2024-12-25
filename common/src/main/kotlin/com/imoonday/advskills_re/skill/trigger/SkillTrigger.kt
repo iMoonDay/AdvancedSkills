@@ -29,9 +29,8 @@ interface SkillTrigger {
     fun PlayerEntity.toggleUsing(): Boolean = toggleUsing(getAsSkill())
     fun PlayerEntity.isReady(): Boolean = hasEquipped() && !isCooling() && !isUsing()
     fun PlayerEntity.stopAndCooldown(cooldown: Int? = null) = stopAndCooldown(getAsSkill(), cooldown)
-    fun PlayerEntity.getEnhancements(): List<SkillEnhancement> = getEnhancements(getAsSkill())
-    fun <T : SkillEnhancement> PlayerEntity.getEnhancement(type: SkillEnhancementType<T>): T? =
-        getEnhancement(getAsSkill(), type)
+    fun PlayerEntity.getEnhancements(): Map<Enhancement, Int> = getEnhancements(getAsSkill())
+    fun <T : SkillEnhancement> PlayerEntity.getEnhancement(type: SkillEnhancementType<T>): T? = TODO()
 
     fun PlayerEntity.getEnhancementLvl(type: SkillEnhancementType<*>): Int =
         getEnhancement(type)?.level ?: 0
@@ -48,6 +47,50 @@ interface SkillTrigger {
             tooltip.add(getAsSkill().message(it.type.id, value(it)))
         }
     }
+
+    fun PlayerEntity.getEnhancement(id: String): Pair<Enhancement, Int>? =
+        getEnhancement(getAsSkill(), id)
+
+    fun PlayerEntity.getEnhancementValue(id: String): Float {
+        val pair = getEnhancement(getAsSkill(), id) ?: return 0.0f
+        return pair.first.getValue(pair.second)
+    }
+
+    fun PlayerEntity.getDoubleParameter(name: String, min: Double? = null, max: Double? = null): Double =
+        getFloatParameter(name, min?.toFloat(), max?.toFloat()).toDouble()
+
+    fun PlayerEntity.getFloatParameter(name: String, min: Float? = null, max: Float? = null): Float {
+        val skill = getAsSkill()
+        val parameter = skill.getFloatParameter(name) ?: throw IllegalArgumentException("No such parameter: $name")
+        val baseValue = parameter.baseValue
+        val enhancementId = parameter.enhancement ?: return baseValue
+        val pair = getEnhancement(skill, enhancementId) ?: return baseValue
+        var value = pair.first.getEnhancedValue(pair.second, baseValue)
+        if (min != null) value = maxOf(value, min)
+        if (max != null) value = minOf(value, max)
+        return value
+    }
+
+    fun PlayerEntity.getIntParameter(name: String, min: Int? = null, max: Int? = null): Int {
+        val skill = getAsSkill()
+        val parameter = skill.getIntParameter(name) ?: throw IllegalArgumentException("No such parameter: $name")
+        val baseValue = parameter.baseValue
+        val enhancementId = parameter.enhancement ?: return baseValue
+        val pair = getEnhancement(skill, enhancementId) ?: return baseValue
+        var value = pair.first.getEnhancedValue(pair.second, baseValue)
+        if (min != null) value = maxOf(value, min)
+        if (max != null) value = minOf(value, max)
+        return value
+    }
+
+    fun getParameterBaseValue(name: String): Number {
+        val skill = getAsSkill()
+        val parameter = skill.getParameter(name) ?: throw IllegalArgumentException("No such parameter: $name")
+        return parameter.baseValue
+    }
+
+    fun PlayerEntity.hasEnhancement(id: String): Boolean =
+        getEnhancement(getAsSkill(), id) != null
 
     companion object {
 

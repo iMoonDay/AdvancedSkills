@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.network.packet.s2c.play.*
@@ -16,45 +16,45 @@ class ArrowRainSkill : Skill(
     types = listOf(SkillType.ATTACK, SkillType.SUMMON),
     cooldown = 15,
     rarity = SkillRarity.RARE,
-    sound = SoundEvents::ENTITY_ARROW_SHOOT,
-    enhancements = setOf(
-        SkillEnhancements.DAMAGE,
-        SkillEnhancements.LAUNCH_COUNT,
-        SkillEnhancements.RANGE,
-        SkillEnhancements.SUMMON_AMOUNT
-    )
+    sound = SoundEvents::ENTITY_ARROW_SHOOT
 ) {
 
     init {
-        addEnhancementTooltipWithArg(SkillEnhancements.LAUNCH_COUNT) { it.level }
-        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level * 2 }
-        addEnhancementTooltipWithArg(SkillEnhancements.SUMMON_AMOUNT) { it.level * 10 }
+        addParameter("max_distance", 256.0)
+        addParameter("min_summon_amount", 50)
+        addParameter("max_summon_amount", 100)
+        addParameter("summon_interval", 2)
+        addEnhanceableParameter("arrow_damage", 2.0, "damage", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter("launch_count", 5, "count", 1f, Enhancement.Type.INCREMENT, 5) { it.toInt() }
+        addEnhanceableParameter("summon_range", 20.0, "range", 2f, Enhancement.Type.INCREMENT, 5) { it.toInt() }
+        addEnhancement("summon_amount", 10f, Enhancement.Type.INCREMENT, 5) { it.toInt() }
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val enhancement = user.getEnhancement(SkillEnhancements.DAMAGE)
-        val damageModifier: ((Double) -> Double)? = if (enhancement == null) null
-        else { value -> enhancement.applyMultiplier(value) }
-
-        val raycast = user.raycast(256.0, 0f, true)
+        val damage = user.getDoubleParameter("arrow_damage")
+        val maxDistance = user.getDoubleParameter("max_distance")
+        val raycast = user.raycast(maxDistance, 0f, true)
         val center = if (raycast.type == HitResult.Type.MISS) user.pos else raycast.pos
-        val remainingTimes = 4 + user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
-        val range = user.getEnhancementLvl(SkillEnhancements.RANGE) * 2.0
-        val amount = user.getEnhancementLvl(SkillEnhancements.SUMMON_AMOUNT) * 10
-        user.executeAndAddTask(2, remainingTimes) { spawnArrows(user, center, damageModifier, range, amount) }
+        val remainingTimes = user.getIntParameter("launch_count") - 1
+        val range = user.getDoubleParameter("summon_range")
+        val amount = user.getEnhancementValue("summon_amount").toInt()
+        val (min, max) = user.getIntParameter("min_summon_amount") to user.getIntParameter("max_summon_amount")
+        val interval = user.getIntParameter("summon_interval")
+        user.executeAndAddTask(interval, remainingTimes) { spawnArrows(user, center, damage, range, min, max, amount) }
         return UseResult.success()
     }
 
     private fun spawnArrows(
         user: ServerPlayerEntity,
         center: Vec3d,
-        damageModifier: ((Double) -> Double)?,
-        extraRange: Double,
+        damage: Double,
+        range: Double,
+        min: Int,
+        max: Int,
         extraAmount: Int
     ): Boolean {
         val random = user.random
-        val amount = random.nextInt(51) + 50 + extraAmount
-        val range = (amount - extraAmount) * 0.25 + extraRange
+        val amount = random.nextBetween(min, max) + extraAmount
 
         var result = false
         val particles: MutableList<ParticleS2CPacket> = mutableListOf()
@@ -68,10 +68,19 @@ class ArrowRainSkill : Skill(
                     user
                 ).apply {
                     pitch = -90f
-                    damageModifier?.let { damage = it(damage) }
+                    if (this.damage != damage) {
+                        this.damage = damage
+                    }
                 }.also {
-                    particles.add(ParticleS2CPacket(ParticleTypes.CLOUD, false, it.x, it.y, it.z, 1f, 0f, 1f, 0f, 5))
-                    //                    user.spawnParticles(ParticleTypes.CLOUD, false, it.pos, 5, 1.0, 0.0, 1.0, 0.0)
+                    particles.add(
+                        ParticleS2CPacket(
+                            ParticleTypes.CLOUD,
+                            false,
+                            it.x, it.y, it.z,
+                            1f, 0f, 1f,
+                            0f, 5
+                        )
+                    )
                 }).also {
                 if (it && !result) {
                     result = true

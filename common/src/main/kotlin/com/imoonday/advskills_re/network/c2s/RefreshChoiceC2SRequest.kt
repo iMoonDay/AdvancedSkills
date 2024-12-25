@@ -6,22 +6,14 @@ import dev.architectury.networking.*
 import net.minecraft.network.*
 import net.minecraft.server.network.*
 
-class RefreshChoiceC2SRequest(val type: Type) : NetworkPacket {
+class RefreshChoiceC2SRequest() : NetworkPacket {
 
-    constructor(buf: PacketByteBuf) : this(buf.readEnumConstant(Type::class.java))
-
-    override fun encode(buf: PacketByteBuf) {
-        buf.writeEnumConstant(type)
-    }
+    override fun encode(buf: PacketByteBuf) = Unit
 
     override fun apply(context: NetworkManager.PacketContext) {
         val player = context.player as? ServerPlayerEntity ?: return
-        if (!player.canFreshChoice(type)) return
+        if (!player.canFreshChoice()) return
 
-        player.refreshSkillChoice(type)
-    }
-
-    enum class Type {
-        SKILL, ENHANCEMENT
+        player.refreshSkillChoice()
     }
 }

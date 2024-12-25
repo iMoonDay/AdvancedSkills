@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.component.Enhancement.Type.*
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.item.*
@@ -86,6 +87,10 @@ abstract class Skill(
     private val enhancementTooltips: MutableMap<SkillEnhancementType<*>, (SkillEnhancement) -> MutableText> =
         mutableMapOf()
 
+    private val parameters: MutableMap<String, SkillParameter<*>> = mutableMapOf()
+
+    private val enhancements: MutableMap<Enhancement, ((value: Float) -> Any)?> = mutableMapOf()
+
     /**
      * @param cooldown cooldown in seconds
      */
@@ -131,6 +136,79 @@ abstract class Skill(
             }
         }
 
+    protected fun addParameter(name: String, baseValue: Number) {
+        parameters[name] = when (baseValue) {
+            is Int, is Long, is Short, is Byte -> SkillParameter.Int(baseValue.toInt(), null)
+            else -> SkillParameter.Float(baseValue.toFloat(), null)
+        }
+    }
+
+    protected fun addEnhanceableParameter(
+        name: String,
+        baseValue: Number,
+        enhancementId: String,
+        value: Float,
+        type: Enhancement.Type,
+        maxLevel: Int,
+        descriptionArg: (value: Float) -> Any
+    ) {
+        val enhancement = addEnhancement(enhancementId, value, type, maxLevel, descriptionArg)
+        parameters[name] = when (baseValue) {
+            is Int, is Long, is Short, is Byte -> SkillParameter.Int(baseValue.toInt(), enhancement.id)
+            else -> SkillParameter.Float(baseValue.toFloat(), enhancement.id)
+        }
+    }
+
+    fun getParameter(name: String): SkillParameter<*>? = parameters[name]
+
+    fun getIntParameter(name: String): SkillParameter.Int? = parameters[name]?.asInt()
+
+    fun getFloatParameter(name: String): SkillParameter.Float? = parameters[name]?.asFloat()
+
+    protected fun addEnhancement(
+        id: String,
+        value: Float,
+        type: Enhancement.Type,
+        maxLevel: Int,
+        descriptionArg: (value: Float) -> Any
+    ): Enhancement {
+        val enhancement = when (type) {
+            INCREMENT -> Enhancement.Increment(
+                id,
+                message("$id.name"),
+                messageKey("$id.description"),
+                value,
+                maxLevel
+            )
+
+            MULTIPLY -> Enhancement.Multiply(
+                id,
+                message("$id.name"),
+                messageKey("$id.description"),
+                value,
+                maxLevel
+            )
+
+            LEVEL_LESS -> return addEnhancement(id)
+        }
+        enhancements[enhancement] = descriptionArg
+        return enhancement
+    }
+
+    protected fun addEnhancement(id: String): Enhancement {
+        val enhancement = Enhancement.LevelLess(id, message("$id.name"), messageKey("$id.description"))
+        enhancements[enhancement] = null
+        return enhancement
+    }
+
+    fun getEnhancements(): List<Enhancement> = enhancements.keys.toList()
+
+    fun getValidEnhancements(): List<Enhancement> = enhancements.keys.filter { it.maxLevel > 0 }
+
+    fun getEnhancement(id: String): Enhancement? = enhancements.keys.firstOrNull { it.id == id }
+
+    fun hasEnhancement(id: String): Boolean = enhancements.keys.any { it.id == id }
+
     @Suppress("UNCHECKED_CAST")
     protected fun <T : SkillEnhancement> addEnhancementTooltip(
         type: SkillEnhancementType<T>,
@@ -153,9 +231,6 @@ abstract class Skill(
         enhancementTooltips[type] =
             { enhancement: T -> message(type.id, *args(enhancement)) } as (SkillEnhancement) -> MutableText
     }
-
-    fun <T : SkillEnhancement> getEnhancementTooltip(enhancement: T): MutableText =
-        enhancementTooltips[enhancement.type]?.invoke(enhancement) ?: enhancement.description.copy()
 
     abstract fun use(user: ServerPlayerEntity): UseResult
 
@@ -234,18 +309,19 @@ abstract class Skill(
 
     fun message(key: String, vararg args: Any) = translateSkill(id.path, key, *args)
 
+    fun messageKey(key: String) = translateSkillKey(id.path, key)
+
     open fun applyCooldownEnhancements(player: PlayerEntity, cooldown: Int): Int =
         getEnhancedValue(player, SkillEnhancements.COOLDOWN, cooldown).coerceAtLeast(0)
 
     open fun getEnhancementTooltips(player: PlayerEntity): List<Text> =
-        player.getEnhancements().map { getEnhancementTooltip(it).formatted(Formatting.BLUE) }
-
-    fun isAvailable(enhancement: SkillEnhancement): Boolean =
-        availableEnhancements.contains(enhancement.type)
-
-    fun isAvailableFor(player: PlayerEntity, enhancement: SkillEnhancement): Boolean =
-        isAvailable(enhancement) && player.getEnhancement(enhancement.type)
-            ?.let { enhancement.level > it.level } != false
+        player.getEnhancements().map {
+            val enhancement = it.key
+            val level = it.value
+            val arg = enhancements[enhancement]?.invoke(enhancement.getValue(level))
+            (if (arg != null) Text.translatable(enhancement.description, arg)
+            else Text.translatable(enhancement.description)).formatted(Formatting.BLUE)
+        }
 
     fun getCooldownText(cooldown: Int) = if (cooldown <= 0) {
         translate("cooldown.none")

@@ -8,9 +8,14 @@ abstract class Choosable(val skill: Skill) {
 
     abstract val type: Type
 
-    abstract fun toNbt(): NbtCompound
+    open fun toNbt(): NbtCompound = NbtCompound().apply {
+        putInt("type", this@Choosable.type.ordinal)
+        putString("skill", skill.id.toString())
+    }
 
     abstract fun isEmpty(): Boolean
+
+    abstract fun compatibleWith(other: Choosable): Boolean
 
     enum class Type {
         EMPTY,
@@ -24,11 +29,9 @@ abstract class Choosable(val skill: Skill) {
 
             override val type: Type = Type.EMPTY
 
-            override fun toNbt(): NbtCompound = NbtCompound().also {
-                it.putInt("type", type.ordinal)
-            }
-
             override fun isEmpty(): Boolean = true
+
+            override fun compatibleWith(other: Choosable): Boolean = true
         }
     }
 }

@@ -68,14 +68,10 @@ class SkillListScreen(
         else translate("screen.list.button.enhance")
         val learnButtonWidth = (textRenderer.getWidth(learnText) + 10).coerceAtLeast(50)
         learnButton = ButtonWidget.builder(learnText) {
-            if (!player.enhancementData.isEmpty()) {
-                client!!.setScreen(SkillEnhancementScreen(player) { SkillListScreen(player) })
-            } else {
-                client!!.setScreen(SkillLearningScreen(player) { SkillListScreen(player) })
-            }
+            client!!.setScreen(SkillChoiceScreen(player) { SkillListScreen(player) })
         }.dimensions(inventoryButton.x - learnButtonWidth - 5, 5, learnButtonWidth, 20)
             .build()
-            .apply { active = !player.learnableData.isEmpty() || !player.enhancementData.isEmpty() }
+            .apply { active = !player.choiceData.isEmpty() || !player.choiceData.isEmpty() }
             .also(::addDrawableChild)
     }
 
@@ -254,13 +250,8 @@ class SkillListScreen(
             )
         }
         if (!learnButton.active) {
-            val learnedAll = player.hasLearnedAll()
-            val text = if (learnedAll && !EnhancementChoice.canGenerate(player)) {
-                translate("screen.list.enhancedAll")
-            } else {
-                val requiredLevels = PlayerUtils.getLevelRequiredForLearningSkill(level)
-                translate("screen.list.requiredLevel.${if (learnedAll) "enhance" else "learn"}", requiredLevels)
-            }
+            val requiredLevels = PlayerUtils.getLevelRequiredForLearningSkill(level)
+            val text = translate("screen.list.requiredLevel.learn", requiredLevels)
             context.drawText(
                 textRenderer,
                 text,
@@ -278,8 +269,8 @@ class SkillListScreen(
         if (skillScroll.children().size != player.learnedSkills.size) {
             skillScroll.refresh()
         }
-        learnButton.active = !player.learnableData.isEmpty() || !player.enhancementData.isEmpty()
-        if (!player.enhancementData.isEmpty() || player.hasLearnedAll()) {
+        learnButton.active = !player.choiceData.isEmpty() || !player.choiceData.isEmpty()
+        if (!player.choiceData.isEmpty() || player.hasLearnedAll()) {
             learnButton.message = translate("screen.list.button.enhance")
         } else {
             learnButton.message = translate("screen.list.button.learn")

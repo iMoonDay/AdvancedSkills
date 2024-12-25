@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.screen.*
-import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.network.s2c.*
@@ -19,8 +18,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
     override var synced: Boolean = false
     var container: SkillContainer = SkillContainer()
     var level: SkillLevelData = SkillLevelData()
-    var learnable: LearnableSkillData = LearnableSkillData()
-    var enhancements: LearnableEnhancementData = LearnableEnhancementData()
+    var choiceData: ChoiceData = ChoiceData()
 
     override fun readFromNbt(tag: NbtCompound) {
         if (tag.contains("container")) {
@@ -29,19 +27,17 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
         if (tag.contains("level")) {
             level = SkillLevelData.fromNbt(tag.getCompound("level"))
         }
-        if (tag.contains("learnable")) {
-            learnable = LearnableSkillData.fromNbt(tag.getCompound("learnable"))
-        }
-        if (tag.contains("enhancements")) {
-            enhancements = LearnableEnhancementData.fromNbt(tag.getCompound("enhancements"))
+        if (tag.contains("choiceData")) {
+            choiceData = ChoiceData.fromNbt(tag.getCompound("choiceData"))
+        } else if (tag.contains("learnable")) {
+            choiceData = ChoiceData.fromNbt(tag.getCompound("learnable"))
         }
     }
 
     override fun writeToNbt(tag: NbtCompound) {
         tag.put("container", container.toNbt())
         tag.put("level", level.toNbt())
-        tag.put("learnable", learnable.toNbt())
-        tag.put("enhancements", enhancements.toNbt())
+        tag.put("choiceData", choiceData.toNbt())
     }
 
     override fun tick() {
@@ -56,21 +52,8 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
             }
         }
         if (entity is ServerPlayerEntity) {
-            if (entity.hasLearnedAll()) {
-                if (learnable.count > 0) {
-                    enhancements.count += learnable.count * 3
-                    learnable.reset()
-                    dirty = true
-                }
-            } else if (enhancements.count > 0) {
-                learnable.count += enhancements.count / 3
-                enhancements.reset()
-                dirty = true
-            }
-
-            val result1 = learnable.correct(entity.learnedSkills, GlobalConfig.get().getLearningFilter())
-            val result2 = enhancements.correct(entity)
-            if (dirty || result1 || result2) {
+            val result = choiceData.correct(entity)
+            if (dirty || result) {
                 sync()
                 dirty = false
             }
@@ -94,8 +77,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
 
     override fun applySyncNbt(tag: NbtCompound) {
         val oldSkills = container.getAllSkills { _, data -> data.using }
-        val hasSkillChoice = learnable.hasNext()
-        val hasEnhancementChoice = enhancements.hasNext()
+        val wasEmpty = choiceData.isEmpty()
         super.applySyncNbt(tag)
         val newSkills = container.getAllSkills { _, data -> data.using }
         newSkills.subtract(oldSkills)
@@ -105,10 +87,8 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
             .filterIsInstance<ClientUseTrigger>()
             .forEach { it.onStop(entity) }
         if (entity.isCurrentClientPlayer) {
-            if (!hasSkillChoice && learnable.hasNext()) {
-                SkillLearningScreen.new = true
-            } else if (!hasEnhancementChoice && enhancements.hasNext()) {
-                SkillEnhancementScreen.new = true
+            if (wasEmpty && !choiceData.isEmpty()) {
+                SkillChoiceScreen.new = true
             }
             entity.updateScreen()
         }
@@ -128,8 +108,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
     fun reset() {
         container = SkillContainer()
         level = SkillLevelData()
-        learnable = LearnableSkillData()
-        enhancements = LearnableEnhancementData()
+        choiceData = ChoiceData()
         synced = false
         sync()
     }
