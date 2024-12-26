@@ -10,6 +10,7 @@ import com.imoonday.advskills_re.skill.enhancement.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
+import kotlinx.serialization.*
 import net.minecraft.entity.player.*
 import net.minecraft.registry.*
 import net.minecraft.server.network.*
@@ -19,29 +20,21 @@ import net.minecraft.util.*
 import java.util.*
 import java.util.function.*
 
-abstract class Skill(
-    val id: Identifier,
-    val name: Text,
-    val description: Text,
-    val icon: Identifier = id("unknown.png"),
-    val types: List<SkillType> = emptyList(),
-    val defaultCooldown: Int = 0,
-    rarity: SkillRarity,
-    val sound: Supplier<SoundEvent>? = null,
-    enhancements: Set<SkillEnhancementType<*>> = emptySet(),
-    invalid: Boolean = false,
-) : SkillTrigger {
+abstract class Skill(settings: Settings) : SkillTrigger {
 
-    val invalid: Boolean = invalid
+    val id: Identifier = settings.id
+    val name: Text = settings.name
+    val description: Text = settings.description
+    val icon: Identifier = settings.icon
+    val types: Set<SkillType> = settings.types
+    val defaultCooldown: Int = settings.cooldown
+    val sound: Supplier<SoundEvent>? = null
+
+    val invalid: Boolean = settings.invalid
         get() = field || SkillConfig.get().isInBlackList(id) || GlobalConfig.get().skillConfig.isInBlackList(id)
 
-    val rarity: SkillRarity = rarity
-        get() = SkillConfig.get().getModifier(id)?.rarity
-            ?: GlobalConfig.get().skillConfig.getModifier(id)?.rarity
-            ?: field
-
-    open val weight: Int
-        get() = rarity.weight
+    val rarity: SkillRarity = settings.rarity
+    val weight: Int = settings.weight
 
     val formattedName: MutableText
         get() = name.copy().formatted(rarity.formatting)
@@ -63,13 +56,9 @@ abstract class Skill(
 
     val cooldown: Int
         get() {
-            val config = SkillConfig.get()
-            val globalConfig = GlobalConfig.get()
-            val cooldown = config.getModifier(id)?.cooldown
-                ?: globalConfig.skillConfig.getModifier(id)?.cooldown
-                ?: defaultCooldown
-            val multiplier = config.skillCooldownMultiplier
-                ?: globalConfig.skillConfig.skillCooldownMultiplier
+            val cooldown = defaultCooldown
+            val multiplier = SkillConfig.get().skillCooldownMultiplier
+                ?: GlobalConfig.get().skillConfig.skillCooldownMultiplier
                 ?: return cooldown
             return (cooldown * multiplier).toInt()
         }
@@ -81,15 +70,14 @@ abstract class Skill(
         get() = getCooldownText(defaultCooldown)
 
     val availableEnhancements: Set<SkillEnhancementType<*>> =
-        if (defaultCooldown > 0) enhancements + SkillEnhancements.COOLDOWN
-        else enhancements
+        TODO()
 
     private val enhancementTooltips: MutableMap<SkillEnhancementType<*>, (SkillEnhancement) -> MutableText> =
         mutableMapOf()
 
-    private val parameters: MutableMap<String, SkillParameter<*>> = mutableMapOf()
-
-    private val enhancements: MutableMap<Enhancement, ((value: Float) -> Any)?> = mutableMapOf()
+    private val parameters: Map<String, SkillParameter> = settings.parameters
+    private val enhancements: List<Enhancement> = settings.enhancements
+    private val enhancementArgs: MutableMap<String, ((value: Float) -> Any)?> = mutableMapOf()
 
     /**
      * @param cooldown cooldown in seconds
@@ -101,18 +89,7 @@ abstract class Skill(
         rarity: SkillRarity,
         sound: Supplier<SoundEvent>? = null,
         enhancements: Set<SkillEnhancementType<*>> = emptySet(),
-    ) : this(
-        id(id),
-        translateSkill(id, "name"),
-        translateSkill(id, "description"),
-        itemId(id),
-        types,
-        20 * cooldown,
-        rarity,
-        sound,
-        enhancements,
-        false
-    )
+    ) : this(Settings(id, types, cooldown, rarity))
 
     fun isEmpty(): Boolean = this === Skills.EMPTY || this is EmptySkill
 
@@ -137,10 +114,7 @@ abstract class Skill(
         }
 
     protected fun addParameter(name: String, baseValue: Number) {
-        parameters[name] = when (baseValue) {
-            is Int, is Long, is Short, is Byte -> SkillParameter.Int(baseValue.toInt(), null)
-            else -> SkillParameter.Float(baseValue.toFloat(), null)
-        }
+        TODO()
     }
 
     protected fun addEnhanceableParameter(
@@ -152,18 +126,20 @@ abstract class Skill(
         maxLevel: Int,
         descriptionArg: (value: Float) -> Any
     ) {
-        val enhancement = addEnhancement(enhancementId, value, type, maxLevel, descriptionArg)
-        parameters[name] = when (baseValue) {
-            is Int, is Long, is Short, is Byte -> SkillParameter.Int(baseValue.toInt(), enhancement.id)
-            else -> SkillParameter.Float(baseValue.toFloat(), enhancement.id)
-        }
+        TODO()
     }
 
-    fun getParameter(name: String): SkillParameter<*>? = parameters[name]
+    protected fun addEnhancementDescArg(id: String, arg: (value: Float) -> Any) {
+        this.enhancementArgs[id] = arg
+    }
 
-    fun getIntParameter(name: String): SkillParameter.Int? = parameters[name]?.asInt()
+    fun getParameter(name: String): SkillParameter? = parameters[name]
 
-    fun getFloatParameter(name: String): SkillParameter.Float? = parameters[name]?.asFloat()
+    fun getIntParameter(name: String): SkillParameter.IntParameter? = getParameter(name)?.asIntParameter()
+
+    fun getFloatParameter(name: String): SkillParameter.FloatParameter? = getParameter(name)?.asFloatParameter()
+
+    fun getStringParameter(name: String): SkillParameter.StringParameter? = getParameter(name)?.asStringParameter()
 
     protected fun addEnhancement(
         id: String,
@@ -172,42 +148,16 @@ abstract class Skill(
         maxLevel: Int,
         descriptionArg: (value: Float) -> Any
     ): Enhancement {
-        val enhancement = when (type) {
-            INCREMENT -> Enhancement.Increment(
-                id,
-                message("$id.name"),
-                messageKey("$id.description"),
-                value,
-                maxLevel
-            )
-
-            MULTIPLY -> Enhancement.Multiply(
-                id,
-                message("$id.name"),
-                messageKey("$id.description"),
-                value,
-                maxLevel
-            )
-
-            LEVEL_LESS -> return addEnhancement(id)
-        }
-        enhancements[enhancement] = descriptionArg
-        return enhancement
+        TODO()
     }
 
-    protected fun addEnhancement(id: String): Enhancement {
-        val enhancement = Enhancement.LevelLess(id, message("$id.name"), messageKey("$id.description"))
-        enhancements[enhancement] = null
-        return enhancement
-    }
+    fun getEnhancements(): List<Enhancement> = enhancements.toList()
 
-    fun getEnhancements(): List<Enhancement> = enhancements.keys.toList()
+    fun getValidEnhancements(): List<Enhancement> = getEnhancements().filter { it.maxLevel > 0 }
 
-    fun getValidEnhancements(): List<Enhancement> = enhancements.keys.filter { it.maxLevel > 0 }
+    fun getEnhancement(id: String): Enhancement? = getEnhancements().firstOrNull { it.id == id }
 
-    fun getEnhancement(id: String): Enhancement? = enhancements.keys.firstOrNull { it.id == id }
-
-    fun hasEnhancement(id: String): Boolean = enhancements.keys.any { it.id == id }
+    fun hasEnhancement(id: String): Boolean = getEnhancements().any { it.id == id }
 
     @Suppress("UNCHECKED_CAST")
     protected fun <T : SkillEnhancement> addEnhancementTooltip(
@@ -318,7 +268,7 @@ abstract class Skill(
         player.getEnhancements().map {
             val enhancement = it.key
             val level = it.value
-            val arg = enhancements[enhancement]?.invoke(enhancement.getValue(level))
+            val arg = enhancementArgs[enhancement.id]?.invoke(enhancement.getValue(level))
             (if (arg != null) Text.translatable(enhancement.description, arg)
             else Text.translatable(enhancement.description)).formatted(Formatting.BLUE)
         }
@@ -331,5 +281,115 @@ abstract class Skill(
             "cooldown.seconds",
             if (text.endsWith(".0")) text.substring(0, text.length - 2) else text
         )
+    }
+
+    @Serializable
+    data class Settings(
+        @Serializable(with = IdentifierSerializer::class)
+        val id: Identifier,
+        var name: Text,
+        var description: Text,
+        @Serializable(with = IdentifierSerializer::class)
+        var icon: Identifier,
+        val types: Set<SkillType> = emptySet(),
+        var cooldown: Int = 0,
+        var rarity: SkillRarity,
+        var invalid: Boolean = false,
+        var weight: Int = rarity.weight,
+        val parameters: MutableMap<String, SkillParameter> = mutableMapOf(),
+        val enhancements: MutableList<Enhancement> = mutableListOf(),
+    ) {
+
+        constructor(
+            id: String,
+            types: List<SkillType>,
+            cooldown: Int = 0,
+            rarity: SkillRarity
+        ) : this(
+            id = id(id),
+            name = translateSkill(id, "name"),
+            description = translateSkill(id, "description"),
+            icon = itemId(id),
+            types = LinkedHashSet(types),
+            cooldown = cooldown,
+            rarity = rarity
+        )
+
+        fun addParameter(name: String, baseValue: Number): Settings {
+            parameters[name] = when (baseValue) {
+                is Int, is Long, is Short, is Byte -> SkillParameter.IntParameter(baseValue.toInt(), null)
+                else -> SkillParameter.FloatParameter(baseValue.toFloat(), null)
+            }
+            return this
+        }
+
+        fun addParameter(name: String, baseValue: String): Settings {
+            parameters[name] = SkillParameter.StringParameter(baseValue, null)
+            return this
+        }
+
+        fun addEnhanceableParameter(
+            name: String,
+            baseValue: Number,
+            enhancementId: String,
+            value: Float,
+            type: Enhancement.Type,
+            maxLevel: Int
+        ): Settings {
+            parameters[name] = when (baseValue) {
+                is Int, is Long, is Short, is Byte -> SkillParameter.IntParameter(baseValue.toInt(), enhancementId)
+                else -> SkillParameter.FloatParameter(baseValue.toFloat(), enhancementId)
+            }
+            return addEnhancement(enhancementId, value, type, maxLevel)
+        }
+
+        fun addEnhancement(
+            id: String,
+            value: Float,
+            type: Enhancement.Type,
+            maxLevel: Int
+        ): Settings {
+            val name = translateSkill(this@Settings.id.path, "$id.name")
+            val descriptionKey = translateSkillKey(this@Settings.id.path, "$id.description")
+            val enhancement = when (type) {
+                ADDITION -> Enhancement.Increment(id, name, descriptionKey, value, maxLevel)
+                MULTIPLY -> Enhancement.Multiply(id, name, descriptionKey, value, maxLevel)
+                LEVEL_LESS -> return addEnhancement(id)
+            }
+            enhancements += enhancement
+            return this
+        }
+
+        fun addEnhancement(id: String): Settings {
+            val enhancement = Enhancement.LevelLess(
+                id,
+                translateSkill(this@Settings.id.path, "$id.name"),
+                translateSkillKey(this@Settings.id.path, "$id.description")
+            )
+            enhancements += enhancement
+            return this
+        }
+
+        companion object {
+
+            fun from(skill: Skill): Settings = Settings(
+                id = skill.id,
+                name = skill.name,
+                description = skill.description,
+                icon = skill.icon,
+                types = skill.types,
+                cooldown = skill.defaultCooldown,
+                rarity = skill.rarity,
+                invalid = skill.invalid,
+                weight = skill.weight,
+                parameters = skill.parameters.toMutableMap(),
+                enhancements = skill.enhancements.toMutableList()
+            )
+
+            fun loadOrCreate(default: () -> Settings): Settings {
+                val settings = default()
+                return SkillSettingsManager.getSettings(settings.id) ?: settings
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -18,7 +19,9 @@ class DisguiseSkill : Skill(
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), DisguiseTrigger, UseInterruptTrigger, AutoStopTrigger {
 
-    override val persistTime: Int = 30 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 30 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 

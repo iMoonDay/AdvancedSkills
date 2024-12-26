@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -10,23 +10,26 @@ import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
 class AbsoluteDomainSkill : Skill(
-    id = "absolute_domain",
-    types = listOf(SkillType.DESTRUCTION),
-    cooldown = 15,
-    rarity = SkillRarity.RARE,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.RANGE)
+    Settings.loadOrCreate {
+        Settings(
+            id = "absolute_domain",
+            types = listOf(SkillType.DESTRUCTION),
+            cooldown = 15,
+            rarity = SkillRarity.RARE
+        ).addEnhanceableParameter("persist_time", 3 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5)
+            .addEnhanceableParameter("range", 1.0, "range", 1f, Enhancement.Type.ADDITION, 3)
+    }
 ), AutoStopTrigger {
 
     private val maxHardness = Blocks.OBSIDIAN.hardness
 
-    override val persistTime: Int = 3 * 20
-
     init {
-        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level * 0.5 }
+        addEnhancementDescArg("time") { (it * 100).toInt() }
+        addEnhancementDescArg("range") { it }
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {
-        putDouble("Range", user.getEnhancementLvl(SkillEnhancements.RANGE) * 0.5)
+        putDouble("Range", user.getDoubleParameter("range"))
     })
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {

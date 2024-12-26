@@ -18,6 +18,7 @@ object AdvancedSkills {
     @JvmStatic
     fun init() {
         GlobalConfig.get().load()
+        SkillSettingsManager.loadFiles()
         Channels.register()
         ModCommands.init()
         ModItems.init()

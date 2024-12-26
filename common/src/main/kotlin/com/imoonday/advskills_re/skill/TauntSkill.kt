@@ -19,7 +19,9 @@ class TauntSkill : Skill(
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DEFENSE_EFFECT)
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {
 
-    override val persistTime: Int = 15 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 15 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 

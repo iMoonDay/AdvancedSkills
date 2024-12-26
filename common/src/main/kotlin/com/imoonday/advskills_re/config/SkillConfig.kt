@@ -17,19 +17,16 @@ class SkillConfig {
 
     var skillCooldownMultiplier: Double? = null
     var skillXpMultiplier: Double? = null
-    val skillModifier: MutableMap<String, SkillModifier> = mutableMapOf()
     val skillBlackList: MutableSet<String> = mutableSetOf()
 
-    fun getModifier(id: Identifier): SkillModifier? =
-        skillModifier[id.toString()] ?: if (id.namespace == MOD_ID) skillModifier[id.path] else null
+    fun getModifier(id: Identifier): SkillModifier =
+        TODO()
 
     fun getOrCreateModifier(id: Identifier): SkillModifier =
-        skillModifier.getOrPut(id.toString()) { SkillModifier.EMPTY }
+        TODO()
 
     fun removeModifier(id: Identifier): Boolean {
-        val result1 = skillModifier.remove(id.toString()) != null
-        val result2 = if (id.namespace == MOD_ID) skillModifier.remove(id.path) != null else false
-        return result1 || result2
+        TODO()
     }
 
     fun isInBlackList(id: Identifier): Boolean =
@@ -76,16 +73,6 @@ class SkillConfig {
     }
 
     fun loadFromNbt(tag: NbtCompound) {
-        if (tag.contains("skillModifier")) {
-            skillModifier.clear()
-
-            val skillModifierTag = tag.getCompound("skillModifier")
-            for (id in skillModifierTag.keys) {
-                val modifierTag = skillModifierTag.getCompound(id)
-                skillModifier[id] = SkillModifier.fromNbt(modifierTag)
-            }
-        }
-
         if (tag.contains("skillBlackList")) {
             skillBlackList.clear()
 
@@ -105,11 +92,6 @@ class SkillConfig {
     }
 
     fun writeToNbt(tag: NbtCompound = NbtCompound()): NbtCompound = tag.apply {
-        put("skillModifier", NbtCompound().apply {
-            for ((id, modifier) in skillModifier) {
-                put(id, modifier.toNbt())
-            }
-        })
         put("skillBlackList", NbtList().apply {
             skillBlackList.forEach { add(NbtString.of(it)) }
         })
@@ -122,7 +104,6 @@ class SkillConfig {
     }
 
     fun reset() {
-        skillModifier.clear()
         skillBlackList.clear()
         skillCooldownMultiplier = null
         skillXpMultiplier = null

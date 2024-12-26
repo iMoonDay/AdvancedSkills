@@ -43,7 +43,7 @@ sealed class Enhancement(
         description: String,
         value: Float,
         maxLevel: Int
-    ) : Leveled(id, name, description, value, maxLevel, Type.INCREMENT) {
+    ) : Leveled(id, name, description, value, maxLevel, Type.ADDITION) {
 
         override fun getValue(level: Int): Float = value * level
 
@@ -64,6 +64,6 @@ sealed class Enhancement(
     }
 
     enum class Type {
-        LEVEL_LESS, INCREMENT, MULTIPLY
+        LEVEL_LESS, ADDITION, MULTIPLY
     }
 }

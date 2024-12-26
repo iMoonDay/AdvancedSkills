@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -26,7 +27,9 @@ class LavaWalkerSkill : Skill(
     DamageTrigger,
     LavaTrigger {
 
-    override val persistTime: Int = 20 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 20 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {
         user.playSound(SoundEvents.BLOCK_LAVA_AMBIENT)

@@ -25,9 +25,9 @@ class ActiveDefenseSkill : LongPressSkill(
     )
 ), DamageTrigger, AttributeTrigger, UsingRenderTrigger {
 
-    override fun getMaxPressTime(): Int = 5 * 20
-
     init {
+        addEnhanceableParameter(timeParameterName, 5 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+
         addEnhancementTooltipWithArg(SkillEnhancements.DEFENSE_EFFECT) { it.level * 6 }
     }
 
@@ -50,7 +50,7 @@ class ActiveDefenseSkill : LongPressSkill(
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopAndCooldown()
-        if (pressedTime.toFloat() / getModifiedPersistTime(player) < 0.5f) {
+        if (pressedTime.toFloat() / getPersistTime(player) < 0.5f) {
             player.modifyCooldown { it / 2 }
         }
         player.removeAttributes()

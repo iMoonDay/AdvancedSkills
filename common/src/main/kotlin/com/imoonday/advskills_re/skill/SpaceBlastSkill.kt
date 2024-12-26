@@ -32,7 +32,11 @@ class SpaceBlastSkill : LongPressSkill(
     )
 ), AttributeTrigger, WorldRendererTrigger, GlowingTrigger {
 
-    override fun getMaxPressTime(): Int = 20 * 5
+    override val timeParameterName: String = "charge_time"
+
+    init {
+        addEnhanceableParameter(timeParameterName, 5 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(

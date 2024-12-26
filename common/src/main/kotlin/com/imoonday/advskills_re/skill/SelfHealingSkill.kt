@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -16,9 +17,13 @@ class SelfHealingSkill : Skill(
     enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.HEALING_AMOUNT)
 ), AutoTrigger, AutoStopTrigger, DamageTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
+    override val timeParameterName: String = "charge_time"
 
-    override val persistTime: Int = 10 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 10 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
+
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = !player.isDead && player.health < player.maxHealth
 

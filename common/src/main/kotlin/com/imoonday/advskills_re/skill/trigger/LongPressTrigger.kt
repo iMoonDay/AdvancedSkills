@@ -7,11 +7,6 @@ import net.minecraft.server.network.*
 
 interface LongPressTrigger : TickTrigger, AutoStopTrigger {
 
-    fun getMaxPressTime(): Int
-
-    override val persistTime: Int
-        get() = getMaxPressTime()
-
     fun use(player: ServerPlayerEntity, keyState: UseSkillC2SRequest.KeyState): UseResult =
         if (keyState == UseSkillC2SRequest.KeyState.PRESS) onPress(player)
         else onRelease(player, player.getUsedTime())
@@ -26,7 +21,7 @@ interface LongPressTrigger : TickTrigger, AutoStopTrigger {
     fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult
 
     override fun onStop(player: ServerPlayerEntity) {
-        val result = onRelease(player, getModifiedPersistTime(player))
+        val result = onRelease(player, getPersistTime(player))
         getAsSkill().handleResult(player, result)
         super.onStop(player)
     }

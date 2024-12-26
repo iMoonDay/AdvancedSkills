@@ -27,9 +27,9 @@ class DangerPerceptionSkill : Skill(
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.MOVEMENT_SPEED, SkillEnhancements.RANGE)
 ), AutoStopTrigger, AttributeTrigger, DamageTrigger, UsingRenderTrigger {
 
-    override val persistTime: Int = 2 * 20
-
     init {
+        addEnhanceableParameter(timeParameterName, 2 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+
         addEnhancementTooltipWithArg(SkillEnhancements.MOVEMENT_SPEED) { it.level * 6 }
         addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level * 0.4f }
     }

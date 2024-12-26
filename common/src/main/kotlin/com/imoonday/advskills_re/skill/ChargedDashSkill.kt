@@ -22,7 +22,11 @@ class ChargedDashSkill : LongPressSkill(
     )
 ), AttributeTrigger {
 
+    override val timeParameterName: String = "charge_time"
+
     init {
+        addEnhanceableParameter(timeParameterName, 3 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+
         addEnhancementTooltipWithArg(SkillEnhancements.VELOCITY) { it.level * 20 }
     }
 
@@ -35,8 +39,6 @@ class ChargedDashSkill : LongPressSkill(
         )
     )
 
-    override fun getMaxPressTime(): Int = 3 * 20
-
     override fun onPress(player: ServerPlayerEntity): UseResult {
         player.addAttributes()
         return super.onPress(player)
@@ -48,7 +50,7 @@ class ChargedDashSkill : LongPressSkill(
             removeAttributes()
             val multiplier = 1.0 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.2
             velocity =
-                rotationVector.normalize().multiply(2.0 * pressedTime / getModifiedPersistTime(player) * multiplier)
+                rotationVector.normalize().multiply(2.0 * pressedTime / getPersistTime(player) * multiplier)
             updateVelocity()
             spawnParticles(ParticleTypes.CLOUD, false, pos, 10, 0.5, 0.0, 0.5, 0.1)
         }

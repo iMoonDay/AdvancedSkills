@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -17,7 +18,9 @@ class GrapplingHookSkill : LongPressSkill(
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DISTANCE)
 ), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger {
 
-    override fun getMaxPressTime(): Int = 3 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 3 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun onPress(player: ServerPlayerEntity): UseResult {
         val raycast = player.raycastBlock(getMaxDistance(player))

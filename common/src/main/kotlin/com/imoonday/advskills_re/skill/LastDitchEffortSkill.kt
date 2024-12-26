@@ -27,7 +27,9 @@ class LastDitchEffortSkill : Skill(
 ), DamageTrigger, AutoStopTrigger, AttackTrigger,
     AttributeTrigger, AutoTrigger, DeathTrigger {
 
-    override val persistTime: Int = 15 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 15 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(

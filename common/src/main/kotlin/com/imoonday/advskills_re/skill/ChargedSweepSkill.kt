@@ -28,11 +28,13 @@ class ChargedSweepSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
+    override val timeParameterName: String = "charge_time"
+
     init {
+        addEnhanceableParameter(timeParameterName, 3 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+
         addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level }
     }
-
-    override fun getMaxPressTime(): Int = 3 * 20
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
@@ -56,7 +58,7 @@ class ChargedSweepSkill : LongPressSkill(
         player.stopUsing()
         val range = player.getEnhancementLvl(SkillEnhancements.RANGE)
         val baseDamage = player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
-        val multiplier = pressedTime.toFloat() / getModifiedPersistTime(player) * 2
+        val multiplier = pressedTime.toFloat() / getPersistTime(player) * 2
         val stack = player.mainHandStack
         player.world.getOtherEntities(
             player, player.boundingBox.expand(5.0 + range)

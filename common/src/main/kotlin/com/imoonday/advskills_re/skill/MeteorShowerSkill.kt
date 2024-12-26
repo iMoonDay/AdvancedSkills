@@ -27,7 +27,11 @@ class MeteorShowerSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
-    override fun getMaxPressTime(): Int = 10 * 20
+    override val timeParameterName: String = "charge_time"
+
+    init {
+        addEnhanceableParameter(timeParameterName, 10 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
@@ -46,7 +50,7 @@ class MeteorShowerSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.removeAttributes()
         player.stopUsing()
-        if (pressedTime < getModifiedPersistTime(player)) {
+        if (pressedTime < getPersistTime(player)) {
             player.startCooling(10)
             return UseResult.fail(failedMessage())
         }

@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -20,14 +21,18 @@ class ReturnSkill : LongPressSkill(
     enhancements = setOf(SkillEnhancements.CHARGE_TIME)
 ), UsingRenderTrigger {
 
+    override val timeParameterName: String = "charge_time"
+
+    init {
+        addEnhanceableParameter(timeParameterName, 5 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
+
     override fun onPress(player: ServerPlayerEntity): UseResult {
         player.startUsing {
             NbtUtils.writeEntityPositionToTag(player.pos, it)
         }
         return getChargingResult()
     }
-
-    override fun getMaxPressTime(): Int = 5 * 20
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
@@ -86,7 +91,7 @@ class ReturnSkill : LongPressSkill(
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopUsing()
-        if (pressedTime < getModifiedPersistTime(player)) {
+        if (pressedTime < getPersistTime(player)) {
             return UseResult.fail(failedMessage())
         }
         val (spawnAngle, world, teleportPos) = getTeleportInfo(player)

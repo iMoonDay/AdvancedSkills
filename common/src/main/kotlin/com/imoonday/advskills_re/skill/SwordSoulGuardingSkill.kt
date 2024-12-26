@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
@@ -24,7 +25,9 @@ class SwordSoulGuardingSkill : Skill(
     )
 ), PostAttackTrigger, PostAttackedTrigger, AutoStopTrigger, UsingRenderTrigger, DangerTrigger {
 
-    override val persistTime: Int = 20 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 20 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 

@@ -115,15 +115,23 @@ class ClientConfig {
         try {
             if (file.exists()) {
                 instance = fromJson(file.readText(Charsets.UTF_8))
-            } else if (oldFile.exists()) {
-                instance = fromJson(oldFile.readText(Charsets.UTF_8))
-                try {
-                    oldFile.renameTo(file)
-                } catch (ignore: Exception) {
+            } else {
+                var renamed = false
+                for (oldFile in oldFiles) {
+                    if (oldFile.exists()) {
+                        try {
+                            instance = fromJson(oldFile.readText(Charsets.UTF_8))
+                            oldFile.renameTo(file)
+                            renamed = true
+                            break
+                        } catch (e: Exception) {
+                            continue
+                        }
+                    }
+                }
+                if (!renamed) {
                     save()
                 }
-            } else {
-                save()
             }
         } catch (e: Exception) {
             LOGGER.error(
@@ -169,8 +177,11 @@ class ClientConfig {
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
-        private var oldFile: File = Platform.getConfigFolder().resolve("$MOD_ID.json").toFile()
-        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID-client.json").toFile()
+        private var oldFiles: Array<File> = arrayOf(
+            Platform.getConfigFolder().resolve("$MOD_ID.json").toFile(),
+            Platform.getConfigFolder().resolve("$MOD_ID-client.json").toFile()
+        )
+        private var file: File = Platform.getConfigFolder().resolve("advskills_re/client.json").toFile()
         private var instance = ClientConfig()
 
         @JvmStatic

@@ -296,7 +296,9 @@ object Skills {
     @JvmField
     val GLIDING = register(GlidingSkill())
 
-    fun init() = Unit
+    fun init() {
+        SkillSettingsManager.saveMissing(skills.values)
+    }
 
     fun <T : Skill> register(skill: T): T {
         if (skill.id in skills.keys || skill in skills.values) {

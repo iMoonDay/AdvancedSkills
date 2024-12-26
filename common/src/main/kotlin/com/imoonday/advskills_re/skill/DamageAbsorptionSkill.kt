@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -22,10 +23,10 @@ class DamageAbsorptionSkill : Skill(
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
 
     init {
+        addEnhanceableParameter(timeParameterName, 15 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+
         addEnhancementTooltipWithArg(SkillEnhancements.EFFECT_COUNT) { it.level }
     }
-
-    override val persistTime: Int = 15 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {
         putInt(REMAINING_EFFECTS, user.getEnhancementLvl(SkillEnhancements.EFFECT_COUNT))

@@ -6,28 +6,42 @@ import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
+import net.minecraft.registry.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.util.hit.*
 import net.minecraft.util.math.*
 
 class ArrowRainSkill : Skill(
-    id = "arrow_rain",
-    types = listOf(SkillType.ATTACK, SkillType.SUMMON),
-    cooldown = 15,
-    rarity = SkillRarity.RARE,
-    sound = SoundEvents::ENTITY_ARROW_SHOOT
+    Settings.loadOrCreate {
+        Settings(
+            id = "arrow_rain",
+            types = listOf(SkillType.ATTACK, SkillType.SUMMON),
+            cooldown = 15,
+            rarity = SkillRarity.RARE
+        ).addParameter("max_distance", 256.0)
+            .addParameter("min_summon_amount", 50)
+            .addParameter("max_summon_amount", 100)
+            .addParameter("summon_interval", 2)
+            .addParameter("launch_sound", SoundEvents.ENTITY_ARROW_SHOOT.id.toString())
+            .addEnhanceableParameter(
+                "arrow_damage",
+                2.0,
+                "damage",
+                0.2f,
+                Enhancement.Type.MULTIPLY,
+                5
+            ).addEnhanceableParameter("launch_count", 5, "count", 1f, Enhancement.Type.ADDITION, 5)
+            .addEnhanceableParameter("summon_range", 20.0, "range", 2f, Enhancement.Type.ADDITION, 5)
+            .addEnhancement("summon_amount", 10f, Enhancement.Type.ADDITION, 5)
+    }
 ) {
 
     init {
-        addParameter("max_distance", 256.0)
-        addParameter("min_summon_amount", 50)
-        addParameter("max_summon_amount", 100)
-        addParameter("summon_interval", 2)
-        addEnhanceableParameter("arrow_damage", 2.0, "damage", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
-        addEnhanceableParameter("launch_count", 5, "count", 1f, Enhancement.Type.INCREMENT, 5) { it.toInt() }
-        addEnhanceableParameter("summon_range", 20.0, "range", 2f, Enhancement.Type.INCREMENT, 5) { it.toInt() }
-        addEnhancement("summon_amount", 10f, Enhancement.Type.INCREMENT, 5) { it.toInt() }
+        addEnhancementDescArg("damage") { (it * 100).toInt() }
+        addEnhancementDescArg("count") { it.toInt() }
+        addEnhancementDescArg("range") { it.toInt() }
+        addEnhancementDescArg("summon_amount") { it.toInt() }
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
@@ -40,7 +54,10 @@ class ArrowRainSkill : Skill(
         val amount = user.getEnhancementValue("summon_amount").toInt()
         val (min, max) = user.getIntParameter("min_summon_amount") to user.getIntParameter("max_summon_amount")
         val interval = user.getIntParameter("summon_interval")
-        user.executeAndAddTask(interval, remainingTimes) { spawnArrows(user, center, damage, range, min, max, amount) }
+        val sound = Registries.SOUND_EVENT.get(user.getStringParameter("launch_sound").toIdentifier())
+        user.executeAndAddTask(interval, remainingTimes) {
+            spawnArrows(user, center, damage, range, min, max, amount, sound)
+        }
         return UseResult.success()
     }
 
@@ -51,14 +68,16 @@ class ArrowRainSkill : Skill(
         range: Double,
         min: Int,
         max: Int,
-        extraAmount: Int
+        extraAmount: Int,
+        sound: SoundEvent?
     ): Boolean {
         val random = user.random
         val amount = random.nextBetween(min, max) + extraAmount
 
+        sound?.let { user.serverWorld.playSound(null, center.x, center.y, center.z, it, SoundCategory.VOICE, 1f, 1f) }
         var result = false
         val particles: MutableList<ParticleS2CPacket> = mutableListOf()
-        for (j in 0 until amount) {
+        repeat(amount) {
             user.world.spawnEntity(
                 UngroundedArrowEntity(
                     user.world,

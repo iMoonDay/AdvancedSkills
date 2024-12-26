@@ -31,7 +31,9 @@ abstract class ReflectionSkill(
     )
 ), DamageTrigger, ReflectionTrigger, UsingRenderTrigger {
 
-    override val persistTime: Int = duration
+    init {
+        addEnhanceableParameter(timeParameterName, duration, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
 

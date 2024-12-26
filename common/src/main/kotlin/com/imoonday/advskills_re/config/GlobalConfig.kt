@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.config
 
 import com.imoonday.advskills_re.*
+import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.enums.*
@@ -61,8 +62,6 @@ class GlobalConfig {
     val skillConfig: SkillConfig = SkillConfig().apply {
         this.skillCooldownMultiplier = 1.0
         this.skillXpMultiplier = 1.0
-        this.skillModifier["$MOD_ID:example ($MOD_ID can ignore, fields of modifier can ignore too)"] =
-            SkillModifier(20, SkillRarity.EPIC, 100)
         this.skillBlackList += "$MOD_ID:example ($MOD_ID can ignore)"
     }
     val learningBlacklist: MutableSet<String> = mutableSetOf()
@@ -91,15 +90,23 @@ class GlobalConfig {
         try {
             if (file.exists()) {
                 instance = fromJson(file.readText(Charsets.UTF_8))
-            } else if (oldFile.exists()) {
-                instance = fromJson(oldFile.readText(Charsets.UTF_8))
-                try {
-                    oldFile.renameTo(file)
-                } catch (ignore: Exception) {
+            } else {
+                var renamed = false
+                for (oldFile in oldFiles) {
+                    if (oldFile.exists()) {
+                        try {
+                            instance = fromJson(oldFile.readText(Charsets.UTF_8))
+                            oldFile.renameTo(file)
+                            renamed = true
+                            break
+                        } catch (e: Exception) {
+                            continue
+                        }
+                    }
+                }
+                if (!renamed) {
                     save()
                 }
-            } else {
-                save()
             }
         } catch (e: Exception) {
             LOGGER.error(
@@ -196,8 +203,11 @@ class GlobalConfig {
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
-        private var oldFile: File = Platform.getConfigFolder().resolve("$MOD_ID-global.json").toFile()
-        private var file: File = Platform.getConfigFolder().resolve("$MOD_ID-common.json").toFile()
+        private var oldFiles: Array<File> = arrayOf(
+            Platform.getConfigFolder().resolve("$MOD_ID-global.json").toFile(),
+            Platform.getConfigFolder().resolve("$MOD_ID-common.json").toFile()
+        )
+        private var file: File = Platform.getConfigFolder().resolve("advskills_re/common.json").toFile()
         private var instance = GlobalConfig()
 
         @JvmStatic

@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -19,6 +20,10 @@ class PiercingSkill : Skill(
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DAMAGE, SkillEnhancements.VELOCITY)
 ), AutoStopTrigger, DangerTrigger, GravityTrigger {
 
+    init {
+        addEnhanceableParameter(timeParameterName, 8, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
+
     override fun use(user: ServerPlayerEntity): UseResult {
         user.stopFallFlying()
         user.velocity = user.horizontalRotationVector.normalize().multiply(1.5, 0.0, 1.5)
@@ -28,8 +33,6 @@ class PiercingSkill : Skill(
             it.putDouble("z", user.velocity.z)
         })
     }
-
-    override val persistTime: Int = 8
 
     override fun onStop(player: ServerPlayerEntity) {
         player.velocity = Vec3d.ZERO

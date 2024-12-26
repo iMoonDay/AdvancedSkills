@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -19,7 +20,9 @@ class ExtremeEvasionSkill : Skill(
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.POWER)
 ), AutoStopTrigger, DamageTrigger, SendPlayerVelocityTrigger {
 
-    override val persistTime: Int = 10
+    init {
+        addEnhanceableParameter(timeParameterName, 10, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {

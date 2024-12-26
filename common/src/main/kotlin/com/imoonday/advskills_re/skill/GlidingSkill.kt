@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.skill.enums.*
@@ -18,6 +19,17 @@ class GlidingSkill : PassiveSkill(
     rarity = SkillRarity.RARE,
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), TickTrigger, JumpStateTrigger, ProgressTrigger {
+
+    init {
+        addEnhanceableParameter(
+            "gliding_time",
+            5 * 20,
+            "time",
+            0.2f,
+            Enhancement.Type.MULTIPLY,
+            5
+        ) { (it * 100).toInt() }
+    }
 
     override fun tick(player: PlayerEntity, usedTime: Int) {
         if (!player.isUsing()) {
@@ -76,11 +88,7 @@ class GlidingSkill : PassiveSkill(
     private fun PlayerEntity.canResetGliding(): Boolean =
         isOnGround || abilities.flying || isTouchingWater || isClimbing
 
-    fun PlayerEntity.getTotalGlidingTime() = getEnhancedValue(
-        this,
-        SkillEnhancements.PERSISTENT_TIME,
-        AutoStopTrigger.getPersistTimeOrDefault(this@GlidingSkill, 20 * 5)
-    )
+    fun PlayerEntity.getTotalGlidingTime() = getIntParameter("gliding_time")
 
     override fun shouldDisplay(player: PlayerEntity): Boolean =
         player.isUsing() || player.getPersistentData().getInt(REMAINING_TIME_KEY) < player.getTotalGlidingTime()

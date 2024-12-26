@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
@@ -17,11 +18,13 @@ class CatapultGlidingSkill : LongPressSkill(
     enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.VELOCITY)
 ) {
 
+    override val timeParameterName: String = "charge_time"
+
     init {
+        addEnhanceableParameter(timeParameterName, 3 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+
         addEnhancementTooltipWithArg(SkillEnhancements.VELOCITY) { it.level * 10 }
     }
-
-    override fun getMaxPressTime(): Int = 3 * 20
 
     override fun use(user: ServerPlayerEntity): UseResult =
         if (!user.canUse()) failedResult() else if (user.isFallFlying) fallFlyingResult() else super.use(user)
@@ -37,7 +40,7 @@ class CatapultGlidingSkill : LongPressSkill(
         player.setOnGround(false)
         player.startFallFlying()
         val multiplier = 1 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1
-        val progress = pressedTime.toDouble() / getModifiedPersistTime(player) * multiplier
+        val progress = pressedTime.toDouble() / getPersistTime(player) * multiplier
         player.velocity =
             player.rotationVector.normalize().multiply(1.5, 0.0, 1.5)
                 .withAxis(Direction.Axis.Y, 3.0) * progress

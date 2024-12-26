@@ -19,7 +19,9 @@ class WallClimbingSkill : PassiveSkill(
 
     override fun isClimbing(player: PlayerEntity): Boolean = player.isUsing() && player.shouldClimb()
 
-    override val persistTime: Int = 15 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 15 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

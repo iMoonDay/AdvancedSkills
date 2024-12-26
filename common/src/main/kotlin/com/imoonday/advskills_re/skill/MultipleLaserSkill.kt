@@ -23,6 +23,10 @@ class MultipleLaserSkill : LongPressSkill(
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DAMAGE, SkillEnhancements.DISTANCE)
 ), DangerTrigger {
 
+    init {
+        addEnhanceableParameter(timeParameterName, 10 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
+
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (!player.isUsing()) return
@@ -77,15 +81,13 @@ class MultipleLaserSkill : LongPressSkill(
     private fun getMaxDistance(player: PlayerEntity): Double =
         64.0 * (1 + player.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.2)
 
-    override fun getMaxPressTime(): Int = 10 * 20
-
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopAndCooldown(calculateCooldown(player, pressedTime))
         return UseResult.fail(Text.empty())
     }
 
     private fun calculateCooldown(player: PlayerEntity, pressedTime: Int) =
-        (pressedTime.toFloat() / getModifiedPersistTime(player) * cooldown).toInt()
+        (pressedTime.toFloat() / getPersistTime(player) * cooldown).toInt()
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(calculateCooldown(player, player.getUsedTime()))

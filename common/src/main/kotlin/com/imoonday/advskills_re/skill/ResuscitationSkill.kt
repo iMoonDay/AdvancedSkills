@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -17,7 +18,9 @@ class ResuscitationSkill : Skill(
     enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.STATUS_EFFECT_DURATION)
 ), DeathTrigger, AutoStopTrigger, DamageTrigger {
 
-    override val persistTime: Int = 2 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 2 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 

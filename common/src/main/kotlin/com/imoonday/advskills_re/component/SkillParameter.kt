@@ -3,32 +3,48 @@ package com.imoonday.advskills_re.component
 import kotlinx.serialization.*
 
 @Serializable
-sealed class SkillParameter<T : Number>(
-    val baseValue: T,
-    val enhancement: String?
-) {
+sealed class SkillParameter {
 
-    abstract fun asInt(): Int
+    abstract val baseValue: Any
+    abstract val enhancement: String?
 
-    abstract fun asFloat(): Float
+    abstract fun asIntParameter(): IntParameter
+    abstract fun asFloatParameter(): FloatParameter
+    abstract fun asStringParameter(): StringParameter
 
-    class Int(
-        baseValue: kotlin.Int,
-        enhancement: String?
-    ) : SkillParameter<kotlin.Int>(baseValue, enhancement) {
+    @Serializable
+    @SerialName("IntParameter")
+    data class IntParameter(
+        override val baseValue: Int,
+        override val enhancement: String?
+    ) : SkillParameter() {
 
-        override fun asInt(): Int = this
-
-        override fun asFloat(): Float = Float(baseValue.toFloat(), enhancement)
+        override fun asIntParameter(): IntParameter = this
+        override fun asFloatParameter(): FloatParameter = FloatParameter(baseValue.toFloat(), enhancement)
+        override fun asStringParameter(): StringParameter = StringParameter(baseValue.toString(), enhancement)
     }
 
-    class Float(
-        baseValue: kotlin.Float,
-        enhancement: String?
-    ) : SkillParameter<kotlin.Float>(baseValue, enhancement) {
+    @Serializable
+    @SerialName("FloatParameter")
+    data class FloatParameter(
+        override val baseValue: Float,
+        override val enhancement: String?
+    ) : SkillParameter() {
 
-        override fun asInt(): Int = Int(baseValue.toInt(), enhancement)
+        override fun asIntParameter(): IntParameter = IntParameter(baseValue.toInt(), enhancement)
+        override fun asFloatParameter(): FloatParameter = this
+        override fun asStringParameter(): StringParameter = StringParameter(baseValue.toString(), enhancement)
+    }
 
-        override fun asFloat(): Float = this
+    @Serializable
+    @SerialName("StringParameter")
+    data class StringParameter(
+        override val baseValue: String,
+        override val enhancement: String?
+    ) : SkillParameter() {
+
+        override fun asIntParameter(): IntParameter = IntParameter(baseValue.toIntOrNull() ?: 0, enhancement)
+        override fun asFloatParameter(): FloatParameter = FloatParameter(baseValue.toFloatOrNull() ?: 0.0f, enhancement)
+        override fun asStringParameter(): StringParameter = this
     }
 }

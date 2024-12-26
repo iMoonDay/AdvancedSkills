@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -25,9 +26,11 @@ class ReverseGravitySkill : Skill(
     InvertInputTrigger,
     CameraUpdateMovementTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
+    init {
+        addEnhanceableParameter(timeParameterName, 15 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
-    override val persistTime: Int = 15 * 20
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 
     override fun onStop(player: ServerPlayerEntity) {
         super<AutoStopTrigger>.onStop(player)
@@ -66,11 +69,8 @@ class ReverseGravitySkill : Skill(
     }
 
     override fun shouldInvertMouse(player: PlayerEntity): Boolean = player.isUsing()
-
     override fun shouldInvertInput(player: PlayerEntity): Boolean = player.isUsing()
-
     override fun shouldFlipUpsideDown(player: PlayerEntity): Boolean = player.isUsing()
-
     override fun getEyeHeight(
         player: PlayerEntity,
         original: Float,

@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -27,14 +28,18 @@ class PrimaryConfinementSkill : LongPressSkill(
     )
 ), UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
 
-    override fun getMaxPressTime(): Int = 5 * 20
+    override val timeParameterName: String = "charge_time"
+
+    init {
+        addEnhanceableParameter(timeParameterName, 5 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopAndCooldown()
         player.swingHand(Hand.MAIN_HAND, true)
         player.raycastLivingEntity(getRange(player))?.takeIf { it.type == HitResult.Type.ENTITY }?.let {
             val extraChance = player.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.04f
-            if (player.random.nextFloat() < (0.8f + extraChance) * pressedTime / getModifiedPersistTime(player)) {
+            if (player.random.nextFloat() < (0.8f + extraChance) * pressedTime / getPersistTime(player)) {
                 val duration = getEnhancedValue(player, SkillEnhancements.STATUS_EFFECT_DURATION, 3 * 20)
                 (it.entity as LivingEntity).addStatusEffect(
                     StatusEffectInstance(

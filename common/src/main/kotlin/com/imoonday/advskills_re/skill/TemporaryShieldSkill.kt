@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -19,7 +20,9 @@ class TemporaryShieldSkill : Skill(
     )
 ), AutoStopTrigger {
 
-    override val persistTime: Int = 10 * 20
+    init {
+        addEnhanceableParameter(timeParameterName, 10 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(true)
 
@@ -28,7 +31,7 @@ class TemporaryShieldSkill : Skill(
         if (!player.isUsing()) return
         val frequency = (20 - player.getEnhancementLvl(SkillEnhancements.EFFECT_FREQUENCY) * 2).coerceAtLeast(1)
         val maxValue = 10f + player.getEnhancementLvl(SkillEnhancements.EFFECT_VALUE) * 2f
-        if (usedTime % min(frequency, (getModifiedPersistTime(player) / maxValue).toInt()) == 0) {
+        if (usedTime % min(frequency, (getPersistTime(player) / maxValue).toInt()) == 0) {
             player.absorptionAmount =
                 (player.absorptionAmount + 1).coerceAtMost(maxValue)
         }

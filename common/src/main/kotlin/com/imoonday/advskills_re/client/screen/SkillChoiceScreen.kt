@@ -265,7 +265,7 @@ class SkillChoiceScreen(
             y -= scrollAmount
 
             currentLevel.takeIf { it > 0 }?.run {
-                val tooltip = enhancement.description(this)
+                val tooltip = Text.translatable(enhancement.description, enhancement.getValue(this))
                 textRenderer.wrapLines(tooltip, width - 15).forEach { text ->
                     context.drawText(
                         textRenderer,
@@ -290,7 +290,7 @@ class SkillChoiceScreen(
                 y += textRenderer.fontHeight + 3
             }
 
-            val tooltip = enhancement.description(currentLevel + 1)
+            val tooltip = Text.translatable(enhancement.description, enhancement.getValue(currentLevel + 1))
             textRenderer.wrapLines(tooltip, width - 15).forEach { text ->
                 context.drawText(
                     textRenderer,

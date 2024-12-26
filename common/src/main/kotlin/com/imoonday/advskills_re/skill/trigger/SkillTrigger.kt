@@ -56,12 +56,22 @@ interface SkillTrigger {
         return pair.first.getValue(pair.second)
     }
 
-    fun PlayerEntity.getDoubleParameter(name: String, min: Double? = null, max: Double? = null): Double =
-        getFloatParameter(name, min?.toFloat(), max?.toFloat()).toDouble()
+    fun PlayerEntity.getDoubleParameter(
+        name: String,
+        default: Double? = null,
+        min: Double? = null,
+        max: Double? = null
+    ): Double = getFloatParameter(name, default?.toFloat(), min?.toFloat(), max?.toFloat()).toDouble()
 
-    fun PlayerEntity.getFloatParameter(name: String, min: Float? = null, max: Float? = null): Float {
+    fun PlayerEntity.getFloatParameter(
+        name: String,
+        default: Float? = null,
+        min: Float? = null,
+        max: Float? = null
+    ): Float {
         val skill = getAsSkill()
-        val parameter = skill.getFloatParameter(name) ?: throw IllegalArgumentException("No such parameter: $name")
+        val parameter = skill.getFloatParameter(name) ?: return default
+            ?: throw IllegalArgumentException("No such parameter: $name")
         val baseValue = parameter.baseValue
         val enhancementId = parameter.enhancement ?: return baseValue
         val pair = getEnhancement(skill, enhancementId) ?: return baseValue
@@ -71,9 +81,10 @@ interface SkillTrigger {
         return value
     }
 
-    fun PlayerEntity.getIntParameter(name: String, min: Int? = null, max: Int? = null): Int {
+    fun PlayerEntity.getIntParameter(name: String, default: Int? = null, min: Int? = null, max: Int? = null): Int {
         val skill = getAsSkill()
-        val parameter = skill.getIntParameter(name) ?: throw IllegalArgumentException("No such parameter: $name")
+        val parameter =
+            skill.getIntParameter(name) ?: return default ?: throw IllegalArgumentException("No such parameter: $name")
         val baseValue = parameter.baseValue
         val enhancementId = parameter.enhancement ?: return baseValue
         val pair = getEnhancement(skill, enhancementId) ?: return baseValue
@@ -83,9 +94,18 @@ interface SkillTrigger {
         return value
     }
 
-    fun getParameterBaseValue(name: String): Number {
+    fun PlayerEntity.getStringParameter(name: String, default: String? = null): String {
         val skill = getAsSkill()
-        val parameter = skill.getParameter(name) ?: throw IllegalArgumentException("No such parameter: $name")
+        val parameter =
+            skill.getStringParameter(name) ?: return default
+                ?: throw IllegalArgumentException("No such parameter: $name")
+        return parameter.baseValue
+    }
+
+    fun getParameterBaseValue(name: String, default: Any? = null): Any {
+        val skill = getAsSkill()
+        val parameter =
+            skill.getParameter(name) ?: return default ?: throw IllegalArgumentException("No such parameter: $name")
         return parameter.baseValue
     }
 
