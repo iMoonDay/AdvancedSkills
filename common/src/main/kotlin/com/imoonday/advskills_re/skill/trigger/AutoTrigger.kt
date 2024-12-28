@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill.trigger
 
+import com.imoonday.advskills_re.util.*
 import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 

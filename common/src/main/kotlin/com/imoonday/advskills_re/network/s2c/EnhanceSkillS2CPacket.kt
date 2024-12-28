@@ -8,7 +8,9 @@ import dev.architectury.utils.*
 import net.minecraft.client.sound.*
 import net.minecraft.network.*
 
-class EnhanceSkillS2CPacket : NetworkPacket {
+object EnhanceSkillS2CPacket : NetworkPacket {
+
+    private var lastPlaySoundTime = 0L
 
     override fun encode(buf: PacketByteBuf) = Unit
 
@@ -20,10 +22,5 @@ class EnhanceSkillS2CPacket : NetworkPacket {
                 lastPlaySoundTime = System.currentTimeMillis()
             }
         }
-    }
-
-    companion object {
-
-        private var lastPlaySoundTime = 0L
     }
 }

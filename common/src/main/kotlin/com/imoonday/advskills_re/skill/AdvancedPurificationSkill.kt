@@ -1,8 +1,8 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
-import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.effect.*
 import net.minecraft.entity.player.*
@@ -12,13 +12,26 @@ import net.minecraft.server.network.*
 import net.minecraft.text.*
 
 class AdvancedPurificationSkill : Skill(
-    id = "advanced_purification",
-    types = listOf(SkillType.RESTORATION),
-    cooldown = 30,
-    rarity = SkillRarity.SUPERB,
-    sound = ModSounds.PURIFY,
-    enhancements = setOf(SkillEnhancements.TIME_UP_LIMIT)
+    Settings(
+        id = "advanced_purification",
+        types = listOf(SkillType.RESTORATION),
+        cooldown = 30,
+        rarity = SkillRarity.SUPERB
+    )
 ) {
+
+    init {
+        this.settings.addParameter("success_sound", ModSounds.PURIFY)
+        addEnhanceableParameter(
+            name = "max_removal_time",
+            baseValue = 30 * 20,
+            enhancementId = "time",
+            value = 0.2f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = user.statusEffects
         .filter { it.effectType.category == StatusEffectCategory.HARMFUL && it.duration < getTimeUpLimit(user) }
@@ -30,7 +43,7 @@ class AdvancedPurificationSkill : Skill(
                 false, user.centerPos, 10,
                 0.25, 0.25, 0.25, 0.1
             )
-            UseResult.success(message("success", Text.translatable(it.translationKey)))
+            UseResult.success(message("success", Text.translatable(it.translationKey))).withSound(getSuccessSound())
         } ?: user.statusEffects
         .filter { it.effectType.category == StatusEffectCategory.HARMFUL }
         .randomOrNull()
@@ -50,10 +63,12 @@ class AdvancedPurificationSkill : Skill(
                     Text.translatable(instance.translationKey),
                     amount
                 )
-            )
+            ).withSound(getSuccessSound())
         }
     ?: UseResult.fail(failedMessage())
 
+    private fun getSuccessSound() = getSoundEventParam("success_sound")
+
     private fun getTimeUpLimit(player: PlayerEntity) =
-        getEnhancedValue(player, SkillEnhancements.TIME_UP_LIMIT, 30 * 20)
+        player.getIntParam("max_removal_time", 30 * 20, 0)
 }

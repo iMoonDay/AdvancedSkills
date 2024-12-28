@@ -16,6 +16,9 @@ interface ReflectionTrigger : AutoStopTrigger {
     }
 
     override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        if (!player.hasEquipped()) return
+
         player.lastReflectedTime = System.currentTimeMillis()
         getStartTime(player)?.let {
             val time = player.lastDamagedTime
@@ -29,7 +32,6 @@ interface ReflectionTrigger : AutoStopTrigger {
                 player.lastReflectedTime = 0
             }
         }
-        super.onStop(player)
     }
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) = Unit

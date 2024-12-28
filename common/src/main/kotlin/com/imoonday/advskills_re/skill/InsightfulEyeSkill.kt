@@ -1,14 +1,16 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import net.minecraft.entity.player.*
 
 class InsightfulEyeSkill : PassiveSkill(
-    id = "insightful_eye",
-    rarity = SkillRarity.EPIC
+    Settings(
+        id = "insightful_eye",
+        rarity = SkillRarity.EPIC
+    ), customToggles = true
 ), FeatureRendererTrigger {
 
     override fun shouldRenderFeature(target: PlayerEntity, clientPlayer: PlayerEntity): Boolean =
-        clientPlayer.hasEquipped() && target != clientPlayer
+        clientPlayer.hasEquipped() && clientPlayer.isAvailable() && target != clientPlayer
 }

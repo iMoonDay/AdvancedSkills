@@ -12,7 +12,7 @@ import net.minecraft.network.*
 import net.minecraft.server.network.*
 import net.minecraft.server.world.*
 
-class RequestSyncComponentC2SRequest(
+data class RequestSyncComponentC2SRequest(
     val entityId: Int,
     val type: ComponentType,
     val receiver: Receiver

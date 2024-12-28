@@ -12,15 +12,24 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
 class TimeRewindSkill : LongPressSkill(
-    id = "time_rewind",
-    types = listOf(SkillType.RESTORATION, SkillType.MOVEMENT),
-    cooldown = 60,
-    rarity = SkillRarity.MYTHIC,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    Settings(
+        id = "time_rewind",
+        types = listOf(SkillType.RESTORATION, SkillType.MOVEMENT),
+        cooldown = 60,
+        rarity = SkillRarity.MYTHIC
+    )
+//    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), UsingRenderTrigger, DeathTrigger {
 
     init {
-        addEnhanceableParameter(timeParameterName, 5 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            timeParamName,
+            5 * 20,
+            "time",
+            0.2f,
+            Enhancement.Operation.MULTIPLY,
+            5
+        ) { (it * 100).toInt() }
     }
 
     override fun onPress(player: ServerPlayerEntity): UseResult {

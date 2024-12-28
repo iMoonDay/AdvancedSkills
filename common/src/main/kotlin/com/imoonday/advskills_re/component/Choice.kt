@@ -1,10 +1,13 @@
 package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.component.choice.*
+import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 
-class Choice(
+data class Choice(
     val first: Choosable,
     val second: Choosable,
     val third: Choosable,
@@ -97,29 +100,30 @@ class Choice(
 
         @JvmStatic
         fun fromNbt(nbt: NbtCompound): Choice = Choice(
-            parseChoosable(nbt.getCompound("1")),
-            parseChoosable(nbt.getCompound("2")),
-            parseChoosable(nbt.getCompound("3")),
+            Choosable.parse(nbt.getCompound("1")),
+            Choosable.parse(nbt.getCompound("2")),
+            Choosable.parse(nbt.getCompound("3")),
         )
 
         @JvmStatic
-        fun parseChoosable(nbt: NbtCompound): Choosable {
-            val type = Choosable.Type.entries.getOrNull(nbt.getInt("type")) ?: return Choosable.EMPTY
-            return when (type) {
-                Choosable.Type.EMPTY -> Choosable.EMPTY
-                Choosable.Type.SKILL -> SkillChoice.fromNbt(nbt)
-                Choosable.Type.ENHANCEMENT -> EnhancementChoice.fromNbt(nbt)
-            }
-        }
-
-        @JvmStatic
         fun canGenerate(player: PlayerEntity): Boolean {
-            TODO()
+            if (Skills.getLearnableSkills(player.learnedSkills).isNotEmpty()) {
+                return true
+            }
+            return !player.learnedSkills
+                .map { it to it.getAvailableEnhancements() }
+                .all { pair ->
+                    pair.second.all {
+                        (player.getEnhancement(pair.first, it.id)?.second ?: 0) >= it.maxLevel
+                    }
+                }
         }
 
         @JvmStatic
-        fun generate(player: PlayerEntity): Choice {
-            TODO()
-        }
+        fun generate(player: PlayerEntity): Choice =
+            Skills.getLearnableSkills(player.learnedSkills)
+                .randomByWeight(Skill::weight, 3, Skills.EMPTY)
+                .map { SkillChoice(it) }
+                .let { Choice(it[0], it[1], it[2]) }
     }
 }

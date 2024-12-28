@@ -8,7 +8,7 @@ import net.fabricmc.api.*
 import net.minecraft.nbt.*
 import net.minecraft.network.*
 
-class SyncPropertiesS2CPacket(
+data class SyncPropertiesS2CPacket(
     val entityId: Int,
     val properties: NbtCompound,
 ) : NetworkPacket {

@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.command
 
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.*
@@ -18,7 +17,7 @@ object EnhanceCommand : PlayerCommand("enhance") {
                     argument("enhancement", StringArgumentType.word())
                         .suggests { context, builder1 ->
                             val skill = SkillArgumentType.getSkill(context)
-                            val enhancements = skill.availableEnhancements
+                            val enhancements = skill.getAvailableEnhancements()
                             CommandSource.suggestMatching(enhancements, builder1, { it.id }, { it.name })
                         }.then(
                             argument("level", IntegerArgumentType.integer(1))
@@ -47,7 +46,7 @@ object EnhanceCommand : PlayerCommand("enhance") {
         player: ServerPlayerEntity,
     ): Int {
         val skill = SkillArgumentType.getSkill(context)
-        val enhancements = skill.availableEnhancements
+        val enhancements = skill.getAvailableEnhancements()
         if (player.enhanceAll(skill)) {
             context.sendFeedback(
                 "enhanceSkill.allSuccess",
@@ -73,18 +72,13 @@ object EnhanceCommand : PlayerCommand("enhance") {
         val skill = SkillArgumentType.getSkill(context)
         val id = StringArgumentType.getString(context, "enhancement")
         val level = IntegerArgumentType.getInteger(context, "level")
-        val enhancement = skill.availableEnhancements.find { it.id == id }?.create(level)
+        val enhancement = skill.getEnhancement(id)
         if (enhancement == null) {
-            val type = SkillEnhancements.get(id)
-            if (type == null) {
-                context.sendError("enhanceSkill.unknown", id)
-            } else {
-                context.sendError("enhanceSkill.invalid", type.name, skill.name)
-            }
+            context.sendError("enhanceSkill.unknown", id)
             return 0
         }
 
-        if (player.enhance(skill, enhancement)) {
+        if (player.enhance(skill, enhancement.id)) {
             context.sendFeedback(
                 "enhanceSkill.success",
                 player.displayName,

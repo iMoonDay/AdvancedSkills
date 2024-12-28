@@ -4,26 +4,48 @@ import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
-import net.minecraft.sound.*
-import java.util.function.*
 
 abstract class PassiveSkill(
-    id: String,
-    extraTypes: List<SkillType> = emptyList(),
-    cooldown: Int = 0,
-    rarity: SkillRarity,
-    sound: Supplier<SoundEvent>? = null,
-    val toggleable: Boolean = false,
-    enhancements: Set<SkillEnhancementType<*>> = emptySet(),
-) : Skill(id, (setOf(SkillType.PASSIVE) + extraTypes).toList(), cooldown, rarity, sound, enhancements),
-    EquipTrigger, AttributeTrigger, RespawnTrigger {
+    settings: Settings,
+    private val toggleable: Boolean = false,
+    private val customToggles: Boolean = toggleable
+) : Skill(settings), EquipTrigger, AttributeTrigger, RespawnTrigger {
 
-    override fun use(user: ServerPlayerEntity): UseResult = if (toggleable)
-        UseResult.consume(translateActive(this, user.toggleUsing())) else UseResult.passive(name)
+    init {
+        if (customToggles) {
+            this.settings.addParameter("toggleable", toggleable)
+        }
 
-    override fun postEquipped(player: ServerPlayerEntity, slot: SkillSlot) = player.addAttributes()
+        if (!this.settings.types.contains(SkillType.PASSIVE)) {
+            this.settings.addTypeToTop(SkillType.PASSIVE)
+        }
+    }
 
-    override fun afterRespawn(player: ServerPlayerEntity) =
-        player.addAttributes()
+    override fun use(user: ServerPlayerEntity): UseResult = if (user.isToggleable()) {
+        val active = user.toggleUsing()
+        if (active) user.addAttributes() else user.removeAttributes()
+        UseResult.consume(translateActive(this, active))
+    } else {
+        UseResult.passive(name)
+    }
+
+    override fun postEquipped(player: ServerPlayerEntity, slot: SkillSlot) {
+        if (player.isAvailable()) {
+            player.addAttributes()
+        }
+    }
+
+    override fun afterRespawn(player: ServerPlayerEntity) {
+        if (player.isAvailable()) {
+            player.addAttributes()
+        }
+    }
+
+    override fun keepUsingAfterRespawn(player: ServerPlayerEntity): Boolean = player.isToggleable()
+
+    fun PlayerEntity.isToggleable() = if (!customToggles) toggleable else getBooleanParam("toggleable", toggleable)
+
+    fun PlayerEntity.isAvailable() = !isToggleable() || isUsing()
 }

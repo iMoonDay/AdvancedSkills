@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
@@ -11,11 +11,15 @@ import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
+private const val DAMAGED_TIMES_KEY = "damagedTimes"
+
 class CounterblastSkill : PassiveSkill(
-    id = "counterblast",
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(SkillEnhancements.RANGE, SkillEnhancements.POWER, SkillEnhancements.CHANCE),
-), PostAttackedTrigger, ProgressTrigger {
+    Settings(
+        id = "counterblast",
+        rarity = SkillRarity.SUPERB
+    ), customToggles = true
+//    enhancements = setOf(SkillEnhancements.RANGE, SkillEnhancements.POWER, SkillEnhancements.CHANCE),
+), PostAttackedTrigger, ProgressTrigger, StopTrigger {
 
     init {
         addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level }
@@ -25,13 +29,15 @@ class CounterblastSkill : PassiveSkill(
 
     override fun postAttacked(source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
         super.postAttacked(source, player, attacker)
+        if (!player.isAvailable()) return
+
         if (attacker != null) {
             val data = player.getPersistentData()
-            data.putInt("damagedTimes", data.getInt("damagedTimes").coerceAtLeast(0) + 1)
-            val times = data.getInt("damagedTimes")
+            data.putInt(DAMAGED_TIMES_KEY, data.getInt(DAMAGED_TIMES_KEY).coerceAtLeast(0) + 1)
+            val times = data.getInt(DAMAGED_TIMES_KEY)
             val chance = getAdditionalChance(player)
             if (times > 0 && player.random.nextFloat() < 0.2f * times + chance) {
-                data.remove("damagedTimes")
+                data.remove(DAMAGED_TIMES_KEY)
                 val range = player.getEnhancementLvl(SkillEnhancements.RANGE)
                 val power = 1.0 + player.getEnhancementLvl(SkillEnhancements.POWER) * 0.1
                 player.world.getOtherEntities(
@@ -52,11 +58,16 @@ class CounterblastSkill : PassiveSkill(
         }
     }
 
+    override fun postStop(player: PlayerEntity) {
+        super.postStop(player)
+        player.getPersistentData().remove(DAMAGED_TIMES_KEY)
+    }
+
     private fun getAdditionalChance(player: PlayerEntity) =
         player.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.04f
 
-    override fun shouldDisplay(player: PlayerEntity): Boolean = player.getPersistentData().contains("damagedTimes")
+    override fun shouldDisplay(player: PlayerEntity): Boolean = player.getPersistentData().contains(DAMAGED_TIMES_KEY)
 
     override fun getProgress(player: PlayerEntity): Double =
-        player.getPersistentData().getInt("damagedTimes") / ((1.0 - getAdditionalChance(player)) * 5.0)
+        player.getPersistentData().getInt(DAMAGED_TIMES_KEY) / ((1.0 - getAdditionalChance(player)) * 5.0)
 }

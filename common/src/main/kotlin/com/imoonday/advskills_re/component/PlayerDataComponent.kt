@@ -41,6 +41,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
     }
 
     override fun tick() {
+        container.getAllSkills { skill, _ -> !entity.hasLearned(skill) }.forEach { container.forget(it) }
         container.forEachData { it.tick() }
         container.getAllSlots { it.skill.invalid && !it.isEmpty() }.forEach {
             val name = it.skill.name
@@ -58,11 +59,6 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
                 dirty = false
             }
         }
-    }
-
-    override fun clientTick() {
-        super.clientTick()
-        container.getAllSkills { skill, _ -> !entity.hasLearned(skill) }.forEach { container.forget(it) }
     }
 
     override fun requestSync() {

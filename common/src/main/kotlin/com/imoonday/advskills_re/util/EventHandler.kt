@@ -71,12 +71,17 @@ object EventHandler {
             else CompoundEventResult.pass()
         }
         registerLootTables()
-        PlayerEvent.PLAYER_JOIN.register {
+        PlayerEvent.PLAYER_JOIN.register { player ->
             Channels.SYNC_CONFIG_S2C.sendToPlayer(
-                it, SyncConfigS2CPacket(
+                player, SyncConfigS2CPacket(
                     SkillConfig.get().writeToNbt(GlobalConfig.get().toNbt()),
                     SyncConfigS2CPacket.ConfigType.BOTH
                 )
+            )
+            Channels.SYNC_RARITIES_S2C.sendToPlayer(player, SyncRaritiesS2CPacket(RarityManager.getLoadedRarities()))
+            Channels.SYNC_SETTINGS_S2C.sendToPlayer(
+                player,
+                SyncSettingsS2CPacket(Skills.getSkills().map { it.settings })
             )
         }
         LifecycleEvent.SERVER_STARTED.register {

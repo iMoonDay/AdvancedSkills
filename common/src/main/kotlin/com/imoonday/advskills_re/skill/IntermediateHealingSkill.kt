@@ -1,11 +1,14 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.enums.*
 
 class IntermediateHealingSkill : HealingSkill(
-    id = "intermediate_healing",
-    types = listOf(SkillType.RESTORATION),
-    cooldown = 30,
-    rarity = SkillRarity.SUPERB,
-    amount = 8.0f,
+    Settings(
+        id = "intermediate_healing",
+        types = listOf(SkillType.RESTORATION),
+        cooldown = 30,
+        rarity = SkillRarity.SUPERB
+    ),
+    8.0f,
 )

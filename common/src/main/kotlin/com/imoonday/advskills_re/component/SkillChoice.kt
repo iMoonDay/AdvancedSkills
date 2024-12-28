@@ -18,11 +18,5 @@ class SkillChoice(skill: Skill) : Choosable(skill) {
         @JvmStatic
         fun fromNbt(nbt: NbtCompound): Choosable =
             Skills.fromIdNullable(nbt.getString("skill"))?.let { SkillChoice(it) } ?: EMPTY
-//
-//        @JvmStatic
-//        fun canGenerate(
-//            except: Collection<Skill> = emptyList(),
-//            filter: (Skill) -> Boolean = { true }
-//        ) = Skills.getLearnableSkills(except, filter).isNotEmpty()
     }
 }

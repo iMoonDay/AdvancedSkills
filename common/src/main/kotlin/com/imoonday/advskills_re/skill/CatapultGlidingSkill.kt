@@ -10,18 +10,30 @@ import net.minecraft.server.network.*
 import net.minecraft.util.math.*
 
 class CatapultGlidingSkill : LongPressSkill(
-    id = "catapult_gliding",
-    types = listOf(SkillType.MOVEMENT),
-    cooldown = 30,
-    rarity = SkillRarity.RARE,
-    sound = ModSounds.DASH,
-    enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.VELOCITY)
+    Settings(
+        id = "catapult_gliding",
+        types = listOf(SkillType.MOVEMENT),
+        cooldown = 30,
+        rarity = SkillRarity.RARE
+//        sound = ModSounds.DASH
+    )
+//    enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.VELOCITY)
 ) {
 
-    override val timeParameterName: String = "charge_time"
+    override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(timeParameterName, 3 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        this.settings.addParameter("fly_out_sound", ModSounds.DASH)
+
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 3 * 20,
+            enhancementId = "time",
+            value = -0.16f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
 
         addEnhancementTooltipWithArg(SkillEnhancements.VELOCITY) { it.level * 10 }
     }
@@ -36,7 +48,7 @@ class CatapultGlidingSkill : LongPressSkill(
         if (!player.canUse()) return failedResult()
         if (player.isFallFlying) return fallFlyingResult()
         player.stopAndCooldown()
-        player.playSkillSound()
+        player.playSoundFromParam("fly_out_sound")
         player.setOnGround(false)
         player.startFallFlying()
         val multiplier = 1 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1

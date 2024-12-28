@@ -8,7 +8,7 @@ import net.fabricmc.api.*
 import net.minecraft.nbt.*
 import net.minecraft.network.*
 
-class SyncConfigS2CPacket(
+data class SyncConfigS2CPacket(
     val tag: NbtCompound,
     val type: ConfigType,
 ) : NetworkPacket {

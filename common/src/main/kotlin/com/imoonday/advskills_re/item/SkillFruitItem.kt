@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.item
 
 import com.imoonday.advskills_re.*
-import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.item.*
 import net.minecraft.entity.*
@@ -31,7 +31,7 @@ class SkillFruitItem(val rarity: SkillRarity, settings: Settings) : Item(setting
         return stack
     }
 
-    override fun getName(): Text = nameText.formatted(rarity.formatting)
+    override fun getName(): Text = rarity.format(nameText)
 
     override fun getName(stack: ItemStack): Text = name
 

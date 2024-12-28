@@ -13,18 +13,30 @@ import net.minecraft.util.math.*
 
 //TODO 服务器跨维度传送坐标异常?
 class ReturnSkill : LongPressSkill(
-    id = "return",
-    types = listOf(SkillType.UTILITY, SkillType.MOVEMENT),
-    cooldown = 0,
-    rarity = SkillRarity.SUPERB,
-    sound = ModSounds.RETURN,
-    enhancements = setOf(SkillEnhancements.CHARGE_TIME)
+    Settings(
+        id = "return",
+        types = listOf(SkillType.UTILITY, SkillType.MOVEMENT),
+        cooldown = 0,
+        rarity = SkillRarity.SUPERB
+    )
+//    sound = ModSounds.RETURN,
+//    enhancements = setOf(SkillEnhancements.CHARGE_TIME)
 ), UsingRenderTrigger {
 
-    override val timeParameterName: String = "charge_time"
+    override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(timeParameterName, 5 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        this.settings.addParameter("return_sound", ModSounds.RETURN)
+
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 5 * 20,
+            enhancementId = "time",
+            value = -0.16f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun onPress(player: ServerPlayerEntity): UseResult {
@@ -95,7 +107,7 @@ class ReturnSkill : LongPressSkill(
             return UseResult.fail(failedMessage())
         }
         val (spawnAngle, world, teleportPos) = getTeleportInfo(player)
-        player.playSkillSound()
+        player.playSoundFromParam("return_sound")
         player.teleport(
             world, teleportPos.x, teleportPos.y, teleportPos.z,
             emptySet(),

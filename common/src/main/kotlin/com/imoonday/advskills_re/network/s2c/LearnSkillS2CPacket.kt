@@ -10,7 +10,7 @@ import dev.architectury.utils.*
 import net.minecraft.client.sound.*
 import net.minecraft.network.*
 
-class LearnSkillS2CPacket(
+data class LearnSkillS2CPacket(
     val skill: Skill,
     val toast: Boolean,
 ) : NetworkPacket {

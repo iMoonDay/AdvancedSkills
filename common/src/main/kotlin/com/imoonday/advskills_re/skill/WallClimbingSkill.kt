@@ -10,17 +10,27 @@ import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 
 class WallClimbingSkill : PassiveSkill(
-    id = "wall_climbing",
-    extraTypes = listOf(SkillType.MOVEMENT),
-    cooldown = 15,
-    rarity = SkillRarity.RARE,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    Settings(
+        id = "wall_climbing",
+        types = listOf(SkillType.MOVEMENT),
+        cooldown = 15,
+        rarity = SkillRarity.RARE
+    )
+//    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), ClimbingTrigger, AutoStopTrigger, AutoTrigger, SendPlayerDataTrigger {
 
     override fun isClimbing(player: PlayerEntity): Boolean = player.isUsing() && player.shouldClimb()
 
     init {
-        addEnhanceableParameter(timeParameterName, 15 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 15 * 20,
+            enhancementId = "time",
+            value = 0.2f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -36,23 +46,23 @@ class WallClimbingSkill : PassiveSkill(
 
     override fun tick(player: PlayerEntity, usedTime: Int) {
         super<AutoStopTrigger>.tick(player, usedTime)
-        if (player.isUsing()) {
-            val horizontalCollision =
-                player.horizontalCollision || player.getPersistentData().getBoolean(HORIZONTAL_COLLISION_KEY)
-            val data = player.getData(this)
-            val oldSpeed = data?.usingSpeed
-            if (!horizontalCollision) {
-                data?.usingSpeed = -1
-                if (usedTime <= 0) {
-                    data?.usingSpeed = 1
-                    player.stopUsing()
-                }
-            } else if (data?.usingSpeed == -1) {
-                data.usingSpeed = 1
+        if (!player.shouldClimb()) return
+
+        val horizontalCollision =
+            player.horizontalCollision || player.getPersistentData().getBoolean(HORIZONTAL_COLLISION_KEY)
+        val data = player.getData(this)
+        val oldSpeed = data?.usingSpeed
+        if (!horizontalCollision) {
+            data?.usingSpeed = -1
+            if (usedTime <= 0) {
+                data?.usingSpeed = 1
+                player.stopUsing()
             }
-            if (oldSpeed != data?.usingSpeed) {
-                player.syncData()
-            }
+        } else if (data?.usingSpeed == -1) {
+            data.usingSpeed = 1
+        }
+        if (oldSpeed != data?.usingSpeed) {
+            player.syncData()
         }
     }
 

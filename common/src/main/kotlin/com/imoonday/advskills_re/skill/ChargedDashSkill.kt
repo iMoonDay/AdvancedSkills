@@ -11,21 +11,31 @@ import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
 class ChargedDashSkill : LongPressSkill(
-    id = "charged_dash",
-    types = listOf(SkillType.MOVEMENT),
-    cooldown = 15,
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(
-        SkillEnhancements.CHARGE_TIME,
-        SkillEnhancements.CHARGE_SLOWDOWN,
-        SkillEnhancements.VELOCITY
+    Settings(
+        id = "charged_dash",
+        types = listOf(SkillType.MOVEMENT),
+        cooldown = 15,
+        rarity = SkillRarity.SUPERB
     )
+//    enhancements = setOf(
+//        SkillEnhancements.CHARGE_TIME,
+//        SkillEnhancements.CHARGE_SLOWDOWN,
+//        SkillEnhancements.VELOCITY
+//    )
 ), AttributeTrigger {
 
-    override val timeParameterName: String = "charge_time"
+    override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(timeParameterName, 3 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 3 * 20,
+            enhancementId = "time",
+            value = -0.16f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
 
         addEnhancementTooltipWithArg(SkillEnhancements.VELOCITY) { it.level * 20 }
     }

@@ -13,48 +13,70 @@ import net.minecraft.util.hit.*
 import net.minecraft.util.math.*
 
 class ArrowRainSkill : Skill(
-    Settings.loadOrCreate {
-        Settings(
-            id = "arrow_rain",
-            types = listOf(SkillType.ATTACK, SkillType.SUMMON),
-            cooldown = 15,
-            rarity = SkillRarity.RARE
-        ).addParameter("max_distance", 256.0)
-            .addParameter("min_summon_amount", 50)
-            .addParameter("max_summon_amount", 100)
-            .addParameter("summon_interval", 2)
-            .addParameter("launch_sound", SoundEvents.ENTITY_ARROW_SHOOT.id.toString())
-            .addEnhanceableParameter(
-                "arrow_damage",
-                2.0,
-                "damage",
-                0.2f,
-                Enhancement.Type.MULTIPLY,
-                5
-            ).addEnhanceableParameter("launch_count", 5, "count", 1f, Enhancement.Type.ADDITION, 5)
-            .addEnhanceableParameter("summon_range", 20.0, "range", 2f, Enhancement.Type.ADDITION, 5)
-            .addEnhancement("summon_amount", 10f, Enhancement.Type.ADDITION, 5)
-    }
+    Settings(
+        id = "arrow_rain",
+        types = listOf(SkillType.ATTACK, SkillType.SUMMON),
+        cooldown = 15,
+        rarity = SkillRarity.RARE
+    )
 ) {
 
     init {
-        addEnhancementDescArg("damage") { (it * 100).toInt() }
-        addEnhancementDescArg("count") { it.toInt() }
-        addEnhancementDescArg("range") { it.toInt() }
-        addEnhancementDescArg("summon_amount") { it.toInt() }
+        this.settings
+            .addParameter("max_distance", 256.0)
+            .addParameter("min_summon_amount", 50)
+            .addParameter("max_summon_amount", 100)
+            .addParameter("summon_interval", 2)
+            .addParameter("launch_sound", SoundEvents.ENTITY_ARROW_SHOOT)
+
+        addEnhanceableParameter(
+            name = "arrow_damage",
+            baseValue = 2.0,
+            enhancementId = "damage",
+            value = 0.2f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+        addEnhanceableParameter(
+            name = "launch_count",
+            baseValue = 5,
+            enhancementId = "count",
+            value = 1f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT
+        )
+        addEnhanceableParameter(
+            name = "summon_range",
+            baseValue = 20.0,
+            enhancementId = "range",
+            value = 2f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.SELF
+        )
+
+        addEnhancement(
+            id = "summon_amount",
+            value = 10f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val damage = user.getDoubleParameter("arrow_damage")
-        val maxDistance = user.getDoubleParameter("max_distance")
+        val damage = user.getDoubleParam("arrow_damage")
+        val maxDistance = user.getDoubleParam("max_distance")
         val raycast = user.raycast(maxDistance, 0f, true)
         val center = if (raycast.type == HitResult.Type.MISS) user.pos else raycast.pos
-        val remainingTimes = user.getIntParameter("launch_count") - 1
-        val range = user.getDoubleParameter("summon_range")
+        val remainingTimes = user.getIntParam("launch_count") - 1
+        val range = user.getDoubleParam("summon_range")
         val amount = user.getEnhancementValue("summon_amount").toInt()
-        val (min, max) = user.getIntParameter("min_summon_amount") to user.getIntParameter("max_summon_amount")
-        val interval = user.getIntParameter("summon_interval")
-        val sound = Registries.SOUND_EVENT.get(user.getStringParameter("launch_sound").toIdentifier())
+        val (min, max) = user.getIntParam("min_summon_amount") to user.getIntParam("max_summon_amount")
+        val interval = user.getIntParam("summon_interval")
+        val sound = Registries.SOUND_EVENT.get(getIdentifierParam("launch_sound"))
         user.executeAndAddTask(interval, remainingTimes) {
             spawnArrows(user, center, damage, range, min, max, amount, sound)
         }

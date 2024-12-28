@@ -9,7 +9,7 @@ import net.minecraft.nbt.*
 import net.minecraft.network.*
 import net.minecraft.server.network.*
 
-class UseSkillC2SRequest(
+data class UseSkillC2SRequest(
     val slot: Int,
     val keyState: KeyState,
     val data: NbtCompound,

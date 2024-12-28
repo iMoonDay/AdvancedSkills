@@ -13,8 +13,45 @@ import net.minecraft.text.*
 import net.minecraft.util.*
 import net.minecraft.util.math.*
 import java.awt.*
+import java.nio.file.*
+import kotlin.io.path.*
 import kotlin.math.*
 import kotlin.random.*
+
+object Utils {
+
+    @JvmStatic
+    fun levenshteinDistance(str1: String, str2: String): Int {
+        val lenStr1 = str1.length
+        val lenStr2 = str2.length
+        val dp = Array(lenStr1 + 1) { IntArray(lenStr2 + 1) }
+        for (i in 0..lenStr1) {
+            for (j in 0..lenStr2) {
+                if (i == 0) {
+                    dp[i][j] = j
+                } else if (j == 0) {
+                    dp[i][j] = i
+                } else {
+                    dp[i][j] = min(
+                        dp[i - 1][j - 1] + if (str1[i - 1] == str2[j - 1]) 0 else 1,
+                        min(dp[i - 1][j] + 1, dp[i][j - 1] + 1)
+                    )
+                }
+            }
+        }
+        return dp[lenStr1][lenStr2]
+    }
+
+    @JvmStatic
+    fun similarityScore(str1: String, str2: String): Double {
+        val maxLen = maxOf(str1.length, str2.length)
+        return 1.0 - levenshteinDistance(str1, str2).toDouble() / maxLen
+    }
+
+    @JvmStatic
+    fun <T> findMostSimilarElement(target: String, candidates: Collection<T>, formatter: (T) -> String): T? =
+        candidates.maxByOrNull { similarityScore(formatter(it), target) }
+}
 
 fun Color.alpha(alpha: Int): Color = Color(this.red, this.green, this.blue, alpha)
 
@@ -186,3 +223,13 @@ fun ServerPlayerEntity.addTask(interval: Int, repeat: Int, task: () -> Boolean) 
 
 fun ServerPlayerEntity.executeAndAddTask(interval: Int, repeat: Int, task: () -> Boolean) =
     serverWorld.executeAndAddTask(interval, repeat, task)
+
+fun Path.listAllFiles(glob: String = "*"): List<Path> = mutableListOf<Path>().apply {
+    listDirectoryEntries().forEach {
+        if (it.isDirectory()) {
+            addAll(it.listAllFiles(glob))
+        } else if (glob == "*" || it.name.matches(glob.toRegex())) {
+            add(it)
+        }
+    }
+}

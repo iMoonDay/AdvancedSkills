@@ -8,7 +8,7 @@ import net.minecraft.network.*
 import net.minecraft.util.math.*
 import java.awt.*
 
-class UpdateOreCacheS2CPacket(
+data class UpdateOreCacheS2CPacket(
     private val colorMap: Map<BlockPos, Color>
 ) : NetworkPacket {
 

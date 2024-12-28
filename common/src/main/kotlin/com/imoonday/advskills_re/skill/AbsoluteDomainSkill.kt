@@ -10,26 +10,39 @@ import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
 class AbsoluteDomainSkill : Skill(
-    Settings.loadOrCreate {
-        Settings(
-            id = "absolute_domain",
-            types = listOf(SkillType.DESTRUCTION),
-            cooldown = 15,
-            rarity = SkillRarity.RARE
-        ).addEnhanceableParameter("persist_time", 3 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5)
-            .addEnhanceableParameter("range", 1.0, "range", 1f, Enhancement.Type.ADDITION, 3)
-    }
+    Settings(
+        id = "absolute_domain",
+        types = listOf(SkillType.DESTRUCTION),
+        cooldown = 15,
+        rarity = SkillRarity.RARE
+    )
 ), AutoStopTrigger {
 
     private val maxHardness = Blocks.OBSIDIAN.hardness
 
     init {
-        addEnhancementDescArg("time") { (it * 100).toInt() }
-        addEnhancementDescArg("range") { it }
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 3 * 20,
+            enhancementId = "time",
+            value = 0.2f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+        addEnhanceableParameter(
+            name = "range",
+            baseValue = 1.0,
+            enhancementId = "range",
+            value = 1f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 3,
+            descArg = Enhancement.ArgFormatters.SELF
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {
-        putDouble("Range", user.getDoubleParameter("range"))
+        putDouble("Range", user.getDoubleParam("range"))
     })
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {

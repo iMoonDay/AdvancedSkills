@@ -21,7 +21,14 @@ class ExtremeEvasionSkill : Skill(
 ), AutoStopTrigger, DamageTrigger, SendPlayerVelocityTrigger {
 
     init {
-        addEnhanceableParameter(timeParameterName, 10, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            timeParamName,
+            10,
+            "time",
+            0.2f,
+            Enhancement.Operation.MULTIPLY,
+            5
+        ) { (it * 100).toInt() }
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {

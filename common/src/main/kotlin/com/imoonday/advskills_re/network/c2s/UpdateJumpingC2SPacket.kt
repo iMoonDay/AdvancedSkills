@@ -6,7 +6,7 @@ import dev.architectury.networking.*
 import net.minecraft.network.*
 import net.minecraft.server.network.*
 
-class UpdateJumpingC2SPacket(
+data class UpdateJumpingC2SPacket(
     val jumping: Boolean
 ) : NetworkPacket {
 

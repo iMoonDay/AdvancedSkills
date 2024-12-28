@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
@@ -18,7 +19,8 @@ object AdvancedSkills {
     @JvmStatic
     fun init() {
         GlobalConfig.get().load()
-        SkillSettingsManager.loadFiles()
+        RarityManager.loadFiles()
+        SkillRarity.init()
         Channels.register()
         ModCommands.init()
         ModItems.init()

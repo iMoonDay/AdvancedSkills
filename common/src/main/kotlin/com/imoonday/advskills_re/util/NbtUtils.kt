@@ -72,44 +72,36 @@ class NbtUtils {
     }
 }
 
-inline fun <reified T : Number> Collection<T>.toNbtNumberList(): NbtList = NbtList().apply {
-    when (T::class) {
-        Int::class -> addAll(this@toNbtNumberList.map { NbtInt.of(it.toInt()) })
-        Float::class -> addAll(this@toNbtNumberList.map { NbtFloat.of(it.toFloat()) })
-        Double::class -> addAll(this@toNbtNumberList.map { NbtDouble.of(it.toDouble()) })
-        Byte::class -> addAll(this@toNbtNumberList.map { NbtByte.of(it.toByte()) })
-        Long::class -> addAll(this@toNbtNumberList.map { NbtLong.of(it.toLong()) })
-        Short::class -> addAll(this@toNbtNumberList.map { NbtShort.of(it.toShort()) })
-        else -> throw IllegalArgumentException("Unsupported type: ${T::class}")
-    }
+inline fun <reified T : Number> Collection<T>.toNbtNumberList(): NbtList = when (T::class) {
+    Int::class -> toNbtList { NbtInt.of(it.toInt()) }
+    Float::class -> toNbtList { NbtFloat.of(it.toFloat()) }
+    Double::class -> toNbtList { NbtDouble.of(it.toDouble()) }
+    Byte::class -> toNbtList { NbtByte.of(it.toByte()) }
+    Long::class -> toNbtList { NbtLong.of(it.toLong()) }
+    Short::class -> toNbtList { NbtShort.of(it.toShort()) }
+    else -> throw IllegalArgumentException("Unsupported type: ${T::class}")
 }
 
-fun Collection<Boolean>.toNbtBooleanList(): NbtList = NbtList().apply {
-    addAll(this@toNbtBooleanList.map { NbtByte.of(it) })
+fun Collection<Boolean>.toNbtBooleanList(): NbtList = toNbtList(NbtByte::of)
+
+fun Collection<String>.toNbtStringList(): NbtList = toNbtList(NbtString::of)
+
+fun Collection<ByteArray>.toNbtByteArrayList(): NbtList = toNbtList(::NbtByteArray)
+
+fun Collection<IntArray>.toNbtIntArrayList(): NbtList = toNbtList(::NbtIntArray)
+
+fun Collection<LongArray>.toNbtLongArrayList(): NbtList = toNbtList(::NbtLongArray)
+
+fun Collection<UUID>.toNbtUUIDList(): NbtList = toNbtList(NbtHelper::fromUuid)
+
+fun Collection<NbtCompound>.toNbtCompoundList(): NbtList = toNbtList { it }
+
+fun <T> Collection<T>.toNbtList(cast: (T) -> NbtElement): NbtList = NbtList().apply {
+    addAll(this@toNbtList.map { cast(it) })
 }
 
-fun Collection<String>.toNbtStringList(): NbtList = NbtList().apply {
-    addAll(this@toNbtStringList.map { NbtString.of(it) })
-}
-
-fun Collection<ByteArray>.toNbtByteArrayList(): NbtList = NbtList().apply {
-    addAll(this@toNbtByteArrayList.map { NbtByteArray(it) })
-}
-
-fun Collection<IntArray>.toNbtIntArrayList(): NbtList = NbtList().apply {
-    addAll(this@toNbtIntArrayList.map { NbtIntArray(it) })
-}
-
-fun Collection<LongArray>.toNbtLongArrayList(): NbtList = NbtList().apply {
-    addAll(this@toNbtLongArrayList.map { NbtLongArray(it) })
-}
-
-fun Collection<UUID>.toNbtUUIDList(): NbtList = NbtList().apply {
-    addAll(this@toNbtUUIDList.map { NbtHelper.fromUuid(it) })
-}
-
-fun Collection<NbtCompound>.toNbtCompoundList(): NbtList = NbtList().apply {
-    addAll(this@toNbtCompoundList.map { it })
+fun <K, V> Map<K, V>.toNbtCompound(putAction: NbtCompound.(K, V) -> Unit): NbtCompound = NbtCompound().apply {
+    forEach { (k, v) -> putAction(k, v) }
 }
 
 fun NbtList.toIntList(): List<Int> = mapNotNull { (it as? NbtInt)?.intValue() }
@@ -125,3 +117,12 @@ fun NbtList.toIntArrayList(): List<IntArray> = mapNotNull { (it as? NbtIntArray)
 fun NbtList.toLongArrayList(): List<LongArray> = mapNotNull { (it as? NbtLongArray)?.longArray }
 fun NbtList.toUUIDList(): List<UUID> = mapNotNull { NbtHelper.toUuid(it) }
 fun NbtList.toCompoundList(): List<NbtCompound> = mapNotNull { it as? NbtCompound }
+fun <V> NbtCompound.toStringMap(getAction: NbtCompound.(String) -> V?): MutableMap<String, V> =
+    LinkedHashMap<String, V>().apply {
+        this@toStringMap.keys.forEach {
+            val value = getAction(it)
+            if (value != null) {
+                put(it, value)
+            }
+        }
+    }

@@ -18,10 +18,18 @@ class SelfRepairSkill : Skill(
     enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.EFFECT_VALUE)
 ), AutoTrigger, AutoStopTrigger {
 
-    override val timeParameterName: String = "charge_time"
+    override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(timeParameterName, 10 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 10 * 20,
+            enhancementId = "time",
+            value = -0.16f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
@@ -31,6 +39,8 @@ class SelfRepairSkill : Skill(
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
+        if (!player.hasEquipped()) return
+
         val repaired = player.armorItems.filter { it.isDamaged && it.damage > getMaxRepairLimit(player, it) }
             .count {
                 it.damage -= 1
@@ -48,4 +58,8 @@ class SelfRepairSkill : Skill(
     fun getMaxRepairLimit(player: PlayerEntity, stack: ItemStack): Int =
         (stack.maxDamage * (0.5 - player.getEnhancementLvl(SkillEnhancements.EFFECT_VALUE) * 0.1)).toInt()
             .coerceAtLeast(0)
+
+    override fun shouldFlashIcon(player: PlayerEntity): Boolean = false
+
+    override fun getProgress(player: PlayerEntity): Double = 1.0 - super.getProgress(player)
 }

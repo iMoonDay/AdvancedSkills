@@ -15,16 +15,27 @@ import net.minecraft.util.hit.*
 import org.joml.*
 
 class MultipleLaserSkill : LongPressSkill(
-    id = "multiple_laser",
-    types = listOf(SkillType.ATTACK),
-    cooldown = 45,
-    rarity = SkillRarity.LEGENDARY,
-    sound = ModSounds.LASER,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DAMAGE, SkillEnhancements.DISTANCE)
+    Settings(
+        id = "multiple_laser",
+        types = listOf(SkillType.ATTACK),
+        cooldown = 45,
+        rarity = SkillRarity.LEGENDARY
+    )
+//    sound = ModSounds.LASER,
+//    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DAMAGE, SkillEnhancements.DISTANCE)
 ), DangerTrigger {
 
     init {
-        addEnhanceableParameter(timeParameterName, 10 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        this.settings.addParameter("laser_sound", ModSounds.LASER)
+
+        addEnhanceableParameter(
+            timeParamName,
+            10 * 20,
+            "time",
+            0.2f,
+            Enhancement.Operation.MULTIPLY,
+            5
+        ) { (it * 100).toInt() }
     }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
@@ -36,7 +47,7 @@ class MultipleLaserSkill : LongPressSkill(
             (if (it.type == HitResult.Type.MISS) distance else it.pos.distanceTo(cameraPos))
         }
         if (usedTime % 4 == 0) {
-            player.playSkillSound()
+            player.playSoundFromParam("laser_sound")
         }
         if (usedTime % 2 == 0) {
             val entities: MutableList<LivingEntity> = mutableListOf()

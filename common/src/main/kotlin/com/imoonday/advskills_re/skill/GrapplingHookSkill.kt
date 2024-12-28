@@ -11,15 +11,24 @@ import net.minecraft.util.hit.*
 import kotlin.math.*
 
 class GrapplingHookSkill : LongPressSkill(
-    id = "grappling_hook",
-    types = listOf(SkillType.MOVEMENT),
-    cooldown = 15,
-    rarity = SkillRarity.EPIC,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DISTANCE)
+    Settings(
+        id = "grappling_hook",
+        types = listOf(SkillType.MOVEMENT),
+        cooldown = 15,
+        rarity = SkillRarity.EPIC
+    )
+//    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DISTANCE)
 ), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger {
 
     init {
-        addEnhanceableParameter(timeParameterName, 3 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            timeParamName,
+            3 * 20,
+            "time",
+            0.2f,
+            Enhancement.Operation.MULTIPLY,
+            5
+        ) { (it * 100).toInt() }
     }
 
     override fun onPress(player: ServerPlayerEntity): UseResult {

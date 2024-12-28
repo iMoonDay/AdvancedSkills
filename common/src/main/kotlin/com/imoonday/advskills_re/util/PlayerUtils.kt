@@ -223,7 +223,7 @@ fun PlayerEntity.refreshSkillChoice(force: Boolean = false) =
         choiceData.refresh(this, force)
         syncData()
     } else {
-        Channels.REFRESH_CHOICE_C2S.sendToServer(RefreshChoiceC2SRequest())
+        Channels.REFRESH_CHOICE_C2S.sendToServer(RefreshChoiceC2SRequest)
     }
 
 fun PlayerEntity.canFreshChoice(): Boolean =
@@ -271,19 +271,19 @@ fun PlayerEntity.enhance(skill: Skill, id: String, level: Int? = null): Boolean 
     getData(skill)?.run { enhancements.compute(id) { _, lvl -> level ?: lvl?.plus(1) ?: 1 } } ?: return false
 
     if (this is ServerPlayerEntity) {
-        Channels.ENHANCE_SKILL_S2C.sendToPlayer(this, EnhanceSkillS2CPacket())
+        Channels.ENHANCE_SKILL_S2C.sendToPlayer(this, EnhanceSkillS2CPacket)
     }
     syncData()
     return true
 }
 
 fun PlayerEntity.enhanceAll(skill: Skill): Boolean = getData(skill)?.run {
-    skill.getValidEnhancements().forEach {
+    skill.getAvailableEnhancements().forEach {
         enhancements[it.id] = it.maxLevel
     }
 
     if (this@enhanceAll is ServerPlayerEntity) {
-        Channels.ENHANCE_SKILL_S2C.sendToPlayer(this@enhanceAll, EnhanceSkillS2CPacket())
+        Channels.ENHANCE_SKILL_S2C.sendToPlayer(this@enhanceAll, EnhanceSkillS2CPacket)
     }
     syncData()
     true
@@ -511,7 +511,7 @@ fun PlayerEntity.isCharging(skill: Skill): Boolean = skill is LongPressTrigger &
 
 fun PlayerEntity.getEnhancements(skill: Skill): Map<Enhancement, Int> =
     getData(skill)?.run {
-        skill.getValidEnhancements().mapNotNull {
+        skill.getAvailableEnhancements().mapNotNull {
             enhancements[it.id]?.run { it to this }
         }.toMap()
     } ?: emptyMap()

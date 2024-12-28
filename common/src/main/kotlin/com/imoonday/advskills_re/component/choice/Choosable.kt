@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.component.choice
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.nbt.*
@@ -32,6 +33,16 @@ abstract class Choosable(val skill: Skill) {
             override fun isEmpty(): Boolean = true
 
             override fun compatibleWith(other: Choosable): Boolean = true
+        }
+
+        @JvmStatic
+        fun parse(nbt: NbtCompound): Choosable {
+            val type = Type.entries.getOrNull(nbt.getInt("type")) ?: return EMPTY
+            return when (type) {
+                Type.EMPTY -> EMPTY
+                Type.SKILL -> SkillChoice.fromNbt(nbt)
+                Type.ENHANCEMENT -> EnhancementChoice.fromNbt(nbt)
+            }
         }
     }
 }

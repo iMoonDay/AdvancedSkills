@@ -19,23 +19,33 @@ import net.minecraft.util.math.*
 import net.minecraft.world.*
 
 class SpaceBlastSkill : LongPressSkill(
-    id = "space_blast",
-    types = listOf(SkillType.DESTRUCTION, SkillType.ATTACK),
-    cooldown = 60,
-    rarity = SkillRarity.MYTHIC,
-    enhancements = setOf(
-        SkillEnhancements.RANGE,
-        SkillEnhancements.DAMAGE,
-        SkillEnhancements.CHARGE_TIME,
-        SkillEnhancements.CHARGE_SLOWDOWN,
-        SkillEnhancements.DISTANCE
+    Settings(
+        id = "space_blast",
+        types = listOf(SkillType.DESTRUCTION, SkillType.ATTACK),
+        cooldown = 60,
+        rarity = SkillRarity.MYTHIC
     )
+//    enhancements = setOf(
+//        SkillEnhancements.RANGE,
+//        SkillEnhancements.DAMAGE,
+//        SkillEnhancements.CHARGE_TIME,
+//        SkillEnhancements.CHARGE_SLOWDOWN,
+//        SkillEnhancements.DISTANCE
+//    )
 ), AttributeTrigger, WorldRendererTrigger, GlowingTrigger {
 
-    override val timeParameterName: String = "charge_time"
+    override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(timeParameterName, 5 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 5 * 20,
+            enhancementId = "time",
+            value = -0.16f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

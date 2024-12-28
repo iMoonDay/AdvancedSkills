@@ -179,25 +179,6 @@ object ConfigScreenHandler {
 
             addEntry(skillFruitGeneration.build())
 
-            val skillRarityWeights = entryBuilder.startSubCategory(translate("screen.config.skillRarityWeights"))
-
-            SkillRarity.DEFAULT_WEIGHTS.forEach { (rarity, weight) ->
-                skillRarityWeights.add(
-                    entryBuilder.startIntField(rarity.displayName, rarity.weight)
-                        .setDefaultValue(weight)
-                        .setMin(0)
-                        .setSaveConsumer { rarity.weight = it }
-                        .build()
-                        .apply {
-                            if (inGame) {
-                                isRequiresRestart = true
-                            }
-                        }
-                )
-            }
-
-            addEntry(skillRarityWeights.build())
-
             val skillConfigEntry =
                 entryBuilder.startSubCategory(translate("screen.config.skillConfig"))
 

@@ -3,7 +3,7 @@ package com.imoonday.advskills_re.component
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 
-class ChoiceData(
+data class ChoiceData(
     private var choice: Choice = Choice.EMPTY,
     var refreshed: Boolean = false,
     var count: Int = 0,

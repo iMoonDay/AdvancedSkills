@@ -19,16 +19,6 @@ class SkillConfig {
     var skillXpMultiplier: Double? = null
     val skillBlackList: MutableSet<String> = mutableSetOf()
 
-    fun getModifier(id: Identifier): SkillModifier =
-        TODO()
-
-    fun getOrCreateModifier(id: Identifier): SkillModifier =
-        TODO()
-
-    fun removeModifier(id: Identifier): Boolean {
-        TODO()
-    }
-
     fun isInBlackList(id: Identifier): Boolean =
         skillBlackList.contains(id.toString()) || id.namespace == MOD_ID && skillBlackList.contains(id.path)
 

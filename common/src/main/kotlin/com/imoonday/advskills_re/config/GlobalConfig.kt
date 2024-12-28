@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.config
 
 import com.imoonday.advskills_re.*
-import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.enums.*
@@ -57,8 +56,6 @@ class GlobalConfig {
             field = value
             if (!loading) save()
         }
-    private val skillRarityWeights: MutableMap<String, Int> =
-        SkillRarity.DEFAULT_WEIGHTS.mapKeys { it.key.id }.toMutableMap()
     val skillConfig: SkillConfig = SkillConfig().apply {
         this.skillCooldownMultiplier = 1.0
         this.skillXpMultiplier = 1.0
@@ -70,13 +67,6 @@ class GlobalConfig {
 
     fun setDefaultSkillSlot(slot: String, count: Int) {
         defaultSkillSlots[slot] = count
-        save()
-    }
-
-    fun getRarityWeight(rarity: SkillRarity): Int = skillRarityWeights[rarity.id] ?: 0
-
-    fun setRarityWeight(rarity: SkillRarity, weight: Int) {
-        skillRarityWeights[rarity.id] = weight
         save()
     }
 
@@ -135,9 +125,6 @@ class GlobalConfig {
         putFloat("buriedTreasureChestGenerationChance", buriedTreasureChestGenerationChance)
         putFloat("endCityTreasureChestGenerationChance", endCityTreasureChestGenerationChance)
         putFloat("spawnBonusChestGenerationChance", spawnBonusChestGenerationChance)
-        put("skillRarityWeights", NbtCompound().apply {
-            skillRarityWeights.forEach { (k, v) -> putInt(k, v) }
-        })
         put("skillConfig", skillConfig.writeToNbt())
         put("learningBlacklist", learningBlacklist.toNbtStringList())
     }
@@ -176,13 +163,6 @@ class GlobalConfig {
         }
         if (nbt.contains("spawnBonusChestGenerationChance")) {
             spawnBonusChestGenerationChance = nbt.getFloat("spawnBonusChestGenerationChance")
-        }
-        if (nbt.contains("skillRarityWeights")) {
-            skillRarityWeights.clear()
-            val skillRarityWeightsNbt = nbt.getCompound("skillRarityWeights")
-            skillRarityWeightsNbt.keys.forEach {
-                skillRarityWeights[it] = skillRarityWeightsNbt.getInt(it)
-            }
         }
         if (nbt.contains("skillConfig")) {
             skillConfig.loadFromNbt(nbt.getCompound("skillConfig"))

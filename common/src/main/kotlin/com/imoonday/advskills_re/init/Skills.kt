@@ -296,10 +296,22 @@ object Skills {
     @JvmField
     val GLIDING = register(GlidingSkill())
 
+    @JvmStatic
     fun init() {
-        SkillSettingsManager.saveMissing(skills.values)
+        SettingsManager.loadOrSaveFiles(skills.values)
+        skills.values.forEach {
+            SettingsManager.getSettings(it)?.run {
+                it.updateSettings(this)
+            }
+        }
     }
 
+    @JvmStatic
+    fun updateSettings(settings: Collection<Skill.Settings>) {
+        settings.forEach { skills[it.id]?.updateSettings(it) }
+    }
+
+    @JvmStatic
     fun <T : Skill> register(skill: T): T {
         if (skill.id in skills.keys || skill in skills.values) {
             LOGGER.warn("Skill ${skill.id} is already registered")
@@ -310,28 +322,37 @@ object Skills {
         return skill
     }
 
+    @JvmStatic
     fun compareIndex(skill1: Skill, skill2: Skill): Int {
         val skillValues = skills.values
         return skillValues.indexOf(skill1).compareTo(skillValues.indexOf(skill2))
     }
 
+    @JvmStatic
     fun getSkills(): List<Skill> = skills.values.filterNot { it.isEmpty() }
 
+    @JvmStatic
     fun getValidSkills(): List<Skill> = skills.values.filterNot { it.invalid }
 
+    @JvmStatic
     fun fromId(id: Identifier): Skill = skills.getOrDefault(id, EMPTY)
 
+    @JvmStatic
     fun fromId(id: String): Skill =
         if (id.contains(":")) id.toIdentifier()?.let { fromId(it) } ?: EMPTY else fromId(id(id))
 
+    @JvmStatic
     fun fromIdNullable(id: Identifier?): Skill? = skills[id]
 
+    @JvmStatic
     fun fromIdNullable(id: String?): Skill? =
         fromIdNullable(id?.let { if (it.contains(":")) it.toIdentifier() else id(it) })
 
+    @JvmStatic
     inline fun <reified T : SkillTrigger> getTriggers(predicate: (T) -> Boolean = { true }): List<T> =
         getSkills().filterIsInstance<T>().filter(predicate)
 
+    @JvmStatic
     fun getLearnableSkills(
         except: Collection<Skill> = emptyList(),
         filter: (Skill) -> Boolean = { true },
@@ -339,6 +360,7 @@ object Skills {
         .filterNot { it in except }
         .filter(filter)
 
+    @JvmStatic
     fun random(
         except: Collection<Skill> = emptyList(),
         filter: (Skill) -> Boolean = { true }

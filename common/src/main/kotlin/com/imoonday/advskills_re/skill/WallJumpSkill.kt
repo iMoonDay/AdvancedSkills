@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.skill.enums.*
@@ -12,13 +13,27 @@ import net.minecraft.server.network.*
 import net.minecraft.util.math.*
 
 class WallJumpSkill : PassiveSkill(
-    id = "wall_jump",
-    extraTypes = listOf(SkillType.MOVEMENT),
-    cooldown = 0,
-    rarity = SkillRarity.SUPERB,
-    sound = ModSounds.DASH,
-    enhancements = setOf(SkillEnhancements.POWER)
+    Settings(
+        id = "wall_jump",
+        types = listOf(SkillType.MOVEMENT),
+        cooldown = 0,
+        rarity = SkillRarity.SUPERB
+    )
 ), AutoTrigger, SendPlayerDataTrigger, UsingProgressTrigger, FallTrigger {
+
+    init {
+        this.settings.addParameter("jump_sound", ModSounds.DASH)
+
+        addEnhanceableParameter(
+            name = "jump_power",
+            baseValue = 1.0,
+            enhancementId = "power",
+            value = 0.1f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+    }
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = player.getPersistentData().getBoolean("jumped")
 
@@ -40,7 +55,7 @@ class WallJumpSkill : PassiveSkill(
             val colliding = (!world.getBlockState(pos).isAir || !world.getBlockState(pos.down()).isAir)
             if (colliding) {
                 jump(player)
-                player.playSkillSound()
+                player.playSoundFromParam("jump_sound")
                 val data = player.getPersistentData()
                 data.remove("jumped")
                 data.putBoolean("wallJumped", true)

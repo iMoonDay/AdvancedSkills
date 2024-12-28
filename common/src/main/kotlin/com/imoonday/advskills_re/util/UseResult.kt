@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.util
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
+import net.minecraft.sound.*
 import net.minecraft.text.*
 
 /**
@@ -10,18 +11,25 @@ import net.minecraft.text.*
  * @param success play sound and send message if true, otherwise send message only
  * @param cooling start cooling if true
  * @param message send message if not null, otherwise send the default failure message. If the content is empty, do not send any message
+ * @param sound play sound if not null, otherwise do not play any sound
  */
 class UseResult(
     val success: Boolean,
     val cooling: Boolean,
     val message: Text?,
+    val sound: SoundEvent? = null
 ) {
 
-    fun withSuccess(success: Boolean) = UseResult(success = success, cooling = cooling, message = message)
+    fun withSuccess(success: Boolean) =
+        UseResult(success = success, cooling = cooling, message = message, sound = sound)
 
-    fun withCooling(cooling: Boolean) = UseResult(success = success, cooling = cooling, message = message)
+    fun withCooling(cooling: Boolean) =
+        UseResult(success = success, cooling = cooling, message = message, sound = sound)
 
-    fun withMessage(message: Text?) = UseResult(success = success, cooling = cooling, message = message)
+    fun withMessage(message: Text?) = UseResult(success = success, cooling = cooling, message = message, sound = sound)
+
+    fun withSound(sound: SoundEvent?) =
+        UseResult(success = success, cooling = cooling, message = message, sound = sound)
 
     companion object {
 
@@ -31,7 +39,8 @@ class UseResult(
          */
         @JvmOverloads
         @JvmStatic
-        fun success(message: Text? = null) = UseResult(success = true, cooling = true, message = message)
+        fun success(message: Text? = null, sound: SoundEvent? = null) =
+            UseResult(success = true, cooling = true, message = message, sound = sound)
 
         /**
          * @param message optional message to display to the user
@@ -39,7 +48,8 @@ class UseResult(
          */
         @JvmOverloads
         @JvmStatic
-        fun consume(message: Text? = null) = UseResult(success = true, cooling = false, message = message)
+        fun consume(message: Text? = null, sound: SoundEvent? = null) =
+            UseResult(success = true, cooling = false, message = message, sound = sound)
 
         /**
          * @param message optional message to display to the user
@@ -47,7 +57,8 @@ class UseResult(
          */
         @JvmOverloads
         @JvmStatic
-        fun fail(message: Text? = null) = UseResult(success = false, cooling = false, message = message)
+        fun fail(message: Text? = null, sound: SoundEvent? = null) =
+            UseResult(success = false, cooling = false, message = message, sound = sound)
 
         /**
          * @param message optional message to display to the user
@@ -55,7 +66,8 @@ class UseResult(
          */
         @JvmOverloads
         @JvmStatic
-        fun pass(message: Text? = null) = UseResult(success = false, cooling = true, message = message)
+        fun pass(message: Text? = null, sound: SoundEvent? = null) =
+            UseResult(success = false, cooling = true, message = message, sound = sound)
 
         /**
          * @param success true for success, false for failure

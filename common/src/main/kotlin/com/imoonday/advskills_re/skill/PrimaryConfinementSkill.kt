@@ -10,28 +10,37 @@ import net.minecraft.entity.*
 import net.minecraft.entity.effect.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
-import net.minecraft.sound.*
 import net.minecraft.util.*
 import net.minecraft.util.hit.*
 
 class PrimaryConfinementSkill : LongPressSkill(
-    id = "primary_confinement",
-    types = listOf(SkillType.CONTROL),
-    cooldown = 12,
-    rarity = SkillRarity.SUPERB,
-    sound = SoundEvents::BLOCK_ENCHANTMENT_TABLE_USE,
-    enhancements = setOf(
-        SkillEnhancements.CHARGE_TIME,
-        SkillEnhancements.RANGE,
-        SkillEnhancements.CHANCE,
-        SkillEnhancements.STATUS_EFFECT_DURATION
+    Settings(
+        id = "primary_confinement",
+        types = listOf(SkillType.CONTROL),
+        cooldown = 12,
+        rarity = SkillRarity.SUPERB
     )
+//    sound = SoundEvents::BLOCK_ENCHANTMENT_TABLE_USE,
+//    enhancements = setOf(
+//        SkillEnhancements.CHARGE_TIME,
+//        SkillEnhancements.RANGE,
+//        SkillEnhancements.CHANCE,
+//        SkillEnhancements.STATUS_EFFECT_DURATION
+//    )
 ), UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
 
-    override val timeParameterName: String = "charge_time"
+    override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(timeParameterName, 5 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 5 * 20,
+            enhancementId = "time",
+            value = -0.16f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {

@@ -14,24 +14,41 @@ import net.minecraft.sound.*
 private const val REMAINING_EFFECTS = "RemainingEffects"
 
 class AbsoluteDefenseSkill : Skill(
-    Settings.loadOrCreate {
-        Settings(
-            id = "absolute_defense",
-            types = listOf(SkillType.DEFENSE),
-            cooldown = 30,
-            rarity = SkillRarity.SUPERB
-        ).addEnhanceableParameter("persist_time", 30 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5)
-            .addEnhanceableParameter("defense_count", 1, "count", 1f, Enhancement.Type.ADDITION, 4)
-    }
+    Settings(
+        id = "absolute_defense",
+        types = listOf(SkillType.DEFENSE),
+        cooldown = 30,
+        rarity = SkillRarity.SUPERB
+    )
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
 
     init {
-        addEnhancementDescArg("time") { (it * 100).toInt() }
-        addEnhancementDescArg("count") { it.toInt() }
+        this.settings
+            .addParameter("block_sound", SoundEvents.ITEM_SHIELD_BLOCK)
+            .addParameter("break_sound", SoundEvents.ITEM_SHIELD_BREAK)
+
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 30 * 20,
+            enhancementId = "time",
+            value = 0.2f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+        addEnhanceableParameter(
+            name = "defense_count",
+            baseValue = 1,
+            enhancementId = "count",
+            value = 1f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 4,
+            descArg = Enhancement.ArgFormatters.INT
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {
-        putInt(REMAINING_EFFECTS, user.getIntParameter("defense_count"))
+        putInt(REMAINING_EFFECTS, user.getIntParam("defense_count"))
     })
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -46,13 +63,13 @@ class AbsoluteDefenseSkill : Skill(
         attacker: Entity?,
     ): Boolean {
         if (!player.isUsing() || amount <= 0) return false
-        player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
+        player.playSoundFromParam("block_sound")
 
         val data = player.getActiveData()
         val remaining = data.getInt(REMAINING_EFFECTS)
         if (remaining <= 0) {
             if (player.hasEnhancement("count")) {
-                player.playSound(SoundEvents.ITEM_SHIELD_BREAK)
+                player.playSoundFromParam("break_sound")
             }
             player.stopAndCooldown()
         } else {

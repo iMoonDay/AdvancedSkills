@@ -1,14 +1,15 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.trigger.*
-import net.minecraft.server.network.*
+import net.minecraft.entity.player.*
 
 class NightVisionSkill : PassiveSkill(
-    id = "night_vision",
-    rarity = SkillRarity.SUPERB,
-    toggleable = true
+    Settings(
+        id = "night_vision",
+        rarity = SkillRarity.SUPERB
+    ), true
 ), PersistentTrigger, NightVisionTrigger {
 
-    override fun keepUsingAfterRespawn(player: ServerPlayerEntity): Boolean = true
+    override fun hasNightVision(player: PlayerEntity): Boolean = player.isAvailable()
 }

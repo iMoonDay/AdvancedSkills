@@ -1,8 +1,8 @@
 package com.imoonday.advskills_re.init
 
 import com.imoonday.advskills_re.*
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.item.*
-import com.imoonday.advskills_re.skill.enums.*
 import dev.architectury.registry.registries.*
 import net.minecraft.item.*
 import net.minecraft.registry.*

@@ -47,20 +47,28 @@ object Channels {
     @JvmStatic
     val UPDATE_JUMPING_C2S: NetworkChannel = registerChannel("update_jumping_c2s")
 
+    @JvmStatic
+    val SYNC_RARITIES_S2C: NetworkChannel = registerChannel("sync_rarities_s2c")
+
+    @JvmStatic
+    val SYNC_SETTINGS_S2C: NetworkChannel = registerChannel("sync_settings_s2c")
+
     fun register() {
         USE_SKILL_C2S.register(::UseSkillC2SRequest)
         EQUIP_SKILL_C2S.register(::EquipSkillC2SRequest)
         SEND_PLAYER_DATA_C2S.register(::SendPlayerDataC2SPacket)
         CHOOSE_SKILL_C2S.register(::ChooseSkillC2SRequest)
-        REFRESH_CHOICE_C2S.register(::RefreshChoiceC2SRequest)
+        REFRESH_CHOICE_C2S.register { RefreshChoiceC2SRequest }
         SYNC_CONFIG_S2C.register(::SyncConfigS2CPacket)
         LEARN_SKILL_S2C.register(::LearnSkillS2CPacket)
         SYNC_PROPERTIES_S2C.register(::SyncPropertiesS2CPacket)
         SYNC_PLAYER_DATA_S2C.register(::SyncPlayerDataS2CPacket)
         REQUEST_SYNC_COMPONENT_C2S.register(::RequestSyncComponentC2SRequest)
         UPDATE_ORE_CACHE_S2C.register(::UpdateOreCacheS2CPacket)
-        ENHANCE_SKILL_S2C.register { EnhanceSkillS2CPacket() }
+        ENHANCE_SKILL_S2C.register { EnhanceSkillS2CPacket }
         UPDATE_JUMPING_C2S.register(::UpdateJumpingC2SPacket)
+        SYNC_RARITIES_S2C.register(::SyncRaritiesS2CPacket)
+        SYNC_SETTINGS_S2C.register(::SyncSettingsS2CPacket)
     }
 
     private fun registerChannel(name: String) = NetworkChannel.create(id(name))

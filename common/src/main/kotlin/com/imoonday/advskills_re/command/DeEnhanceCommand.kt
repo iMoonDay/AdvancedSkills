@@ -19,8 +19,8 @@ object DeEnhanceCommand : PlayerCommand("de-enhance") {
                         .suggests { context, builder1 ->
                             val skill = SkillArgumentType.getSkill(context)
                             val player = getPlayer(context)
-                            val enhancements = player.getEnhancements(skill)
-                            CommandSource.suggestMatching(enhancements, builder1, { it.type.id }, { it.name })
+                            val enhancements = player.getEnhancements(skill).keys
+                            CommandSource.suggestMatching(enhancements, builder1, { it.id }, { it.name })
                         }.executesWithPlayer(this::deEnhance)
                 ).then(
                     literal("all")
@@ -68,7 +68,7 @@ object DeEnhanceCommand : PlayerCommand("de-enhance") {
     ): Int {
         val skill = SkillArgumentType.getSkill(context)
         val id = StringArgumentType.getString(context, "enhancement")
-        val enhancement = player.getEnhancements(skill).find { it.type.id == id }
+        val enhancement = player.getEnhancement(skill, id)
         if (enhancement == null) {
             val type = SkillEnhancements.get(id)
             if (type == null) {
@@ -79,12 +79,12 @@ object DeEnhanceCommand : PlayerCommand("de-enhance") {
             return 0
         }
 
-        if (player.deEnhance(skill, enhancement.type)) {
+        if (player.deEnhance(skill, enhancement.first.id)) {
             context.sendFeedback(
                 "deEnhanceSkill.success",
                 player.displayName,
                 skill.name,
-                enhancement.name
+                enhancement.first.name
             )
             return 1
         } else {

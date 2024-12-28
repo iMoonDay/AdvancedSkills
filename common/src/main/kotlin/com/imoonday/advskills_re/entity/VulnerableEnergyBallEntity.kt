@@ -37,10 +37,10 @@ class VulnerableEnergyBallEntity(entityType: EntityType<out VulnerableEnergyBall
     override fun getEffects(): Map<StatusEffectInstance, Float> {
         val effect = ModEffects.VULNERABLE.get()
         return linkedMapOf(
-            StatusEffectInstance(effect, 8 * 20, 0, false, false, true) to 0.8f,
-            StatusEffectInstance(effect, 8 * 20, 1, false, false, true) to 0.4f,
-            StatusEffectInstance(effect, 8 * 20, 2, false, false, true) to 0.2f,
-            StatusEffectInstance(effect, 8 * 20, 3, false, false, true) to 0.1f,
+            StatusEffectInstance(effect, 8 * 20, 0, false, false, true) to 1.0f,
+            StatusEffectInstance(effect, 8 * 20, 1, false, false, true) to 0.5f,
+            StatusEffectInstance(effect, 8 * 20, 2, false, false, true) to 0.25f,
+            StatusEffectInstance(effect, 8 * 20, 3, false, false, true) to 0.125f,
         )
     }
 
@@ -48,6 +48,6 @@ class VulnerableEnergyBallEntity(entityType: EntityType<out VulnerableEnergyBall
 
     companion object {
 
-        private val particleColor = Vec3d.unpackRgb(16738740).toVector3f()
+        private val particleColor = Vec3d.unpackRgb(0x940F2C).toVector3f()
     }
 }

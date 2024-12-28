@@ -14,28 +14,49 @@ import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
 class ActiveDefenseSkill : LongPressSkill(
-    id = "active_defense",
-    types = listOf(SkillType.DEFENSE),
-    cooldown = 10,
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(
-        SkillEnhancements.PERSISTENT_TIME,
-        SkillEnhancements.DEFENSE_EFFECT,
-        SkillEnhancements.CHARGE_SLOWDOWN
+    Settings(
+        id = "active_defense",
+        types = listOf(SkillType.DEFENSE),
+        cooldown = 10,
+        rarity = SkillRarity.SUPERB
     )
 ), DamageTrigger, AttributeTrigger, UsingRenderTrigger {
 
     init {
-        addEnhanceableParameter(timeParameterName, 5 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
-
-        addEnhancementTooltipWithArg(SkillEnhancements.DEFENSE_EFFECT) { it.level * 6 }
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 5 * 20,
+            enhancementId = "time",
+            value = 0.2f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+        addEnhanceableParameter(
+            name = "damage_reduction",
+            baseValue = 0.2f,
+            enhancementId = "reduction_value",
+            value = 0.06f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+        addEnhanceableParameter(
+            name = "charge_slowdown",
+            baseValue = 0.5,
+            enhancementId = "slowdown_multiplier",
+            value = -0.2f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Active Defense"),
             "Active Defense",
-            player.applyChargeSlowdownEnhancement(-0.5),
+            -player.getDoubleParam("charge_slowdown", 0.5, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -63,7 +84,7 @@ class ActiveDefenseSkill : LongPressSkill(
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
     ): Float = if (!player.isUsing()) amount
-    else amount * (0.8f - player.getEnhancementLvl(SkillEnhancements.DEFENSE_EFFECT) * 0.06f)
+    else amount * (1f - player.getFloatParam("damage_reduction", 0.2f, 0f, 1f))
 
     override fun shouldRenderFeature(target: PlayerEntity, clientPlayer: PlayerEntity): Boolean =
         target.isUsing() && !target.isUsing(Skills.ABSOLUTE_DEFENSE)

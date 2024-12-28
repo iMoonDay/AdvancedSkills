@@ -7,6 +7,7 @@ import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
@@ -17,10 +18,18 @@ class SelfHealingSkill : Skill(
     enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.HEALING_AMOUNT)
 ), AutoTrigger, AutoStopTrigger, DamageTrigger {
 
-    override val timeParameterName: String = "charge_time"
+    override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(timeParameterName, 10 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 10 * 20,
+            enhancementId = "time",
+            value = -0.16f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
@@ -28,6 +37,9 @@ class SelfHealingSkill : Skill(
     override fun shouldStart(player: ServerPlayerEntity): Boolean = !player.isDead && player.health < player.maxHealth
 
     override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        if (!player.hasEquipped()) return
+
         val amount = getEnhancedValue(player, SkillEnhancements.HEALING_AMOUNT, 2.0f)
         player.heal(amount)
         player.spawnParticles(
@@ -35,7 +47,6 @@ class SelfHealingSkill : Skill(
             false, player.centerPos, amount.toInt(),
             0.5, 0.5, 0.5, 0.1
         )
-        super.onStop(player)
     }
 
     override fun onDamaged(
@@ -51,4 +62,8 @@ class SelfHealingSkill : Skill(
         }
         return amount
     }
+
+    override fun shouldFlashIcon(player: PlayerEntity): Boolean = false
+
+    override fun getProgress(player: PlayerEntity): Double = 1.0 - super.getProgress(player)
 }

@@ -10,7 +10,7 @@ import net.minecraft.nbt.*
 import net.minecraft.network.*
 import net.minecraft.server.network.*
 
-class SendPlayerDataC2SPacket(
+data class SendPlayerDataC2SPacket(
     val skill: Skill,
     val data: NbtCompound,
 ) : NetworkPacket {

@@ -12,20 +12,29 @@ import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
 class ItemAttractionSkill : LongPressSkill(
-    id = "item_attraction",
-    types = listOf(SkillType.UTILITY),
-    cooldown = 15,
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(
-        SkillEnhancements.PERSISTENT_TIME,
-        SkillEnhancements.RANGE,
-        SkillEnhancements.VELOCITY,
-        SkillEnhancements.EXPERIENCE_ORB
+    Settings(
+        id = "item_attraction",
+        types = listOf(SkillType.UTILITY),
+        cooldown = 15,
+        rarity = SkillRarity.SUPERB
     )
+//    enhancements = setOf(
+//        SkillEnhancements.PERSISTENT_TIME,
+//        SkillEnhancements.RANGE,
+//        SkillEnhancements.VELOCITY,
+//        SkillEnhancements.EXPERIENCE_ORB
+//    )
 ), UsingRenderTrigger, GlowingTrigger {
 
     init {
-        addEnhanceableParameter(timeParameterName, 10 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            timeParamName,
+            10 * 20,
+            "time",
+            0.2f,
+            Enhancement.Operation.MULTIPLY,
+            5
+        ) { (it * 100).toInt() }
     }
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {

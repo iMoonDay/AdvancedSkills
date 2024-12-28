@@ -20,7 +20,6 @@ object ModCommands {
                 ListCommand,
                 SlotCommand,
                 ResetDataCommand,
-                ModifySkillCommand,
                 AddXpCommand,
                 SetXpCommand,
                 QueryXpCommand,

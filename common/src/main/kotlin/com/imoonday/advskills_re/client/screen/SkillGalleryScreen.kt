@@ -203,7 +203,7 @@ class SkillGalleryScreen(
 
             context.drawText(
                 textRenderer,
-                translate("screen.gallery.info.rarity", skill.rarity.displayName).formatted(skill.rarity.formatting),
+                translate("screen.gallery.info.rarity", skill.rarity.displayName).let { skill.rarity.format(it) },
                 xOffset,
                 yOffset,
                 0xFFFFFF,

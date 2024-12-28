@@ -28,7 +28,16 @@ class LastDitchEffortSkill : Skill(
     AttributeTrigger, AutoTrigger, DeathTrigger {
 
     init {
-        addEnhanceableParameter(timeParameterName, 15 * 20, "time", 0.2f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        this.settings.addParameter("healing_sound", ModSounds.HEAL)
+
+        addEnhanceableParameter(
+            timeParamName,
+            15 * 20,
+            "time",
+            0.2f,
+            Enhancement.Operation.MULTIPLY,
+            5
+        ) { (it * 100).toInt() }
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
@@ -57,7 +66,7 @@ class LastDitchEffortSkill : Skill(
     override fun shouldStart(player: ServerPlayerEntity): Boolean =
         if (player.isReady() && !player.isDead && (player.health / player.maxHealth) < 0.3f) {
             player.health = getEnhancedValue(player, SkillEnhancements.HEALING_AMOUNT, player.maxHealth * 0.5f)
-            player.playSkillSound()
+            player.playSoundFromParam("healing_sound")
             player.addAttributes()
             true
         } else false

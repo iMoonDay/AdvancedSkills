@@ -6,7 +6,7 @@ import dev.architectury.networking.*
 import net.minecraft.network.*
 import net.minecraft.server.network.*
 
-class RefreshChoiceC2SRequest() : NetworkPacket {
+object RefreshChoiceC2SRequest : NetworkPacket {
 
     override fun encode(buf: PacketByteBuf) = Unit
 

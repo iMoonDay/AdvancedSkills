@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
@@ -14,21 +13,23 @@ import net.minecraft.util.math.*
 private const val REMAINING_TIME_KEY = "remainingTime"
 
 class GlidingSkill : PassiveSkill(
-    id = "gliding",
-    extraTypes = listOf(SkillType.MOVEMENT),
-    rarity = SkillRarity.RARE,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    Settings(
+        id = "gliding",
+        types = listOf(SkillType.MOVEMENT),
+        rarity = SkillRarity.RARE
+    )
 ), TickTrigger, JumpStateTrigger, ProgressTrigger {
 
     init {
         addEnhanceableParameter(
-            "gliding_time",
-            5 * 20,
-            "time",
-            0.2f,
-            Enhancement.Type.MULTIPLY,
-            5
-        ) { (it * 100).toInt() }
+            name = "gliding_time",
+            baseValue = 5 * 20,
+            enhancementId = "time",
+            value = 0.2f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun tick(player: PlayerEntity, usedTime: Int) {
@@ -72,9 +73,10 @@ class GlidingSkill : PassiveSkill(
                         delta, 0.0, delta, 0.0
                     )
                 }
+
+                data.putInt(REMAINING_TIME_KEY, time - 1)
             }
 
-            data.putInt(REMAINING_TIME_KEY, time - 1)
             if (data.getInt(REMAINING_TIME_KEY) <= 0) {
                 data.remove(REMAINING_TIME_KEY)
                 player.stopUsing()
@@ -88,7 +90,7 @@ class GlidingSkill : PassiveSkill(
     private fun PlayerEntity.canResetGliding(): Boolean =
         isOnGround || abilities.flying || isTouchingWater || isClimbing
 
-    fun PlayerEntity.getTotalGlidingTime() = getIntParameter("gliding_time")
+    fun PlayerEntity.getTotalGlidingTime() = getIntParam("gliding_time")
 
     override fun shouldDisplay(player: PlayerEntity): Boolean =
         player.isUsing() || player.getPersistentData().getInt(REMAINING_TIME_KEY) < player.getTotalGlidingTime()

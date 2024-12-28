@@ -9,7 +9,7 @@ import net.minecraft.network.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
-class EquipSkillC2SRequest(
+data class EquipSkillC2SRequest(
     val slot: Int,
     val skill: Skill,
 ) : NetworkPacket {

@@ -165,7 +165,7 @@ advskills_re:
     absolute_defense:
       name: Absolute Defense
       description: Block any damage once. The skill lasts for 30s
-      effect_count: +%d Block Count
+      effect_count: '%s Block Count'
     extreme_reflection:
       name: Extreme Reflection
       description: Reflects the first arbitrary damage within 0.25 seconds at a 75% probability, and resets the cooldown immediately after the reflection
@@ -209,7 +209,7 @@ advskills_re:
     agility:
       name: Agility
       description: Slightly increases movement speed
-      movement_speed: +%d Movement Speed
+      movement_speed: '%s Movement Speed'
     resuscitation:
       name: Resuscitation
       description: Blocks fatal damage, becomes invincible for 2 seconds and gains 30 seconds health regeneration
@@ -244,14 +244,14 @@ advskills_re:
     absolute_domain:
       name: Absolute Domain
       description: Break the blocks within 1 square around
-      range: +%d Range
+      range: '%s Range'
     charged_sweep:
       name: Charged Sweep
       description: After charging, it will cause damage to entities within the fan-shaped range in front. The amount of damage depends on the item held.
     active_defense:
       name: Active Defense
       description: Reduce damage by 20% when long pressed
-      defense_effect: +%d%% Damage Reduction
+      defense_effect: '%s Damage Reduction'
     self_repair:
       name: Self Repair
       description: Automatically repair your equipment, up to 50%
@@ -406,9 +406,9 @@ advskills_re:
     arrow_rain:
       name: Arrow Rain
       description: Summons several arrows randomly above the target
-      launch_count: +%d Summon Waves
-      range: +%d Summon Range Radius
-      summon_amount: +%d Arrow Count/Wave
+      launch_count: '%s Summon Waves'
+      range: '%s Summon Range Radius'
+      summon_amount: '%s Arrow Count/Wave'
     weed_cleaner:
       name: Weed Cleaner
       description: Clean up weeds around
@@ -437,7 +437,7 @@ advskills_re:
     armor_shatterer:
       name: Armor Shatterer
       description: Fires an energy ball with an 80% chance to weaken nearby entities, increasing the damage they take
-      launch_count: +%d Launch Count
+      launch_count: '%s Launch Count'
     death_archive:
       name: Death Archive
       description: After activation, the player's position is recorded. Upon death, the skill is triggered to prevent the death, restore full health, and teleport the player back to the recorded position, granting 5 seconds of invincibility
@@ -599,19 +599,19 @@ advskills_re:
       description: No Effect
     cooldown:
       name: Cooldown Enhancement
-      description: -%d%% Cooldown
+      description: '%s Cooldown'
     persistent_time:
       name: Persistent Time Enhancement
-      description: +%d%% Persistent Time
+      description: '%s Persistent Time'
     charge_time:
       name: Charge Time Enhancement
-      description: +%d%% Charge Time
+      description: '%s Charge Time'
     damage:
       name: Damage Enhancement
-      description: +%d%% Damage
+      description: '%s Damage'
     healing_amount:
       name: Healing Amount Enhancement
-      description: +%d%% Healing Amount
+      description: '%s Healing Amount'
     use_times:
       name: Use Times Enhancement
       description: Use Times++
@@ -632,10 +632,10 @@ advskills_re:
       description: Defense Effect++
     charge_slowdown:
       name: Charge Slowdown Enhancement
-      description: -%d%% Charge Slowdown
+      description: '%s Charge Slowdown'
     time_up_limit:
       name: Time Up Limit Enhancement
-      description: +%d%% Time Up Limit
+      description: '%s Time Up Limit'
     movement_speed:
       name: Movement Speed Enhancement
       description: Movement Speed++
@@ -647,7 +647,7 @@ advskills_re:
       description: Effect Value++
     status_effect_duration:
       name: Status Effect Duration Enhancement
-      description: +%d%% Status Effect Duration
+      description: '%s Status Effect Duration'
     status_effect_amplifier:
       name: Status Effect Amplifier Enhancement
       description: Status Effect Amplifier++

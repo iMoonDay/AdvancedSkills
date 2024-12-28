@@ -6,7 +6,10 @@ import com.imoonday.advskills_re.skill.enhancement.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
-import net.minecraft.text.*
+import net.minecraft.sound.*
+import net.minecraft.util.*
+import kotlin.Pair
+import kotlin.jvm.optionals.*
 
 interface SkillTrigger {
 
@@ -14,8 +17,8 @@ interface SkillTrigger {
     fun PlayerEntity.isUsing(): Boolean = isUsing(getAsSkill())
     fun PlayerEntity.isCooling(): Boolean = isCooling(getAsSkill())
     fun PlayerEntity.hasEquipped(): Boolean = hasEquipped(getAsSkill())
-    fun PlayerEntity.getActiveData(): NbtCompound = this.getActiveData(getAsSkill()) ?: throw NO_DATA_EXCEPTION
-    fun PlayerEntity.getPersistentData(): NbtCompound = this.getPersistentData(getAsSkill()) ?: throw NO_DATA_EXCEPTION
+    fun PlayerEntity.getActiveData(): NbtCompound = this.getActiveData(getAsSkill()) ?: throw NO_DATA_EXCEPTION()
+    fun PlayerEntity.getPersistentData(): NbtCompound = this.getPersistentData(getAsSkill()) ?: throw NO_DATA_EXCEPTION()
     fun PlayerEntity.clearPersistentData() = this.clearPersistentData(getAsSkill())
     fun PlayerEntity.getUsedTime(): Int = getUsedTime(getAsSkill())
     fun PlayerEntity.modifyUsedTime(operation: (Int) -> Int) = modifyUsedTime(getAsSkill(), operation)
@@ -30,23 +33,18 @@ interface SkillTrigger {
     fun PlayerEntity.isReady(): Boolean = hasEquipped() && !isCooling() && !isUsing()
     fun PlayerEntity.stopAndCooldown(cooldown: Int? = null) = stopAndCooldown(getAsSkill(), cooldown)
     fun PlayerEntity.getEnhancements(): Map<Enhancement, Int> = getEnhancements(getAsSkill())
-    fun <T : SkillEnhancement> PlayerEntity.getEnhancement(type: SkillEnhancementType<T>): T? = TODO()
 
+    @Deprecated("Use getEnhancement(id) instead", ReplaceWith("TODO()"))
+    fun <T : SkillEnhancement> PlayerEntity.getEnhancement(type: SkillEnhancementType<T>): T? =
+        type.factory.create(type, 0)
+
+    @Deprecated("Use getParameter(name) instead", ReplaceWith("TODO()"))
     fun PlayerEntity.getEnhancementLvl(type: SkillEnhancementType<*>): Int =
         getEnhancement(type)?.level ?: 0
 
+    @Deprecated("Use hasEnhancement(id) instead", ReplaceWith("TODO()"))
     fun PlayerEntity.hasEnhancement(type: SkillEnhancementType<*>): Boolean =
         getEnhancement(type) != null
-
-    fun <T : SkillEnhancement> PlayerEntity.addEnhancementTooltip(
-        tooltip: MutableList<Text>,
-        type: SkillEnhancementType<T>,
-        value: (T) -> Any
-    ) {
-        getEnhancement(type)?.let {
-            tooltip.add(getAsSkill().message(it.type.id, value(it)))
-        }
-    }
 
     fun PlayerEntity.getEnhancement(id: String): Pair<Enhancement, Int>? =
         getEnhancement(getAsSkill(), id)
@@ -56,56 +54,85 @@ interface SkillTrigger {
         return pair.first.getValue(pair.second)
     }
 
-    fun PlayerEntity.getDoubleParameter(
+    fun PlayerEntity.getDoubleParam(
         name: String,
         default: Double? = null,
-        min: Double? = null,
-        max: Double? = null
-    ): Double = getFloatParameter(name, default?.toFloat(), min?.toFloat(), max?.toFloat()).toDouble()
+        min: Double = Double.MIN_VALUE,
+        max: Double = Double.MAX_VALUE
+    ): Double = getFloatParam(name, default?.toFloat(), min.toFloat(), max.toFloat()).toDouble()
 
-    fun PlayerEntity.getFloatParameter(
+    fun PlayerEntity.getFloatParam(
         name: String,
         default: Float? = null,
-        min: Float? = null,
-        max: Float? = null
+        min: Float = Float.MIN_VALUE,
+        max: Float = Float.MAX_VALUE
     ): Float {
         val skill = getAsSkill()
-        val parameter = skill.getFloatParameter(name) ?: return default
-            ?: throw IllegalArgumentException("No such parameter: $name")
+        val parameter = skill.getParam(name)?.asFloat() ?: return default ?: 0f
         val baseValue = parameter.baseValue
-        val enhancementId = parameter.enhancement ?: return baseValue
-        val pair = getEnhancement(skill, enhancementId) ?: return baseValue
-        var value = pair.first.getEnhancedValue(pair.second, baseValue)
-        if (min != null) value = maxOf(value, min)
-        if (max != null) value = minOf(value, max)
-        return value
+        var result = baseValue
+        for (id in parameter.enhancements) {
+            val pair = getEnhancement(skill, id) ?: continue
+            result = pair.first.getEnhancedValue(pair.second, result)
+        }
+        return result.coerceIn(min, max)
     }
 
-    fun PlayerEntity.getIntParameter(name: String, default: Int? = null, min: Int? = null, max: Int? = null): Int {
+    fun PlayerEntity.getIntParam(
+        name: String,
+        default: Int? = null,
+        min: Int = Int.MIN_VALUE,
+        max: Int = Int.MAX_VALUE
+    ): Int {
         val skill = getAsSkill()
-        val parameter =
-            skill.getIntParameter(name) ?: return default ?: throw IllegalArgumentException("No such parameter: $name")
+        val parameter = skill.getParam(name)?.asInt() ?: return default ?: 0
         val baseValue = parameter.baseValue
-        val enhancementId = parameter.enhancement ?: return baseValue
-        val pair = getEnhancement(skill, enhancementId) ?: return baseValue
-        var value = pair.first.getEnhancedValue(pair.second, baseValue)
-        if (min != null) value = maxOf(value, min)
-        if (max != null) value = minOf(value, max)
-        return value
+        var result = baseValue
+        for (id in parameter.enhancements) {
+            val pair = getEnhancement(skill, id) ?: continue
+            result = pair.first.getEnhancedValue(pair.second, result)
+        }
+        return result.coerceIn(min, max)
     }
 
-    fun PlayerEntity.getStringParameter(name: String, default: String? = null): String {
+    fun PlayerEntity.getBooleanParam(name: String, default: Boolean? = null): Boolean {
+        val skill = getAsSkill()
+        val parameter = skill.getParam(name)?.asBoolean() ?: return default ?: false
+        val baseValue = parameter.baseValue
+        return if (parameter.enhancements.any { hasEnhancement(it) }) !baseValue else baseValue
+    }
+
+    fun getStringParam(name: String, default: String? = null): String {
         val skill = getAsSkill()
         val parameter =
-            skill.getStringParameter(name) ?: return default
-                ?: throw IllegalArgumentException("No such parameter: $name")
+            skill.getParam(name)?.asString() ?: return default ?: ""
         return parameter.baseValue
     }
 
-    fun getParameterBaseValue(name: String, default: Any? = null): Any {
+    fun getIdentifierParam(name: String): Identifier? = try {
+        getStringParam(name).toIdentifier()
+    } catch (e: IllegalArgumentException) {
+        null
+    }
+
+    fun getSoundEventParam(name: String): SoundEvent? {
+        val skill = getAsSkill()
+        val parameter = skill.getParam(name)?.asSoundEvent() ?: return null
+        return parameter.baseValue.getOrNull()
+    }
+
+    fun getListParam(name: String): List<SkillParameter> {
+        val skill = getAsSkill()
+        val parameter = skill.getParam(name)?.asList() ?: return emptyList()
+        return parameter.baseValue
+    }
+
+    fun getStringListParam(name: String): List<String> = getListParam(name).map { it.asString().baseValue }
+
+    fun getParamBaseValue(name: String, default: Any? = null): Any {
         val skill = getAsSkill()
         val parameter =
-            skill.getParameter(name) ?: return default ?: throw IllegalArgumentException("No such parameter: $name")
+            skill.getParam(name) ?: return default ?: throw NoParameterException(skill, name)
         return parameter.baseValue
     }
 
@@ -114,10 +141,11 @@ interface SkillTrigger {
 
     companion object {
 
-        private val NO_DATA_EXCEPTION = IllegalStateException("Trying to access data for an unlearned skill")
+        private val NO_DATA_EXCEPTION = { IllegalStateException("Trying to access data for an unlearned skill") }
     }
 }
 
+@Deprecated("Use getParam instead", ReplaceWith("TODO()"))
 inline fun <reified N : Number> SkillTrigger.getEnhancedValue(
     player: PlayerEntity,
     type: SkillEnhancementType<FixedValueEnhancement>,

@@ -9,7 +9,7 @@ import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.network.*
 
-class SyncPlayerDataS2CPacket(
+data class SyncPlayerDataS2CPacket(
     val playerId: Int,
     val playerData: NbtCompound,
 ) : NetworkPacket {

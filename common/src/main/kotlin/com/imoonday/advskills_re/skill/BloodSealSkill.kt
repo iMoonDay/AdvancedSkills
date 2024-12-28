@@ -15,23 +15,33 @@ import net.minecraft.util.*
 import net.minecraft.util.hit.*
 
 class BloodSealSkill : LongPressSkill(
-    id = "blood_seal",
-    types = listOf(SkillType.ENHANCEMENT),
-    cooldown = 45,
-    rarity = SkillRarity.EPIC,
-    enhancements = setOf(
-        SkillEnhancements.CHARGE_TIME,
-        SkillEnhancements.CHARGE_SLOWDOWN,
-        SkillEnhancements.DAMAGE,
-        SkillEnhancements.DISTANCE,
-        SkillEnhancements.STATUS_EFFECT_DURATION
+    Settings(
+        id = "blood_seal",
+        types = listOf(SkillType.ENHANCEMENT),
+        cooldown = 45,
+        rarity = SkillRarity.EPIC
     )
+//    enhancements = setOf(
+//        SkillEnhancements.CHARGE_TIME,
+//        SkillEnhancements.CHARGE_SLOWDOWN,
+//        SkillEnhancements.DAMAGE,
+//        SkillEnhancements.DISTANCE,
+//        SkillEnhancements.STATUS_EFFECT_DURATION
+//    )
 ), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger, DangerTrigger {
 
-    override val timeParameterName: String = "charge_time"
+    override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(timeParameterName, 5 * 20, "time", -0.16f, Enhancement.Type.MULTIPLY, 5) { (it * 100).toInt() }
+        addEnhanceableParameter(
+            name = timeParamName,
+            baseValue = 5 * 20,
+            enhancementId = "time",
+            value = -0.16f,
+            operation = Enhancement.Operation.MULTIPLY,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
 
         addEnhancementTooltipWithArg(SkillEnhancements.DISTANCE) { it.level }
     }

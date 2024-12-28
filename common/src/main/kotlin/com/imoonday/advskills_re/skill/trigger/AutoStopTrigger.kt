@@ -6,11 +6,10 @@ import net.minecraft.server.network.*
 
 interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
 
-    val timeParameterName: String
-        get() = "persist_time"
+    val timeParamName: String get() = "persist_time"
 
     fun getPersistTime(player: PlayerEntity): Int =
-        player.getIntParameter(timeParameterName, 0, 0)
+        player.getIntParam(timeParamName, 0, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)

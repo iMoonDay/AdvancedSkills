@@ -6,7 +6,7 @@ import dev.architectury.networking.*
 import net.minecraft.network.*
 import net.minecraft.server.network.*
 
-class ChooseSkillC2SRequest(
+data class ChooseSkillC2SRequest(
     val id: Int,
 ) : NetworkPacket {
 
