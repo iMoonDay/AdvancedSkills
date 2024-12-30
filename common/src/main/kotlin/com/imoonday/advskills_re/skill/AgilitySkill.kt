@@ -16,7 +16,7 @@ class AgilitySkill : PassiveSkill(
             name = "speed_multiplier",
             baseValue = 0.2,
             enhancementId = "speed",
-            value = 0.04f,
+            value = 0.04,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
@@ -27,7 +27,7 @@ class AgilitySkill : PassiveSkill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Agility"),
             "Agility",
-            player.getDoubleParam("speed_multiplier"),
+            getDoubleParam("speed_multiplier", player, 0.2, 0.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )

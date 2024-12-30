@@ -1,12 +1,15 @@
 package com.imoonday.advskills_re.component
 
+import com.imoonday.advskills_re.component.choice.*
+import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 
 data class ChoiceData(
     private var choice: Choice = Choice.EMPTY,
-    var refreshed: Boolean = false,
-    var count: Int = 0,
+    var refreshableCount: Int = 0,
+    var count: Int = 5,
 ) {
 
     fun next(player: PlayerEntity) {
@@ -16,14 +19,15 @@ data class ChoiceData(
         } else {
             choice = Choice.EMPTY
         }
-        refreshed = false
     }
 
     fun hasNext(player: PlayerEntity) = count > 0 && Choice.canGenerate(player)
 
+    fun isCompleted() = count > 0 && choice.isEmpty()
+
     fun clear() {
         choice = Choice.EMPTY
-        refreshed = false
+        refreshableCount = 0
     }
 
     fun reset() {
@@ -39,8 +43,8 @@ data class ChoiceData(
         player: PlayerEntity,
         force: Boolean = false,
     ) {
-        if (refreshed && !force || choice.isEmpty() || !Choice.canGenerate(player)) return
-        refreshed = true
+        if (refreshableCount <= 0 && !force || choice.isEmpty() || !Choice.canGenerate(player)) return
+        refreshableCount--
         choice = Choice.generate(player)
     }
 
@@ -58,41 +62,70 @@ data class ChoiceData(
             choice = choice.removeDuplicates()
             modified = true
         }
-//        val replacePredicate: (Skill) -> Boolean = { it.invalid || it in except || !filter(it) }
-//        if (!choice.isEmpty() && choice.choices.any(replacePredicate)) {
-//            choice = choice.replaceWith(replacePredicate) { set ->
-//                Skills.random(except + set, filter).also { if (!it.isEmpty()) set.add(it) }
-//            }
-//            modified = true
-//        }
-
-//        val replacePredicate: (EnhancementChoice.Pair) -> Boolean =
-//            {
-//                it.isEmtpy() || player.getEnhancement(it.skill, it.enhancement.type)
-//                    ?.run { it.enhancement.level <= level } == true
-//            }
-//        if (!choice.isEmpty() && choice.choices.any(replacePredicate)) {
-//            choice = choice.replaceWith(replacePredicate) { set ->
-//                EnhancementChoice.random(player, set).also { if (!it.isEmtpy()) set.add(it) }
-//            }
-//            modified = true
-//        }
+        if (!choice.isEmpty() && choice.choices.any { invalidCheck(player, it) }) {
+            choice = choice.replaceWith({ invalidCheck(player, it) }) { createChoosable(player, it) }
+            modified = true
+        }
         return modified
     }
 
+    private fun createChoosable(
+        player: PlayerEntity,
+        except: MutableSet<Choosable>
+    ): Choosable = SkillPoolGenerator.generateSingle(
+        player = player,
+        exceptSkill = { createSkillFilter(except, it, player) },
+        exceptEnhancement = { skill, enhancement -> createEnhancementFilter(except, skill, enhancement, player) },
+    ).also {
+        if (!it.isEmpty()) {
+            except.add(it)
+        }
+    }
+
+    private fun createEnhancementFilter(
+        except: MutableSet<Choosable>,
+        skill: Skill,
+        enhancement: Enhancement,
+        player: PlayerEntity
+    ) = except.any { !it.compatibleWith(EnhancementChoice(skill, enhancement.id)) } ||
+        player.isMaxEnhancement(skill, enhancement.id)
+
+    private fun createSkillFilter(
+        except: MutableSet<Choosable>,
+        skill: Skill,
+        player: PlayerEntity
+    ) = player.hasLearned(skill) || except.any { !it.compatibleWith(SkillChoice(skill)) }
+
     fun toNbt(): NbtCompound = NbtCompound().apply {
         put("choice", choice.toNbt())
-        putBoolean("refreshed", refreshed)
+        putInt("refreshableCount", refreshableCount)
         putInt("count", count)
     }
 
     companion object {
 
+        private val invalidCheck: (PlayerEntity, Choosable) -> Boolean = { player, choosable ->
+            when (choosable) {
+                is SkillChoice -> choosable.skill.invalid || player.hasLearned(choosable.skill)
+                is EnhancementChoice -> choosable.skill.invalid || player.isMaxEnhancement(
+                    choosable.skill,
+                    choosable.enhancementId
+                )
+
+                else -> true
+            }
+        }
+
+        @JvmStatic
         fun fromNbt(nbt: NbtCompound): ChoiceData {
             val choice = Choice.fromNbt(nbt.getCompound("choice"))
-            val refreshed = nbt.getBoolean("refreshed")
+            val refreshableCount = if (nbt.contains("refreshed")) {
+                if (nbt.getBoolean("refreshed")) 0 else 1
+            } else {
+                nbt.getInt("refreshableCount")
+            }
             val remainingCount = nbt.getInt("count")
-            return ChoiceData(choice, refreshed, remainingCount)
+            return ChoiceData(choice, refreshableCount, remainingCount)
         }
     }
 }

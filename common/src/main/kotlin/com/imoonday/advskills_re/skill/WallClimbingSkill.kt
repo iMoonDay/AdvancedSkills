@@ -26,8 +26,8 @@ class WallClimbingSkill : PassiveSkill(
             name = timeParamName,
             baseValue = 15 * 20,
             enhancementId = "time",
-            value = 0.2f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )

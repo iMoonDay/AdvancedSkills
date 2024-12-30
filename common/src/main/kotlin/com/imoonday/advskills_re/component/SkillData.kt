@@ -10,8 +10,11 @@ data class SkillData(
     var usingSpeed: Int = 1,
     val activeData: NbtCompound = NbtCompound(),
     val persistentData: NbtCompound = NbtCompound(),
-    val enhancements: MutableMap<String, Int> = mutableMapOf()
+    val enhancements: MutableMap<String, EnhancementData> = mutableMapOf()
 ) {
+
+    fun getOrCreateEnhancementData(id: String, level: Int? = null): EnhancementData =
+        enhancements.getOrPut(id) { EnhancementData(level ?: 1) }
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
         putInt("cooldown", cooldown)
@@ -20,12 +23,10 @@ data class SkillData(
         putInt("usingSpeed", usingSpeed)
         put("activeData", activeData)
         put("persistentData", persistentData)
-        put("enhancements", NbtCompound().apply {
-            enhancements.forEach { (key, value) -> putInt(key, value) }
-        })
+        put("enhancements", enhancements.toNbtCompound { k, v -> put(k, v.toNbt()) })
     }
 
-    fun copy(data: SkillData) {
+    fun copyFrom(data: SkillData) {
         this.cooldown = data.cooldown
         this.using = data.using
         this.usedTime = data.usedTime
@@ -58,11 +59,7 @@ data class SkillData(
             if (nbt.contains("usingSpeed")) nbt.getInt("usingSpeed") else 1,
             nbt.getCompound("activeData"),
             nbt.getCompound("persistentData"),
-            nbt.getCompound("enhancements").let {
-                mutableMapOf<String, Int>().apply {
-                    it.keys.forEach { key -> put(key, it.getInt(key)) }
-                }
-            }
+            nbt.getCompound("enhancements").toStringMap { EnhancementData.fromNbt(getCompound(it)) }
         )
     }
 }

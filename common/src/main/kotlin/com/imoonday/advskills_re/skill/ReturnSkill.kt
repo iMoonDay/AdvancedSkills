@@ -32,8 +32,8 @@ class ReturnSkill : LongPressSkill(
             name = timeParamName,
             baseValue = 5 * 20,
             enhancementId = "time",
-            value = -0.16f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = -0.16,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
@@ -107,7 +107,7 @@ class ReturnSkill : LongPressSkill(
             return UseResult.fail(failedMessage())
         }
         val (spawnAngle, world, teleportPos) = getTeleportInfo(player)
-        player.playSoundFromParam("return_sound")
+        player.playSoundFromParam("return_sound", ModSounds.RETURN.get())
         player.teleport(
             world, teleportPos.x, teleportPos.y, teleportPos.z,
             emptySet(),

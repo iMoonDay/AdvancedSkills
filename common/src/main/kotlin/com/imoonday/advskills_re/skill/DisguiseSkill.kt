@@ -24,8 +24,8 @@ class DisguiseSkill : Skill(
             timeParamName,
             30 * 20,
             "time",
-            0.2f,
-            Enhancement.Operation.MULTIPLY,
+            0.2,
+            Enhancement.Operation.MULTIPLY_TOTAL,
             5
         ) { (it * 100).toInt() }
     }

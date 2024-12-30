@@ -25,8 +25,8 @@ class GlidingSkill : PassiveSkill(
             name = "gliding_time",
             baseValue = 5 * 20,
             enhancementId = "time",
-            value = 0.2f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
@@ -90,7 +90,7 @@ class GlidingSkill : PassiveSkill(
     private fun PlayerEntity.canResetGliding(): Boolean =
         isOnGround || abilities.flying || isTouchingWater || isClimbing
 
-    fun PlayerEntity.getTotalGlidingTime() = getIntParam("gliding_time")
+    fun PlayerEntity.getTotalGlidingTime() = getIntParam("gliding_time", this, 5 * 20)
 
     override fun shouldDisplay(player: PlayerEntity): Boolean =
         player.isUsing() || player.getPersistentData().getInt(REMAINING_TIME_KEY) < player.getTotalGlidingTime()

@@ -209,11 +209,9 @@ val PlayerEntity.choiceData: ChoiceData
     get() = data.choiceData
 
 fun ServerPlayerEntity.addChoice() {
-    if (hasLearnedAll()) {
-        choiceData.count += 3
-    } else {
-        choiceData.count++
-    }
+    val increment = (levelData.cycle + 1).coerceIn(1, 5)
+    choiceData.count += increment
+    choiceData.refreshableCount += increment
 }
 
 fun PlayerEntity.getChoice(): Choice = choiceData.get()
@@ -227,7 +225,7 @@ fun PlayerEntity.refreshSkillChoice(force: Boolean = false) =
     }
 
 fun PlayerEntity.canFreshChoice(): Boolean =
-    !choiceData.isEmpty() && Choice.canGenerate(this) && !choiceData.refreshed
+    !choiceData.isEmpty() && Choice.canGenerate(this) && choiceData.refreshableCount > 0
 
 fun PlayerEntity.choose(id: Int): Boolean = when (id) {
     0 -> chooseFirst()
@@ -265,10 +263,10 @@ private fun ServerPlayerEntity.choose(index: Int): Boolean {
     return true
 }
 
-fun PlayerEntity.enhance(skill: Skill, id: String, level: Int? = null): Boolean {
+fun PlayerEntity.enhance(skill: Skill, id: String, level: Int = 1): Boolean {
     if (!skill.hasEnhancement(id)) return false
 
-    getData(skill)?.run { enhancements.compute(id) { _, lvl -> level ?: lvl?.plus(1) ?: 1 } } ?: return false
+    getData(skill)?.run { getOrCreateEnhancementData(id, level).maxLevel = level } ?: return false
 
     if (this is ServerPlayerEntity) {
         Channels.ENHANCE_SKILL_S2C.sendToPlayer(this, EnhanceSkillS2CPacket)
@@ -279,7 +277,7 @@ fun PlayerEntity.enhance(skill: Skill, id: String, level: Int? = null): Boolean 
 
 fun PlayerEntity.enhanceAll(skill: Skill): Boolean = getData(skill)?.run {
     skill.getAvailableEnhancements().forEach {
-        enhancements[it.id] = it.maxLevel
+        getOrCreateEnhancementData(it.id, it.maxLevel).maxLevel = it.maxLevel
     }
 
     if (this@enhanceAll is ServerPlayerEntity) {
@@ -509,22 +507,28 @@ fun PlayerEntity.getData(skill: Skill): SkillData? = skillContainer.getData(skil
 
 fun PlayerEntity.isCharging(skill: Skill): Boolean = skill is LongPressTrigger && isUsing(skill)
 
-fun PlayerEntity.getEnhancements(skill: Skill): Map<Enhancement, Int> =
+fun PlayerEntity.getEnhancements(skill: Skill): Map<Enhancement, EnhancementData> =
     getData(skill)?.run {
         skill.getAvailableEnhancements().mapNotNull {
             enhancements[it.id]?.run { it to this }
         }.toMap()
     } ?: emptyMap()
 
-fun PlayerEntity.getEnhancement(skill: Skill, id: String): Pair<Enhancement, Int>? =
+fun PlayerEntity.getEnhancement(skill: Skill, id: String): Pair<Enhancement, EnhancementData>? =
     getData(skill)?.let {
         skill.getEnhancement(id)?.run {
             it.enhancements[id]?.let { this to it }
         }
     }
 
+fun PlayerEntity.getCurrentEnhancementLvl(skill: Skill, id: String): Int =
+    getEnhancement(skill, id)?.second?.currentLevel ?: 0
+
 fun PlayerEntity.getEnhancementLvl(skill: Skill, id: String): Int =
-    getData(skill)?.enhancements?.get(id) ?: 0
+    getData(skill)?.enhancements?.get(id)?.maxLevel ?: 0
+
+fun PlayerEntity.isMaxEnhancement(skill: Skill, id: String): Boolean =
+    getEnhancement(skill, id)?.let { it.second.maxLevel >= it.first.maxLevel } ?: false
 
 fun PlayerEntity.addEnhancement(skill: Skill, id: String): Boolean =
     modifySkillData(skill) {
@@ -533,7 +537,7 @@ fun PlayerEntity.addEnhancement(skill: Skill, id: String): Boolean =
             if (enhancements.containsKey(id)) {
                 false
             } else {
-                enhancements[id] = 1
+                it.getOrCreateEnhancementData(id)
                 true
             }
         } else {

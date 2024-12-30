@@ -41,8 +41,8 @@ class SpaceBlastSkill : LongPressSkill(
             name = timeParamName,
             baseValue = 5 * 20,
             enhancementId = "time",
-            value = -0.16f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = -0.16,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )

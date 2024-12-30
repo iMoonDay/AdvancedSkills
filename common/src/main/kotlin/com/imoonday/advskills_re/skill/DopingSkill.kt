@@ -28,8 +28,8 @@ class DopingSkill : Skill(
             timeParamName,
             10 * 20,
             "time",
-            0.2f,
-            Enhancement.Operation.MULTIPLY,
+            0.2,
+            Enhancement.Operation.MULTIPLY_TOTAL,
             5
         ) { (it * 100).toInt() }
     }
@@ -43,14 +43,11 @@ class DopingSkill : Skill(
         )
     )
 
-    override fun use(user: ServerPlayerEntity): UseResult {
-        val result = UseResult.startUsing(user, this)
-        if (!result.success) return result
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this) {
         user.addAttributes()
         val cost = 5f * (1 - user.getEnhancementLvl(SkillEnhancements.USE_COST) * 0.16f)
         user.health = max(user.health - cost, 1f)
         user.playSound(ModSounds.DASH.get())
-        return result
     }
 
     override fun tick(player: PlayerEntity, usedTime: Int) {

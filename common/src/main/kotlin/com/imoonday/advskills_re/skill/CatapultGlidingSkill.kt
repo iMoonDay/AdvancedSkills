@@ -15,9 +15,7 @@ class CatapultGlidingSkill : LongPressSkill(
         types = listOf(SkillType.MOVEMENT),
         cooldown = 30,
         rarity = SkillRarity.RARE
-//        sound = ModSounds.DASH
     )
-//    enhancements = setOf(SkillEnhancements.CHARGE_TIME, SkillEnhancements.VELOCITY)
 ) {
 
     override val timeParamName: String = "charge_time"
@@ -29,13 +27,21 @@ class CatapultGlidingSkill : LongPressSkill(
             name = timeParamName,
             baseValue = 3 * 20,
             enhancementId = "time",
-            value = -0.16f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = -0.16,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhancementTooltipWithArg(SkillEnhancements.VELOCITY) { it.level * 10 }
+        addEnhanceableParameter(
+            name = "velocity_multiplier",
+            baseValue = 1.0,
+            enhancementId = "multiplier",
+            value = 0.1,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult =
@@ -48,10 +54,10 @@ class CatapultGlidingSkill : LongPressSkill(
         if (!player.canUse()) return failedResult()
         if (player.isFallFlying) return fallFlyingResult()
         player.stopAndCooldown()
-        player.playSoundFromParam("fly_out_sound")
+        player.playSoundFromParam("fly_out_sound", ModSounds.DASH.get())
         player.setOnGround(false)
         player.startFallFlying()
-        val multiplier = 1 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1
+        val multiplier = getDoubleParam("velocity_multiplier", player, 1.0, 0.0)
         val progress = pressedTime.toDouble() / getPersistTime(player) * multiplier
         player.velocity =
             player.rotationVector.normalize().multiply(1.5, 0.0, 1.5)

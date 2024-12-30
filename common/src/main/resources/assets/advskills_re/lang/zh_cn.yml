@@ -547,13 +547,10 @@ advskills_re:
       cancel: 取消
       tip: 松开选中，左键使用，右键取消，中键查看详情，按下 %s 打开技能背包
       empty: 无技能槽
-    learn:
+    choice:
       refresh: 重抽
-      learn: 学习
-      count: '剩余技能数：%d'
-    enhance:
-      enhance: 强化
-      count: '剩余强化数：%d'
+      choose: 选择
+      count: '剩余抽取数：%d'
       new: '新'
     config:
       title: 进阶技能：重制版

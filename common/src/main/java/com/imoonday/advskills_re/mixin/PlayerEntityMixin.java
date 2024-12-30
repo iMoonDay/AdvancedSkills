@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.mixin;
 
 import com.imoonday.advskills_re.api.PlayerDataContainer;
 import com.imoonday.advskills_re.component.PlayerDataComponent;
+import com.imoonday.advskills_re.config.GlobalConfig;
 import com.imoonday.advskills_re.config.SkillConfig;
 import com.imoonday.advskills_re.entity.Servant;
 import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
@@ -49,8 +50,11 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
     public void advskills_re$addExperience(int experience, CallbackInfo ci) {
         if (experience > 0) {
             PlayerEntity player = (PlayerEntity) (Object) this;
-            double multiplier = SkillConfig.get().getSkillXpMultiplier();
-            if (multiplier != 1.0) {
+            Double multiplier = SkillConfig.get().getSkillXpMultiplier();
+            if (multiplier == null) {
+                multiplier = GlobalConfig.get().getSkillConfig().getSkillXpMultiplier();
+            }
+            if (multiplier != null && multiplier != 1.0) {
                 experience = (int) (experience * multiplier);
             }
             PlayerUtilsKt.setSkillExp(player, PlayerUtilsKt.getSkillExp(player) + experience);

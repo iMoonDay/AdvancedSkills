@@ -117,6 +117,9 @@ fun NbtList.toIntArrayList(): List<IntArray> = mapNotNull { (it as? NbtIntArray)
 fun NbtList.toLongArrayList(): List<LongArray> = mapNotNull { (it as? NbtLongArray)?.longArray }
 fun NbtList.toUUIDList(): List<UUID> = mapNotNull { NbtHelper.toUuid(it) }
 fun NbtList.toCompoundList(): List<NbtCompound> = mapNotNull { it as? NbtCompound }
+inline fun <reified T : NbtElement, R : Any> NbtList.castToList(cast: (T) -> R?): List<R> =
+    mapNotNull { if (it is T) cast(it) else null }
+
 fun <V> NbtCompound.toStringMap(getAction: NbtCompound.(String) -> V?): MutableMap<String, V> =
     LinkedHashMap<String, V>().apply {
         this@toStringMap.keys.forEach {

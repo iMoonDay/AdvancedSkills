@@ -48,13 +48,14 @@ class SkillChoiceScreen(
                 addDrawableChild(it)
             }
         val buttonY = (40 + boxHeight + height) / 2 - 10
+        val text = createRefreshButtonText()
         refreshButton =
-            ButtonWidget.builder(translate("screen.learn.refresh")) { player.refreshSkillChoice() }
+            ButtonWidget.builder(text) { player.refreshSkillChoice() }
                 .dimensions(width / 3 - 25, buttonY, 50, 20)
                 .build()
                 .apply { active = player.canFreshChoice() }
                 .also(::addDrawableChild)
-        chooseButton = ButtonWidget.builder(translate("screen.learn.choose")) { selectedBox?.choose() }
+        chooseButton = ButtonWidget.builder(translate("screen.choice.choose")) { selectedBox?.choose() }
             .dimensions(width / 3 * 2 - 25, buttonY, 50, 20)
             .build()
             .apply { active = false }
@@ -63,10 +64,19 @@ class SkillChoiceScreen(
         new = false
     }
 
+    private fun createRefreshButtonText(): MutableText {
+        var text = translate("screen.choice.refresh")
+        val refreshableCount = player.choiceData.refreshableCount
+        if (refreshableCount > 0) {
+            text = text.append(" ($refreshableCount)")
+        }
+        return text
+    }
+
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(context)
         super.render(context, mouseX, mouseY, delta)
-        val countText = translate("screen.learn.count", player.choiceData.count)
+        val countText = translate("screen.choice.count", player.choiceData.count)
         context.drawText(
             textRenderer,
             countText,
@@ -89,6 +99,7 @@ class SkillChoiceScreen(
 
     private fun updateButtons() {
         refreshButton.active = player.canFreshChoice()
+        refreshButton.message = createRefreshButtonText()
         chooseButton.active = selectedBox != null && !selectedBox!!.choice.isEmpty()
     }
 
@@ -106,6 +117,16 @@ class SkillChoiceScreen(
         var maxScrollAmount: Int? = null
 
         override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+            val selected = selectedBox == this
+            if (selected || hovered) {
+                val light = if (selected) 0.45f else 0.35f
+                context.setShaderColor(light, light, light, 1f)
+                context.renderPanel(x, y, width, height)
+                context.setShaderColor(1f, 1f, 1f, 1f)
+            } else {
+                context.renderDarkPanel(x, y, width, height)
+            }
+
             when (val choosable = choice) {
                 is SkillChoice -> {
                     renderSkillBox(context, choosable)
@@ -118,16 +139,6 @@ class SkillChoiceScreen(
         }
 
         private fun renderSkillBox(context: DrawContext, choice: SkillChoice) {
-            val selected = selectedBox == this
-            if (selected || hovered) {
-                val light = if (selected) 0.45f else 0.35f
-                context.setShaderColor(light, light, light, 1f)
-                context.renderPanel(x, y, width, height)
-                context.setShaderColor(1f, 1f, 1f, 1f)
-            } else {
-                context.renderDarkPanel(x, y, width, height)
-            }
-
             val skill = choice.skill
 
             if (skill.invalid) return
@@ -203,17 +214,8 @@ class SkillChoiceScreen(
         fun renderEnhancementBox(context: DrawContext, mouseX: Int, mouseY: Int, choice: EnhancementChoice) {
             val skill = choice.skill
             val enhancement = choice.enhancement ?: return
-            val currentLevel = player.getEnhancementLvl(skill, choice.enhancementId)
+            val currentLevel = player.getCurrentEnhancementLvl(skill, choice.enhancementId)
 
-            val selected = selectedBox == this
-            if (selected || hovered) {
-                val light = if (selected) 0.45f else 0.35f
-                context.setShaderColor(light, light, light, 1f)
-                context.renderPanel(x, y, width, height)
-                context.setShaderColor(1f, 1f, 1f, 1f)
-            } else {
-                context.renderDarkPanel(x, y, width, height)
-            }
             if (choice.isEmpty()) return
             val gap = 5
             val x = x + 8
@@ -226,7 +228,7 @@ class SkillChoiceScreen(
             }
 
             if (currentLevel <= 0) {
-                val new = translate("screen.enhance.new")
+                val new = translate("screen.choice.new")
                 context.drawText(
                     textRenderer,
                     new,
@@ -265,7 +267,7 @@ class SkillChoiceScreen(
             y -= scrollAmount
 
             currentLevel.takeIf { it > 0 }?.run {
-                val tooltip = Text.translatable(enhancement.description, enhancement.getValue(this))
+                val tooltip = skill.getEnhancementTooltip(enhancement.id, this)
                 textRenderer.wrapLines(tooltip, width - 15).forEach { text ->
                     context.drawText(
                         textRenderer,
@@ -290,7 +292,7 @@ class SkillChoiceScreen(
                 y += textRenderer.fontHeight + 3
             }
 
-            val tooltip = Text.translatable(enhancement.description, enhancement.getValue(currentLevel + 1))
+            val tooltip = skill.getEnhancementTooltip(enhancement.id, currentLevel + 1)
             textRenderer.wrapLines(tooltip, width - 15).forEach { text ->
                 context.drawText(
                     textRenderer,

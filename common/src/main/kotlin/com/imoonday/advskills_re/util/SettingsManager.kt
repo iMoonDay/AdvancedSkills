@@ -1,12 +1,8 @@
 package com.imoonday.advskills_re.util
 
-import com.google.gson.*
-import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
-import net.minecraft.sound.*
-import net.minecraft.text.*
 import net.minecraft.util.*
 import java.io.*
 import java.nio.file.*
@@ -14,29 +10,12 @@ import kotlin.io.path.*
 
 object SettingsManager {
 
-    private val GSON: Gson = GsonBuilder().setPrettyPrinting().setLenient()
-        .registerTypeAdapter(Identifier::class.java, Identifier.Serializer())
-        .registerTypeAdapter(SoundEvent::class.java, Serializers.SOUND_EVENT)
-        .registerTypeHierarchyAdapter(Text::class.java, Serializers.TextSerializer)
-        .registerTypeAdapter(Enhancement::class.java, Enhancement.Serializer())
-        .registerTypeAdapter(SkillParameter::class.java, SkillParameter.Serializer())
-        .registerTypeAdapter(SkillRarity::class.java, SkillRarity.SerializerById)
-        .create()
     private val LOGGER = LogUtils.getLogger()
     private val settingsDir = Platform.getConfigFolder().resolve("advskills_re/skills")
     private val settings: MutableMap<Identifier, Skill.Settings> = mutableMapOf()
 
     @JvmStatic
-    fun tryLoad(file: File): Skill.Settings? {
-        if (!file.exists()) return null
-
-        return try {
-            GSON.fromJson(file.readText(), Skill.Settings::class.java)
-        } catch (e: Exception) {
-            LOGGER.error("Failed to load Skill Settings from $file", e)
-            null
-        }
-    }
+    fun tryLoad(file: File): Skill.Settings? = if (!file.exists()) null else Skill.Settings.fromJson(file.readText())
 
     @JvmStatic
     fun loadFiles() {
@@ -70,7 +49,7 @@ object SettingsManager {
         val file = namespaceDir.resolve("${id.path}.json")
         try {
             val json = try {
-                GSON.toJson(settings)
+                settings.toJson()
             } catch (e: Exception) {
                 LOGGER.error("Failed to encode Skill Settings: $settings", e)
                 return
@@ -99,7 +78,7 @@ object SettingsManager {
             val file = namespaceDir.resolve("${id.path}.json")
             try {
                 val json = try {
-                    GSON.toJson(settings)
+                    settings.toJson()
                 } catch (e: Exception) {
                     LOGGER.error("Failed to encode Skill Settings: $settings", e)
                     continue

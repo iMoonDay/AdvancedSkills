@@ -214,8 +214,10 @@ fun ServerWorld.addTask(interval: Int, repeat: Int, task: () -> Boolean) {
 }
 
 fun ServerWorld.executeAndAddTask(interval: Int, repeat: Int, task: () -> Boolean) {
+    if (repeat <= 0) return
+
     task()
-    addTask(interval, repeat, task)
+    addTask(interval, repeat - 1, task)
 }
 
 fun ServerPlayerEntity.addTask(interval: Int, repeat: Int, task: () -> Boolean) =

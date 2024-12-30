@@ -37,6 +37,7 @@
     "GhastEntity$ShootFireballGoalMixin",
     "GuardianEntity$FireBeamGoalMixin",
     "ItemStackMixin",
+    "LightningEntityMixin",
     "LivingEntityAccessor",
     "LivingEntityMixin",
     "MeleeAttackGoalMixin",

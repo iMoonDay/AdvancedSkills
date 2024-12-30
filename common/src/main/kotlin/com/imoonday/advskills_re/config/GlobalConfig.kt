@@ -3,7 +3,6 @@ package com.imoonday.advskills_re.config
 import com.imoonday.advskills_re.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.*
-import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import dev.architectury.platform.*

@@ -18,44 +18,56 @@ class AbsoluteDomainSkill : Skill(
     )
 ), AutoStopTrigger {
 
-    private val maxHardness = Blocks.OBSIDIAN.hardness
-
     init {
+        this.settings
+            .addParameter("min_hardness_included", 0f)
+            .addParameter("max_hardness_excluded", Blocks.OBSIDIAN.hardness)
+            .addParameter("above_player_y", true)
+
         addEnhanceableParameter(
             name = timeParamName,
             baseValue = 3 * 20,
             enhancementId = "time",
-            value = 0.2f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
+
         addEnhanceableParameter(
             name = "range",
             baseValue = 1.0,
             enhancementId = "range",
-            value = 1f,
+            value = 1.0,
             operation = Enhancement.Operation.ADDITION,
-            maxLevel = 3,
-            descArg = Enhancement.ArgFormatters.SELF
+            maxLevel = 3
         )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {
-        putDouble("Range", user.getDoubleParam("range"))
+        putDouble("Range", getDoubleParam("range", user, 1.0))
+        putFloat("MinHardness", getFloatParam("min_hardness_included", user, 0f))
+        putFloat("MaxHardness", getFloatParam("max_hardness_excluded", user, Blocks.OBSIDIAN.hardness))
+        putBoolean("AbovePlayerY", getBooleanParam("above_player_y", user, true))
     })
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (!player.isUsing()) return
-        val range = player.getActiveData().getDouble("Range")
-        player.boundingBox.expand(1.0 + range).blockPosSet.filter {
-            val hardness = player.world.getBlockState(it).getHardness(player.world, it)
-            hardness < maxHardness && hardness >= 0 && it.y >= player.blockY
+        val world = player.world
+        val data = player.getActiveData()
+        val range = data.getDouble("Range")
+        val hardnessRange = data.getFloat("MinHardness")..<data.getFloat("MaxHardness")
+        val abovePlayerY = data.getBoolean("AbovePlayerY")
+        player.boundingBox.expand(range).blockPosSet.filter {
+            val hardness = world.getBlockState(it).getHardness(world, it)
+            hardness in hardnessRange && (!abovePlayerY || it.y >= player.blockY)
         }.forEach {
-            val centerPos = it.toCenterPos()
-            player.spawnParticles(ParticleTypes.SMOKE, false, centerPos, 1, 0.0, 0.0, 0.0, 0.0)
-            player.world.breakBlock(it, true, player)
+            val hardness = world.getBlockState(it).getHardness(world, it).toInt()
+            if (world.breakBlock(it, true, player)) {
+                val centerPos = it.toCenterPos()
+                player.spawnParticles(ParticleTypes.SMOKE, false, centerPos, hardness, 0.5, 0.5, 0.5, 0.1)
+            }
         }
     }
 

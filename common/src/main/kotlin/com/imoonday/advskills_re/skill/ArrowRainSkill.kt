@@ -6,7 +6,6 @@ import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
-import net.minecraft.registry.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.util.hit.*
@@ -33,33 +32,34 @@ class ArrowRainSkill : Skill(
             name = "arrow_damage",
             baseValue = 2.0,
             enhancementId = "damage",
-            value = 0.2f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
+
         addEnhanceableParameter(
             name = "launch_count",
             baseValue = 5,
             enhancementId = "count",
-            value = 1f,
+            value = 1,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT
         )
+
         addEnhanceableParameter(
             name = "summon_range",
             baseValue = 20.0,
             enhancementId = "range",
-            value = 2f,
+            value = 2.0,
             operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.SELF
+            maxLevel = 5
         )
 
         addEnhancement(
             id = "summon_amount",
-            value = 10f,
+            value = 10.0,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT
@@ -67,16 +67,16 @@ class ArrowRainSkill : Skill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val damage = user.getDoubleParam("arrow_damage")
-        val maxDistance = user.getDoubleParam("max_distance")
+        val damage = getDoubleParam("arrow_damage", user, 2.0)
+        val maxDistance = getDoubleParam("max_distance", user, 256.0)
         val raycast = user.raycast(maxDistance, 0f, true)
         val center = if (raycast.type == HitResult.Type.MISS) user.pos else raycast.pos
-        val remainingTimes = user.getIntParam("launch_count") - 1
-        val range = user.getDoubleParam("summon_range")
+        val remainingTimes = getIntParam("launch_count", user, 5)
+        val range = getDoubleParam("summon_range", user, 20.0)
         val amount = user.getEnhancementValue("summon_amount").toInt()
-        val (min, max) = user.getIntParam("min_summon_amount") to user.getIntParam("max_summon_amount")
-        val interval = user.getIntParam("summon_interval")
-        val sound = Registries.SOUND_EVENT.get(getIdentifierParam("launch_sound"))
+        val (min, max) = getIntParam("min_summon_amount", user, 50) to getIntParam("max_summon_amount", user, 100)
+        val interval = getIntParam("summon_interval", user, 2)
+        val sound = getSoundEventParam("launch_sound", SoundEvents.ENTITY_ARROW_SHOOT)
         user.executeAndAddTask(interval, remainingTimes) {
             spawnArrows(user, center, damage, range, min, max, amount, sound)
         }

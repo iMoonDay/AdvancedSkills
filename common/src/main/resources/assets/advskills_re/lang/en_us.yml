@@ -535,13 +535,10 @@ advskills_re:
       cancel: Cancel
       tip: Release to select, left click to use, right click to cancel, middle click to view details, press %s to open Skill Inventory
       empty: No skill slot
-    learn:
+    choice:
       refresh: Refresh
-      learn: Learn
-      count: 'Remaining Skills: %d'
-    enhance:
-      enhance: Enhance
-      count: 'Remaining Enhancements: %d'
+      choose: Choose
+      count: 'Remaining Choices: %d'
       new: 'New'
     config:
       title: 'Advanced Skills: Remastered'

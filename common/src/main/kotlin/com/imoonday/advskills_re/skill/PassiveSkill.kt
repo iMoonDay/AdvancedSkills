@@ -45,7 +45,11 @@ abstract class PassiveSkill(
 
     override fun keepUsingAfterRespawn(player: ServerPlayerEntity): Boolean = player.isToggleable()
 
-    fun PlayerEntity.isToggleable() = if (!customToggles) toggleable else getBooleanParam("toggleable", toggleable)
+    fun PlayerEntity.isToggleable() = if (!customToggles) toggleable else getBooleanParam(
+        "toggleable",
+        this,
+        toggleable
+    )
 
     fun PlayerEntity.isAvailable() = !isToggleable() || isUsing()
 }

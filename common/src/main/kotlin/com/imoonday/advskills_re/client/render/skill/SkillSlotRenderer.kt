@@ -214,13 +214,13 @@ object SkillSlotRenderer {
         SkillRenderer.render(skill, context, x + 3, y + 3, player, 0, belowCrosshair)
 
         if (config.displayQuickCastKey) {
-            val text = ModKeyBindings.QUICK_CAST.boundKeyLocalizedText
+            val text = "[".toText().append(ModKeyBindings.QUICK_CAST.boundKeyLocalizedText).append("]")
             val textRenderer = client!!.textRenderer
             context.drawCenteredTextWithShadow(
                 textRenderer,
                 text,
                 x + 11,
-                y - 3,
+                y - textRenderer.fontHeight,
                 0xFFFFFF
             )
         }

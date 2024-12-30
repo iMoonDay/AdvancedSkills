@@ -22,7 +22,7 @@ class LaserEyeSkill : Skill(
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val times = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
+        val times = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT) + 1
         val distanceMultiplier = 1.0 + user.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.2
         val distance = 64.0 * distanceMultiplier
         val damage = getEnhancedValue(user, SkillEnhancements.DAMAGE, 8f)

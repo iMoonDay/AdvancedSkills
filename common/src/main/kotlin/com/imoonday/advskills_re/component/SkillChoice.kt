@@ -13,6 +13,8 @@ class SkillChoice(skill: Skill) : Choosable(skill) {
 
     override fun compatibleWith(other: Choosable): Boolean = other.type != this.type || other.skill != skill
 
+    override fun toString(): String = "SkillChoice(skill=$skill, type=$type)"
+
     companion object {
 
         @JvmStatic

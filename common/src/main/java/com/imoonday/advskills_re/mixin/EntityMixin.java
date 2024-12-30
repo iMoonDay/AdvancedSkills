@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.mixin;
 
+import com.imoonday.advskills_re.api.DamageFilter;
 import com.imoonday.advskills_re.api.ICollisionRecorder;
 import com.imoonday.advskills_re.api.Propertied;
 import com.imoonday.advskills_re.client.ClientTriggerHandler;
@@ -7,12 +8,14 @@ import com.imoonday.advskills_re.component.EntityPropertyComponent;
 import com.imoonday.advskills_re.init.ModEffectsKt;
 import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

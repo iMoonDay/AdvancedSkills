@@ -22,12 +22,13 @@ class AdvancedPurificationSkill : Skill(
 
     init {
         this.settings.addParameter("success_sound", ModSounds.PURIFY)
+
         addEnhanceableParameter(
             name = "max_removal_time",
             baseValue = 30 * 20,
             enhancementId = "time",
-            value = 0.2f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
@@ -67,8 +68,8 @@ class AdvancedPurificationSkill : Skill(
         }
     ?: UseResult.fail(failedMessage())
 
-    private fun getSuccessSound() = getSoundEventParam("success_sound")
+    private fun getSuccessSound() = getSoundEventParam("success_sound", ModSounds.PURIFY.get())
 
     private fun getTimeUpLimit(player: PlayerEntity) =
-        player.getIntParam("max_removal_time", 30 * 20, 0)
+        getIntParam("max_removal_time", player, 30 * 20, 0)
 }

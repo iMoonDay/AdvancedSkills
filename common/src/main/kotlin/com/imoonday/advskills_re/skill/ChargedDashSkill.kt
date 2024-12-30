@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -17,11 +16,6 @@ class ChargedDashSkill : LongPressSkill(
         cooldown = 15,
         rarity = SkillRarity.SUPERB
     )
-//    enhancements = setOf(
-//        SkillEnhancements.CHARGE_TIME,
-//        SkillEnhancements.CHARGE_SLOWDOWN,
-//        SkillEnhancements.VELOCITY
-//    )
 ), AttributeTrigger {
 
     override val timeParamName: String = "charge_time"
@@ -31,20 +25,37 @@ class ChargedDashSkill : LongPressSkill(
             name = timeParamName,
             baseValue = 3 * 20,
             enhancementId = "time",
-            value = -0.16f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = -0.16,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhancementTooltipWithArg(SkillEnhancements.VELOCITY) { it.level * 20 }
+        addEnhanceableParameter(
+            name = "charge_slowdown",
+            baseValue = 0.2,
+            enhancementId = "slowdown_reduction",
+            value = -0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addEnhanceableParameter(
+            name = "velocity_multiplier",
+            baseValue = 1.0,
+            enhancementId = "multiplier",
+            value = 0.2,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5
+        )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Charged Dash Charging"),
             "Charged Dash Charging",
-            player.applyChargeSlowdownEnhancement(-0.2),
+            -getDoubleParam("charge_slowdown", player, 0.2, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -58,7 +69,7 @@ class ChargedDashSkill : LongPressSkill(
         player.run {
             stopUsing()
             removeAttributes()
-            val multiplier = 1.0 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.2
+            val multiplier = getDoubleParam("velocity_multiplier", player, 1.0)
             velocity =
                 rotationVector.normalize().multiply(2.0 * pressedTime / getPersistTime(player) * multiplier)
             updateVelocity()

@@ -27,12 +27,12 @@ class SwordSoulGuardingSkill : Skill(
 
     init {
         addEnhanceableParameter(
-            timeParamName,
-            20 * 20,
-            "time",
-            0.2f,
-            Enhancement.Operation.MULTIPLY,
-            5
+            name = timeParamName,
+            baseValue = 20 * 20,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5
         ) { (it * 100).toInt() }
     }
 

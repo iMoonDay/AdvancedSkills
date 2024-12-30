@@ -29,12 +29,12 @@ class MultipleLaserSkill : LongPressSkill(
         this.settings.addParameter("laser_sound", ModSounds.LASER)
 
         addEnhanceableParameter(
-            timeParamName,
-            10 * 20,
-            "time",
-            0.2f,
-            Enhancement.Operation.MULTIPLY,
-            5
+            name = timeParamName,
+            baseValue = 10 * 20,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5
         ) { (it * 100).toInt() }
     }
 
@@ -47,7 +47,7 @@ class MultipleLaserSkill : LongPressSkill(
             (if (it.type == HitResult.Type.MISS) distance else it.pos.distanceTo(cameraPos))
         }
         if (usedTime % 4 == 0) {
-            player.playSoundFromParam("laser_sound")
+            player.playSoundFromParam("laser_sound", ModSounds.LASER.get())
         }
         if (usedTime % 2 == 0) {
             val entities: MutableList<LivingEntity> = mutableListOf()

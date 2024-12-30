@@ -22,16 +22,17 @@ class ExtremeEvasionSkill : Skill(
 
     init {
         addEnhanceableParameter(
-            timeParamName,
-            10,
-            "time",
-            0.2f,
-            Enhancement.Operation.MULTIPLY,
-            5
-        ) { (it * 100).toInt() }
+            name = timeParamName,
+            baseValue = 10,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
-    override fun use(user: ServerPlayerEntity): UseResult {
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this) {
         user.run {
             stopFallFlying()
             val multiplier = 2.0 + user.getEnhancementLvl(SkillEnhancements.POWER) * 0.2
@@ -45,7 +46,6 @@ class ExtremeEvasionSkill : Skill(
                 -velocity.x, 0.0, -velocity.z, 0.0
             )
         }
-        return UseResult.startUsing(user, this)
     }
 
     override fun ignoreDamage(

@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import net.minecraft.entity.player.*
@@ -12,13 +11,21 @@ class AutomaticUphillSkill : PassiveSkill(
         types = listOf(SkillType.MOVEMENT),
         rarity = SkillRarity.RARE
     ), true
-//    enhancements = setOf(SkillEnhancements.EFFECT_VALUE)
 ), StepHeightTrigger, PersistentTrigger {
 
     init {
-        addEnhancementTooltipWithArg(SkillEnhancements.EFFECT_VALUE) { it.level * 0.5f }
+        addEnhanceableParameter(
+            name = "step_height",
+            baseValue = 1.0f,
+            enhancementId = "height",
+            value = 0.5f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5
+        )
     }
 
-    override fun getStepHeight(player: PlayerEntity): Float? =
-        if (player.isAvailable()) 1.0f + player.getEnhancementLvl(SkillEnhancements.EFFECT_VALUE) * 0.5f else null
+    override fun getStepHeight(player: PlayerEntity): Float? {
+        if (!player.isAvailable()) return null
+        return getFloatParam("step_height", player, 1.0f)
+    }
 }

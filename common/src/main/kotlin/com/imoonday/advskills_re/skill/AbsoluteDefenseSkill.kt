@@ -11,7 +11,7 @@ import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
-private const val REMAINING_EFFECTS = "RemainingEffects"
+private const val REMAINING_COUNT = "RemainingEffects"
 
 class AbsoluteDefenseSkill : Skill(
     Settings(
@@ -31,16 +31,17 @@ class AbsoluteDefenseSkill : Skill(
             name = timeParamName,
             baseValue = 30 * 20,
             enhancementId = "time",
-            value = 0.2f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
+
         addEnhanceableParameter(
             name = "defense_count",
             baseValue = 1,
             enhancementId = "count",
-            value = 1f,
+            value = 1,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 4,
             descArg = Enhancement.ArgFormatters.INT
@@ -48,7 +49,7 @@ class AbsoluteDefenseSkill : Skill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {
-        putInt(REMAINING_EFFECTS, user.getIntParam("defense_count"))
+        putInt(REMAINING_COUNT, getIntParam("defense_count", user, 1))
     })
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -63,17 +64,19 @@ class AbsoluteDefenseSkill : Skill(
         attacker: Entity?,
     ): Boolean {
         if (!player.isUsing() || amount <= 0) return false
-        player.playSoundFromParam("block_sound")
 
         val data = player.getActiveData()
-        val remaining = data.getInt(REMAINING_EFFECTS)
+        val remaining = data.getInt(REMAINING_COUNT)
         if (remaining <= 0) {
             if (player.hasEnhancement("count")) {
-                player.playSoundFromParam("break_sound")
+                player.playSoundFromParam("break_sound", SoundEvents.ITEM_SHIELD_BREAK)
+            } else {
+                player.playSoundFromParam("block_sound", SoundEvents.ITEM_SHIELD_BLOCK)
             }
             player.stopAndCooldown()
         } else {
-            data.putInt(REMAINING_EFFECTS, remaining - 1)
+            player.playSoundFromParam("block_sound", SoundEvents.ITEM_SHIELD_BLOCK)
+            data.putInt(REMAINING_COUNT, remaining - 1)
         }
         return true
     }

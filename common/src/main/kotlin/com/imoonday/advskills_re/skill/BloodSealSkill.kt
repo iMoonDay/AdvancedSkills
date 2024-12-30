@@ -21,13 +21,6 @@ class BloodSealSkill : LongPressSkill(
         cooldown = 45,
         rarity = SkillRarity.EPIC
     )
-//    enhancements = setOf(
-//        SkillEnhancements.CHARGE_TIME,
-//        SkillEnhancements.CHARGE_SLOWDOWN,
-//        SkillEnhancements.DAMAGE,
-//        SkillEnhancements.DISTANCE,
-//        SkillEnhancements.STATUS_EFFECT_DURATION
-//    )
 ), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger, DangerTrigger {
 
     override val timeParamName: String = "charge_time"
@@ -37,20 +30,57 @@ class BloodSealSkill : LongPressSkill(
             name = timeParamName,
             baseValue = 5 * 20,
             enhancementId = "time",
-            value = -0.16f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = -0.16,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhancementTooltipWithArg(SkillEnhancements.DISTANCE) { it.level }
+        addEnhanceableParameter(
+            name = "charge_slowdown",
+            baseValue = 0.25,
+            enhancementId = "slowdown_reduction",
+            value = -0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addEnhanceableParameter(
+            name = "damage",
+            baseValue = 3f,
+            enhancementId = "damage",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addEnhanceableParameter(
+            name = "distance",
+            baseValue = 5.0,
+            enhancementId = "distance",
+            value = 1.0,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5
+        )
+
+        addEnhanceableParameter(
+            name = "status_effect_duration",
+            baseValue = 7 * 20,
+            enhancementId = "duration",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Blood Seal Charging"),
             "Blood Seal Charging",
-            player.applyChargeSlowdownEnhancement(-0.25),
+            -getDoubleParam("charge_slowdown", player, 0.25, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -73,12 +103,12 @@ class BloodSealSkill : LongPressSkill(
             ?.let {
                 it.entity.damage(
                     player.damageSources.playerAttack(player),
-                    getEnhancedValue(player, SkillEnhancements.DAMAGE, 3f)
+                    getFloatParam("damage", player, 3f)
                 )
                 (it.entity as? LivingEntity)?.addStatusEffect(
                     StatusEffectInstance(
                         ModEffects.SERIOUS_INJURY.get(),
-                        getEnhancedValue(player, SkillEnhancements.STATUS_EFFECT_DURATION, 7 * 20),
+                        getIntParam("status_effect_duration", player, 7 * 20, 0),
                     )
                 )
                 return UseResult.success()
@@ -87,7 +117,7 @@ class BloodSealSkill : LongPressSkill(
     }
 
     private fun PlayerEntity.getRaycastDistance() =
-        5.0 + this.getEnhancementLvl(SkillEnhancements.DISTANCE)
+        getDoubleParam("distance", this, 5.0, 0.0)
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(10)

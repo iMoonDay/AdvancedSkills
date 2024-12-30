@@ -27,11 +27,12 @@ class ActiveDefenseSkill : LongPressSkill(
             name = timeParamName,
             baseValue = 5 * 20,
             enhancementId = "time",
-            value = 0.2f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
+
         addEnhanceableParameter(
             name = "damage_reduction",
             baseValue = 0.2f,
@@ -41,12 +42,13 @@ class ActiveDefenseSkill : LongPressSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
+
         addEnhanceableParameter(
             name = "charge_slowdown",
             baseValue = 0.5,
             enhancementId = "slowdown_multiplier",
-            value = -0.2f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = -0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
@@ -56,7 +58,7 @@ class ActiveDefenseSkill : LongPressSkill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Active Defense"),
             "Active Defense",
-            -player.getDoubleParam("charge_slowdown", 0.5, 0.0, 1.0),
+            -getDoubleParam("charge_slowdown", player, 0.5, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -84,7 +86,7 @@ class ActiveDefenseSkill : LongPressSkill(
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
     ): Float = if (!player.isUsing()) amount
-    else amount * (1f - player.getFloatParam("damage_reduction", 0.2f, 0f, 1f))
+    else amount * (1f - getFloatParam("damage_reduction", player, 0.2f, 0f, 1f))
 
     override fun shouldRenderFeature(target: PlayerEntity, clientPlayer: PlayerEntity): Boolean =
         target.isUsing() && !target.isUsing(Skills.ABSOLUTE_DEFENSE)

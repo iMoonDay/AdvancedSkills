@@ -105,9 +105,12 @@ class UseResult(
             user: PlayerEntity,
             skill: Skill,
             data: NbtCompound? = null,
-            failedMessage: Text? = null
-        ): UseResult = if (user.startUsing(skill, data)) consume(null)
-        else fail(failedMessage ?: translateActive(skill, true))
+            failedMessage: Text? = null,
+            onStart: (() -> Unit)? = null,
+        ): UseResult = if (user.startUsing(skill, data)) {
+            onStart?.invoke()
+            consume(null)
+        } else fail(failedMessage ?: translateActive(skill, true))
 
         /**
          * @param user player who is using the skill

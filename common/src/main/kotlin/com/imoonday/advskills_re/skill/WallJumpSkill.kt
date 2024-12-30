@@ -28,8 +28,8 @@ class WallJumpSkill : PassiveSkill(
             name = "jump_power",
             baseValue = 1.0,
             enhancementId = "power",
-            value = 0.1f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = 0.1,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
@@ -55,7 +55,7 @@ class WallJumpSkill : PassiveSkill(
             val colliding = (!world.getBlockState(pos).isAir || !world.getBlockState(pos.down()).isAir)
             if (colliding) {
                 jump(player)
-                player.playSoundFromParam("jump_sound")
+                player.playSoundFromParam("jump_sound", ModSounds.DASH.get())
                 val data = player.getPersistentData()
                 data.remove("jumped")
                 data.putBoolean("wallJumped", true)

@@ -20,12 +20,12 @@ class LivingDetectionSkill : Skill(
 
     init {
         addEnhanceableParameter(
-            timeParamName,
-            5 * 20,
-            "time",
-            0.2f,
-            Enhancement.Operation.MULTIPLY,
-            5
+            name = timeParamName,
+            baseValue = 5 * 20,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5
         ) { (it * 100).toInt() }
     }
 

@@ -28,6 +28,13 @@ class EnhancementChoice(
         putString("enhancement", enhancementId)
     }
 
+    override fun equals(other: Any?): Boolean =
+        super.equals(other) && (other as? EnhancementChoice)?.enhancementId == this.enhancementId
+
+    override fun hashCode(): Int = super.hashCode() * 31 + enhancementId.hashCode()
+
+    override fun toString(): String = "EnhancementChoice(skill=$skill, enhancementId=$enhancementId, type=$type)"
+
     companion object {
 
         @JvmStatic

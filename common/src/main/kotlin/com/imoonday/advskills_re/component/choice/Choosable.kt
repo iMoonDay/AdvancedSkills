@@ -18,6 +18,24 @@ abstract class Choosable(val skill: Skill) {
 
     abstract fun compatibleWith(other: Choosable): Boolean
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Choosable) return false
+
+        if (skill != other.skill) return false
+        if (type != other.type) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = skill.hashCode()
+        result = 31 * result + type.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "Choosable(skill=$skill, type=$type)"
+
     enum class Type {
         EMPTY,
         SKILL,

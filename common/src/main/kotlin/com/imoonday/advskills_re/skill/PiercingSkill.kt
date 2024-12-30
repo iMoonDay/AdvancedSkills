@@ -22,12 +22,12 @@ class PiercingSkill : Skill(
 
     init {
         addEnhanceableParameter(
-            timeParamName,
-            8,
-            "time",
-            0.2f,
-            Enhancement.Operation.MULTIPLY,
-            5
+            name = timeParamName,
+            baseValue = 8,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5
         ) { (it * 100).toInt() }
     }
 

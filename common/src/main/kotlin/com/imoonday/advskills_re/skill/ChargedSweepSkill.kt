@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -22,35 +21,58 @@ class ChargedSweepSkill : LongPressSkill(
         cooldown = 9,
         rarity = SkillRarity.RARE
     )
-//    enhancements = setOf(
-//        SkillEnhancements.CHARGE_TIME,
-//        SkillEnhancements.CHARGE_SLOWDOWN,
-//        SkillEnhancements.RANGE,
-//        SkillEnhancements.DAMAGE
-//    )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
     override val timeParamName: String = "charge_time"
 
     init {
+        this.settings.addEnhanceableParameter("damage_item", true, "no_item_damage")
+
         addEnhanceableParameter(
             name = timeParamName,
             baseValue = 3 * 20,
             enhancementId = "time",
-            value = -0.16f,
-            operation = Enhancement.Operation.MULTIPLY,
+            value = -0.16,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level }
+        addEnhanceableParameter(
+            name = "charge_slowdown",
+            baseValue = 0.8,
+            enhancementId = "slowdown_reduction",
+            value = -0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addEnhanceableParameter(
+            name = "range",
+            baseValue = 5.0,
+            enhancementId = "range",
+            value = 1.0,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5
+        )
+
+        addEnhanceableParameter(
+            name = "damage_multiplier",
+            baseValue = 1.0f,
+            enhancementId = "multiplier",
+            value = 0.2f,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Charged Sweep Charging"),
             "Charged Sweep Charging",
-            player.applyChargeSlowdownEnhancement(-0.8),
+            -getDoubleParam("charge_slowdown", player, 0.8, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -66,13 +88,12 @@ class ChargedSweepSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.removeAttributes()
         player.stopUsing()
-        val range = player.getEnhancementLvl(SkillEnhancements.RANGE)
+        val range = getDoubleParam("range", player, 5.0)
         val baseDamage = player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
-        val multiplier = pressedTime.toFloat() / getPersistTime(player) * 2
+        val multiplier =
+            pressedTime.toFloat() / getPersistTime(player) * 2f * getFloatParam("damage_multiplier", player, 1f)
         val stack = player.mainHandStack
-        player.world.getOtherEntities(
-            player, player.boundingBox.expand(5.0 + range)
-        ) {
+        player.world.getOtherEntities(player, player.boundingBox.expand(range)) {
             it is LivingEntity &&
                 (it.boundingBox.maxY >= player.boundingBox.minY
                     && it.boundingBox.maxY <= player.boundingBox.maxY
@@ -80,18 +101,16 @@ class ChargedSweepSkill : LongPressSkill(
                     && it.boundingBox.minY >= player.boundingBox.minY)
                 && player.calculateAngle(it) <= PI / 3
         }.filterIsInstance<LivingEntity>().forEach {
-            val amount = getEnhancedValue(
-                player,
-                SkillEnhancements.DAMAGE,
-                (baseDamage + EnchantmentHelper.getAttackDamage(stack, it.group)) * multiplier
-            )
+            val amount = (baseDamage + EnchantmentHelper.getAttackDamage(stack, it.group)) * multiplier
             it.damage(player.damageSources.playerAttack(player), amount)
         }
         player.swingHand(Hand.MAIN_HAND, true)
         player.spawnSweepAttackParticles()
         player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
         player.startCooling(pressedTime * 3)
-        stack.damage(1, player) { it.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND) }
+        if (getBooleanParam("damage_item", player, true)) {
+            stack.damage(1, player) { it.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND) }
+        }
         return UseResult.consume()
     }
 

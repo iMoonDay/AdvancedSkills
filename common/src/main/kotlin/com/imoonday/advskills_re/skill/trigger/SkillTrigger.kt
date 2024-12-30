@@ -18,7 +18,9 @@ interface SkillTrigger {
     fun PlayerEntity.isCooling(): Boolean = isCooling(getAsSkill())
     fun PlayerEntity.hasEquipped(): Boolean = hasEquipped(getAsSkill())
     fun PlayerEntity.getActiveData(): NbtCompound = this.getActiveData(getAsSkill()) ?: throw NO_DATA_EXCEPTION()
-    fun PlayerEntity.getPersistentData(): NbtCompound = this.getPersistentData(getAsSkill()) ?: throw NO_DATA_EXCEPTION()
+    fun PlayerEntity.getPersistentData(): NbtCompound =
+        this.getPersistentData(getAsSkill()) ?: throw NO_DATA_EXCEPTION()
+
     fun PlayerEntity.clearPersistentData() = this.clearPersistentData(getAsSkill())
     fun PlayerEntity.getUsedTime(): Int = getUsedTime(getAsSkill())
     fun PlayerEntity.modifyUsedTime(operation: (Int) -> Int) = modifyUsedTime(getAsSkill(), operation)
@@ -32,7 +34,7 @@ interface SkillTrigger {
     fun PlayerEntity.toggleUsing(): Boolean = toggleUsing(getAsSkill())
     fun PlayerEntity.isReady(): Boolean = hasEquipped() && !isCooling() && !isUsing()
     fun PlayerEntity.stopAndCooldown(cooldown: Int? = null) = stopAndCooldown(getAsSkill(), cooldown)
-    fun PlayerEntity.getEnhancements(): Map<Enhancement, Int> = getEnhancements(getAsSkill())
+    fun PlayerEntity.getEnhancements(): Map<Enhancement, EnhancementData> = getEnhancements(getAsSkill())
 
     @Deprecated("Use getEnhancement(id) instead", ReplaceWith("TODO()"))
     fun <T : SkillEnhancement> PlayerEntity.getEnhancement(type: SkillEnhancementType<T>): T? =
@@ -46,93 +48,90 @@ interface SkillTrigger {
     fun PlayerEntity.hasEnhancement(type: SkillEnhancementType<*>): Boolean =
         getEnhancement(type) != null
 
-    fun PlayerEntity.getEnhancement(id: String): Pair<Enhancement, Int>? =
+    fun PlayerEntity.getEnhancement(id: String): Pair<Enhancement, EnhancementData>? =
         getEnhancement(getAsSkill(), id)
 
-    fun PlayerEntity.getEnhancementValue(id: String): Float {
-        val pair = getEnhancement(getAsSkill(), id) ?: return 0.0f
-        return pair.first.getValue(pair.second)
+    fun PlayerEntity.getEnhancementValue(id: String): Double {
+        val pair = getEnhancement(getAsSkill(), id) ?: return 0.0
+        return pair.first.getValue(pair.second.currentLevel)
     }
 
-    fun PlayerEntity.getDoubleParam(
+    fun getDoubleParam(
         name: String,
-        default: Double? = null,
+        player: PlayerEntity?,
+        default: Double?,
         min: Double = Double.MIN_VALUE,
         max: Double = Double.MAX_VALUE
-    ): Double = getFloatParam(name, default?.toFloat(), min.toFloat(), max.toFloat()).toDouble()
+    ): Double {
+        val skill = getAsSkill()
+        val parameter = skill.getParam(name)?.asDouble() ?: return default ?: 0.0
+        val baseValue = parameter.baseValue
 
-    fun PlayerEntity.getFloatParam(
+        if (player == null) return baseValue
+        return Enhancement.calculateValue<Double>(player.getEnhancements(), baseValue).coerceIn(min, max)
+    }
+
+    fun getFloatParam(
         name: String,
-        default: Float? = null,
+        player: PlayerEntity?,
+        default: Float?,
         min: Float = Float.MIN_VALUE,
         max: Float = Float.MAX_VALUE
     ): Float {
         val skill = getAsSkill()
         val parameter = skill.getParam(name)?.asFloat() ?: return default ?: 0f
         val baseValue = parameter.baseValue
-        var result = baseValue
-        for (id in parameter.enhancements) {
-            val pair = getEnhancement(skill, id) ?: continue
-            result = pair.first.getEnhancedValue(pair.second, result)
-        }
-        return result.coerceIn(min, max)
+
+        if (player == null) return baseValue
+        return Enhancement.calculateValue<Float>(player.getEnhancements(), baseValue).coerceIn(min, max)
     }
 
-    fun PlayerEntity.getIntParam(
+    fun getIntParam(
         name: String,
-        default: Int? = null,
+        player: PlayerEntity?,
+        default: Int?,
         min: Int = Int.MIN_VALUE,
         max: Int = Int.MAX_VALUE
     ): Int {
         val skill = getAsSkill()
         val parameter = skill.getParam(name)?.asInt() ?: return default ?: 0
         val baseValue = parameter.baseValue
-        var result = baseValue
-        for (id in parameter.enhancements) {
-            val pair = getEnhancement(skill, id) ?: continue
-            result = pair.first.getEnhancedValue(pair.second, result)
-        }
-        return result.coerceIn(min, max)
+
+        if (player == null) return baseValue
+        return Enhancement.calculateValue<Int>(player.getEnhancements(), baseValue).coerceIn(min, max)
     }
 
-    fun PlayerEntity.getBooleanParam(name: String, default: Boolean? = null): Boolean {
+    fun getBooleanParam(name: String, player: PlayerEntity?, default: Boolean?): Boolean {
         val skill = getAsSkill()
         val parameter = skill.getParam(name)?.asBoolean() ?: return default ?: false
         val baseValue = parameter.baseValue
-        return if (parameter.enhancements.any { hasEnhancement(it) }) !baseValue else baseValue
+        return if (player != null && parameter.enhancements.any { player.getEnhancement(name)?.second?.activated == true }) !baseValue else baseValue
     }
 
-    fun getStringParam(name: String, default: String? = null): String {
+    fun getStringParam(name: String, default: String?): String {
         val skill = getAsSkill()
-        val parameter =
-            skill.getParam(name)?.asString() ?: return default ?: ""
+        val parameter = skill.getParam(name)?.asString() ?: return default ?: ""
         return parameter.baseValue
     }
 
-    fun getIdentifierParam(name: String): Identifier? = try {
-        getStringParam(name).toIdentifier()
+    fun getIdentifierParam(name: String, default: Identifier?): Identifier? = try {
+        getStringParam(name, "").toIdentifier() ?: default
     } catch (e: IllegalArgumentException) {
         null
     }
 
-    fun getSoundEventParam(name: String): SoundEvent? {
+    fun getSoundEventParam(name: String, default: SoundEvent?): SoundEvent? {
         val skill = getAsSkill()
-        val parameter = skill.getParam(name)?.asSoundEvent() ?: return null
-        return parameter.baseValue.getOrNull()
+        val parameter = skill.getParam(name)?.asSoundEvent() ?: return default
+        return parameter.baseValue.getOrDefault(default)
     }
 
-    fun getListParam(name: String): List<SkillParameter> {
-        val skill = getAsSkill()
-        val parameter = skill.getParam(name)?.asList() ?: return emptyList()
-        return parameter.baseValue
-    }
+    fun getListParam(name: String): Parameter.ListParameter =
+        getAsSkill().getParam(name)?.asList() ?: Parameter.ListParameter(listOf(), listOf())
 
-    fun getStringListParam(name: String): List<String> = getListParam(name).map { it.asString().baseValue }
-
-    fun getParamBaseValue(name: String, default: Any? = null): Any {
+    fun getParamBaseValue(name: String, default: Any? = null): Any? {
         val skill = getAsSkill()
-        val parameter =
-            skill.getParam(name) ?: return default ?: throw NoParameterException(skill, name)
+        val parameter = skill.getParam(name) ?: return default
         return parameter.baseValue
     }
 
@@ -141,7 +140,7 @@ interface SkillTrigger {
 
     companion object {
 
-        private val NO_DATA_EXCEPTION = { IllegalStateException("Trying to access data for an unlearned skill") }
+        private val NO_DATA_EXCEPTION = { IllegalStateException("Error! Trying to access data for an unlearned skill") }
     }
 }
 

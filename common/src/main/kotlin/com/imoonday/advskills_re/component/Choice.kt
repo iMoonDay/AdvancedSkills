@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.component.choice.*
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
@@ -24,7 +23,7 @@ data class Choice(
 
         for (i in choices.indices) {
             for (j in i + 1 until choices.size) {
-                if (!areCompatible(choices[i], choices[j])) {
+                if (!Companion.areCompatible(choices[i], choices[j])) {
                     return true
                 }
             }
@@ -77,7 +76,7 @@ data class Choice(
 
         val unique = mutableListOf<Choosable>()
         for (choice in choices) {
-            if (unique.none { it.compatibleWith(choice) }) {
+            if (unique.none { !it.compatibleWith(choice) }) {
                 unique.add(choice)
             }
         }
@@ -90,9 +89,6 @@ data class Choice(
             else -> throw IllegalStateException("Choice has more than 3 items")
         }
     }
-
-    fun areCompatible(choosable: Choosable, another: Choosable): Boolean =
-        choosable.compatibleWith(another) && another.compatibleWith(choosable)
 
     companion object {
 
@@ -110,20 +106,20 @@ data class Choice(
             if (Skills.getLearnableSkills(player.learnedSkills).isNotEmpty()) {
                 return true
             }
-            return !player.learnedSkills
+            return player.learnedSkills
                 .map { it to it.getAvailableEnhancements() }
-                .all { pair ->
-                    pair.second.all {
-                        (player.getEnhancement(pair.first, it.id)?.second ?: 0) >= it.maxLevel
+                .any { pair ->
+                    pair.second.any {
+                        player.getEnhancementLvl(pair.first, it.id) < it.maxLevel
                     }
                 }
         }
 
         @JvmStatic
-        fun generate(player: PlayerEntity): Choice =
-            Skills.getLearnableSkills(player.learnedSkills)
-                .randomByWeight(Skill::weight, 3, Skills.EMPTY)
-                .map { SkillChoice(it) }
-                .let { Choice(it[0], it[1], it[2]) }
+        fun generate(player: PlayerEntity): Choice = SkillPoolGenerator.generateChoice(player)
+
+        @JvmStatic
+        fun areCompatible(choosable: Choosable, another: Choosable): Boolean =
+            choosable.compatibleWith(another) && another.compatibleWith(choosable)
     }
 }

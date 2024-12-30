@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.skill
 
+import com.google.gson.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.component.Enhancement.Operation.*
 import com.imoonday.advskills_re.config.*
@@ -18,6 +19,7 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.text.*
 import net.minecraft.util.*
+import java.awt.SystemColor.*
 import java.util.*
 import java.util.function.*
 
@@ -35,7 +37,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         get() = settings.invalid
             || SkillConfig.get().isInBlackList(id)
             || GlobalConfig.get().skillConfig.isInBlackList(id)
-    private val parameters: Map<String, SkillParameter> get() = settings.parameters
+    private val parameters: Map<String, Parameter> get() = settings.parameters
     private val enhancements: List<Enhancement> get() = settings.enhancements.toList()
     val item: SkillItem? get() = Registries.ITEM[id] as? SkillItem
 
@@ -65,14 +67,14 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
 
     val cooldownText: MutableText get() = getCooldownText(cooldown)
     val defaultCooldownText: MutableText get() = getCooldownText(defaultCooldown)
-    private val enhancementDescArgs: MutableMap<String, ((value: Float) -> Any)?> = mutableMapOf()
+    private val enhancementDescArgs: MutableMap<String, ((value: Double) -> Any)?> = mutableMapOf()
 
     init {
         if (defaultCooldown > 0) {
             addEnhancement(
                 id = "cooldown",
-                value = -0.16f,
-                operation = MULTIPLY,
+                value = -0.16,
+                operation = MULTIPLY_TOTAL,
                 maxLevel = 5,
                 genericText = true,
                 descArg = Enhancement.ArgFormatters.INT_PERCENT
@@ -122,33 +124,41 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         name: String,
         baseValue: Number,
         enhancementId: String,
-        value: Float,
+        value: Number,
         operation: Enhancement.Operation,
         maxLevel: Int,
         genericText: Boolean = false,
-        descArg: (value: Float) -> Any = Enhancement.ArgFormatters.SELF
+        descArg: (value: Double) -> Any = Enhancement.ArgFormatters.SELF
     ) {
-        this.settings.addEnhanceableParameter(name, baseValue, enhancementId, value, operation, maxLevel, genericText)
+        this.settings.addEnhanceableParameter(
+            name,
+            baseValue,
+            enhancementId,
+            value.toDouble(),
+            operation,
+            maxLevel,
+            genericText
+        )
         this.addEnhancementDescArg(enhancementId, descArg)
     }
 
     protected fun addEnhancement(
         id: String,
-        value: Float,
+        value: Number,
         operation: Enhancement.Operation,
         maxLevel: Int,
         genericText: Boolean = false,
-        descArg: (value: Float) -> Any = Enhancement.ArgFormatters.SELF
+        descArg: (value: Double) -> Any = Enhancement.ArgFormatters.SELF
     ) {
-        this.settings.addEnhancement(id, value, operation, maxLevel, genericText)
+        this.settings.addEnhancement(id, value.toDouble(), operation, maxLevel, genericText)
         this.addEnhancementDescArg(id, descArg)
     }
 
-    protected fun addEnhancementDescArg(id: String, arg: (value: Float) -> Any) {
+    protected fun addEnhancementDescArg(id: String, arg: (value: Double) -> Any) {
         this.enhancementDescArgs[id] = arg
     }
 
-    fun getParam(name: String): SkillParameter? = parameters[name]
+    fun getParam(name: String): Parameter? = parameters[name]
 
     fun getAvailableEnhancements(): List<Enhancement> = enhancements.filter { it.maxLevel > 0 }
 
@@ -162,8 +172,8 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
 
     abstract fun use(user: ServerPlayerEntity): UseResult
 
-    open fun PlayerEntity.playSoundFromParam(name: String, exceptSelf: Boolean = false) {
-        getSoundEventParam(name)?.let {
+    open fun PlayerEntity.playSoundFromParam(name: String, default: SoundEvent?, exceptSelf: Boolean = false) {
+        getSoundEventParam(name, default)?.let {
             world.playSound(
                 if (exceptSelf) this else null,
                 blockPos,
@@ -231,14 +241,21 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
     fun messageKey(key: String) = translateSkillKey(id.path, key)
 
     open fun applyCooldownEnhancements(player: PlayerEntity, cooldown: Int): Int {
-        val (enhancement, level) = player.getEnhancement("cooldown_reduction") ?: return cooldown
-        return enhancement.getEnhancedValue(level, cooldown).coerceAtLeast(0)
+        val (enhancement, data) = player.getEnhancement("cooldown") ?: return cooldown
+        return enhancement.getEnhancedValue(data.currentLevel, cooldown).coerceAtLeast(0)
     }
+
+    open fun getEnhancementTooltip(id: String, level: Int): Text? =
+        getEnhancement(id)?.let {
+            val arg = enhancementDescArgs[it.id]?.invoke(it.getValue(level))
+            if (arg != null) Text.translatable(it.description, arg)
+            else Text.translatable(it.description)
+        }
 
     open fun getEnhancementTooltips(player: PlayerEntity): List<Text> =
         player.getEnhancements().map {
             val enhancement = it.key
-            val level = it.value
+            val level = it.value.currentLevel
             val arg = enhancementDescArgs[enhancement.id]?.invoke(enhancement.getValue(level))
             (if (arg != null) Text.translatable(enhancement.description, arg)
             else Text.translatable(enhancement.description)).formatted(Formatting.BLUE)
@@ -276,7 +293,8 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         var rarity: SkillRarity,
         var invalid: Boolean = false,
         var weight: Int = rarity.weight,
-        val parameters: MutableMap<String, SkillParameter> = mutableMapOf(),
+        var drawable: Boolean = true,
+        val parameters: MutableMap<String, Parameter> = mutableMapOf(),
         val enhancements: MutableList<Enhancement> = mutableListOf(),
     ) {
 
@@ -345,7 +363,12 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             return this
         }
 
-        fun setParameters(parameters: Map<String, SkillParameter>): Settings {
+        fun setDrawable(drawable: Boolean): Settings {
+            this.drawable = drawable
+            return this
+        }
+
+        fun setParameters(parameters: Map<String, Parameter>): Settings {
             this.parameters.clear()
             this.parameters.putAll(parameters)
             return this
@@ -358,7 +381,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         }
 
         fun addParameter(name: String, baseValue: Any): Settings {
-            parameters[name] = SkillParameter.create(baseValue)
+            parameters[name] = Parameter.create(baseValue)
             return this
         }
 
@@ -366,18 +389,28 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             name: String,
             baseValue: Number,
             enhancementId: String,
-            value: Float,
+            value: Number,
             operation: Enhancement.Operation,
             maxLevel: Int,
             genericText: Boolean = false
         ): Settings {
-            parameters[name] = SkillParameter.create(baseValue, listOf(enhancementId))
-            return addEnhancement(enhancementId, value, operation, maxLevel, genericText)
+            parameters[name] = Parameter.create(baseValue, listOf(enhancementId))
+            return addEnhancement(enhancementId, value.toDouble(), operation, maxLevel, genericText)
+        }
+
+        fun addEnhanceableParameter(
+            name: String,
+            baseValue: Boolean,
+            enhancementId: String,
+            genericText: Boolean = false
+        ): Settings {
+            parameters[name] = Parameter.create(baseValue, listOf(enhancementId))
+            return addEnhancement(enhancementId, genericText)
         }
 
         fun addEnhancement(
             id: String,
-            value: Float,
+            value: Number,
             operation: Enhancement.Operation,
             maxLevel: Int,
             genericText: Boolean = false
@@ -385,8 +418,33 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             val name = createName(genericText, id)
             val descriptionKey = createDescriptionKey(genericText, id)
             val enhancement = when (operation) {
-                ADDITION -> Enhancement.Increment(id, name, descriptionKey, value, maxLevel)
-                MULTIPLY -> Enhancement.Multiply(id, name, descriptionKey, value, maxLevel)
+                ADDITION -> Enhancement.Increment(
+                    id = id,
+                    name = name,
+                    description = descriptionKey,
+                    valuePerLvl = value.toDouble(),
+                    maxLevel = maxLevel,
+                    weight = Enhancement.Weight.Incremental(maxLevel * 2, -2)
+                )
+
+                MULTIPLY_BASE -> Enhancement.MultiplyBase(
+                    id = id,
+                    name = name,
+                    description = descriptionKey,
+                    valuePerLvl = value.toDouble(),
+                    maxLevel = maxLevel,
+                    weight = Enhancement.Weight.Incremental(maxLevel * 2, -2)
+                )
+
+                MULTIPLY_TOTAL -> Enhancement.MultiplyTotal(
+                    id = id,
+                    name = name,
+                    description = descriptionKey,
+                    valuePerLvl = value.toDouble(),
+                    maxLevel = maxLevel,
+                    weight = Enhancement.Weight.Incremental(maxLevel * 2, -2)
+                )
+
                 NONE -> return addEnhancement(id)
             }
             enhancements += enhancement
@@ -395,7 +453,12 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
 
         fun addEnhancement(id: String, genericText: Boolean = false): Settings {
             val enhancement =
-                Enhancement.LevelLess(id, createName(genericText, id), createDescriptionKey(genericText, id))
+                Enhancement.LevelLess(
+                    id = id,
+                    name = createName(genericText, id),
+                    description = createDescriptionKey(genericText, id),
+                    weight = Enhancement.Weight.Fixed(5)
+                )
             enhancements += enhancement
             return this
         }
@@ -420,6 +483,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             this.rarity = other.rarity
             this.invalid = other.invalid
             this.weight = other.weight
+            this.drawable = other.drawable
             this.parameters.clear()
             this.parameters.putAll(other.parameters)
             this.enhancements.clear()
@@ -436,13 +500,37 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             putString("rarity", rarity.id)
             putBoolean("invalid", invalid)
             putInt("weight", weight)
+            putBoolean("drawable", drawable)
             put("parameters", parameters.toNbtCompound { k, v -> put(k, v.toNbt()) })
             put("enhancements", enhancements.toNbtList { it.toNbt() })
         }
 
+        fun toJson(): String = GSON.toJson(this)
+
+        fun toJsonTree(): JsonElement = GSON.toJsonTree(this)
+
         companion object {
 
             private val LOGGER = LogUtils.getLogger()
+
+            @JvmStatic
+            val GSON: Gson = GsonBuilder().setPrettyPrinting().setLenient()
+                .registerTypeAdapter(Identifier::class.java, Identifier.Serializer())
+                .registerTypeAdapter(SoundEvent::class.java, Serializers.SOUND_EVENT)
+                .registerTypeHierarchyAdapter(Text::class.java, Serializers.TextSerializer)
+                .registerTypeHierarchyAdapter(Enhancement::class.java, Enhancement.Serializer)
+                .registerTypeHierarchyAdapter(Parameter::class.java, Parameter.Serializer)
+                .registerTypeAdapter(SkillRarity::class.java, SkillRarity.SerializerById)
+                .registerTypeHierarchyAdapter(Enhancement.Weight::class.java, Enhancement.Weight.Serializer)
+                .registerTypeAdapter(
+                    Parameter.SoundEventParameter.soundType,
+                    Serializers.OptionalSerializer(SoundEvent::class.java)
+                )
+                .registerTypeHierarchyAdapter(
+                    Parameter.ListParameter.PrimitiveType::class.java,
+                    Parameter.ListParameter.PrimitiveType.Serializer
+                )
+                .create()
 
             @JvmStatic
             fun fromNbt(nbt: NbtCompound): Settings? {
@@ -456,13 +544,23 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
                 val rarity = SkillRarity.fromId(nbt.getString("rarity"))
                 val invalid = nbt.getBoolean("invalid")
                 val weight = nbt.getInt("weight")
-                val parameters = nbt.getCompound("parameters").toStringMap { SkillParameter.fromNbt(getCompound(it)) }
+                val drawable = nbt.getBoolean("drawable")
+                val parameters = nbt.getCompound("parameters").toStringMap { Parameter.fromNbt(getCompound(it)) }
                 val enhancements = nbt.getList("enhancements", NbtElement.COMPOUND_TYPE.toInt())
                     .mapNotNull { element -> (element as? NbtCompound)?.let { Enhancement.fromNbt(it) } }
                 return Settings(
                     id, name, description, icon, types, cooldown, rarity,
-                    invalid, weight, parameters, enhancements.toMutableList()
+                    invalid, weight, drawable,
+                    parameters, enhancements.toMutableList()
                 )
+            }
+
+            @JvmStatic
+            fun fromJson(json: String): Settings? = try {
+                GSON.fromJson(json, Settings::class.java)
+            } catch (e: Exception) {
+                LOGGER.error("Failed to parse skill settings from json: $json", e)
+                null
             }
         }
     }

@@ -10,6 +10,7 @@ import net.minecraft.sound.*
 import net.minecraft.text.*
 import net.minecraft.util.*
 import java.lang.reflect.*
+import java.util.*
 import kotlin.jvm.optionals.*
 
 object Serializers {
@@ -51,5 +52,19 @@ object Serializers {
 
         override fun serialize(src: Text, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
             Text.Serializer.toJsonTree(src)
+    }
+
+    class OptionalSerializer<T : Any>(private val clazz: Class<T>) : JsonSerializer<Optional<T>>,
+        JsonDeserializer<Optional<T>> {
+
+        override fun serialize(src: Optional<T>, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
+            if (src.isPresent) context.serialize(src.get()) else JsonNull.INSTANCE
+
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type,
+            context: JsonDeserializationContext
+        ): Optional<T> = if (json.isJsonNull) Optional.empty<T>()
+        else Optional.ofNullable(context.deserialize<T>(json, clazz))
     }
 }

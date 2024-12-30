@@ -23,20 +23,19 @@ class RisingShockSkill : Skill(
 
     init {
         addEnhanceableParameter(
-            timeParamName,
-            8,
-            "time",
-            0.2f,
-            Enhancement.Operation.MULTIPLY,
-            5
+            name = timeParamName,
+            baseValue = 8,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5
         ) { (it * 100).toInt() }
     }
 
-    override fun use(user: ServerPlayerEntity): UseResult {
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this) {
         user.stopFallFlying()
         user.velocity = Vec3d(0.0, user.getVelocityY(), 0.0)
         user.updateVelocity()
-        return UseResult.startUsing(user, this)
     }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
