@@ -73,6 +73,7 @@ object RarityManager {
     @JvmStatic
     fun saveAll(rarities: Collection<SkillRarity>) {
         if (!checkOrCreateDirectory(raritiesDir)) return
+        if (rarities.isEmpty()) return
 
         var successCount = 0
 
@@ -113,7 +114,6 @@ object RarityManager {
     @JvmStatic
     fun saveMissing(rarities: Collection<SkillRarity>) = saveAll(rarities.filter { it.id !in this.rarities })
 
-    @JvmStatic
     private fun checkOrCreateDirectory(path: Path, error: Boolean = true): Boolean {
         if (!path.isDirectory()) {
             try {

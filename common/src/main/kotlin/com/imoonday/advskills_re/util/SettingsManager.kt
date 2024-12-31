@@ -11,7 +11,9 @@ import kotlin.io.path.*
 object SettingsManager {
 
     private val LOGGER = LogUtils.getLogger()
+    private const val VERSION = 1
     private val settingsDir = Platform.getConfigFolder().resolve("advskills_re/skills")
+    private val versionFile = settingsDir.resolve("version")
     private val settings: MutableMap<Identifier, Skill.Settings> = mutableMapOf()
 
     @JvmStatic
@@ -63,6 +65,7 @@ object SettingsManager {
     @JvmStatic
     fun saveAll(skills: Collection<Skill>) {
         if (!checkOrCreateDirectory(settingsDir)) return
+        if (skills.isEmpty()) return
 
         var successCount = 0
 
@@ -90,18 +93,48 @@ object SettingsManager {
         }
 
         LOGGER.info("Skill Settings saved: $successCount succeeded, ${skills.size - successCount} failed")
+
+        saveVersion()
     }
 
     @JvmStatic
     fun loadOrSaveFiles(skills: Collection<Skill>) {
-        loadFiles()
+        val version = loadVersion()
+        when {
+            version == null -> LOGGER.warn("Missing version file, stopping Skill Settings loading")
+            version < 0 -> LOGGER.warn("Invalid version: $version, stopping Skill Settings loading")
+            version < VERSION -> LOGGER.warn("Outdated version: $version, stopping Skill Settings loading")
+            else -> loadFiles()
+        }
         saveMissing(skills)
     }
 
     @JvmStatic
     fun saveMissing(skills: Collection<Skill>) = saveAll(skills.filter { it.id !in settings })
 
-    @JvmStatic
+    private fun saveVersion() {
+        if (!checkOrCreateDirectory(settingsDir)) return
+        try {
+            if (!versionFile.exists()) {
+                versionFile.createFile()
+            }
+            versionFile.writeText(VERSION.toString())
+        } catch (e: Exception) {
+            LOGGER.error("Failed to save version file", e)
+        }
+    }
+
+    private fun loadVersion(): Int? = if (versionFile.exists()) {
+        try {
+            versionFile.readText().toInt()
+        } catch (e: NumberFormatException) {
+            LOGGER.warn("Invalid version format in version file")
+            null
+        }
+    } else {
+        null
+    }
+
     private fun checkOrCreateDirectory(path: Path, error: Boolean = true): Boolean {
         if (!path.isDirectory()) {
             try {

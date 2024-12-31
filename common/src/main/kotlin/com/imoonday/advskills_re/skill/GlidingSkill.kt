@@ -21,7 +21,7 @@ class GlidingSkill : PassiveSkill(
 ), TickTrigger, JumpStateTrigger, ProgressTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = "gliding_time",
             baseValue = 5 * 20,
             enhancementId = "time",

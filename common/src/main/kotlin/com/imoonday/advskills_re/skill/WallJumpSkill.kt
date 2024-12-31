@@ -24,7 +24,7 @@ class WallJumpSkill : PassiveSkill(
     init {
         this.settings.addParameter("jump_sound", ModSounds.DASH)
 
-        addEnhanceableParameter(
+        addParameter(
             name = "jump_power",
             baseValue = 1.0,
             enhancementId = "power",

@@ -21,7 +21,7 @@ class ChargedDashSkill : LongPressSkill(
     override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 3 * 20,
             enhancementId = "time",
@@ -31,7 +31,7 @@ class ChargedDashSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "charge_slowdown",
             baseValue = 0.2,
             enhancementId = "slowdown_reduction",
@@ -41,7 +41,7 @@ class ChargedDashSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "velocity_multiplier",
             baseValue = 1.0,
             enhancementId = "multiplier",

@@ -37,7 +37,7 @@ class SpaceBlastSkill : LongPressSkill(
     override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 5 * 20,
             enhancementId = "time",

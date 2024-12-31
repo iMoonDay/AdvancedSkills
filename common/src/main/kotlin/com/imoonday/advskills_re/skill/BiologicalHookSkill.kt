@@ -18,7 +18,7 @@ class BiologicalHookSkill : Skill(
 ) {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = "hook_life",
             baseValue = 5 * 20,
             enhancementId = "time",

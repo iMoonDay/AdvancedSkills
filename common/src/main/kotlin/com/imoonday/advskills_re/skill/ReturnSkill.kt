@@ -28,7 +28,7 @@ class ReturnSkill : LongPressSkill(
     init {
         this.settings.addParameter("return_sound", ModSounds.RETURN)
 
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 5 * 20,
             enhancementId = "time",

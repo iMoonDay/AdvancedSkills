@@ -20,25 +20,45 @@ import net.minecraft.potion.*
 import net.minecraft.server.network.*
 
 class DangerPerceptionSkill : Skill(
-    id = "danger_perception",
-    types = listOf(SkillType.PASSIVE),
-    cooldown = 12,
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.MOVEMENT_SPEED, SkillEnhancements.RANGE)
+    Settings(
+        id = "danger_perception",
+        types = listOf(SkillType.PASSIVE),
+        cooldown = 12,
+        rarity = SkillRarity.SUPERB
+    )
 ), AutoStopTrigger, AttributeTrigger, DamageTrigger, UsingRenderTrigger {
 
     init {
-        addEnhanceableParameter(
-            timeParamName,
-            2 * 20,
-            "time",
-            0.2,
-            Enhancement.Operation.MULTIPLY_TOTAL,
-            5
-        ) { (it * 100).toInt() }
+        this.settings.addParameter("speed_up_sound", ModSounds.DASH)
 
-        addEnhancementTooltipWithArg(SkillEnhancements.MOVEMENT_SPEED) { it.level * 6 }
-        addEnhancementTooltipWithArg(SkillEnhancements.RANGE) { it.level * 0.4f }
+        addParameter(
+            name = timeParamName,
+            baseValue = 2 * 20,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addParameter(
+            name = "speed_multiplier",
+            baseValue = 0.3,
+            enhancementId = "multiplier",
+            value = 0.06,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addParameter(
+            name = "trigger_range",
+            baseValue = 3.0,
+            enhancementId = "range",
+            value = 0.4,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
@@ -47,7 +67,7 @@ class DangerPerceptionSkill : Skill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Danger Perception"),
             "Danger Perception",
-            0.3 + player.getEnhancementLvl(SkillEnhancements.MOVEMENT_SPEED) * 0.06,
+            getDoubleParam("speed_multiplier", player, 0.3, 0.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -59,9 +79,9 @@ class DangerPerceptionSkill : Skill(
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isCreative && !player.isSpectator && !player.abilities.invulnerable && (player.isUsing() || !player.isCooling())) {
-            val range = player.getEnhancementLvl(SkillEnhancements.RANGE) * 0.4
+            val range = getDoubleParam("trigger_range", player, 3.0)
             val hasDanger = player.world
-                .getOtherEntities(player, player.boundingBox.expand(3.0 + range)) { dangerTest(player, it) }
+                .getOtherEntities(player, player.boundingBox.expand(range)) { dangerTest(player, it) }
                 .isNotEmpty()
             if (hasDanger) {
                 if (player.isUsing()) {
@@ -102,7 +122,7 @@ class DangerPerceptionSkill : Skill(
     }
 
     private fun start(player: ServerPlayerEntity) {
-        player.playSound(ModSounds.DASH.get())
+        player.playSoundFromParam("speed_up_sound", ModSounds.DASH.get())
         player.startUsing()
         player.addAttributes()
         player.spawnParticles(

@@ -24,7 +24,7 @@ class ArmorShattererSkill : Skill(
             .addEnhancement("immune_effect")
             .addParameter("launch_sound", ModSounds.FIRE)
 
-        addEnhanceableParameter(
+        addParameter(
             name = "launch_count",
             baseValue = 1,
             enhancementId = "count",

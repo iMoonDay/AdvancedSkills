@@ -26,7 +26,7 @@ class BloodSealSkill : LongPressSkill(
     override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 5 * 20,
             enhancementId = "time",
@@ -36,7 +36,7 @@ class BloodSealSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "charge_slowdown",
             baseValue = 0.25,
             enhancementId = "slowdown_reduction",
@@ -46,7 +46,7 @@ class BloodSealSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "damage",
             baseValue = 3f,
             enhancementId = "damage",
@@ -56,7 +56,7 @@ class BloodSealSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "distance",
             baseValue = 5.0,
             enhancementId = "distance",
@@ -65,7 +65,7 @@ class BloodSealSkill : LongPressSkill(
             maxLevel = 5
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "status_effect_duration",
             baseValue = 7 * 20,
             enhancementId = "duration",

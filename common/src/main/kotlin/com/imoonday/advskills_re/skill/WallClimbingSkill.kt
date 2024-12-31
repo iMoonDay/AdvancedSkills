@@ -22,7 +22,7 @@ class WallClimbingSkill : PassiveSkill(
     override fun isClimbing(player: PlayerEntity): Boolean = player.isUsing() && player.shouldClimb()
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 15 * 20,
             enhancementId = "time",

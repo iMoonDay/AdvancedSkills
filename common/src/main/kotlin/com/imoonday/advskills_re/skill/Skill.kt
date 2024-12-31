@@ -19,7 +19,6 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.text.*
 import net.minecraft.util.*
-import java.awt.SystemColor.*
 import java.util.*
 import java.util.function.*
 
@@ -71,14 +70,14 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
 
     init {
         if (defaultCooldown > 0) {
-            addEnhancement(
+            this.settings.addEnhancement(
                 id = "cooldown",
                 value = -0.16,
                 operation = MULTIPLY_TOTAL,
                 maxLevel = 5,
-                genericText = true,
-                descArg = Enhancement.ArgFormatters.INT_PERCENT
+                genericText = true
             )
+            this.addEnhancementDescArg("cooldown", Enhancement.ArgFormatters.INT_PERCENT)
         }
     }
 
@@ -120,25 +119,16 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             }
         }
 
-    protected fun addEnhanceableParameter(
+    protected fun addParameter(
         name: String,
         baseValue: Number,
         enhancementId: String,
         value: Number,
         operation: Enhancement.Operation,
         maxLevel: Int,
-        genericText: Boolean = false,
         descArg: (value: Double) -> Any = Enhancement.ArgFormatters.SELF
     ) {
-        this.settings.addEnhanceableParameter(
-            name,
-            baseValue,
-            enhancementId,
-            value.toDouble(),
-            operation,
-            maxLevel,
-            genericText
-        )
+        this.settings.addParameter(name, baseValue, enhancementId, value.toDouble(), operation, maxLevel, false)
         this.addEnhancementDescArg(enhancementId, descArg)
     }
 
@@ -147,14 +137,13 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         value: Number,
         operation: Enhancement.Operation,
         maxLevel: Int,
-        genericText: Boolean = false,
         descArg: (value: Double) -> Any = Enhancement.ArgFormatters.SELF
     ) {
-        this.settings.addEnhancement(id, value.toDouble(), operation, maxLevel, genericText)
+        this.settings.addEnhancement(id, value.toDouble(), operation, maxLevel, false)
         this.addEnhancementDescArg(id, descArg)
     }
 
-    protected fun addEnhancementDescArg(id: String, arg: (value: Double) -> Any) {
+    fun addEnhancementDescArg(id: String, arg: (value: Double) -> Any) {
         this.enhancementDescArgs[id] = arg
     }
 
@@ -231,8 +220,6 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
     }
 
     override fun getAsSkill(): Skill = this
-
-    open fun isDangerous(player: ServerPlayerEntity): Boolean = false
 
     fun failedMessage() = translateSkill(id.path, "failed")
 
@@ -385,7 +372,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             return this
         }
 
-        fun addEnhanceableParameter(
+        fun addParameter(
             name: String,
             baseValue: Number,
             enhancementId: String,
@@ -398,7 +385,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             return addEnhancement(enhancementId, value.toDouble(), operation, maxLevel, genericText)
         }
 
-        fun addEnhanceableParameter(
+        fun addParameter(
             name: String,
             baseValue: Boolean,
             enhancementId: String,

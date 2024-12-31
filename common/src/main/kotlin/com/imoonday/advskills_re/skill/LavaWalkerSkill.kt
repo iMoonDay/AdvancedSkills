@@ -28,14 +28,14 @@ class LavaWalkerSkill : Skill(
     LavaTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 20 * 20,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5
-        ) { (it * 100).toInt() }
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {

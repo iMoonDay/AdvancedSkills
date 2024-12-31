@@ -32,7 +32,7 @@ class MeteorShowerSkill : LongPressSkill(
     override val timeParamName: String = "charge_time"
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 10 * 20,
             enhancementId = "time",

@@ -26,9 +26,9 @@ class ChargedSweepSkill : LongPressSkill(
     override val timeParamName: String = "charge_time"
 
     init {
-        this.settings.addEnhanceableParameter("damage_item", true, "no_item_damage")
+        this.settings.addParameter("damage_item", true, "no_item_damage")
 
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 3 * 20,
             enhancementId = "time",
@@ -38,7 +38,7 @@ class ChargedSweepSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "charge_slowdown",
             baseValue = 0.8,
             enhancementId = "slowdown_reduction",
@@ -48,7 +48,7 @@ class ChargedSweepSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "range",
             baseValue = 5.0,
             enhancementId = "range",
@@ -57,7 +57,7 @@ class ChargedSweepSkill : LongPressSkill(
             maxLevel = 5
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "damage_multiplier",
             baseValue = 1.0f,
             enhancementId = "multiplier",

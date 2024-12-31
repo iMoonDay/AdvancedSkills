@@ -23,7 +23,7 @@ class AdvancedPurificationSkill : Skill(
     init {
         this.settings.addParameter("success_sound", ModSounds.PURIFY)
 
-        addEnhanceableParameter(
+        addParameter(
             name = "max_removal_time",
             baseValue = 30 * 20,
             enhancementId = "time",

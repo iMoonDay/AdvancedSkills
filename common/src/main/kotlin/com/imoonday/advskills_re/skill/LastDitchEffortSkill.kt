@@ -30,14 +30,14 @@ class LastDitchEffortSkill : Skill(
     init {
         this.settings.addParameter("healing_sound", ModSounds.HEAL)
 
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 15 * 20,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5
-        ) { (it * 100).toInt() }
+        )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

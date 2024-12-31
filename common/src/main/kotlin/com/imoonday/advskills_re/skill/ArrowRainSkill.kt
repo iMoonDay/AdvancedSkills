@@ -28,7 +28,7 @@ class ArrowRainSkill : Skill(
             .addParameter("summon_interval", 2)
             .addParameter("launch_sound", SoundEvents.ENTITY_ARROW_SHOOT)
 
-        addEnhanceableParameter(
+        addParameter(
             name = "arrow_damage",
             baseValue = 2.0,
             enhancementId = "damage",
@@ -38,7 +38,7 @@ class ArrowRainSkill : Skill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "launch_count",
             baseValue = 5,
             enhancementId = "count",
@@ -48,7 +48,7 @@ class ArrowRainSkill : Skill(
             descArg = Enhancement.ArgFormatters.INT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "summon_range",
             baseValue = 20.0,
             enhancementId = "range",

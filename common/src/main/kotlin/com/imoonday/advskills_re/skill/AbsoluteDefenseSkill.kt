@@ -27,7 +27,7 @@ class AbsoluteDefenseSkill : Skill(
             .addParameter("block_sound", SoundEvents.ITEM_SHIELD_BLOCK)
             .addParameter("break_sound", SoundEvents.ITEM_SHIELD_BREAK)
 
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 30 * 20,
             enhancementId = "time",
@@ -37,7 +37,7 @@ class AbsoluteDefenseSkill : Skill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "defense_count",
             baseValue = 1,
             enhancementId = "count",

@@ -14,7 +14,7 @@ class AutomaticUphillSkill : PassiveSkill(
 ), StepHeightTrigger, PersistentTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = "step_height",
             baseValue = 1.0f,
             enhancementId = "height",

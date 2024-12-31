@@ -21,7 +21,7 @@ class ThunderFurySkill : Skill(
     init {
         this.settings.addEnhancement("immune_to_lightning")
 
-        addEnhanceableParameter(
+        addParameter(
             name = "summon_amount",
             baseValue = 1,
             enhancementId = "amount",

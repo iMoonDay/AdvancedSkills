@@ -12,7 +12,7 @@ class AgilitySkill : PassiveSkill(
 ) {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = "speed_multiplier",
             baseValue = 0.2,
             enhancementId = "speed",

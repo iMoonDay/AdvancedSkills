@@ -24,7 +24,7 @@ class AbsoluteDomainSkill : Skill(
             .addParameter("max_hardness_excluded", Blocks.OBSIDIAN.hardness)
             .addParameter("above_player_y", true)
 
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 3 * 20,
             enhancementId = "time",
@@ -34,7 +34,7 @@ class AbsoluteDomainSkill : Skill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "range",
             baseValue = 1.0,
             enhancementId = "range",

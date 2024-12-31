@@ -20,14 +20,14 @@ class DisguiseSkill : Skill(
 ), DisguiseTrigger, UseInterruptTrigger, AutoStopTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             timeParamName,
             30 * 20,
             "time",
             0.2,
             Enhancement.Operation.MULTIPLY_TOTAL,
             5
-        ) { (it * 100).toInt() }
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)

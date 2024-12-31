@@ -23,7 +23,7 @@ class ActiveDefenseSkill : LongPressSkill(
 ), DamageTrigger, AttributeTrigger, UsingRenderTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 5 * 20,
             enhancementId = "time",
@@ -33,7 +33,7 @@ class ActiveDefenseSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "damage_reduction",
             baseValue = 0.2f,
             enhancementId = "reduction_value",
@@ -43,7 +43,7 @@ class ActiveDefenseSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "charge_slowdown",
             baseValue = 0.5,
             enhancementId = "slowdown_multiplier",

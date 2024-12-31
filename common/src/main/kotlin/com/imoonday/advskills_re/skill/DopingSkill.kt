@@ -24,14 +24,14 @@ class DopingSkill : Skill(
 ), AttributeTrigger, AutoStopTrigger, UsingRenderTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             timeParamName,
             10 * 20,
             "time",
             0.2,
             Enhancement.Operation.MULTIPLY_TOTAL,
             5
-        ) { (it * 100).toInt() }
+        )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

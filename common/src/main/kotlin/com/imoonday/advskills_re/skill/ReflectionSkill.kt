@@ -32,14 +32,14 @@ abstract class ReflectionSkill(
 ), DamageTrigger, ReflectionTrigger, UsingRenderTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = duration,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5
-        ) { (it * 100).toInt() }
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)

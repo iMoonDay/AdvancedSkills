@@ -27,14 +27,14 @@ class ReverseGravitySkill : Skill(
     CameraUpdateMovementTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 15 * 20,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5
-        ) { (it * 100).toInt() }
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)

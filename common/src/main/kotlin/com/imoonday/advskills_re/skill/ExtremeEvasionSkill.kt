@@ -21,7 +21,7 @@ class ExtremeEvasionSkill : Skill(
 ), AutoStopTrigger, DamageTrigger, SendPlayerVelocityTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 10,
             enhancementId = "time",

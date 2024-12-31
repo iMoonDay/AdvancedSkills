@@ -23,7 +23,7 @@ class CatapultGlidingSkill : LongPressSkill(
     init {
         this.settings.addParameter("fly_out_sound", ModSounds.DASH)
 
-        addEnhanceableParameter(
+        addParameter(
             name = timeParamName,
             baseValue = 3 * 20,
             enhancementId = "time",
@@ -33,7 +33,7 @@ class CatapultGlidingSkill : LongPressSkill(
             descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
 
-        addEnhanceableParameter(
+        addParameter(
             name = "velocity_multiplier",
             baseValue = 1.0,
             enhancementId = "multiplier",

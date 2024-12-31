@@ -10,7 +10,7 @@ import net.minecraft.server.network.*
 abstract class HealingSkill(settings: Settings, amount: Float) : Skill(settings), SynchronousCoolingTrigger {
 
     init {
-        addEnhanceableParameter(
+        addParameter(
             name = "healing_amount",
             baseValue = amount,
             enhancementId = "amount",
