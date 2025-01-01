@@ -186,13 +186,13 @@ val Entity.centerPos: Vec3d
     get() = Vec3d(pos.x, pos.y + height / 2, pos.z)
 
 val Entity.wasHorizontalCollision: Boolean
-    get() = (this as ICollisionRecorder).wasHorizontalCollision()
+    get() = (this as CollisionRecorder).wasHorizontalCollision()
 
 val Entity.wasVerticalCollision: Boolean
-    get() = (this as ICollisionRecorder).wasVerticalCollision()
+    get() = (this as CollisionRecorder).wasVerticalCollision()
 
 val Entity.wasGroundCollision: Boolean
-    get() = (this as ICollisionRecorder).wasGroundCollision()
+    get() = (this as CollisionRecorder).wasGroundCollision()
 
 fun Entity.hasMoved(): Boolean = prevX != x || prevY != y || prevZ != z
 

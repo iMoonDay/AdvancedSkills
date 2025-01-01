@@ -10,7 +10,7 @@ class EmptySkill : Skill(
         id = id("empty"),
         name = translateSkill("empty", "name"),
         description = Text.empty(),
-        rarity = SkillRarity.USELESS,
+        rarity = SkillRarity.UNKNOWN,
         invalid = true,
     )
 ) {
@@ -18,4 +18,8 @@ class EmptySkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.fail(Text.empty())
 
     override fun getItemTooltips(displayName: Boolean, displayId: Boolean): MutableList<Text> = mutableListOf()
+
+    override fun updateSettings(settings: Settings) = Unit
+
+    override fun resetSettings() = Unit
 }

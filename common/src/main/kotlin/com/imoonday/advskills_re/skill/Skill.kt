@@ -24,6 +24,8 @@ import java.util.function.*
 
 abstract class Skill(val settings: Settings) : SkillTrigger {
 
+    private var defaultSettings: Settings? = null
+
     val id: Identifier get() = settings.id
     val name: Text get() = settings.name
     val description: Text get() = settings.description
@@ -91,10 +93,18 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         enhancements: Set<SkillEnhancementType<*>> = emptySet(),
     ) : this(Settings(id, types, cooldown, rarity))
 
-    fun updateSettings(settings: Settings) {
+    open fun updateSettings(settings: Settings) {
         if (settings.id == this.settings.id) {
             this.settings.copyFrom(settings)
         }
+    }
+
+    fun initDefaultSettings() {
+        this.defaultSettings = Settings(settings)
+    }
+
+    open fun resetSettings() {
+        this.defaultSettings?.let { this.settings.copyFrom(it) }
     }
 
     fun isEmpty(): Boolean = this === Skills.EMPTY || this is EmptySkill
@@ -300,22 +310,37 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             rarity = rarity
         )
 
-        fun setName(name: Text): Settings {
+        constructor(settings: Settings) : this(
+            id = settings.id,
+            name = settings.name,
+            description = settings.description,
+            icon = settings.icon,
+            types = settings.types.toSet(),
+            cooldown = settings.cooldown,
+            rarity = settings.rarity,
+            invalid = settings.invalid,
+            weight = settings.weight,
+            drawable = settings.drawable,
+            parameters = settings.parameters.toMutableMap(),
+            enhancements = settings.enhancements.toMutableList()
+        )
+
+        fun withName(name: Text): Settings {
             this.name = name
             return this
         }
 
-        fun setDescription(description: Text): Settings {
+        fun withDescription(description: Text): Settings {
             this.description = description
             return this
         }
 
-        fun setIcon(icon: Identifier): Settings {
+        fun withIcon(icon: Identifier): Settings {
             this.icon = icon
             return this
         }
 
-        fun setTypes(types: Collection<SkillType>): Settings {
+        fun withTypes(types: Collection<SkillType>): Settings {
             this.types = LinkedHashSet(types)
             return this
         }
@@ -330,38 +355,38 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             return this
         }
 
-        fun setCooldown(cooldown: Int): Settings {
+        fun withCooldown(cooldown: Int): Settings {
             this.cooldown = cooldown
             return this
         }
 
-        fun setRarity(rarity: SkillRarity): Settings {
+        fun withRarity(rarity: SkillRarity): Settings {
             this.rarity = rarity
             return this
         }
 
-        fun setInvalid(invalid: Boolean): Settings {
+        fun withInvalid(invalid: Boolean): Settings {
             this.invalid = invalid
             return this
         }
 
-        fun setWeight(weight: Int): Settings {
+        fun withWeight(weight: Int): Settings {
             this.weight = weight
             return this
         }
 
-        fun setDrawable(drawable: Boolean): Settings {
+        fun withDrawable(drawable: Boolean): Settings {
             this.drawable = drawable
             return this
         }
 
-        fun setParameters(parameters: Map<String, Parameter>): Settings {
+        fun withParameters(parameters: Map<String, Parameter>): Settings {
             this.parameters.clear()
             this.parameters.putAll(parameters)
             return this
         }
 
-        fun setEnhancements(enhancements: Collection<Enhancement>): Settings {
+        fun withEnhancements(enhancements: Collection<Enhancement>): Settings {
             this.enhancements.clear()
             this.enhancements.addAll(enhancements)
             return this

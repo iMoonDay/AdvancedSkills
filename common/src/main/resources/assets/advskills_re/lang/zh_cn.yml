@@ -480,7 +480,7 @@ advskills_re:
     movement: 移动
     destruction: 破坏
   skillRarity:
-    useless: 无用
+    unknown: 未知
     common: 普通
     uncommon: 罕见
     rare: 稀有

@@ -72,17 +72,16 @@ object EventHandler {
         }
         registerLootTables()
         PlayerEvent.PLAYER_JOIN.register { player ->
-            Channels.SYNC_CONFIG_S2C.sendToPlayer(
-                player, SyncConfigS2CPacket(
-                    SkillConfig.get().writeToNbt(GlobalConfig.get().toNbt()),
-                    SyncConfigS2CPacket.ConfigType.BOTH
-                )
-            )
-            Channels.SYNC_RARITIES_S2C.sendToPlayer(player, SyncRaritiesS2CPacket(RarityManager.getLoadedRarities()))
-            Channels.SYNC_SETTINGS_S2C.sendToPlayer(
-                player,
-                SyncSettingsS2CPacket(Skills.getSkills().map { it.settings })
-            )
+            syncServerConfigs(player)
+        }
+        DataPackReloadEvents.START.register { server, _ ->
+            SkillConfig.get().load()
+            GlobalConfig.get().load()
+            reloadSkillConfigs()
+            syncServerConfigs(server.playerManager.playerList)
+        }
+        LifecycleEvent.SERVER_BEFORE_START.register {
+            reloadSkillConfigs()
         }
         LifecycleEvent.SERVER_STARTED.register {
             SkillConfig.init(it)
@@ -94,6 +93,39 @@ object EventHandler {
             SkillConfig.get().reset()
             SkillConfig.resetFile()
         }
+    }
+
+    private fun reloadSkillConfigs() {
+        SkillRarity.reload()
+        Skills.reload()
+    }
+
+    private fun syncServerConfigs(player: ServerPlayerEntity) {
+        Channels.SYNC_CONFIG_S2C.sendToPlayer(
+            player, SyncConfigS2CPacket(
+                SkillConfig.get().writeToNbt(GlobalConfig.get().toNbt()),
+                SyncConfigS2CPacket.ConfigType.BOTH
+            )
+        )
+        Channels.SYNC_RARITIES_S2C.sendToPlayer(player, SyncRaritiesS2CPacket(RarityManager.getLoadedRarities()))
+        Channels.SYNC_SETTINGS_S2C.sendToPlayer(
+            player,
+            SyncSettingsS2CPacket(Skills.getSkills().map { it.settings })
+        )
+    }
+
+    private fun syncServerConfigs(players: Iterable<ServerPlayerEntity>) {
+        Channels.SYNC_CONFIG_S2C.sendToPlayers(
+            players, SyncConfigS2CPacket(
+                SkillConfig.get().writeToNbt(GlobalConfig.get().toNbt()),
+                SyncConfigS2CPacket.ConfigType.BOTH
+            )
+        )
+        Channels.SYNC_RARITIES_S2C.sendToPlayers(players, SyncRaritiesS2CPacket(RarityManager.getLoadedRarities()))
+        Channels.SYNC_SETTINGS_S2C.sendToPlayers(
+            players,
+            SyncSettingsS2CPacket(Skills.getSkills().map { it.settings })
+        )
     }
 
     private fun registerLootTables() {

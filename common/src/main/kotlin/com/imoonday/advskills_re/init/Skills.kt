@@ -297,9 +297,14 @@ object Skills {
     val GLIDING = register(GlidingSkill())
 
     @JvmStatic
-    fun init() {
-        SettingsManager.loadOrSaveFiles(skills.values)
-        skills.values.forEach {
+    fun init() = Unit
+
+    @JvmStatic
+    fun reload() {
+        val skills = skills.values.filterNot { it.isEmpty() }
+        skills.forEach { it.resetSettings() }
+        SettingsManager.loadOrSaveFiles(skills)
+        skills.forEach {
             SettingsManager.getSettings(it)?.run {
                 it.updateSettings(this)
             }
@@ -319,6 +324,7 @@ object Skills {
         }
         if (!skill.isEmpty()) ITEMS.register(skill.id.path) { SkillItem(skill) }
         skills[skill.id] = skill
+        skill.initDefaultSettings()
         return skill
     }
 

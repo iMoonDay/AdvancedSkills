@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.forge.mixin;
 
 import com.imoonday.advskills_re.init.ModEffectsKt;
+import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.BowAttackGoal;
 import net.minecraft.entity.mob.MobEntity;
 import org.spongepowered.asm.mixin.Final;
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BowAttackGoal.class)
-public abstract class BowAttackGoalMixin<T extends MobEntity> {
+public abstract class BowAttackGoalMixin<T extends MobEntity & RangedAttackMob> {
 
     @Shadow
     @Final

@@ -116,7 +116,7 @@ data class Choice(
         }
 
         @JvmStatic
-        fun generate(player: PlayerEntity): Choice = SkillPoolGenerator.generateChoice(player)
+        fun generate(player: PlayerEntity): Choice = SkillGenerator.generateChoice(player)
 
         @JvmStatic
         fun areCompatible(choosable: Choosable, another: Choosable): Boolean =

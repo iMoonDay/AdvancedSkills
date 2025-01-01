@@ -468,7 +468,7 @@ advskills_re:
     movement: Movement
     destruction: Destruction
   skillRarity:
-    useless: Useless
+    unknown: Unknown
     common: Common
     uncommon: Uncommon
     rare: Rare

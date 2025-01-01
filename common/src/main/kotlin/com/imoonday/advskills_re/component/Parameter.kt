@@ -388,7 +388,7 @@ sealed class Parameter {
                         create(baseValue.toString(), enhancements)
                     }
                 } else {
-                    LOGGER.warn("Invalid unknown value $baseValue with type: ${baseValue.javaClass.name}")
+                    LOGGER.warn("Unknown value $baseValue with type: ${baseValue.javaClass.name}")
                     create(baseValue.toString(), enhancements)
                 }
             } catch (e: Exception) {

@@ -130,7 +130,13 @@ sealed class Enhancement {
             val name = context.deserialize<Text>(obj.get("name"), Text::class.java)
             val description = obj.get("description").asString
             val weight = context.deserialize<Weight>(obj.get("weight"), Weight::class.java)
-            return when (val operation = context.deserialize<Operation>(obj.get("operation"), Operation::class.java)) {
+            val operation = try {
+                context.deserialize(obj.get("operation"), Operation::class.java)
+            } catch (e: Exception) {
+                LOGGER.error("Failed to deserialize operation: $json", e)
+                Operation.NONE
+            }
+            return when (operation) {
                 Operation.NONE -> LevelLess(id, name, description, weight)
                 Operation.ADDITION -> {
                     val value = obj.get("valuePerLvl").asDouble
@@ -149,8 +155,6 @@ sealed class Enhancement {
                     val maxLevel = obj.get("maxLevel").asInt
                     MultiplyTotal(id, name, description, value, maxLevel, weight)
                 }
-
-                else -> throw IllegalArgumentException("Invalid operation: $operation")
             }
         }
 
@@ -373,6 +377,8 @@ sealed class Enhancement {
     }
 
     companion object {
+
+        private val LOGGER = LogUtils.getLogger()
 
         @JvmStatic
         fun fromNbt(nbt: NbtCompound): Enhancement? {

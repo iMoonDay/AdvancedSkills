@@ -1,6 +1,6 @@
 package com.imoonday.advskills_re.api;
 
-public interface ICollisionRecorder {
+public interface CollisionRecorder {
 
     default boolean wasHorizontalCollision() {
         return false;

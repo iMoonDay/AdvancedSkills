@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.component
 import com.google.gson.*
 import com.google.gson.JsonSerializer
 import com.imoonday.advskills_re.util.*
+import com.mojang.logging.*
 import net.minecraft.nbt.*
 import net.minecraft.text.*
 import net.minecraft.util.*
@@ -47,6 +48,15 @@ class SkillRarity {
         weight: Int
     ) : this(level, id, roman, formatting.colorValue ?: 0, weight)
 
+    constructor(rarity: SkillRarity) : this(
+        rarity.level,
+        rarity.id,
+        rarity.roman,
+        rarity.color,
+        rarity.weight,
+        rarity.displayName
+    )
+
     fun format(text: Text): MutableText = text.copy().run {
         formatting?.let { formatted(it) } ?: styled { it.withColor(color) }
     }
@@ -74,7 +84,15 @@ class SkillRarity {
             json: JsonElement,
             typeOfT: Type,
             context: JsonDeserializationContext
-        ): SkillRarity = fromId(json.asJsonPrimitive.asString)
+        ): SkillRarity = try {
+            fromIdNullable(json.asJsonPrimitive.asString) ?: run {
+                LOGGER.error("Unknown Skill Rarity id: $json")
+                UNKNOWN
+            }
+        } catch (e: Exception) {
+            LOGGER.error("Error deserializing Skill Rarity: $json", e)
+            UNKNOWN
+        }
 
         override fun serialize(src: SkillRarity, typeOfSrc: Type, context: JsonSerializationContext): JsonElement =
             JsonPrimitive(src.id)
@@ -87,14 +105,19 @@ class SkillRarity {
             typeOfT: Type,
             context: JsonDeserializationContext
         ): SkillRarity {
-            val obj = json.asJsonObject
-            val level = obj.get("level").asInt
-            val id = obj.get("id").asString
-            val roman = obj.get("roman").asString
-            val color = obj.get("color").asInt
-            val weight = obj.get("weight").asInt
-            val displayName = context.deserialize<MutableText>(obj.get("displayName"), MutableText::class.java)
-            return SkillRarity(level, id, roman, color, weight, displayName)
+            try {
+                val obj = json.asJsonObject
+                val level = obj.get("level").asInt
+                val id = obj.get("id").asString
+                val roman = obj.get("roman").asString
+                val color = obj.get("color").asInt
+                val weight = obj.get("weight").asInt
+                val displayName = context.deserialize<MutableText>(obj.get("displayName"), MutableText::class.java)
+                return SkillRarity(level, id, roman, color, weight, displayName)
+            } catch (e: Exception) {
+                LOGGER.error("Error deserializing SkillRarity: $json", e)
+                return UNKNOWN
+            }
         }
 
         override fun serialize(src: SkillRarity, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
@@ -111,15 +134,18 @@ class SkillRarity {
 
     companion object {
 
-        val USELESS = SkillRarity(0, "useless", "N", Formatting.GRAY, 0)
-        val COMMON = loadOrCreate { SkillRarity(1, "common", "I", Formatting.WHITE, 8) }
-        val UNCOMMON = loadOrCreate { SkillRarity(2, "uncommon", "II", Formatting.GREEN, 7) }
-        val RARE = loadOrCreate { SkillRarity(3, "rare", "III", Formatting.AQUA, 6) }
-        val SUPERB = loadOrCreate { SkillRarity(4, "superb", "IV", Formatting.GOLD, 5) }
-        val EPIC = loadOrCreate { SkillRarity(5, "epic", "V", Formatting.RED, 4) }
-        val LEGENDARY = loadOrCreate { SkillRarity(6, "legendary", "VI", Formatting.LIGHT_PURPLE, 3) }
-        val MYTHIC = loadOrCreate { SkillRarity(7, "mythic", "VII", Formatting.DARK_PURPLE, 2) }
-        val UNIQUE = loadOrCreate { SkillRarity(8, "unique", "VIII", Formatting.DARK_RED, 1) }
+        private val LOGGER = LogUtils.getLogger()
+        private val predefinedRarities = mutableMapOf<String, SkillRarity>()
+
+        val UNKNOWN = SkillRarity(0, "unknown", "N", Formatting.GRAY, 0)
+        val COMMON = create { SkillRarity(1, "common", "I", Formatting.WHITE, 8) }
+        val UNCOMMON = create { SkillRarity(2, "uncommon", "II", Formatting.GREEN, 7) }
+        val RARE = create { SkillRarity(3, "rare", "III", Formatting.AQUA, 6) }
+        val SUPERB = create { SkillRarity(4, "superb", "IV", Formatting.GOLD, 5) }
+        val EPIC = create { SkillRarity(5, "epic", "V", Formatting.RED, 4) }
+        val LEGENDARY = create { SkillRarity(6, "legendary", "VI", Formatting.LIGHT_PURPLE, 3) }
+        val MYTHIC = create { SkillRarity(7, "mythic", "VII", Formatting.DARK_PURPLE, 2) }
+        val UNIQUE = create { SkillRarity(8, "unique", "VIII", Formatting.DARK_RED, 1) }
 
         private val _rarities = listOf(
             COMMON, UNCOMMON, RARE, SUPERB, EPIC, LEGENDARY, MYTHIC, UNIQUE
@@ -128,27 +154,31 @@ class SkillRarity {
         @JvmStatic
         val rarities: List<SkillRarity> = _rarities.values.toList()
 
-        private fun loadOrCreate(factory: () -> SkillRarity): SkillRarity {
+        private fun create(factory: () -> SkillRarity): SkillRarity {
             val rarity = factory()
-            return RarityManager.getRarity(rarity.id) ?: RarityManager.getRarity(rarity.level) ?: rarity
+            predefinedRarities[rarity.id] = SkillRarity(rarity)
+            return getOrDefault(rarity)
         }
 
+        private fun getOrDefault(rarity: SkillRarity) =
+            RarityManager.getRarity(rarity.id) ?: RarityManager.getRarity(rarity.level) ?: rarity
+
         @JvmStatic
-        fun fromLevel(level: Int): SkillRarity = fromLevelNullable(level) ?: USELESS
+        fun fromLevel(level: Int): SkillRarity = fromLevelNullable(level) ?: UNKNOWN
 
         @JvmStatic
         fun fromLevelNullable(level: Int): SkillRarity? =
-            if (level == 0) USELESS else rarities.find { it.level == level }
+            if (level == 0) UNKNOWN else rarities.find { it.level == level }
 
         @JvmStatic
-        fun fromId(id: String): SkillRarity = fromIdNullable(id) ?: USELESS
+        fun fromId(id: String): SkillRarity = fromIdNullable(id) ?: UNKNOWN
 
         @JvmStatic
-        fun fromIdNullable(id: String): SkillRarity? = if (id == USELESS.id) USELESS else _rarities[id]
+        fun fromIdNullable(id: String): SkillRarity? = if (id == UNKNOWN.id) UNKNOWN else _rarities[id]
 
         @JvmStatic
         fun parse(string: String): SkillRarity =
-            fromIdNullable(string) ?: string.toIntOrNull()?.let { fromLevel(it) } ?: USELESS
+            fromIdNullable(string) ?: string.toIntOrNull()?.let { fromLevel(it) } ?: UNKNOWN
 
         @JvmStatic
         fun fromNbt(nbt: NbtCompound): SkillRarity {
@@ -162,7 +192,12 @@ class SkillRarity {
         }
 
         @JvmStatic
-        fun init() {
+        fun init() = Unit
+
+        @JvmStatic
+        fun reload() {
+            RarityManager.loadFiles()
+            predefinedRarities.forEach { _rarities[it.key]?.copyFrom(getOrDefault(it.value)) }
             RarityManager.saveMissing(rarities)
         }
 

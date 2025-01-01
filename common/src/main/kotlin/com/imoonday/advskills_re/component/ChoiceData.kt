@@ -72,7 +72,7 @@ data class ChoiceData(
     private fun createChoosable(
         player: PlayerEntity,
         except: MutableSet<Choosable>
-    ): Choosable = SkillPoolGenerator.generateSingle(
+    ): Choosable = SkillGenerator.generateSingle(
         player = player,
         exceptSkill = { createSkillFilter(except, it, player) },
         exceptEnhancement = { skill, enhancement -> createEnhancementFilter(except, skill, enhancement, player) },
@@ -87,14 +87,15 @@ data class ChoiceData(
         skill: Skill,
         enhancement: Enhancement,
         player: PlayerEntity
-    ) = except.any { !it.compatibleWith(EnhancementChoice(skill, enhancement.id)) } ||
-        player.isMaxEnhancement(skill, enhancement.id)
+    ) = createSkillFilter(except, skill, player)
+        || except.any { !it.compatibleWith(EnhancementChoice(skill, enhancement.id)) }
+        || player.isMaxEnhancement(skill, enhancement.id)
 
     private fun createSkillFilter(
         except: MutableSet<Choosable>,
         skill: Skill,
         player: PlayerEntity
-    ) = player.hasLearned(skill) || except.any { !it.compatibleWith(SkillChoice(skill)) }
+    ) = player.hasLearned(skill) || !skill.settings.drawable || except.any { !it.compatibleWith(SkillChoice(skill)) }
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
         put("choice", choice.toNbt())
@@ -105,12 +106,13 @@ data class ChoiceData(
     companion object {
 
         private val invalidCheck: (PlayerEntity, Choosable) -> Boolean = { player, choosable ->
+            val skill = choosable.skill
             when (choosable) {
-                is SkillChoice -> choosable.skill.invalid || player.hasLearned(choosable.skill)
-                is EnhancementChoice -> choosable.skill.invalid || player.isMaxEnhancement(
-                    choosable.skill,
-                    choosable.enhancementId
-                )
+                is SkillChoice -> skill.invalid || player.hasLearned(skill) || !skill.settings.drawable
+                is EnhancementChoice -> skill.invalid
+                    || !player.hasLearned(skill)
+                    || !skill.settings.drawable
+                    || player.isMaxEnhancement(skill, choosable.enhancementId)
 
                 else -> true
             }

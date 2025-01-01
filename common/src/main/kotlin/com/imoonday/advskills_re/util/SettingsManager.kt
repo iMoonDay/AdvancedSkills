@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.util
 
+import com.imoonday.advskills_re.*
 import com.imoonday.advskills_re.skill.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
@@ -23,6 +24,8 @@ object SettingsManager {
     fun loadFiles() {
         if (!settingsDir.isDirectory()) return
 
+        settings.clear()
+
         val loadedCount = settingsDir.listAllFiles(".*\\.json").map { it.toFile() }.count { file ->
             tryLoad(file)?.let {
                 if (settings.containsKey(it.id)) {
@@ -45,7 +48,7 @@ object SettingsManager {
         val settings = skill.settings
 
         val id = settings.id
-        val namespaceDir = settingsDir.resolve(id.namespace)
+        val namespaceDir = getNamespaceDir(id)
         if (!checkOrCreateDirectory(namespaceDir)) return
 
         val file = namespaceDir.resolve("${id.path}.json")
@@ -73,7 +76,7 @@ object SettingsManager {
             val settings = skill.settings
 
             val id = settings.id
-            val namespaceDir = settingsDir.resolve(id.namespace)
+            val namespaceDir = getNamespaceDir(id)
             if (!checkOrCreateDirectory(namespaceDir, false)) {
                 continue
             }
@@ -96,6 +99,9 @@ object SettingsManager {
 
         saveVersion()
     }
+
+    private fun getNamespaceDir(id: Identifier): Path =
+        if (id.namespace == MOD_ID) settingsDir else settingsDir.resolve(id.namespace)
 
     @JvmStatic
     fun loadOrSaveFiles(skills: Collection<Skill>) {

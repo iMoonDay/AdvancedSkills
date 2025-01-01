@@ -35,6 +35,8 @@ object RarityManager {
     fun loadFiles() {
         if (!raritiesDir.isDirectory()) return
 
+        rarities.clear()
+
         val loadedCount = raritiesDir.listAllFiles(".*\\.json").map { it.toFile() }.count { file ->
             tryLoad(file)?.let {
                 if (rarities.containsKey(it.id)) {

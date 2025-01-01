@@ -19,7 +19,6 @@ object AdvancedSkills {
     @JvmStatic
     fun init() {
         GlobalConfig.get().load()
-        RarityManager.loadFiles()
         SkillRarity.init()
         Channels.register()
         ModCommands.init()
