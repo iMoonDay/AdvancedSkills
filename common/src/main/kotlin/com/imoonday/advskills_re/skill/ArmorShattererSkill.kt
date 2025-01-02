@@ -19,20 +19,19 @@ class ArmorShattererSkill : Skill(
     )
 ), SpecialStateRenderTrigger {
 
-    init {
-        this.settings
+    override fun initDefaultSettings(settings: Settings) {
+        settings
             .addEnhancement("immune_effect")
             .addParameter("launch_sound", ModSounds.FIRE)
-
-        addParameter(
-            name = "launch_count",
-            baseValue = 1,
-            enhancementId = "count",
-            value = 1,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT
-        )
+            .addParameter(
+                name = "launch_count",
+                baseValue = 1,
+                enhancementId = "count",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
@@ -59,12 +58,12 @@ class ArmorShattererSkill : Skill(
                 if (ignoreSelf) {
                     ignoreOwner = true
                 }
-            }.also {
-                if (sound != null) {
-                    playSound(sound)
-                }
             }
-        )
+        ).also {
+            if (it && sound != null) {
+                playSound(sound)
+            }
+        }
     }
 
     override fun isInSpecialState(player: PlayerEntity): Boolean = player.isVulnerable

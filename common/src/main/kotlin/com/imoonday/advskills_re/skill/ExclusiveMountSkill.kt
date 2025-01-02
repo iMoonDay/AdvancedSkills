@@ -16,6 +16,8 @@ class ExclusiveMountSkill : Skill(
     )
 ) {
 
+    override fun initDefaultSettings(settings: Settings) = Unit
+
     override fun use(user: ServerPlayerEntity): UseResult {
         if (!user.isOnGround && !user.isTouchingWater || user.hasVehicle()) {
             return UseResult.fail(message("unsupportedStatus"))

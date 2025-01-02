@@ -27,7 +27,6 @@ object AdvancedSkills {
         ModEffects.init()
         ModSounds.init()
         ModEntities.init()
-        SkillEnhancements.init()
         Skills.init()
         ModItemGroups.init()
         EventHandler.register()

@@ -21,18 +21,18 @@ class WallJumpSkill : PassiveSkill(
     )
 ), AutoTrigger, SendPlayerDataTrigger, UsingProgressTrigger, FallTrigger {
 
-    init {
-        this.settings.addParameter("jump_sound", ModSounds.DASH)
-
-        addParameter(
-            name = "jump_power",
-            baseValue = 1.0,
-            enhancementId = "power",
-            value = 0.1,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("jump_sound", ModSounds.DASH)
+            .addParameter(
+                name = "jump_power",
+                baseValue = 1.0,
+                enhancementId = "power",
+                value = 0.1,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = player.getPersistentData().getBoolean("jumped")
@@ -70,8 +70,8 @@ class WallJumpSkill : PassiveSkill(
         player.isSprinting = false
         player.jump()
         player.velocity -= Vec3d.of(player.horizontalFacing.vector) * 0.25
-        val power = 1.0 + player.getEnhancementLvl(SkillEnhancements.POWER) * 0.1
-        player.velocity.multiply(1.0, power, 1.0)
+        val power = getDoubleParam("jump_power", player, 1.0)
+        player.velocity = player.velocity.multiply(1.0, power, 1.0)
         player.abilities.flying = false
     }
 
@@ -103,8 +103,7 @@ class WallJumpSkill : PassiveSkill(
         val jumping = (player as LivingEntityAccessor).isJumping && !player.isOnGround && !player.abilities.flying
         val colliding = player.horizontalCollision && jumping &&
             (!player.world.getBlockState(pos).isAir || !player.world.getBlockState(pos.down()).isAir)
-        val jumped = jumping && colliding
-        return jumped
+        return jumping && colliding
     }
 
     override fun getProgress(player: PlayerEntity): Double = if (player.isUsing()) 1.0 else 0.0

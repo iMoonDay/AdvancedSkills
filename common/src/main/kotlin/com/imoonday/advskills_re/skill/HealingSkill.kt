@@ -7,17 +7,18 @@ import net.minecraft.entity.player.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
-abstract class HealingSkill(settings: Settings, amount: Float) : Skill(settings), SynchronousCoolingTrigger {
+abstract class HealingSkill(settings: Settings, private val amount: Float) : Skill(settings),
+    SynchronousCoolingTrigger {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = "healing_amount",
             baseValue = amount,
             enhancementId = "amount",
             value = 0.2f,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
     }
 
@@ -32,7 +33,7 @@ abstract class HealingSkill(settings: Settings, amount: Float) : Skill(settings)
         return UseResult.success()
     }
 
-    fun getHealingAmount(player: ServerPlayerEntity): Float = getFloatParam("healing_amount", player, 0f, 0f)
+    fun getHealingAmount(player: ServerPlayerEntity): Float = getFloatParam("healing_amount", player, amount, 0f)
 
     override fun getOtherSkills(player: PlayerEntity): Set<Skill> =
         player.learnedSkills.filter { it is HealingSkill && it != this }.toSet()

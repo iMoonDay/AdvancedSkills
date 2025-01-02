@@ -13,15 +13,17 @@ class AutomaticUphillSkill : PassiveSkill(
     ), true
 ), StepHeightTrigger, PersistentTrigger {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = "step_height",
             baseValue = 1.0f,
             enhancementId = "height",
             value = 0.5f,
             operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.FLOAT
         )
+        super.initDefaultSettings(settings)
     }
 
     override fun getStepHeight(player: PlayerEntity): Float? {

@@ -15,15 +15,15 @@ class DoubleJumpSkill : Skill(
     )
 ) {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = "jump_power",
             baseValue = 1.35,
             enhancementId = "power",
             value = 0.1,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
     }
 

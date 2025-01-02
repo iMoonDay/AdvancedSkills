@@ -16,6 +16,7 @@ sealed class Enhancement {
     abstract val id: String
     abstract val name: Text
     abstract val description: String
+    abstract val descArg: ArgFormatter?
     abstract val maxLevel: Int
     abstract val operation: Operation
     abstract val weight: Weight
@@ -34,6 +35,7 @@ sealed class Enhancement {
         putString("id", id)
         putString("name", Text.Serializer.toJson(name))
         putString("description", description)
+        descArg?.let { putInt("descArg", it.ordinal) }
         putInt("maxLevel", maxLevel)
         putInt("operation", operation.ordinal)
         put("weight", weight.toNbt())
@@ -48,6 +50,7 @@ sealed class Enhancement {
 
         override val maxLevel: Int = 1
         override val operation: Operation = Operation.NONE
+        override val descArg: ArgFormatter? = null
     }
 
     abstract class Leveled : Enhancement() {
@@ -67,7 +70,8 @@ sealed class Enhancement {
         override val description: String,
         override val valuePerLvl: Double,
         override val maxLevel: Int,
-        override val weight: Weight
+        override val weight: Weight,
+        override val descArg: ArgFormatter? = null
     ) : Leveled() {
 
         override val operation: Operation = Operation.ADDITION
@@ -81,7 +85,8 @@ sealed class Enhancement {
         override val description: String,
         override val valuePerLvl: Double,
         override val maxLevel: Int,
-        override val weight: Weight
+        override val weight: Weight,
+        override val descArg: ArgFormatter? = null
     ) : Leveled() {
 
         override val operation: Operation = Operation.MULTIPLY_BASE
@@ -95,7 +100,8 @@ sealed class Enhancement {
         override val description: String,
         override val valuePerLvl: Double,
         override val maxLevel: Int,
-        override val weight: Weight
+        override val weight: Weight,
+        override val descArg: ArgFormatter? = null
     ) : Leveled() {
 
         override val operation: Operation = Operation.MULTIPLY_TOTAL
@@ -129,6 +135,16 @@ sealed class Enhancement {
             val id = obj.get("id").asString
             val name = context.deserialize<Text>(obj.get("name"), Text::class.java)
             val description = obj.get("description").asString
+            val descArg: ArgFormatter? = if (obj.has("descArg")) {
+                try {
+                    context.deserialize(obj.get("descArg"), ArgFormatter::class.java)
+                } catch (e: Exception) {
+                    LOGGER.error("Failed to deserialize descArg: $json", e)
+                    null
+                }
+            } else {
+                null
+            }
             val weight = context.deserialize<Weight>(obj.get("weight"), Weight::class.java)
             val operation = try {
                 context.deserialize(obj.get("operation"), Operation::class.java)
@@ -141,19 +157,19 @@ sealed class Enhancement {
                 Operation.ADDITION -> {
                     val value = obj.get("valuePerLvl").asDouble
                     val maxLevel = obj.get("maxLevel").asInt
-                    Increment(id, name, description, value, maxLevel, weight)
+                    Increment(id, name, description, value, maxLevel, weight, descArg)
                 }
 
                 Operation.MULTIPLY_BASE -> {
                     val value = obj.get("valuePerLvl").asDouble
                     val maxLevel = obj.get("maxLevel").asInt
-                    MultiplyBase(id, name, description, value, maxLevel, weight)
+                    MultiplyBase(id, name, description, value, maxLevel, weight, descArg)
                 }
 
                 Operation.MULTIPLY_TOTAL -> {
                     val value = obj.get("valuePerLvl").asDouble
                     val maxLevel = obj.get("maxLevel").asInt
-                    MultiplyTotal(id, name, description, value, maxLevel, weight)
+                    MultiplyTotal(id, name, description, value, maxLevel, weight, descArg)
                 }
             }
         }
@@ -163,6 +179,7 @@ sealed class Enhancement {
                 addProperty("id", src.id)
                 add("name", context.serialize(src.name))
                 addProperty("description", src.description)
+                src.descArg?.let { add("descArg", context.serialize(it)) }
                 if (src is Leveled) {
                     addProperty("valuePerLvl", src.valuePerLvl)
                 }
@@ -174,30 +191,37 @@ sealed class Enhancement {
             }
     }
 
-    enum class ArgFormatters : (Double) -> String {
-        SELF {
+    enum class ArgFormatter : (Double) -> String {
+        @SerializedName("float")
+        FLOAT {
 
-            override fun format(value: Double): Any {
+            override fun format(value: Double): String {
                 val formatted = String.format("%.2f", value)
                 return formatted.replace(Regex("0+$"), "").replace(Regex("\\.$"), "")
             }
         },
+
+        @SerializedName("int")
         INT {
 
-            override fun format(value: Double): Any = value.roundToInt()
+            override fun format(value: Double): String = value.roundToInt().toString()
         },
+
+        @SerializedName("int_percent")
         INT_PERCENT {
 
-            override fun format(value: Double): Any = "${(value * 100).roundToInt()}%"
+            override fun format(value: Double): String = "${(value * 100).roundToInt()}%"
         },
+
+        @SerializedName("float_percent")
         FLOAT_PERCENT {
 
-            override fun format(value: Double): Any = "${value * 100}%"
+            override fun format(value: Double): String = "${value * 100}%"
         };
 
-        abstract fun format(value: Double): Any
-
-        override fun invoke(value: Double): String = "${if (value < 0) "-" else "+"}${format(value.absoluteValue)}"
+        abstract fun format(value: Double): String
+        override fun invoke(value: Double): String =
+            "${if (value < 0) "-" else "+"}${format(value.absoluteValue)}"
     }
 
     sealed class Weight {
@@ -385,24 +409,26 @@ sealed class Enhancement {
             val id = nbt.getString("id")
             val name = Text.Serializer.fromJson(nbt.getString("name")) ?: Text.literal("???")
             val description = nbt.getString("description")
+            val descArg = if (nbt.contains("descArg")) ArgFormatter.entries.getOrNull(nbt.getInt("descArg")) else null
             val maxLevel = nbt.getInt("maxLevel")
             val operation = Operation.entries.getOrElse(nbt.getInt("operation")) { return null }
             val weight = Weight.fromNbt(nbt.getCompound("weight")) ?: Weight.Fixed(0)
+
             return when (operation) {
                 Operation.NONE -> LevelLess(id, name, description, weight)
                 Operation.ADDITION -> {
                     val valuePerLvl = nbt.getDouble("valuePerLvl")
-                    Increment(id, name, description, valuePerLvl, maxLevel, weight)
+                    Increment(id, name, description, valuePerLvl, maxLevel, weight, descArg)
                 }
 
                 Operation.MULTIPLY_BASE -> {
                     val valuePerLvl = nbt.getDouble("valuePerLvl")
-                    MultiplyBase(id, name, description, valuePerLvl, maxLevel, weight)
+                    MultiplyBase(id, name, description, valuePerLvl, maxLevel, weight, descArg)
                 }
 
                 Operation.MULTIPLY_TOTAL -> {
                     val valuePerLvl = nbt.getDouble("valuePerLvl")
-                    MultiplyTotal(id, name, description, valuePerLvl, maxLevel, weight)
+                    MultiplyTotal(id, name, description, valuePerLvl, maxLevel, weight, descArg)
                 }
             }
         }

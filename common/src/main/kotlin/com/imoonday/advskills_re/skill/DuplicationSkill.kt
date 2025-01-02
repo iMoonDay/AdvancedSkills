@@ -17,30 +17,27 @@ class DuplicationSkill : Skill(
     )
 ), SendPlayerVelocityTrigger {
 
-    init {
-        this.settings
+    override fun initDefaultSettings(settings: Settings) {
+        settings
             .addParameter("summon_interval", 10)
             .addParameter("movement_time", 3 * 20)
-
-        addParameter(
-            name = "status_effect_duration",
-            baseValue = 3 * 20,
-            enhancementId = "duration",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "summon_amount",
-            baseValue = 1,
-            enhancementId = "amount",
-            value = 1,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT
-        )
+            .addParameter(
+                name = "invisible_duration",
+                baseValue = 3 * 20,
+                enhancementId = "duration",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "summon_amount",
+                baseValue = 1,
+                enhancementId = "amount",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
@@ -48,7 +45,7 @@ class DuplicationSkill : Skill(
         val amount = getIntParam("summon_amount", user, 1)
         val time = getIntParam("movement_time", user, 3 * 20)
         user.executeAndAddTask(interval, amount) { summonClones(user, time) }
-        val duration = getIntParam("status_effect_duration", user, 3 * 20)
+        val duration = getIntParam("invisible_duration", user, 3 * 20)
         user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, duration, 0, true, false, true))
         return UseResult.success()
     }

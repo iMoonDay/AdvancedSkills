@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.projectile.*
@@ -10,25 +9,61 @@ import net.minecraft.sound.*
 
 //TODO 不要对使用者有碰撞
 class FireballSkill : Skill(
-    id = "fireball",
-    types = listOf(SkillType.DESTRUCTION),
-    cooldown = 8,
-    rarity = SkillRarity.RARE,
-    enhancements = setOf(SkillEnhancements.LAUNCH_COUNT, SkillEnhancements.POWER, SkillEnhancements.VELOCITY)
+    Settings(
+        id = "fireball",
+        types = listOf(SkillType.DESTRUCTION),
+        cooldown = 8,
+        rarity = SkillRarity.RARE
+    )
 ) {
+
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("shoot_sound", SoundEvents.ENTITY_ENDER_DRAGON_SHOOT)
+            .addParameter(
+                name = "power",
+                baseValue = 1,
+                enhancementId = "power",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            ).addParameter(
+                name = "launch_count",
+                baseValue = 1,
+                enhancementId = "count",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            ).addParameter(
+                name = "velocity_multiplier",
+                baseValue = 1.5,
+                enhancementId = "multiplier",
+                value = 0.1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
-            val power = 1 + user.getEnhancementLvl(SkillEnhancements.POWER)
-            val launchCount = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
-            val velocity = 1.5 + user.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1
-            executeAndAddTask(5, launchCount) { spawnFireball(power, velocity) }
+            val power = getIntParam("power", this, 1)
+            val launchCount = getIntParam("launch_count", this, 0)
+            val velocityMultiplier = getDoubleParam("velocity_multiplier", this, 1.5)
+            val shootSound = getSoundEventParam("shoot_sound", SoundEvents.ENTITY_ENDER_DRAGON_SHOOT)
+            executeAndAddTask(5, launchCount) { spawnFireball(power, velocityMultiplier, shootSound) }
         }
         return UseResult.success()
     }
 
-    private fun ServerPlayerEntity.spawnFireball(power: Int, velocity: Double): Boolean {
-        val rotation = rotationVector.normalize().multiply(velocity)
+    private fun ServerPlayerEntity.spawnFireball(
+        power: Int,
+        velocityMultiplier: Double,
+        shootSound: SoundEvent?
+    ): Boolean {
+        val rotation = rotationVector.normalize().multiply(velocityMultiplier)
         return world.spawnEntity(
             FireballEntity(
                 world,
@@ -40,7 +75,7 @@ class FireballSkill : Skill(
             ).apply {
                 setPosition(x + rotation.x, eyeY, z + rotation.z)
             }.also {
-                playSound(SoundEvents.ENTITY_ENDER_DRAGON_SHOOT)
+                shootSound?.let(::playSound)
             }
         )
     }

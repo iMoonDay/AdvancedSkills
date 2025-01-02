@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -19,35 +18,70 @@ class MeteorShowerSkill : LongPressSkill(
         cooldown = 120,
         rarity = SkillRarity.MYTHIC
     )
-//    enhancements = setOf(
-//        SkillEnhancements.CHARGE_TIME,
-//        SkillEnhancements.CHARGE_SLOWDOWN,
-//        SkillEnhancements.SUMMON_AMOUNT,
-//        SkillEnhancements.RANGE,
-//        SkillEnhancements.POWER,
-//        SkillEnhancements.VELOCITY
-//    )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
-    override val timeParamName: String = "charge_time"
+    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 10 * 20,
-            enhancementId = "time",
-            value = -0.16,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("min_summon_amount", 5)
+            .addParameter("max_summon_amount", 10)
+            .addParameter(
+                name = AutoStopTrigger.CHARGE_TIME,
+                baseValue = 10 * 20,
+                enhancementId = "time",
+                value = -0.16,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "charge_slowdown",
+                baseValue = 0.5,
+                enhancementId = "slowdown_reduction",
+                value = -0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "extra_summon_amount",
+                baseValue = 0,
+                enhancementId = "amount",
+                value = 2,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            ).addParameter(
+                name = "range",
+                baseValue = 10.0,
+                enhancementId = "range",
+                value = 2.0,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            ).addParameter(
+                name = "radius_multiplier",
+                baseValue = 1.0f,
+                enhancementId = "power",
+                value = 0.2f,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "velocity_multiplier",
+                baseValue = 1.0,
+                enhancementId = "velocity",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Meteor Shower Charging"),
             "Meteor Shower Charging",
-            player.applyChargeSlowdownEnhancement(-0.5),
+            -getDoubleParam("charge_slowdown", player, 0.5, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -66,11 +100,14 @@ class MeteorShowerSkill : LongPressSkill(
         }
         val targetPos = player.raycast(512.0, 0f, false).pos
         val random = player.random
-        val extraAmount = player.getEnhancementLvl(SkillEnhancements.SUMMON_AMOUNT)
-        val amount = (5..10).random() + extraAmount * 2
-        val range = 10 + player.getEnhancementLvl(SkillEnhancements.RANGE) * 2
-        val radiusMultiplier = 1f + player.getEnhancementLvl(SkillEnhancements.POWER) * 0.2f
-        val velocityMultiplier = 1.0 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.2
+        val minAmount = getIntParam("min_summon_amount", player, 5)
+        val maxAmount = getIntParam("max_summon_amount", player, 10, minAmount)
+        val extraAmount = getIntParam("extra_summon_amount", player, 0)
+        val amount = (minAmount..maxAmount).random() + extraAmount
+        val range = getDoubleParam("range", player, 10.0)
+        val radiusMultiplier = getFloatParam("radius_multiplier", player, 1.0f)
+        val velocityMultiplier = getDoubleParam("velocity_multiplier", player, 1.0)
+
         for (i in 0 until amount) {
             val x = targetPos.x + random.nextDouble() * range * 2 - range
             val z = targetPos.z + random.nextDouble() * range * 2 - range

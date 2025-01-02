@@ -13,13 +13,13 @@ abstract class PassiveSkill(
     private val customToggles: Boolean = toggleable
 ) : Skill(settings), EquipTrigger, AttributeTrigger, RespawnTrigger {
 
-    init {
+    override fun initDefaultSettings(settings: Settings) {
         if (customToggles) {
-            this.settings.addParameter("toggleable", toggleable)
+            settings.addParameter("toggleable", toggleable)
         }
 
-        if (!this.settings.types.contains(SkillType.PASSIVE)) {
-            this.settings.addTypeToTop(SkillType.PASSIVE)
+        if (!settings.types.contains(SkillType.PASSIVE)) {
+            settings.addTypeToTop(SkillType.PASSIVE)
         }
     }
 

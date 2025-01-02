@@ -20,38 +20,34 @@ class DyingCounterattackSkill : Skill(
     )
 ), DeathTrigger, PersistentTrigger, AttackTrigger, TickTrigger, UnequipTrigger, StatusEffectTrigger {
 
-    init {
-        this.settings.addParameter("effect_sound", SoundEvents.ITEM_TOTEM_USE)
-
-        addParameter(
-            name = "healing_amount_multiplier",
-            baseValue = 0.1f,
-            enhancementId = "healing_multiplier",
-            value = 0.1f,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 4,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "damage_multiplier",
-            baseValue = 1.0f,
-            enhancementId = "damage_multiplier",
-            value = -0.1f,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "damage_interval",
-            baseValue = 20,
-            enhancementId = "interval",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("effect_sound", SoundEvents.ITEM_TOTEM_USE)
+            .addParameter(
+                name = "healing_amount_multiplier",
+                baseValue = 0.1f,
+                enhancementId = "healing_amount",
+                value = 0.1f,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 4,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage_multiplier",
+                baseValue = 1.0f,
+                enhancementId = "damage_amount",
+                value = -0.1f,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage_interval",
+                baseValue = 20,
+                enhancementId = "damage_interval",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)

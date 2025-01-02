@@ -23,57 +23,51 @@ class BloodSealSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger, DangerTrigger {
 
-    override val timeParamName: String = "charge_time"
+    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 5 * 20,
-            enhancementId = "time",
-            value = -0.16,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "charge_slowdown",
-            baseValue = 0.25,
-            enhancementId = "slowdown_reduction",
-            value = -0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "damage",
-            baseValue = 3f,
-            enhancementId = "damage",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "distance",
-            baseValue = 5.0,
-            enhancementId = "distance",
-            value = 1.0,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5
-        )
-
-        addParameter(
-            name = "status_effect_duration",
-            baseValue = 7 * 20,
-            enhancementId = "duration",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter(
+                name = AutoStopTrigger.CHARGE_TIME,
+                baseValue = 5 * 20,
+                enhancementId = "time",
+                value = -0.16,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "charge_slowdown",
+                baseValue = 0.25,
+                enhancementId = "slowdown_reduction",
+                value = -0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage",
+                baseValue = 3f,
+                enhancementId = "damage",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "distance",
+                baseValue = 5.0,
+                enhancementId = "distance",
+                value = 1.0,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            ).addParameter(
+                name = "status_effect_duration",
+                baseValue = 7 * 20,
+                enhancementId = "duration",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

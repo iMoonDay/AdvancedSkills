@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.client.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -18,23 +17,36 @@ class ItemAttractionSkill : LongPressSkill(
         cooldown = 15,
         rarity = SkillRarity.SUPERB
     )
-//    enhancements = setOf(
-//        SkillEnhancements.PERSISTENT_TIME,
-//        SkillEnhancements.RANGE,
-//        SkillEnhancements.VELOCITY,
-//        SkillEnhancements.EXPERIENCE_ORB
-//    )
 ), UsingRenderTrigger, GlowingTrigger {
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 10 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("attract_exp", false, "exp")
+            .addParameter(
+                name = timeParamName,
+                baseValue = 10 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "range",
+                baseValue = 15.0,
+                enhancementId = "range",
+                value = 3.0,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            ).addParameter(
+                name = "velocity",
+                baseValue = 0.25,
+                enhancementId = "velocity",
+                value = 0.1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
@@ -47,7 +59,7 @@ class ItemAttractionSkill : LongPressSkill(
         if (!player.isUsing()) return
 
         val range = getRange(player)
-        val velocity = 0.25 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1
+        val velocity = getDoubleParam("velocity", player, 0.25)
         val world = player.world
         world.getOtherEntities(
             player,
@@ -72,10 +84,11 @@ class ItemAttractionSkill : LongPressSkill(
     }
 
     private fun checkAttractiveEntity(player: PlayerEntity, entity: Entity) =
-        entity is ItemEntity && !entity.cannotPickup() || player.hasEnhancement(SkillEnhancements.EXPERIENCE_ORB) && entity is ExperienceOrbEntity
+        entity is ItemEntity && !entity.cannotPickup() ||
+            getBooleanParam("attract_exp", player, false) && entity is ExperienceOrbEntity
 
     private fun getRange(player: PlayerEntity) =
-        15.0 + player.getEnhancementLvl(SkillEnhancements.RANGE) * 3.0
+        getDoubleParam("range", player, 15.0)
 
     override fun isGlowing(entity: Entity, clientPlayer: PlayerEntity): Boolean =
         (clientPlayer.isUsing() && checkAttractiveEntity(clientPlayer, entity)

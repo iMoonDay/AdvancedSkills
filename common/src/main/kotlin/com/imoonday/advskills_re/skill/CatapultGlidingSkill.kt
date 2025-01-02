@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.item.*
@@ -18,30 +19,28 @@ class CatapultGlidingSkill : LongPressSkill(
     )
 ) {
 
-    override val timeParamName: String = "charge_time"
+    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
 
-    init {
-        this.settings.addParameter("fly_out_sound", ModSounds.DASH)
-
-        addParameter(
-            name = timeParamName,
-            baseValue = 3 * 20,
-            enhancementId = "time",
-            value = -0.16,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "velocity_multiplier",
-            baseValue = 1.0,
-            enhancementId = "multiplier",
-            value = 0.1,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("fly_out_sound", ModSounds.DASH)
+            .addParameter(
+                name = AutoStopTrigger.CHARGE_TIME,
+                baseValue = 3 * 20,
+                enhancementId = "time",
+                value = -0.16,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "velocity_multiplier",
+                baseValue = 1.0,
+                enhancementId = "multiplier",
+                value = 0.1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult =

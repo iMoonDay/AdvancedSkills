@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.skill.enums.*
@@ -17,29 +16,42 @@ import java.awt.*
 import java.util.function.*
 
 class OrePerceptionSkill : Skill(
-    id = "ore_perception",
-    types = listOf(SkillType.UTILITY),
-    cooldown = 30,
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    Settings(
+        id = "ore_perception",
+        types = listOf(SkillType.UTILITY),
+        cooldown = 30,
+        rarity = SkillRarity.SUPERB
+    )
 ), AutoStopTrigger, WorldRendererTrigger {
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 10 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("update_interval", 5)
+            .addParameter(
+                name = "detection_range",
+                baseValue = 15.0,
+                enhancementId = "range",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = timeParamName,
+                baseValue = 10 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).also { updateOres(user) }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
-        if (player.isUsing() && usedTime % 5 == 0) {
+        val interval = getIntParam("update_interval", player, 5, 1)
+        if (player.isUsing() && usedTime % interval == 0) {
             player.server.execute {
                 updateOres(player)
             }
@@ -48,7 +60,8 @@ class OrePerceptionSkill : Skill(
 
     private fun updateOres(player: ServerPlayerEntity) {
         val world = player.world
-        player.boundingBox.expand(15.0).blockPosSet
+        val range = getDoubleParam("detection_range", player, 15.0)
+        player.boundingBox.expand(range).blockPosSet
             .filter { pos -> world.isChunkLoaded(pos) }
             .filter { pos ->
                 val state = world.getBlockState(pos)

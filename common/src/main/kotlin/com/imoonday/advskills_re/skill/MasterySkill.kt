@@ -15,15 +15,15 @@ class MasterySkill : Skill(
     )
 ), CooldownTrigger {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = "cooldown_multiplier",
             baseValue = 0.8,
             enhancementId = "multiplier",
             value = -0.06,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
     }
 

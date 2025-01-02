@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -13,26 +12,30 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
 class WaterWalkerSkill : Skill(
-    id = "water_walker",
-    types = listOf(SkillType.ENHANCEMENT),
-    cooldown = 15,
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    Settings(
+        id = "water_walker",
+        types = listOf(SkillType.ENHANCEMENT),
+        cooldown = 15,
+        rarity = SkillRarity.SUPERB
+    )
 ), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger, UsingRenderTrigger {
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 15 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("use_sound", SoundEvents.BLOCK_WATER_AMBIENT)
+            .addParameter(
+                name = timeParamName,
+                baseValue = 15 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {
-        user.playSound(SoundEvents.BLOCK_WATER_AMBIENT)
+        user.playSoundFromParam("use_sound", SoundEvents.BLOCK_WATER_AMBIENT)
     }
 
     override fun canWalkOnFluid(player: PlayerEntity, state: FluidState): Boolean =

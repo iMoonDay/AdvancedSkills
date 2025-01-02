@@ -139,139 +139,388 @@ advskills_re:
     fireball:
       name: 火球术
       description: 发射火球
+      power:
+        name: 威力增幅
+        description: '%s 威力'
+      count:
+        name: 发射次数增幅
+        description: '%s 发射次数'
+      multiplier:
+        name: 速度增幅
+        description: '%s 速度'
     horizontal_dash:
       name: 水平冲刺
       description: 水平向前冲刺
+      velocity:
+        name: 速度增幅
+        description: '%s 速度'
     teleport:
       name: 传送
       description: 向前传送
       collide: 无容纳空间
+      distance:
+        name: 距离增幅
+        description: '%s 距离'
     jump:
       name: 跳跃
       description: 无需地面的跳跃
+      power:
+        name: 跳跃力增幅
+        description: '%s 跳跃力'
     double_jump:
       name: 二级跳跃
       description: 无需地面的双倍高度跳跃
+      power:
+        name: 跳跃力增幅
+        description: '%s 跳跃力'
     triple_jump:
       name: 三级跳跃
       description: 无需地面的三倍高度跳跃
+      power:
+        name: 跳跃力增幅
+        description: '%s 跳跃力'
     dash:
       name: 冲刺
       description: 向前冲刺
-      velocity: '%s 冲刺速度'
+      velocity:
+        name: 速度增幅
+        description: '%s 速度'
     ground_whack:
       name: 地面重击
       description: 从空中砸向地面，免疫10格以下摔落伤害，10格以上摔落伤害减半
       failed: 不在空中！
+      velocity:
+        name: 速度增幅
+        description: '%s 速度'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
+      bonus:
+        name: 额外伤害增幅
+        description: '%s 额外伤害'
+      reduction:
+        name: 减伤增幅
+        description: '%s 减伤'
+      immune_height:
+        name: 免疫高度增幅
+        description: '%s 免疫高度'
+      effect_height:
+        name: 效果高度增幅
+        description: '%s 效果高度'
     absolute_defense:
       name: 绝对防御
       description: 格挡一次任意伤害，持续30s
-      effect_count: '%s 格挡次数'
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      count:  
+        name: 格挡次数增幅
+        description: '%s 格挡次数'
     extreme_reflection:
       name: 极限反弹
       description: 以75%的概率在0.25秒内反弹首个任意伤害，反弹后立即重置冷却时间，免伤100%
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      multiplier:
+        name: 伤害增幅
+        description: '%s 伤害'
     rapid_reflection:
       name: 快速反弹
       description: 以50%的概率在0.5秒内反弹首个任意伤害，反弹后立即将冷却时间减半，免伤50%
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      multiplier:
+        name: 伤害增幅
+        description: '%s 伤害'
     micro_reflection:
       name: 微反弹
       description: 以25%的概率在1秒内反弹首个任意伤害的50%，免伤25%
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      multiplier:
+        name: 伤害增幅
+        description: '%s 伤害'
     perfect_reflection:
       name: 完美反弹
       description: 以100%的概率在0.1秒内反弹首个任意伤害的150%，反弹后立即重置冷却时间，并弹开伤害来源，免伤100%，治疗伤害量的10%
       success: 完美反弹!%s
+      healing_multiplier:
+        name: 治疗量增幅
+        description: '%s 治疗量'
+      power:
+        name: 力量增幅
+        description: '%s 力量'
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      multiplier:
+        name: 伤害增幅
+        description: '%s 伤害'
     wall_climbing:
       name: 爬墙
       description: 允许爬墙
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     piercing:
       name: 突刺
       description: 向前冲刺一段距离，并对接触的生物造成伤害并击退
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
+      velocity:
+        name: 速度增幅
+        description: '%s 速度'
     primary_healing:
       name: 初级治疗术
       description: 瞬间恢复4点血量，然后所有治疗术进入冷却
+      amount:
+        name: 治疗量增幅
+        description: '%s 治疗量'
     intermediate_healing:
       name: 中级治疗术
       description: 瞬间恢复8点血量，然后所有治疗术进入冷却
+      amount:
+        name: 治疗量增幅
+        description: '%s 治疗量'
     advanced_healing:
       name: 高级治疗术
       description: 瞬间恢复12点血量，然后所有治疗术进入冷却
+      amount:
+        name: 治疗量增幅
+        description: '%s 治疗量'
     top_healing:
       name: 顶级治疗术
       description: 瞬间恢复16点血量，然后所有治疗术进入冷却
+      amount:
+        name: 治疗量增幅
+        description: '%s 治疗量'
     extreme_evasion:
       name: 极限闪避
       description: 根据自身移动方向闪避，移动期间免疫任何伤害
+      time:
+        name: 闪避时间增幅
+        description: '%s 闪避时间'
+      velocity:
+        name: 闪避速度增幅
+        description: '%s 闪避速度'
     self_healing:
       name: 自愈
       description: 每10秒自然恢复2点血量，受伤时重置时间
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      amount:
+        name: 治疗量增幅
+        description: '%s 治疗量'
     strong_physique:
       name: 强健体魄
       description: 增加4点血量上限
+      value:
+        name: 血量增幅
+        description: '%s 血量'
     agility:
       name: 身手敏捷
       description: 略微增加移动速度
-      movement_speed: '%s 移动速度'
+      speed:
+        name: 移动速度增幅
+        description: '%s 移动速度'
     resuscitation:
       name: 起死回生
       description: 抵挡致命伤害，触发后无敌2s，并获得30s生命恢复
+      time:
+        name: 无敌时间增幅
+        description: '%s 无敌时间'
+      duration:
+        name: 恢复时间增幅
+        description: '%s 恢复时间'
     dying_counterattack:
       name: 垂死反击
       description: 受到致命伤害时，血量恢复到上限，然后进入死亡模式：持续扣血，攻击其他生物可以吸血，当血量不足时死亡
+      healing_amount:
+        name: 治疗量增幅
+        description: '%s 治疗量'
+      damage_amount:
+        name: 伤害增幅
+        description: '%s 持续伤害'
+      damage_interval:
+        name: 伤害间隔增幅
+        description: '%s 伤害间隔'
     disarm:
       name: 缴械
       description: 下一次攻击有45%概率对目标施加缴械，缴械成功后有极小概率夺取目标手持物品
       success: 缴械成功！
       failed: 缴械失败
       disarmed: 你被缴械了！
+      success_probability:
+        name: 概率增幅
+        description: '%s 概率'
+      duration:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      loot_probability:
+        name: 夺取概率增幅
+        description: '%s 夺取概率'
     primary_silence:
       name: 初级沉默术
       description: 发射一个30%概率沉默并100%概率减速小范围内生物的能量球
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      count:
+        name: 数量增幅
+        description: '%s 数量'
+      self_immune:
+        name: 自身免疫
+        description: '免疫自身效果'
     last_ditch_effort:
       name: 回光返照
       description: 血量低于30%时，血量恢复至50%，大幅增加移动速度，伤害+1，受到的伤害+1，持续15s
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      speed:
+        name: 速度增幅
+        description: '%s 速度'
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
+      healing_multiplier:
+        name: 治疗量增幅
+        description: '%s 治疗量'
+      damage_taken:
+        name: 受伤增幅
+        description: '%s 受伤'
+      healing:
+        name: 治疗增幅
+        description: '%s 治疗'
     mastery:
       name: 技能精通
       description: 所有技能进入冷却时减少20%时间
+      multiplier:
+        name: 冷却削弱
+        description: '%s 冷却'
     primary_purification:
       name: 初级净化术
       description: 随机减少一个负面效果的20%剩余时间，最多15秒
       success: '%s 已减少 %d 秒'
       failed: 没有负面效果
+      time:
+        name: 时间增幅
+        description: '%s 时间'
     advanced_purification:
       name: 高级净化术
       description: 去除时间剩余30秒以内时间最长的一个负面效果，若没有，则随机减少一个负面效果的剩余时间30秒
       success: '成功净化 %s'
       failed: 没有符合的负面效果
+      time:
+        name: 时间增幅
+        description: '%s 时间'
     absolute_domain:
       name: 绝对领域
-      description: 将周围1格内方块击碎
-      range: '%s 范围半径'
+      description: 破坏周围的方块
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
     charged_sweep:
       name: 蓄力横扫
       description: 蓄力后对前方扇形范围内实体造成伤害，伤害量取决于手持的物品
-      range: '%s 范围'
+      time:
+        name: 蓄力时间增幅
+        description: '%s 蓄力时间'
+      multiplier:
+        name: 伤害增幅
+        description: '%s 伤害'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      no_item_damage:
+        name: 物品免伤
+        description: '不消耗物品耐久'
+      slowdown_reduction:
+        name: 减速削弱
+        description: '%s 减速'
     active_defense:
       name: 主动防御
-      description: 长按使用时减伤20%
-      defense_effect: '%s 减伤'
+      description: 减少受到的伤害，但移动速度降低
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      reduction_value:
+        name: 减伤增幅
+        description: '%s 减伤'
+      slowdown_reduction:
+        name: 减速削弱
+        description: '%s 减速'
     self_repair:
       name: 自我修复
       description: 自动修复身上装备，最高修复至50%
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      limit:
+        name: 上限增幅
+        description: '%s 上限'
     instant_explosive:
       name: 瞬爆炸药
       description: 投掷一个不稳定的Tnt
+      count:
+        name: 数量增幅
+        description: '%s 数量'
     primary_freeze:
       name: 初级冰冻术
       description: 发射一个30%概率冰冻周围生物的冰球
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      count:
+        name: 数量增幅
+        description: '%s 数量'
+      self_immune:
+        name: 自身免疫
+        description: '免疫自身效果'
     primary_slowness:
       name: 初级迟缓术
       description: 发射一个50%概率减缓周围生物速度的小冰球
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      count:
+        name: 数量增幅
+        description: '%s 数量'
+      self_immune:
+        name: 自身免疫
+        description: '免疫自身效果'
     primary_confinement:
       name: 初级禁锢术
       description: 在一定范围内，最高80%概率将指向的生物禁锢3s
       success: 禁锢成功
       failed: 禁锢失败
       empty: 未选中目标
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      chance:
+        name: 概率增幅
+        description: '%s 概率'
+      duration:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     exclusive_mount:
       name: 专属坐骑
       description: 召唤一匹专属坐骑马，可以直接乘骑，仅本人可用，马的血量、防御、速度和跳跃高度提升。若马已存在一只，则销毁原先的，并召唤一只新的，这将重置所有状态。若马死亡，该技能进入冷却
@@ -289,185 +538,498 @@ advskills_re:
       name: 死灵召唤
       description: 召唤一些不死仆从
       customName: "%s的奴仆"
+      amount:
+        name: 数量增幅
+        description: '%s 数量'
     taunt:
       name: 嘲讽
       description: 嘲讽其他玩家的奴仆，并获得奴仆伤害减伤，持续15s，使用期间无法解除
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      defense:
+        name: 防御增幅
+        description: '%s 防御'
     liquid_shield:
       name: 液体护罩
       description: 你将隔离周围液体
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     water_walker:
       name: 水上行者
       description: 你可以在水上行走
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     automatic_uphill:
       name: 自动上坡
       description: 可以自动爬上方块
-      effect_value: '%s 最大高度'
+      height:
+        name: 高度增幅
+        description: '%s 高度'
     water_breathing:
       name: 水下呼吸
       description: 你可以在水中呼吸
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     static_invisibility:
       name: 静态隐身
       description: 静止不动时隐身
     faster_eating:
       name: 快速进食
       description: 加快进食速度
+      multiplier:
+        name: 速度增幅
+        description: '%s 速度'
     danger_perception:
       name: 危险感知
       description: 遇到危险时临时获得加速
-      movement_speed: '%s 加速量'
-      range: '%s 判定范围半径'
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      speed:
+        name: 速度增幅
+        description: '%s 速度'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
     rising_shock:
       name: 上升冲击
       description: 向上升起一段距离，同时将身边的生物一起带飞
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      velocity:
+        name: 速度增幅
+        description: '%s 速度'
     catapult_gliding:
       name: 弹射滑翔
       description: 蓄力然后弹出去并使用鞘翅滑翔
       failed: 你没有鞘翅或者已损坏
       fallFlying: 无法在滑翔时使用
-      velocity: '%s 弹出速度'
+      time:
+        name: 蓄力时间增幅
+        description: '%s 蓄力时间'
+      multiplier:
+        name: 速度增幅
+        description: '%s 速度'
     charged_dash:
       name: 蓄力冲刺
       description: 蓄力然后弹出去，可用于滑翔
-      velocity: '%s 弹出速度'
+      time:
+        name: 蓄力时间增幅
+        description: '%s 蓄力时间'
+      multiplier:
+        name: 速度增幅
+        description: '%s 速度'
+      slowdown_reduction:
+        name: 减速削弱
+        description: '%s 减速'
     laser_eye:
       name: 激光眼
       description: 发射一束激光，对路径上的所有生物造成伤害
+      count:
+        name: 数量增幅
+        description: '%s 数量'
+      distance:
+        name: 距离增幅
+        description: '%s 距离'
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
     meteor_shower:
       name: 流星雨
       description: 召唤一场陨石雨
       failed: 蓄力中断
+      time:
+        name: 蓄力时间增幅
+        description: '%s 蓄力时间'
+      slowdown_reduction:
+        name: 减速削弱
+        description: '%s 减速'
+      amount:
+        name: 数量增幅
+        description: '%s 数量'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      power:
+        name: 威力增幅
+        description: '%s 威力'
+      velocity:
+        name: 速度增幅
+        description: '%s 速度'
     negative_resistance:
       name: 负面抵抗
       description: 短时间内抵挡一次负面效果
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      count:
+        name: 抵抗次数增幅
+        description: '%s 抵抗次数'
     insightful_eye:
       name: 洞察之眼
       description: 可以看到其他玩家的技能
     item_attraction:
       name: 物品吸引
       description: 吸引周围物品
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      velocity:
+        name: 速度增幅
+        description: '%s 速度'
+      exp:
+        name: 经验球吸引
+        description: '将经验球视为物品'
     doping:
       name: 兴奋剂
       description: 以少量血量为代价，获得大量速度
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      cost:
+        name: 血量消耗增幅
+        description: '%s 血量消耗'
+      speed:
+        name: 速度增幅
+        description: '%s 速度'
     grappling_hook:
       name: 抓钩
       description: 抓住一个方块并向方块移动
       failed: 无可抓方块
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      distance:
+        name: 距离增幅
+        description: '%s 距离'
     reverse_gravity:
       name: 反重力
       description: 颠倒重力
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     ore_perception:
       name: 矿物感知
       description: 可以透视周围矿石
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     invisible_trap:
       name: 隐形陷阱
       description: 放置一个隐形陷阱
       failed: 没有空位
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      count:
+        name: 数量增幅
+        description: '%s 数量'
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
     frost_trap:
       name: 冰霜陷阱
       description: 放置一个雪陷阱
       failed: 没有空位
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      count:
+        name: 数量增幅
+        description: '%s 数量'
+      duration:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     temporary_shield:
       name: 临时护盾
       description: 缓慢增加额外血量上限,上限10
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      interval:
+        name: 间隔增幅
+        description: '%s 间隔'
+      value:
+        name: 数值增幅
+        description: '%s 数值'
     pain_feedback:
       name: 痛苦反馈
       description: 受伤时反弹50%伤害
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
     thunder_fury:
       name: 雷霆之怒
       description: 召唤一道闪电
+      immune_to_lightning:
+        name: 闪电免疫
+        description: '免疫闪电伤害'
+      amount:
+        name: 数量增幅
+        description: '%s 数量'
     counterblast:
       name: 蓄势爆发
       description: 被攻击时有一定概率击退周围生物，次数越多，概率越高
-      range: '%s 击退范围半径'
-      power: '%s 击退力量'
-      chance: '%s 击退概率'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      power:
+        name: 力量增幅
+        description: '%s 力量'
+      chance:
+        name: 概率增幅
+        description: '%s 概率'
+      additional_probability:
+        name: 额外概率增幅
+        description: '%s 额外概率'
     time_rewind:
       name: 时间倒流
       description: 回溯坐标和血量，蓄力时死亡将立刻回溯
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     living_detection:
       name: 活体检测
       description: 检测附近的移动中的生物
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
     blood_seal:
       name: 血印术
       description: 封印生物的治疗效果
       interrupt: 蓄力中断
       failed: 未选中目标
-      distance: '%s 判定距离'
+      time:
+        name: 蓄力时间增幅
+        description: '%s 蓄力时间'
+      slowdown_reduction:
+        name: 减速削弱
+        description: '%s 减速'
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
+      distance:
+        name: 距离增幅
+        description: '%s 距离'
+      duration:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     sword_soul_guarding:
       name: 剑魂守护
       description: 召唤附魔剑跟随作战，攻击时有概率发动追加攻击，受伤时必定触发追加攻击
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      chance:
+        name: 概率增幅
+        description: '%s 概率'
+      amount:
+        name: 数量增幅
+        description: '%s 数量'
+      interval:
+        name: 间隔增幅
+        description: '%s 间隔'
     wind_blade:
       name: 风刃剑
       description: 触发横扫之刃效果时生成一个小龙卷风
+      velocity:
+        name: 速度增幅
+        description: '%s 速度'
+      amount:
+        name: 数量增幅
+        description: '%s 数量'
     biological_hook:
       name: 生物钩爪
       description: 发射一个生物抓钩，有一定概率被挣脱
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     duplication:
       name: 分身术
       description: 召唤一个分身并隐身3秒
+      amount:
+        name: 数量增幅
+        description: '%s 数量'
+      duration:
+        name: 隐身时间增幅
+        description: '%s 隐身时间'
     magnetic_trap:
       name: 磁力陷阱
       description: 生成一个减速陷阱
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     multiple_laser:
       name: 多重激光
       description: 连续发射激光，对路径上的所有生物造成少量伤害
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
+      distance:
+        name: 距离增幅
+        description: '%s 距离'
     super_shadow_clone:
       name: 超级影分身
       description: 向不同方向召唤数个分身并隐身5秒
+      amount:
+        name: 数量增幅
+        description: '%s 数量'
+      duration:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     arrow_rain:
       name: 箭雨
       description: 在目标上方随机召唤数根箭
-      launch_count: '%s 召唤波次'
-      range: '%s 召唤范围半径'
-      summon_amount: '%s 箭数量/波次'
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
+      count:
+        name: 数量增幅
+        description: '%s 数量'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      amount:
+        name: 波次增幅
+        description: '%s 波次'
     weed_cleaner:
       name: 杂草清理者
       description: 扫除周围杂草
+      range:
+        name: 范围增幅
+        description: '%s 范围'
     unhindered_stride:
       name: 如履平地
       description: 可以跨过任何障碍，不会被阻挡
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     damage_absorption:
       name: 伤害吸收
       description: 一定时间内，吸收一次伤害，并根据其伤害量回复自身血量
-      effect_count: '%s 吸收次数'
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      count:
+        name: 吸收次数增幅
+        description: '%s 吸收次数'
     disguise:
       name: 伪装术
       description: 伪装成脚下的方块，释放任意技能时失效
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     wall_jump:
       name: 蹬墙跳
       description: 可以在墙上跳跃
+      power:
+        name: 跳跃力增幅
+        description: '%s 跳跃力'
     return:
       name: 回城
       description: 原地不动蓄力，然后回到出生点
       failed: 中断回城
+      time:
+        name: 蓄力时间增幅
+        description: '%s 蓄力时间'
     portable_chest:
       name: 随身箱
       description: 可以随时随地打开末影箱
     lava_walker:
       name: 岩浆行者
       description: 你可以在岩浆上行走，并免疫岩浆块
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
     armor_shatterer:
       name: 破甲者
       description: 发射一个以80%概率给予周围生物易伤效果的能量球，使其受到的伤害增加
-      launch_count: '%s 发射次数'
+      count:
+        name: 发射次数增幅
+        description: '%s 发射次数'
+      immune_effect:
+        name: 效果免疫
+        description: '免疫易伤效果'
     death_archive:
       name: 死亡存档
       description: 使用后记录坐标，死亡时触发技能，阻止此次死亡，并回满血然后传送回记录的坐标，同时给予5秒无敌
       failed: 当前状态不可使用
+      time:
+        name: 无敌时间增幅
+        description: '%s 无敌时间'
     withering_touch:
       name: 凋零之触
       description: 强化3次普攻，攻击使目标附加凋零效果，持续3秒，可叠加
+      uses:
+        name: 使用次数增幅
+        description: '%s 使用次数'
+      duration:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      amplifier:
+        name: 等级增幅
+        description: '%s 等级'
     forced_growth:
       name: 拔苗助长
       description: 有概率催熟周围农作物
       success: 成功催熟了 %d 个农作物
       failed: 没有催熟任何农作物
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      count:
+        name: 数量增幅
+        description: '%s 数量'
+      chance:
+        name: 概率增幅
+        description: '%s 概率'
     space_blast:
       name: 空间爆破
       description: 对前方区域进行爆破，直接摧毁全部可破坏方块，并对区域内的实体造成大量伤害
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
+      range:
+        name: 范围增幅
+        description: '%s 范围'
+      distance:
+        name: 距离增幅
+        description: '%s 距离'
+      damage:
+        name: 伤害增幅
+        description: '%s 伤害'
+      slowdown:
+        name: 减速增幅
+        description: '%s 减速'
     gliding:
       name: 滑翔
       description: 可以在空中滑翔一段时间
+      time:
+        name: 持续时间增幅
+        description: '%s 持续时间'
   skillType:
     attack: 攻击
     defense: 防御

@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.particle.*
@@ -10,16 +9,31 @@ import net.minecraft.sound.*
 import net.minecraft.util.math.*
 
 class TeleportSkill : Skill(
-    id = "teleport",
-    types = listOf(SkillType.MOVEMENT),
-    cooldown = 2,
-    rarity = SkillRarity.UNCOMMON,
-    enhancements = setOf(SkillEnhancements.DISTANCE),
+    Settings(
+        id = "teleport",
+        types = listOf(SkillType.MOVEMENT),
+        cooldown = 2,
+        rarity = SkillRarity.UNCOMMON
+    )
 ) {
+
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
+            .addParameter(
+                name = "teleport_distance",
+                baseValue = 2.0,
+                enhancementId = "distance",
+                value = 0.5,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
-            var distance = 2.0 + user.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.5
+            var distance = getDoubleParam("teleport_distance", user, 2.0)
             val rotation = horizontalRotationVector.normalize()
             var offset = rotation.multiply(distance)
             var collisions = world.getBlockCollisions(this, boundingBox.offset(offset))
@@ -41,26 +55,14 @@ class TeleportSkill : Skill(
             requestTeleportOffset(offset.x, offset.y, offset.z)
             this.velocity = velocity
             updateVelocity()
-            world.playSound(
-                null,
-                prevPos.x,
-                prevPos.y,
-                prevPos.z,
-                SoundEvents.ENTITY_ENDERMAN_TELEPORT,
-                SoundCategory.PLAYERS,
-                1.0f,
-                1.0f
-            )
-            user.spawnParticles(
-                ParticleTypes.LARGE_SMOKE,
-                false,
-                prevPos,
-                10,
-                width / 2.0,
-                height / 2.0,
-                width / 2.0,
-                0.1
-            )
+            val sound = getSoundEventParam("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
+            sound?.let {
+                world.playSound(
+                    null, prevPos.x, prevPos.y, prevPos.z, it,
+                    SoundCategory.PLAYERS, 1.0f, 1.0f
+                )
+            }
+            spawnParticles(ParticleTypes.LARGE_SMOKE, false, prevPos, 10, width / 2.0, height / 2.0, width / 2.0, 0.1)
         }
         return UseResult.success()
     }

@@ -16,18 +16,18 @@ class DashSkill : Skill(
     )
 ) {
 
-    init {
-        this.settings.addParameter("dash_sound", ModSounds.DASH)
-
-        addParameter(
-            name = "velocity_multiplier",
-            baseValue = 1.5,
-            enhancementId = "multiplier",
-            value = 0.1,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("dash_sound", ModSounds.DASH)
+            .addParameter(
+                name = "velocity_multiplier",
+                baseValue = 1.5,
+                enhancementId = "velocity",
+                value = 0.1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = user.run {

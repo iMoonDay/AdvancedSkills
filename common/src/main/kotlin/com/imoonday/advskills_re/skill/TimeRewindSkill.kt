@@ -18,18 +18,21 @@ class TimeRewindSkill : LongPressSkill(
         cooldown = 60,
         rarity = SkillRarity.MYTHIC
     )
-//    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), UsingRenderTrigger, DeathTrigger {
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 5 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("teleport_sound", SoundEvents.ENTITY_FOX_TELEPORT)
+            .addParameter("heal_sound", ModSounds.HEAL)
+            .addParameter(
+                name = timeParamName,
+                baseValue = 5 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun onPress(player: ServerPlayerEntity): UseResult {
@@ -46,15 +49,15 @@ class TimeRewindSkill : LongPressSkill(
         NbtUtils.readEntityPositionFromTag(data)?.let {
             data.getString("Dimension").toIdentifier()?.let { id ->
                 player.server.getWorld(RegistryKey.of(RegistryKeys.WORLD, id))?.let { world ->
-                    player.playSound(SoundEvents.ENTITY_FOX_TELEPORT)
+                    player.playSoundFromParam("teleport_sound", SoundEvents.ENTITY_FOX_TELEPORT)
                     player.teleport(world, it.x, it.y, it.z, emptySet(), player.yaw, player.pitch)
-                    player.playSound(SoundEvents.ENTITY_FOX_TELEPORT)
+                    player.playSoundFromParam("teleport_sound", SoundEvents.ENTITY_FOX_TELEPORT)
                 }
             }
         }
         if (data.contains("Health")) {
-            player.playSound(ModSounds.HEAL.get())
             player.health = data.getFloat("Health") * player.maxHealth
+            player.playSoundFromParam("heal_sound", ModSounds.HEAL.get())
         }
         player.fallDistance = 0f
         player.stopUsing()

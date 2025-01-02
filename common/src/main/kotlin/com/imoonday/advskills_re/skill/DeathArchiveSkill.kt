@@ -23,18 +23,18 @@ class DeathArchiveSkill : Skill(
     )
 ), UsingProgressTrigger, DeathTrigger, DamageTrigger, TickTrigger, UnequipTrigger {
 
-    init {
-        this.settings.addParameter("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
-
-        addParameter(
-            name = "invulnerable_time",
-            baseValue = 5 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
+            .addParameter(
+                name = "invulnerable_time",
+                baseValue = 5 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {

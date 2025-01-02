@@ -12,39 +12,75 @@ import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
 class LastDitchEffortSkill : Skill(
-    id = "last_ditch_effort",
-    types = listOf(SkillType.PASSIVE),
-    cooldown = 180,
-    rarity = SkillRarity.SUPERB,
-    sound = ModSounds.HEAL,
-    enhancements = setOf(
-        SkillEnhancements.PERSISTENT_TIME,
-        SkillEnhancements.MOVEMENT_SPEED,
-        SkillEnhancements.DAMAGE,
-        SkillEnhancements.HEALING_AMOUNT,
-        SkillEnhancements.USE_COST
+    Settings(
+        id = "last_ditch_effort",
+        types = listOf(SkillType.PASSIVE),
+        cooldown = 180,
+        rarity = SkillRarity.SUPERB
     )
 ), DamageTrigger, AutoStopTrigger, AttackTrigger,
     AttributeTrigger, AutoTrigger, DeathTrigger {
 
-    init {
-        this.settings.addParameter("healing_sound", ModSounds.HEAL)
-
-        addParameter(
-            name = timeParamName,
-            baseValue = 15 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("healing_sound", ModSounds.HEAL)
+            .addParameter("health_threshold", 0.3f)
+            .addParameter(
+                name = timeParamName,
+                baseValue = 15 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "movement_speed",
+                baseValue = 0.4,
+                enhancementId = "speed",
+                value = 0.06,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage_bonus",
+                baseValue = 1.0f,
+                enhancementId = "damage",
+                value = 0.2f,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "healing_amount_multiplier",
+                baseValue = 0.5f,
+                enhancementId = "healing_multiplier",
+                value = 0.1f,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage_taken_bonus",
+                baseValue = 1.0f,
+                enhancementId = "damage_taken",
+                value = -0.2f,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "healing_amount",
+                baseValue = 0.2f,
+                enhancementId = "healing",
+                value = 0.1f,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Last Ditch Effort"),
             "Last Ditch Effort",
-            0.4 + player.getEnhancementLvl(SkillEnhancements.MOVEMENT_SPEED) * 0.06,
+            getDoubleParam("movement_speed", player, 0.4, 0.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -61,14 +97,19 @@ class LastDitchEffortSkill : Skill(
         source: DamageSource,
         player: ServerPlayerEntity,
         target: LivingEntity,
-    ): Float = if (!player.isUsing()) amount else getEnhancedValue(player, SkillEnhancements.DAMAGE, amount + 1)
+    ): Float = if (!player.isUsing()) amount
+    else (amount + 1) * getFloatParam("damage_bonus", player, 1.0f)
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean =
-        if (player.isReady() && !player.isDead && (player.health / player.maxHealth) < 0.3f) {
-            player.health = getEnhancedValue(player, SkillEnhancements.HEALING_AMOUNT, player.maxHealth * 0.5f)
-            player.playSoundFromParam("healing_sound", ModSounds.HEAL.get())
-            player.addAttributes()
-            true
+        if (player.isReady() && !player.isDead) {
+            val threshold = getFloatParam("health_threshold", player, 0.3f, 0.0f)
+            if ((player.health / player.maxHealth) < threshold) {
+                val healingBonus = getFloatParam("healing_amount", player, 0.2f, 0.0f)
+                player.health = player.maxHealth * (threshold + healingBonus)
+                player.playSoundFromParam("healing_sound", ModSounds.HEAL.get())
+                player.addAttributes()
+                true
+            } else false
         } else false
 
     override fun onDamaged(
@@ -77,7 +118,7 @@ class LastDitchEffortSkill : Skill(
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
     ): Float = if (!player.isUsing()) amount
-    else amount + (1 - player.getEnhancementLvl(SkillEnhancements.USE_COST) * 0.2f).coerceAtLeast(0f)
+    else amount + getFloatParam("damage_taken_bonus", player, 1.0f)
 
     override fun onStop(player: ServerPlayerEntity) {
         player.startCooling()

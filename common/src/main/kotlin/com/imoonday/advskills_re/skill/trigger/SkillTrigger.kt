@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.skill.trigger
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.*
-import com.imoonday.advskills_re.skill.enhancement.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
@@ -36,18 +35,6 @@ interface SkillTrigger {
     fun PlayerEntity.stopAndCooldown(cooldown: Int? = null) = stopAndCooldown(getAsSkill(), cooldown)
     fun PlayerEntity.getEnhancements(): Map<Enhancement, EnhancementData> = getEnhancements(getAsSkill())
 
-    @Deprecated("Use getEnhancement(id) instead", ReplaceWith("TODO()"))
-    fun <T : SkillEnhancement> PlayerEntity.getEnhancement(type: SkillEnhancementType<T>): T? =
-        type.factory.create(type, 0)
-
-    @Deprecated("Use getParameter(name) instead", ReplaceWith("TODO()"))
-    fun PlayerEntity.getEnhancementLvl(type: SkillEnhancementType<*>): Int =
-        getEnhancement(type)?.level ?: 0
-
-    @Deprecated("Use hasEnhancement(id) instead", ReplaceWith("TODO()"))
-    fun PlayerEntity.hasEnhancement(type: SkillEnhancementType<*>): Boolean =
-        getEnhancement(type) != null
-
     fun PlayerEntity.getEnhancement(id: String): Pair<Enhancement, EnhancementData>? =
         getEnhancement(getAsSkill(), id)
 
@@ -68,7 +55,8 @@ interface SkillTrigger {
         val baseValue = parameter.baseValue
 
         if (player == null) return baseValue
-        return Enhancement.calculateValue<Double>(player.getEnhancements(), baseValue).coerceIn(min, max)
+        return Enhancement.calculateValue<Double>(player.getEnhancements(skill, parameter), baseValue)
+            .coerceIn(min, max)
     }
 
     fun getFloatParam(
@@ -83,7 +71,7 @@ interface SkillTrigger {
         val baseValue = parameter.baseValue
 
         if (player == null) return baseValue
-        return Enhancement.calculateValue<Float>(player.getEnhancements(), baseValue).coerceIn(min, max)
+        return Enhancement.calculateValue<Float>(player.getEnhancements(skill, parameter), baseValue).coerceIn(min, max)
     }
 
     fun getIntParam(
@@ -94,18 +82,21 @@ interface SkillTrigger {
         max: Int = Int.MAX_VALUE
     ): Int {
         val skill = getAsSkill()
-        val parameter = skill.getParam(name)?.asInt() ?: return default ?: 0
+        val param = skill.getParam(name)
+        val parameter = param?.asInt() ?: return default ?: 0
         val baseValue = parameter.baseValue
 
         if (player == null) return baseValue
-        return Enhancement.calculateValue<Int>(player.getEnhancements(), baseValue).coerceIn(min, max)
+        return Enhancement.calculateValue<Int>(player.getEnhancements(skill, parameter), baseValue).coerceIn(min, max)
     }
 
     fun getBooleanParam(name: String, player: PlayerEntity?, default: Boolean?): Boolean {
         val skill = getAsSkill()
         val parameter = skill.getParam(name)?.asBoolean() ?: return default ?: false
         val baseValue = parameter.baseValue
-        return if (player != null && parameter.enhancements.any { player.getEnhancement(name)?.second?.activated == true }) !baseValue else baseValue
+        return if (player != null && parameter.enhancements.any {
+                player.getEnhancement(it)?.second?.activated == true
+            }) !baseValue else baseValue
     }
 
     fun getStringParam(name: String, default: String?): String {
@@ -143,10 +134,3 @@ interface SkillTrigger {
         private val NO_DATA_EXCEPTION = { IllegalStateException("Error! Trying to access data for an unlearned skill") }
     }
 }
-
-@Deprecated("Use getParam instead", ReplaceWith("TODO()"))
-inline fun <reified N : Number> SkillTrigger.getEnhancedValue(
-    player: PlayerEntity,
-    type: SkillEnhancementType<FixedValueEnhancement>,
-    value: N
-): N = player.getEnhancement(type)?.applyMultiplier(value) ?: value

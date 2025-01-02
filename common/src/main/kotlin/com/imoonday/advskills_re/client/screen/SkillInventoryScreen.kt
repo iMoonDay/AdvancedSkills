@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screen.*
 import net.minecraft.client.gui.screen.narration.*
 import net.minecraft.client.gui.tooltip.*
 import net.minecraft.client.gui.widget.*
+import net.minecraft.client.resource.language.*
 import net.minecraft.entity.player.*
 import net.minecraft.text.*
 import net.minecraft.util.*
@@ -498,7 +499,9 @@ class SkillInventoryScreen(
             skills.forEach(::addSlot)
             val size = skills.size
             val totalSlots = rows * columns
-            repeat(if (size < totalSlots) totalSlots - size else columns - (if (size % columns == 0) columns else size % columns)) {
+            repeat(
+                if (size < totalSlots) totalSlots - size else columns - (if (size % columns == 0) columns else size % columns)
+            ) {
                 addSlot(Skills.EMPTY)
             }
             scrollOffset = scrollOffset

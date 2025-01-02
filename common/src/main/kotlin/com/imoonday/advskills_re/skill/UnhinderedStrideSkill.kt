@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -9,21 +8,23 @@ import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
 class UnhinderedStrideSkill : Skill(
-    id = "unhindered_stride",
-    types = listOf(SkillType.ENHANCEMENT, SkillType.MOVEMENT),
-    cooldown = 15,
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    Settings(
+        id = "unhindered_stride",
+        types = listOf(SkillType.ENHANCEMENT, SkillType.MOVEMENT),
+        cooldown = 15,
+        rarity = SkillRarity.SUPERB
+    )
 ), StepHeightTrigger, AutoStopTrigger {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = timeParamName,
             baseValue = 10 * 20,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
     }
 

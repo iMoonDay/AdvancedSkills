@@ -21,21 +21,37 @@ class MultipleLaserSkill : LongPressSkill(
         cooldown = 45,
         rarity = SkillRarity.LEGENDARY
     )
-//    sound = ModSounds.LASER,
-//    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DAMAGE, SkillEnhancements.DISTANCE)
 ), DangerTrigger {
 
-    init {
-        this.settings.addParameter("laser_sound", ModSounds.LASER)
-
-        addParameter(
-            name = timeParamName,
-            baseValue = 10 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("damage_interval", 2)
+            .addParameter("laser_sound", ModSounds.LASER)
+            .addParameter(
+                name = timeParamName,
+                baseValue = 10 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage",
+                baseValue = 2.0f,
+                enhancementId = "damage",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "distance",
+                baseValue = 64.0,
+                enhancementId = "distance",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
@@ -49,7 +65,8 @@ class MultipleLaserSkill : LongPressSkill(
         if (usedTime % 4 == 0) {
             player.playSoundFromParam("laser_sound", ModSounds.LASER.get())
         }
-        if (usedTime % 2 == 0) {
+        val interval = getIntParam("damage_interval", player, 2, 1)
+        if (usedTime % interval == 0) {
             val entities: MutableList<LivingEntity> = mutableListOf()
             while (true) {
                 ProjectileUtil.raycast(
@@ -63,7 +80,7 @@ class MultipleLaserSkill : LongPressSkill(
                     entities.add(it.entity as LivingEntity)
                 } ?: break
             }
-            val damage = getEnhancedValue(player, SkillEnhancements.DAMAGE, 2f)
+            val damage = getFloatParam("damage", player, 2.0f)
             entities.forEach { it.damage(player.damageSources.magic(), damage) }
         }
     }
@@ -71,7 +88,8 @@ class MultipleLaserSkill : LongPressSkill(
     override fun clientTick(player: PlayerEntity, usedTime: Int) {
         super.clientTick(player, usedTime)
         if (!player.isUsing()) return
-        if (usedTime % 2 != 0) return
+        val interval = getIntParam("damage_interval", player, 2, 1)
+        if (usedTime % interval != 0) return
         val start = player.centerPos
         val length = player.raycastVisualBlock(getMaxDistance(player)).pos.distanceTo(start)
         val color = Vector3f(0f, 1f, 0f)
@@ -90,7 +108,7 @@ class MultipleLaserSkill : LongPressSkill(
     }
 
     private fun getMaxDistance(player: PlayerEntity): Double =
-        64.0 * (1 + player.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.2)
+        getDoubleParam("distance", player, 64.0)
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopAndCooldown(calculateCooldown(player, pressedTime))

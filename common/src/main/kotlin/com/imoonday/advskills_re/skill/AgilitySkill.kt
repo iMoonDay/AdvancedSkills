@@ -11,16 +11,17 @@ class AgilitySkill : PassiveSkill(
     ), customToggles = true
 ) {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = "speed_multiplier",
             baseValue = 0.2,
             enhancementId = "speed",
             value = 0.04,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
+        super.initDefaultSettings(settings)
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

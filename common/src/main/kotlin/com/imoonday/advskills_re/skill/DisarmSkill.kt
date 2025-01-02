@@ -21,38 +21,34 @@ class DisarmSkill : Skill(
     )
 ), PostAttackTrigger, PersistentTrigger, DeathTrigger {
 
-    init {
-        this.settings.addParameter("disarm_sound", ModSounds.DISARM)
-
-        addParameter(
-            name = "disarm_probability",
-            baseValue = 0.45f,
-            enhancementId = "success_probability",
-            value = 0.05f,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "disarm_duration",
-            baseValue = 5 * 20,
-            enhancementId = "duration",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "loot_probability",
-            baseValue = 0.01f,
-            enhancementId = "loot_probability",
-            value = 0.01f,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("disarm_sound", ModSounds.DISARM)
+            .addParameter(
+                name = "disarm_probability",
+                baseValue = 0.45f,
+                enhancementId = "success_probability",
+                value = 0.05f,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "disarm_duration",
+                baseValue = 5 * 20,
+                enhancementId = "duration",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "loot_probability",
+                baseValue = 0.01f,
+                enhancementId = "loot_probability",
+                value = 0.01f,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)

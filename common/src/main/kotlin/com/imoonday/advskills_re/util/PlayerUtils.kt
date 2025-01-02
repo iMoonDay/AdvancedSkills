@@ -263,10 +263,15 @@ private fun ServerPlayerEntity.choose(index: Int): Boolean {
     return true
 }
 
-fun PlayerEntity.enhance(skill: Skill, id: String, level: Int = 1): Boolean {
+fun PlayerEntity.enhance(skill: Skill, id: String, level: Int? = null): Boolean {
     if (!skill.hasEnhancement(id)) return false
 
-    getData(skill)?.run { getOrCreateEnhancementData(id, level).maxLevel = level } ?: return false
+    getData(skill)?.run {
+        val newEnhance = enhancements[id] == null
+        getOrCreateEnhancementData(id, level).apply {
+            maxLevel = level ?: if (newEnhance) maxLevel else maxLevel + 1
+        }
+    } ?: return false
 
     if (this is ServerPlayerEntity) {
         Channels.ENHANCE_SKILL_S2C.sendToPlayer(this, EnhanceSkillS2CPacket)
@@ -513,6 +518,9 @@ fun PlayerEntity.getEnhancements(skill: Skill): Map<Enhancement, EnhancementData
             enhancements[it.id]?.run { it to this }
         }.toMap()
     } ?: emptyMap()
+
+fun PlayerEntity.getEnhancements(skill: Skill, param: Parameter): Map<Enhancement, EnhancementData> =
+    getEnhancements(skill).filterKeys { param.enhancements.contains(it.id) }
 
 fun PlayerEntity.getEnhancement(skill: Skill, id: String): Pair<Enhancement, EnhancementData>? =
     getData(skill)?.let {

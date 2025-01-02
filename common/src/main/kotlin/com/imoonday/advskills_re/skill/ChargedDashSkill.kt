@@ -18,36 +18,33 @@ class ChargedDashSkill : LongPressSkill(
     )
 ), AttributeTrigger {
 
-    override val timeParamName: String = "charge_time"
+    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
 
-    init {
-        addParameter(
-            name = timeParamName,
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
+            name = AutoStopTrigger.CHARGE_TIME,
             baseValue = 3 * 20,
             enhancementId = "time",
             value = -0.16,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
+        ).addParameter(
             name = "charge_slowdown",
             baseValue = 0.2,
             enhancementId = "slowdown_reduction",
             value = -0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
+        ).addParameter(
             name = "velocity_multiplier",
             baseValue = 1.0,
             enhancementId = "multiplier",
             value = 0.2,
             operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
     }
 

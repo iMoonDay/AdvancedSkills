@@ -78,7 +78,7 @@ object EnhanceCommand : PlayerCommand("enhance") {
             return 0
         }
 
-        if (player.enhance(skill, enhancement.id)) {
+        if (player.enhance(skill, enhancement.id, level)) {
             context.sendFeedback(
                 "enhanceSkill.success",
                 player.displayName,

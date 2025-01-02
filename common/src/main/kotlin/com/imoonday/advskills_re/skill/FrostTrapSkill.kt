@@ -4,33 +4,57 @@ import com.imoonday.advskills_re.block.entity.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
-import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
 
 class FrostTrapSkill : Skill(
-    id = "frost_trap",
-    types = listOf(SkillType.CONTROL),
-    cooldown = 8,
-    rarity = SkillRarity.EPIC,
-    enhancements = setOf(
-        SkillEnhancements.RANGE,
-        SkillEnhancements.EFFECT_COUNT,
-        SkillEnhancements.STATUS_EFFECT_DURATION
+    Settings(
+        id = "frost_trap",
+        types = listOf(SkillType.CONTROL),
+        cooldown = 8,
+        rarity = SkillRarity.EPIC
     )
 ) {
+
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
+            name = "range",
+            baseValue = 0,
+            enhancementId = "range",
+            value = 1,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT
+        ).addParameter(
+            name = "trap_count",
+            baseValue = 1,
+            enhancementId = "count",
+            value = 1,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT
+        ).addParameter(
+            name = "freeze_duration",
+            baseValue = 10,
+            enhancementId = "duration",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
+        )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val world = user.world
         val pos = user.blockPos
-        val range = user.getEnhancementLvl(SkillEnhancements.RANGE)
-        val times = 1 + user.getEnhancementLvl(SkillEnhancements.EFFECT_COUNT)
+        val range = getIntParam("range", user, 0)
+        val times = getIntParam("trap_count", user, 1)
         var success = false
         val trapBlock = ModBlocks.FROST_TRAP.get()
         val defaultState = trapBlock.defaultState
-        val modifyDuration: (Int) -> Int = { getEnhancedValue(user, SkillEnhancements.STATUS_EFFECT_DURATION, it) }
+        val duration = getIntParam("freeze_duration", user, 10)
         val uuid = user.uuid
 
         BlockPos.iterateOutwards(pos, range, 0, range).forEach {
@@ -51,7 +75,7 @@ class FrostTrapSkill : Skill(
             if (blockEntity is FrostTrapBlockEntity) {
                 blockEntity.placer = uuid
                 if (!wasTrap) {
-                    blockEntity.duration = modifyDuration(blockEntity.duration)
+                    blockEntity.duration = duration
                 }
                 blockEntity.markDirty()
                 success = true

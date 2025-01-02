@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.Blocks.*
@@ -10,17 +9,30 @@ import net.minecraft.server.network.*
 import net.minecraft.util.math.*
 
 class WeedCleanerSkill : Skill(
-    id = "weed_cleaner",
-    types = listOf(SkillType.UTILITY),
-    cooldown = 10,
-    rarity = SkillRarity.COMMON,
-    enhancements = setOf(SkillEnhancements.RANGE)
+    Settings(
+        id = "weed_cleaner",
+        types = listOf(SkillType.UTILITY),
+        cooldown = 10,
+        rarity = SkillRarity.COMMON
+    )
 ) {
+
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
+            name = "clean_range",
+            baseValue = 25.0,
+            enhancementId = "range",
+            value = 5.0,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.FLOAT
+        )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val world = user.world
         val userPos = user.pos
-        val range = 25.0 + user.getEnhancementLvl(SkillEnhancements.RANGE) * 5.0
+        val range = getDoubleParam("clean_range", user, 25.0)
         user.boundingBox.expand(range).blockPosSet.forEach { pos ->
             val state = world.getBlockState(pos)
             if (WEEDS.contains(state.block)) {

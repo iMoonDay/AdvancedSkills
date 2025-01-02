@@ -18,26 +18,26 @@ class PerfectReflectionSkill : ReflectionSkill(
     baseChance = null
 ) {
 
-    init {
-        addParameter(
-            name = "healing_amount_multiplier",
-            baseValue = 0.1f,
-            enhancementId = "healing_multiplier",
-            value = 0.2f,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "power",
-            baseValue = 1.5,
-            enhancementId = "power",
-            value = 0.1,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter(
+                name = "healing_amount_multiplier",
+                baseValue = 0.1f,
+                enhancementId = "healing_multiplier",
+                value = 0.2f,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "power",
+                baseValue = 1.5,
+                enhancementId = "power",
+                value = 0.1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
+        super.initDefaultSettings(settings)
     }
 
     override fun ignoreDamage(

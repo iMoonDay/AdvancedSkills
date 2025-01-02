@@ -15,16 +15,17 @@ class RapidReflectionSkill : ReflectionSkill(
     baseChance = 0.5f
 ) {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = "damage_reduction",
             baseValue = 0.5f,
             enhancementId = "multiplier",
             value = 0.05f,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
+        super.initDefaultSettings(settings)
     }
 
     override fun onDamaged(

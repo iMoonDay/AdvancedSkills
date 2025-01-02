@@ -8,19 +8,45 @@ import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
 
 class PrimarySlownessSkill : Skill(
-    id = "primary_slowness",
-    types = listOf(SkillType.CONTROL),
-    cooldown = 6,
-    rarity = SkillRarity.RARE,
-    sound = ModSounds.FIRE,
-    enhancements = setOf(SkillEnhancements.RANGE, SkillEnhancements.LAUNCH_COUNT, SkillEnhancements.SELF_IMMUNE)
+    Settings(
+        id = "primary_slowness",
+        types = listOf(SkillType.CONTROL),
+        cooldown = 6,
+        rarity = SkillRarity.RARE
+    )
 ) {
 
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("launch_sound", ModSounds.FIRE)
+            .addParameter(
+                name = "extra_range",
+                baseValue = 0,
+                enhancementId = "range",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            ).addParameter(
+                name = "launch_count",
+                baseValue = 1,
+                enhancementId = "count",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            ).addParameter(
+                name = "ignore_owner",
+                baseValue = false,
+                enhancementId = "self_immune"
+            )
+    }
+
     override fun use(user: ServerPlayerEntity): UseResult {
-        val extraRange = user.getEnhancementLvl(SkillEnhancements.RANGE)
-        val times = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT)
-        val ignoreSelf = user.hasEnhancement(SkillEnhancements.SELF_IMMUNE)
-        user.executeAndAddTask(5, times) { user.spawnEnergyBall(extraRange, ignoreSelf) }
+        val extraRange = getIntParam("extra_range", user, 0)
+        val launchCount = getIntParam("launch_count", user, 1)
+        val ignoreSelf = getBooleanParam("ignore_owner", user, false)
+        user.executeAndAddTask(5, launchCount) { user.spawnEnergyBall(extraRange, ignoreSelf) }
         return UseResult.success()
     }
 
@@ -40,6 +66,10 @@ class PrimarySlownessSkill : Skill(
                     ignoreOwner = true
                 }
             }
-        )
+        ).also {
+            if (it) {
+                playSoundFromParam("launch_sound", ModSounds.FIRE.get())
+            }
+        }
     }
 }

@@ -16,22 +16,21 @@ class WallClimbingSkill : PassiveSkill(
         cooldown = 15,
         rarity = SkillRarity.RARE
     )
-//    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
 ), ClimbingTrigger, AutoStopTrigger, AutoTrigger, SendPlayerDataTrigger {
 
-    override fun isClimbing(player: PlayerEntity): Boolean = player.isUsing() && player.shouldClimb()
-
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = timeParamName,
             baseValue = 15 * 20,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
     }
+
+    override fun isClimbing(player: PlayerEntity): Boolean = player.isUsing() && player.shouldClimb()
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

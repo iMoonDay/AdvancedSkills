@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.command
 
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.*
@@ -68,23 +67,18 @@ object DeEnhanceCommand : PlayerCommand("de-enhance") {
     ): Int {
         val skill = SkillArgumentType.getSkill(context)
         val id = StringArgumentType.getString(context, "enhancement")
-        val enhancement = player.getEnhancement(skill, id)
+        val enhancement = skill.getEnhancement(id)
         if (enhancement == null) {
-            val type = SkillEnhancements.get(id)
-            if (type == null) {
-                context.sendError("deEnhanceSkill.unknown", id)
-            } else {
-                context.sendFeedback("deEnhanceSkill.invalid", player.displayName, skill.name, type.name)
-            }
+            context.sendError("deEnhanceSkill.unknown", id)
             return 0
         }
 
-        if (player.deEnhance(skill, enhancement.first.id)) {
+        if (player.deEnhance(skill, id)) {
             context.sendFeedback(
                 "deEnhanceSkill.success",
                 player.displayName,
                 skill.name,
-                enhancement.first.name
+                enhancement.name
             )
             return 1
         } else {

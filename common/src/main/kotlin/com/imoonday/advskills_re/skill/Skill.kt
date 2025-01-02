@@ -7,7 +7,6 @@ import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.item.*
 import com.imoonday.advskills_re.network.c2s.*
-import com.imoonday.advskills_re.skill.enhancement.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -20,11 +19,12 @@ import net.minecraft.sound.*
 import net.minecraft.text.*
 import net.minecraft.util.*
 import java.util.*
-import java.util.function.*
 
-abstract class Skill(val settings: Settings) : SkillTrigger {
+@Suppress("LeakingThis")
+abstract class Skill(settings: Settings) : SkillTrigger {
 
-    private var defaultSettings: Settings? = null
+    private val defaultSettings: Settings = settings
+    val settings: Settings
 
     val id: Identifier get() = settings.id
     val name: Text get() = settings.name
@@ -71,27 +71,19 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
     private val enhancementDescArgs: MutableMap<String, ((value: Double) -> Any)?> = mutableMapOf()
 
     init {
-        if (defaultCooldown > 0) {
-            this.settings.addEnhancement(
+        if (this.defaultSettings.cooldown > 0) {
+            this.defaultSettings.addEnhancement(
                 id = "cooldown",
                 value = -0.16,
                 operation = MULTIPLY_TOTAL,
                 maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
                 genericText = true
             )
-            this.addEnhancementDescArg("cooldown", Enhancement.ArgFormatters.INT_PERCENT)
         }
+        initDefaultSettings(this.defaultSettings)
+        this.settings = Settings(this.defaultSettings)
     }
-
-    @Deprecated("Use Settings instead")
-    internal constructor(
-        id: String,
-        types: List<SkillType>,
-        cooldown: Int = 0,
-        rarity: SkillRarity,
-        sound: Supplier<SoundEvent>? = null,
-        enhancements: Set<SkillEnhancementType<*>> = emptySet(),
-    ) : this(Settings(id, types, cooldown, rarity))
 
     open fun updateSettings(settings: Settings) {
         if (settings.id == this.settings.id) {
@@ -99,12 +91,10 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         }
     }
 
-    fun initDefaultSettings() {
-        this.defaultSettings = Settings(settings)
-    }
+    abstract fun initDefaultSettings(settings: Settings)
 
     open fun resetSettings() {
-        this.defaultSettings?.let { this.settings.copyFrom(it) }
+        this.settings.copyFrom(defaultSettings)
     }
 
     fun isEmpty(): Boolean = this === Skills.EMPTY || this is EmptySkill
@@ -136,10 +126,15 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         value: Number,
         operation: Enhancement.Operation,
         maxLevel: Int,
-        descArg: (value: Double) -> Any = Enhancement.ArgFormatters.SELF
+        descArg: (value: Double) -> Any = Enhancement.ArgFormatter.FLOAT
     ) {
-        this.settings.addParameter(name, baseValue, enhancementId, value.toDouble(), operation, maxLevel, false)
-        this.addEnhancementDescArg(enhancementId, descArg)
+        val formatter = descArg as? Enhancement.ArgFormatter
+        this.settings.addParameter(
+            name, baseValue, enhancementId, value.toDouble(), operation, maxLevel, formatter, false
+        )
+        if (formatter == null) {
+            this.addEnhancementDescArg(enhancementId, descArg)
+        }
     }
 
     protected fun addEnhancement(
@@ -147,10 +142,15 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         value: Number,
         operation: Enhancement.Operation,
         maxLevel: Int,
-        descArg: (value: Double) -> Any = Enhancement.ArgFormatters.SELF
+        descArg: (value: Double) -> Any = Enhancement.ArgFormatter.FLOAT
     ) {
-        this.settings.addEnhancement(id, value.toDouble(), operation, maxLevel, false)
-        this.addEnhancementDescArg(id, descArg)
+        val formatter = descArg as? Enhancement.ArgFormatter
+        this.settings.addEnhancement(
+            id, value.toDouble(), operation, maxLevel, formatter, false
+        )
+        if (formatter == null) {
+            this.addEnhancementDescArg(id, descArg)
+        }
     }
 
     fun addEnhancementDescArg(id: String, arg: (value: Double) -> Any) {
@@ -164,10 +164,6 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
     fun getEnhancement(id: String): Enhancement? = enhancements.firstOrNull { it.id == id }
 
     fun hasEnhancement(id: String): Boolean = enhancements.any { it.id == id }
-
-    @Deprecated("Use getEnhancement instead")
-    protected fun <T : SkillEnhancement> addEnhancementTooltipWithArg(type: SkillEnhancementType<T>, arg: (T) -> Any) {
-    }
 
     abstract fun use(user: ServerPlayerEntity): UseResult
 
@@ -244,7 +240,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
 
     open fun getEnhancementTooltip(id: String, level: Int): Text? =
         getEnhancement(id)?.let {
-            val arg = enhancementDescArgs[it.id]?.invoke(it.getValue(level))
+            val arg = (it.descArg ?: enhancementDescArgs[it.id])?.invoke(it.getValue(level))
             if (arg != null) Text.translatable(it.description, arg)
             else Text.translatable(it.description)
         }
@@ -253,7 +249,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         player.getEnhancements().map {
             val enhancement = it.key
             val level = it.value.currentLevel
-            val arg = enhancementDescArgs[enhancement.id]?.invoke(enhancement.getValue(level))
+            val arg = (enhancement.descArg ?: enhancementDescArgs[enhancement.id])?.invoke(enhancement.getValue(level))
             (if (arg != null) Text.translatable(enhancement.description, arg)
             else Text.translatable(enhancement.description)).formatted(Formatting.BLUE)
         }
@@ -404,10 +400,11 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             value: Number,
             operation: Enhancement.Operation,
             maxLevel: Int,
+            descArg: Enhancement.ArgFormatter?,
             genericText: Boolean = false
         ): Settings {
             parameters[name] = Parameter.create(baseValue, listOf(enhancementId))
-            return addEnhancement(enhancementId, value.toDouble(), operation, maxLevel, genericText)
+            return addEnhancement(enhancementId, value.toDouble(), operation, maxLevel, descArg, genericText)
         }
 
         fun addParameter(
@@ -425,6 +422,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             value: Number,
             operation: Enhancement.Operation,
             maxLevel: Int,
+            descArg: Enhancement.ArgFormatter?,
             genericText: Boolean = false
         ): Settings {
             val name = createName(genericText, id)
@@ -436,7 +434,8 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
                     description = descriptionKey,
                     valuePerLvl = value.toDouble(),
                     maxLevel = maxLevel,
-                    weight = Enhancement.Weight.Incremental(maxLevel * 2, -2)
+                    weight = Enhancement.Weight.Incremental(maxLevel * 2, -2),
+                    descArg = descArg
                 )
 
                 MULTIPLY_BASE -> Enhancement.MultiplyBase(
@@ -445,7 +444,8 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
                     description = descriptionKey,
                     valuePerLvl = value.toDouble(),
                     maxLevel = maxLevel,
-                    weight = Enhancement.Weight.Incremental(maxLevel * 2, -2)
+                    weight = Enhancement.Weight.Incremental(maxLevel * 2, -2),
+                    descArg = descArg
                 )
 
                 MULTIPLY_TOTAL -> Enhancement.MultiplyTotal(
@@ -454,7 +454,8 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
                     description = descriptionKey,
                     valuePerLvl = value.toDouble(),
                     maxLevel = maxLevel,
-                    weight = Enhancement.Weight.Incremental(maxLevel * 2, -2)
+                    weight = Enhancement.Weight.Incremental(maxLevel * 2, -2),
+                    descArg = descArg
                 )
 
                 NONE -> return addEnhancement(id)
@@ -485,7 +486,9 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
 
         fun copyFrom(other: Settings) {
             if (this.id != other.id) {
-                LOGGER.warn("${this.id} is copying settings from different id: ${other.id}, please make sure the parameters are correct")
+                LOGGER.warn(
+                    "${this.id} is copying settings from different id: ${other.id}, please make sure the parameters are correct"
+                )
             }
             this.name = other.name
             this.description = other.description

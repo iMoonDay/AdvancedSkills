@@ -87,7 +87,7 @@ data class ChoiceData(
         skill: Skill,
         enhancement: Enhancement,
         player: PlayerEntity
-    ) = createSkillFilter(except, skill, player)
+    ) = !skill.settings.drawable
         || except.any { !it.compatibleWith(EnhancementChoice(skill, enhancement.id)) }
         || player.isMaxEnhancement(skill, enhancement.id)
 

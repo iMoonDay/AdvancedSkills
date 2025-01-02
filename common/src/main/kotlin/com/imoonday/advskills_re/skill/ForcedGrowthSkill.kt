@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
@@ -12,20 +11,49 @@ import net.minecraft.util.math.*
 import net.minecraft.util.math.random.*
 
 class ForcedGrowthSkill : Skill(
-    id = "forced_growth",
-    types = listOf(SkillType.UTILITY),
-    cooldown = 30,
-    rarity = SkillRarity.RARE,
-    enhancements = setOf(SkillEnhancements.RANGE, SkillEnhancements.CHANCE, SkillEnhancements.EFFECT_COUNT)
+    Settings(
+        id = "forced_growth",
+        types = listOf(SkillType.UTILITY),
+        cooldown = 30,
+        rarity = SkillRarity.RARE
+    )
 ) {
+
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
+            name = "range",
+            baseValue = 5.0,
+            enhancementId = "range",
+            value = 1.0,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.FLOAT
+        ).addParameter(
+            name = "growth_count",
+            baseValue = 1,
+            enhancementId = "count",
+            value = 1,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT
+        ).addParameter(
+            name = "success_chance",
+            baseValue = 0.5f,
+            enhancementId = "chance",
+            value = 0.1f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
+        )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val world = user.serverWorld
-        val range = user.getEnhancementLvl(SkillEnhancements.RANGE)
-        val times = 1 + user.getEnhancementLvl(SkillEnhancements.EFFECT_COUNT)
-        val chance = 0.5f + user.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.1f
+        val range = getDoubleParam("range", user, 5.0)
+        val times = getIntParam("growth_count", user, 1)
+        val chance = getFloatParam("success_chance", user, 0.5f)
         val random = user.random
-        val result = user.boundingBox.expand(5.0 + range)
+        val result = user.boundingBox.expand(range)
             .blockPosSet
             .asSequence()
             .mapNotNull {

@@ -55,10 +55,13 @@ object SkillGenerator {
     }
 
     private fun shouldSkip(skill: Skill, player: PlayerEntity): Boolean =
-        player.hasLearned(skill) || !skill.settings.drawable
+        player.hasLearned(skill) || !skill.settings.drawable || skill.weight <= 0
 
     private fun shouldSkip(skill: Skill, enhancement: Enhancement, player: PlayerEntity): Boolean =
-        shouldSkip(skill, player) || player.isMaxEnhancement(skill, enhancement.id)
+        !skill.settings.drawable
+            || (player.getEnhancement(skill, enhancement.id)?.let { it.first.weight.getWeight(it.second.maxLevel + 1) }
+            ?: enhancement.weight.getWeight(1)) <= 0
+            || player.isMaxEnhancement(skill, enhancement.id)
 
     private fun createChoice(item: Any): Choosable {
         when (item) {

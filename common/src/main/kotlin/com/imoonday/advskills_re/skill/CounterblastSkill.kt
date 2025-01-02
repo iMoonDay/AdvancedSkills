@@ -19,37 +19,34 @@ class CounterblastSkill : PassiveSkill(
     ), customToggles = true
 ), PostAttackedTrigger, ProgressTrigger, StopTrigger {
 
-    init {
-        this.settings
+    override fun initDefaultSettings(settings: Settings) {
+        settings
             .addParameter("basic_probability_each_time", 0.2f)
             .addParameter("blast_sound", SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
-
-        addParameter(
-            name = "range",
-            baseValue = 5.0,
-            enhancementId = "range",
-            value = 1.0,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5
-        )
-
-        addParameter(
-            name = "power",
-            baseValue = 1.0,
-            enhancementId = "power",
-            value = 0.1,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addEnhancement(
-            id = "additional_probability",
-            value = 0.04,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+            .addParameter(
+                name = "range",
+                baseValue = 5.0,
+                enhancementId = "range",
+                value = 1.0,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            ).addParameter(
+                name = "power",
+                baseValue = 1.0,
+                enhancementId = "power",
+                value = 0.1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addEnhancement(
+                id = "additional_probability",
+                value = 0.04,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
+        super.initDefaultSettings(settings)
     }
 
     override fun postAttacked(source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {

@@ -22,30 +22,27 @@ class AbsoluteDefenseSkill : Skill(
     )
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
 
-    init {
-        this.settings
+    override fun initDefaultSettings(settings: Settings) {
+        settings
             .addParameter("block_sound", SoundEvents.ITEM_SHIELD_BLOCK)
             .addParameter("break_sound", SoundEvents.ITEM_SHIELD_BREAK)
-
-        addParameter(
-            name = timeParamName,
-            baseValue = 30 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "defense_count",
-            baseValue = 1,
-            enhancementId = "count",
-            value = 1,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 4,
-            descArg = Enhancement.ArgFormatters.INT
-        )
+            .addParameter(
+                name = timeParamName,
+                baseValue = 30 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "defense_count",
+                baseValue = 1,
+                enhancementId = "count",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 4,
+                descArg = Enhancement.ArgFormatter.INT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {

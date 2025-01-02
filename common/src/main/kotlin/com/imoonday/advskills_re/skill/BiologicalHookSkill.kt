@@ -17,15 +17,15 @@ class BiologicalHookSkill : Skill(
     )
 ) {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = "hook_life",
             baseValue = 5 * 20,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
     }
 

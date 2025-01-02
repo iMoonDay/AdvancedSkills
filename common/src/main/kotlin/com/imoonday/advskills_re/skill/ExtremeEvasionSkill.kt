@@ -19,28 +19,26 @@ class ExtremeEvasionSkill : Skill(
     )
 ), AutoStopTrigger, DamageTrigger, SendPlayerVelocityTrigger {
 
-    init {
-        this.settings.addParameter("moving_sound", ModSounds.DASH)
-
-        addParameter(
-            name = timeParamName,
-            baseValue = 10,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "velocity_multiplier",
-            baseValue = 2.0,
-            enhancementId = "multiplier",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("moving_sound", ModSounds.DASH)
+            .addParameter(
+                name = timeParamName,
+                baseValue = 10,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "velocity_multiplier",
+                baseValue = 2.0,
+                enhancementId = "velocity",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this) {

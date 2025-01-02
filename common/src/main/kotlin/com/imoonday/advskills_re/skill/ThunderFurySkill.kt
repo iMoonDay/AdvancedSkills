@@ -18,24 +18,26 @@ class ThunderFurySkill : Skill(
     )
 ) {
 
-    init {
-        this.settings.addEnhancement("immune_to_lightning")
-
-        addParameter(
-            name = "summon_amount",
-            baseValue = 1,
-            enhancementId = "amount",
-            value = 1,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addEnhancement("immune_to_lightning")
+            .addParameter("max_distance", 512.0)
+            .addParameter(
+                name = "summon_amount",
+                baseValue = 1,
+                enhancementId = "amount",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val result = user.raycastBlock(512.0)
+        val maxDistance = getDoubleParam("max_distance", user, 512.0)
+        val result = user.raycastBlock(maxDistance)
         if (result.type != HitResult.Type.BLOCK) return UseResult.fail(failedMessage())
-
+    
         val times = getIntParam("summon_amount", user, 1)
         val immuneToLightning = user.hasEnhancement("immune_to_lightning")
         user.executeAndAddTask(5, times) { summonLightning(user, result.pos, immuneToLightning) }

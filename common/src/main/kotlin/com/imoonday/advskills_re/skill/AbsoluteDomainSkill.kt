@@ -18,30 +18,28 @@ class AbsoluteDomainSkill : Skill(
     )
 ), AutoStopTrigger {
 
-    init {
-        this.settings
+    override fun initDefaultSettings(settings: Settings) {
+        settings
             .addParameter("min_hardness_included", 0f)
             .addParameter("max_hardness_excluded", Blocks.OBSIDIAN.hardness)
             .addParameter("above_player_y", true)
-
-        addParameter(
-            name = timeParamName,
-            baseValue = 3 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "range",
-            baseValue = 1.0,
-            enhancementId = "range",
-            value = 1.0,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 3
-        )
+            .addParameter(
+                name = timeParamName,
+                baseValue = 3 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "range",
+                baseValue = 1.0,
+                enhancementId = "range",
+                value = 1.0,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 3,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {

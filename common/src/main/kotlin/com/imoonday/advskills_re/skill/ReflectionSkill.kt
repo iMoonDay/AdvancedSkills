@@ -24,42 +24,40 @@ abstract class ReflectionSkill(
 
     override val defaultTime: Int = duration
 
-    init {
-        if (!this.settings.types.contains(SkillType.DEFENSE)) {
-            this.settings.addTypeToTop(SkillType.DEFENSE)
+    override fun initDefaultSettings(settings: Settings) {
+        if (!settings.types.contains(SkillType.DEFENSE)) {
+            settings.addTypeToTop(SkillType.DEFENSE)
         }
 
-        this.settings.addParameter("reflection_sound", SoundEvents.ITEM_SHIELD_BLOCK)
-
-        addParameter(
-            name = timeParamName,
-            baseValue = duration,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "damage_multiplier",
-            baseValue = damageMultiplier,
-            enhancementId = "multiplier",
-            value = 0.1f,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+        settings
+            .addParameter("reflection_sound", SoundEvents.ITEM_SHIELD_BLOCK)
+            .addParameter(
+                name = timeParamName,
+                baseValue = duration,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage_multiplier",
+                baseValue = damageMultiplier,
+                enhancementId = "multiplier",
+                value = 0.1f,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
 
         baseChance?.let {
-            addParameter(
+            settings.addParameter(
                 name = "reflection_chance",
                 baseValue = it,
                 enhancementId = "chance",
                 value = 0.05f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatters.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
             )
         }
     }

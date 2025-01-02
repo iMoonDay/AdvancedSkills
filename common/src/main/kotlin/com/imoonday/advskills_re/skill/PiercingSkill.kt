@@ -7,39 +7,60 @@ import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
+import net.minecraft.nbt.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
 
 class PiercingSkill : Skill(
-    id = "piercing",
-    types = listOf(SkillType.MOVEMENT, SkillType.ATTACK),
-    cooldown = 15,
-    rarity = SkillRarity.SUPERB,
-    sound = ModSounds.PIERCING,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DAMAGE, SkillEnhancements.VELOCITY)
+    Settings(
+        id = "piercing",
+        types = listOf(SkillType.MOVEMENT, SkillType.ATTACK),
+        cooldown = 15,
+        rarity = SkillRarity.SUPERB
+    )
 ), AutoStopTrigger, DangerTrigger, GravityTrigger {
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 8,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("piercing_sound", ModSounds.PIERCING)
+            .addParameter(
+                name = timeParamName,
+                baseValue = 8,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage",
+                baseValue = 6.0f,
+                enhancementId = "damage",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "velocity",
+                baseValue = 1.5,
+                enhancementId = "velocity",
+                value = 0.1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
-    override fun use(user: ServerPlayerEntity): UseResult {
-        user.stopFallFlying()
-        user.velocity = user.horizontalRotationVector.normalize().multiply(1.5, 0.0, 1.5)
-        user.updateVelocity()
-        return UseResult.of(user.startUsing {
-            it.putDouble("x", user.velocity.x)
-            it.putDouble("z", user.velocity.z)
-        })
-    }
+    override fun use(user: ServerPlayerEntity): UseResult =
+        UseResult.startUsing(user, this, NbtCompound().apply {
+            putDouble("x", user.velocity.x)
+            putDouble("z", user.velocity.z)
+        }) {
+            user.stopFallFlying()
+            val initialVelocity = getDoubleParam("velocity", user, 1.5)
+            user.velocity = user.horizontalRotationVector.normalize().multiply(initialVelocity, 0.0, initialVelocity)
+            user.updateVelocity()
+        }
 
     override fun onStop(player: ServerPlayerEntity) {
         player.velocity = Vec3d.ZERO
@@ -54,14 +75,15 @@ class PiercingSkill : Skill(
             player.stopUsing()
             return
         }
-        player.getActiveData().let {
-            if (it.contains("x") && it.contains("z")) {
-                player.velocity = Vec3d(it.getDouble("x"), 0.0, it.getDouble("z"))
-                player.updateVelocity()
-            }
+
+        val data = player.getActiveData()
+        if (data.contains("x") && data.contains("z")) {
+            player.velocity = Vec3d(data.getDouble("x"), 0.0, data.getDouble("z"))
+            player.updateVelocity()
         }
-        val damage = getEnhancedValue(player, SkillEnhancements.DAMAGE, 6.0f)
-        val velocity = 1.5 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.1
+
+        val damage = getFloatParam("damage", player, 6.0f)
+        val velocity = getDoubleParam("velocity", player, 1.5)
         player.world.getOtherEntities(
             player, player.boundingBox
         ) { it is LivingEntity }.forEach {

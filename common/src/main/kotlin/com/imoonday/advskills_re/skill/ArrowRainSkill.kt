@@ -20,50 +20,46 @@ class ArrowRainSkill : Skill(
     )
 ) {
 
-    init {
-        this.settings
+    override fun initDefaultSettings(settings: Settings) {
+        settings
             .addParameter("max_distance", 256.0)
             .addParameter("min_summon_amount", 50)
             .addParameter("max_summon_amount", 100)
             .addParameter("summon_interval", 2)
             .addParameter("launch_sound", SoundEvents.ENTITY_ARROW_SHOOT)
-
-        addParameter(
-            name = "arrow_damage",
-            baseValue = 2.0,
-            enhancementId = "damage",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "launch_count",
-            baseValue = 5,
-            enhancementId = "count",
-            value = 1,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT
-        )
-
-        addParameter(
-            name = "summon_range",
-            baseValue = 20.0,
-            enhancementId = "range",
-            value = 2.0,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5
-        )
-
-        addEnhancement(
-            id = "summon_amount",
-            value = 10.0,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT
-        )
+            .addParameter(
+                name = "arrow_damage",
+                baseValue = 2.0,
+                enhancementId = "damage",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "wave_count",
+                baseValue = 5,
+                enhancementId = "count",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            ).addParameter(
+                name = "summon_range",
+                baseValue = 20.0,
+                enhancementId = "range",
+                value = 2.0,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            ).addParameter(
+                name = "extra_arrows",
+                baseValue = 0,
+                enhancementId = "amount",
+                value = 10,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
@@ -71,14 +67,15 @@ class ArrowRainSkill : Skill(
         val maxDistance = getDoubleParam("max_distance", user, 256.0)
         val raycast = user.raycast(maxDistance, 0f, true)
         val center = if (raycast.type == HitResult.Type.MISS) user.pos else raycast.pos
-        val remainingTimes = getIntParam("launch_count", user, 5)
+        val waveCount = getIntParam("wave_count", user, 5)
         val range = getDoubleParam("summon_range", user, 20.0)
-        val amount = user.getEnhancementValue("summon_amount").toInt()
-        val (min, max) = getIntParam("min_summon_amount", user, 50) to getIntParam("max_summon_amount", user, 100)
+        val extraArrows = getIntParam("extra_arrows", user, 0)
+        val minAmount = getIntParam("min_summon_amount", user, 50)
+        val maxAmount = getIntParam("max_summon_amount", user, 100)
         val interval = getIntParam("summon_interval", user, 2)
         val sound = getSoundEventParam("launch_sound", SoundEvents.ENTITY_ARROW_SHOOT)
-        user.executeAndAddTask(interval, remainingTimes) {
-            spawnArrows(user, center, damage, range, min, max, amount, sound)
+        user.executeAndAddTask(interval, waveCount) {
+            spawnArrows(user, center, damage, range, minAmount, maxAmount, extraArrows, sound)
         }
         return UseResult.success()
     }
@@ -109,9 +106,7 @@ class ArrowRainSkill : Skill(
                     user
                 ).apply {
                     pitch = -90f
-                    if (this.damage != damage) {
-                        this.damage = damage
-                    }
+                    this.damage = damage
                 }.also {
                     particles.add(
                         ParticleS2CPacket(
@@ -122,12 +117,12 @@ class ArrowRainSkill : Skill(
                             0f, 5
                         )
                     )
-                }).also {
-                if (it && !result) {
-                    result = true
                 }
+            ).also {
+                if (it && !result) result = true
             }
         }
+
         if (particles.isNotEmpty()) {
             user.sendPacket(BundleS2CPacket(particles))
         }

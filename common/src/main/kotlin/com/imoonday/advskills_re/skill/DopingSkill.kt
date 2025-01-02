@@ -20,35 +20,33 @@ class DopingSkill : Skill(
     )
 ), AttributeTrigger, AutoStopTrigger, UsingRenderTrigger {
 
-    init {
-        addParameter(
-            timeParamName,
-            10 * 20,
-            "time",
-            0.2,
-            Enhancement.Operation.MULTIPLY_TOTAL,
-            5
-        )
-
-        addParameter(
-            name = "speed_multiplier",
-            baseValue = 0.5,
-            enhancementId = "multiplier",
-            value = 0.05,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "health_cost",
-            baseValue = 5f,
-            enhancementId = "cost",
-            value = -0.16f,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter(
+                name = timeParamName,
+                baseValue = 10 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "speed_multiplier",
+                baseValue = 0.5,
+                enhancementId = "speed",
+                value = 0.05,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "health_cost",
+                baseValue = 5f,
+                enhancementId = "cost",
+                value = -0.16f,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

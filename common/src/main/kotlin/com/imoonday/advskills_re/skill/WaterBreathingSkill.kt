@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -11,21 +10,23 @@ import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
 class WaterBreathingSkill : Skill(
-    id = "water_breathing",
-    types = listOf(SkillType.ENHANCEMENT),
-    cooldown = 10,
-    rarity = SkillRarity.RARE,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    Settings(
+        id = "water_breathing",
+        types = listOf(SkillType.ENHANCEMENT),
+        cooldown = 10,
+        rarity = SkillRarity.RARE
+    )
 ), AutoStopTrigger, BreatheInWaterTrigger {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = timeParamName,
             baseValue = 30 * 20,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
     }
 
@@ -37,19 +38,17 @@ class WaterBreathingSkill : Skill(
     }
 
     override fun clientTick(player: PlayerEntity, usedTime: Int) {
-        if (player.isUsing()
+        val shouldAdd = (player.isUsing()
             && usedTime % 4 == 0
-            && player.world.getFluidState(player.eyePos.toBlockPos()).isOf(Fluids.WATER)
-        ) {
+            && player.world.getFluidState(player.eyePos.toBlockPos()).isOf(Fluids.WATER))
+        if (shouldAdd) {
             val rotation = player.rotationVector.normalize().multiply(player.width / 2.0)
             player.world.addParticle(
                 ParticleTypes.BUBBLE,
                 player.x + rotation.x,
                 player.eyeY + rotation.y,
                 player.z + rotation.z,
-                0.0,
-                1.0,
-                0.0,
+                0.0, 1.0, 0.0,
             )
         }
         super.clientTick(player, usedTime)

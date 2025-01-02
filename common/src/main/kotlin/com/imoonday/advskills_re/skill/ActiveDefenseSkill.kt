@@ -22,36 +22,33 @@ class ActiveDefenseSkill : LongPressSkill(
     )
 ), DamageTrigger, AttributeTrigger, UsingRenderTrigger {
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 5 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "damage_reduction",
-            baseValue = 0.2f,
-            enhancementId = "reduction_value",
-            value = 0.06f,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "charge_slowdown",
-            baseValue = 0.5,
-            enhancementId = "slowdown_multiplier",
-            value = -0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter(
+                name = timeParamName,
+                baseValue = 5 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage_reduction",
+                baseValue = 0.2f,
+                enhancementId = "reduction_value",
+                value = 0.06f,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "charge_slowdown",
+                baseValue = 0.5,
+                enhancementId = "slowdown_reduction",
+                value = -0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

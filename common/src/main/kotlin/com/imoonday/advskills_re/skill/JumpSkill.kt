@@ -1,37 +1,40 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
 class JumpSkill : Skill(
-    id = "jump",
-    types = listOf(SkillType.MOVEMENT),
-    cooldown = 1,
-    rarity = SkillRarity.COMMON,
-    enhancements = setOf(SkillEnhancements.POWER)
+    Settings(
+        id = "jump",
+        types = listOf(SkillType.MOVEMENT),
+        cooldown = 1,
+        rarity = SkillRarity.COMMON
+    )
 ) {
+
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
+            name = "jump_power",
+            baseValue = 1.0,
+            enhancementId = "power",
+            value = 0.1,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
+        )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             stopFallFlying()
             jump()
-            val power = 1 + user.getEnhancementLvl(SkillEnhancements.POWER) * 0.1
+            val power = getDoubleParam("jump_power", user, 1.0)
             velocity = velocity.multiply(1.0, power, 1.0)
             updateVelocity()
-            user.spawnParticles(
-                ParticleTypes.CLOUD,
-                false,
-                pos,
-                10,
-                0.5,
-                0.0,
-                0.5,
-                0.1
-            )
+            spawnParticles(ParticleTypes.CLOUD, false, pos, 10, 0.5, 0.0, 0.5, 0.1)
         }
         return UseResult.success()
     }

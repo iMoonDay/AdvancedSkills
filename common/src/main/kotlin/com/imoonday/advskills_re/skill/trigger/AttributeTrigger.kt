@@ -22,9 +22,6 @@ interface AttributeTrigger : UnequipTrigger {
         }
     }
 
-    fun PlayerEntity.applyChargeSlowdownEnhancement(multiplier: Double): Double =
-        getEnhancedValue(this, SkillEnhancements.CHARGE_SLOWDOWN, multiplier).coerceAtLeast(0.0)
-
     fun ServerPlayerEntity.removeAttributes() {
         this@AttributeTrigger.getAttributes(this).forEach {
             attributes.getCustomInstance(it.key)?.run {

@@ -13,11 +13,15 @@ import net.minecraft.stat.*
 import net.minecraft.text.*
 
 class PortableChestSkill : Skill(
-    id = "portable_chest",
-    types = listOf(SkillType.UTILITY),
-    cooldown = 5,
-    rarity = SkillRarity.SUPERB
+    Settings(
+        id = "portable_chest",
+        types = listOf(SkillType.UTILITY),
+        cooldown = 5,
+        rarity = SkillRarity.SUPERB
+    )
 ), TickTrigger, UsingProgressTrigger {
+
+    override fun initDefaultSettings(settings: Settings) = Unit
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {
         user.openHandledScreen(

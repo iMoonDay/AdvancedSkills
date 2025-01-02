@@ -13,30 +13,49 @@ import net.minecraft.util.math.*
 import kotlin.math.*
 
 class RisingShockSkill : Skill(
-    id = "rising_shock",
-    types = listOf(SkillType.MOVEMENT),
-    cooldown = 10,
-    rarity = SkillRarity.RARE,
-    sound = ModSounds.DASH,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.RANGE, SkillEnhancements.VELOCITY)
+    Settings(
+        id = "rising_shock",
+        types = listOf(SkillType.MOVEMENT),
+        cooldown = 10,
+        rarity = SkillRarity.RARE
+    )
 ), AutoStopTrigger, GravityTrigger {
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 8,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("use_sound", ModSounds.DASH)
+            .addParameter(
+                name = timeParamName,
+                baseValue = 8,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "range",
+                baseValue = 1.0,
+                enhancementId = "range",
+                value = 0.8,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            ).addParameter(
+                name = "velocity_multiplier",
+                baseValue = 1.0,
+                enhancementId = "velocity",
+                value = 0.01,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this) {
         user.stopFallFlying()
         user.velocity = Vec3d(0.0, user.getVelocityY(), 0.0)
         user.updateVelocity()
-    }
+    }.withSound(getSoundEventParam("use_sound", ModSounds.DASH.get()))
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return
@@ -44,25 +63,19 @@ class RisingShockSkill : Skill(
         player.velocity = Vec3d(0.0, velocityY, 0.0)
         player.updateVelocity()
         player.spawnParticles(
-            ParticleTypes.CLOUD,
-            false,
-            Vec3d(player.x, player.boundingBox.minY, player.z),
-            10,
-            0.5,
-            0.5,
-            0.5,
-            0.1
+            ParticleTypes.CLOUD, false, Vec3d(player.x, player.boundingBox.minY, player.z), 10, 0.5, 0.5, 0.5, 0.1
         )
-        val range = 1.0 + player.getEnhancementLvl(SkillEnhancements.RANGE) * 0.8
-        player.world.getOtherEntities(player, player.boundingBox.expand(range)) { it is LivingEntity }
-            .forEach {
-                it.velocity = it.velocity.withAxis(Direction.Axis.Y, max(it.velocity.y, velocityY))
-                it.velocityDirty = true
-                (it as? ServerPlayerEntity)?.updateVelocity()
-            }
+        val range = getDoubleParam("range", player, 1.0)
+        player.world.getOtherEntities(player, player.boundingBox.expand(range)) { it is LivingEntity }.forEach {
+            it.velocity = it.velocity.withAxis(Direction.Axis.Y, max(it.velocity.y, velocityY))
+            it.velocityDirty = true
+            (it as? ServerPlayerEntity)?.updateVelocity()
+        }
         super.serverTick(player, usedTime)
     }
 
-    private fun PlayerEntity.getVelocityY(): Double =
-        max(velocity.y, 0.5) * (1.0 + this.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.01)
+    private fun PlayerEntity.getVelocityY(): Double {
+        val multiplier = getDoubleParam("velocity_multiplier", this, 1.0)
+        return max(velocity.y, 0.5) * multiplier
+    }
 }

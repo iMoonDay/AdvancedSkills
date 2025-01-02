@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.entity.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -15,29 +14,50 @@ import net.minecraft.util.math.*
 import kotlin.math.*
 
 class WindBladeSkill : Skill(
-    id = "wind_blade",
-    types = listOf(SkillType.ENHANCEMENT),
-    cooldown = 10,
-    rarity = SkillRarity.RARE,
-    enhancements = setOf(SkillEnhancements.VELOCITY, SkillEnhancements.SUMMON_AMOUNT)
+    Settings(
+        id = "wind_blade",
+        types = listOf(SkillType.ENHANCEMENT),
+        cooldown = 10,
+        rarity = SkillRarity.RARE
+    )
 ), PostAttackTrigger, PersistentTrigger, DeathTrigger, UsingRenderTrigger {
+
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter(
+                name = "blade_velocity",
+                baseValue = 0.25,
+                enhancementId = "velocity",
+                value = 0.05,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            ).addParameter(
+                name = "extra_blades",
+                baseValue = 0,
+                enhancementId = "amount",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
     override fun postSweepAttack(player: PlayerEntity, target: LivingEntity) {
         super.postSweepAttack(player, target)
         if (!player.isUsing() || player.world.isClient) return
-        val velocity =
-            player.horizontalRotationVector * (0.25 + player.getEnhancementLvl(SkillEnhancements.VELOCITY) * 0.05)
-        val summonAmount = player.getEnhancementLvl(SkillEnhancements.SUMMON_AMOUNT)
+        val velocity = player.horizontalRotationVector * getDoubleParam("blade_velocity", player, 0.25)
+        val extraBlades = getIntParam("extra_blades", player, 0)
         spawnTornado(player, velocity, target)
-        calculateRadians(summonAmount).forEach {
+        calculateRadians(extraBlades).forEach {
             spawnTornado(player, velocity.rotateY(-it.toFloat()), target)
         }
         player.stopAndCooldown()
     }
 
-    fun calculateRadians(n: Int): List<Double> {
+    private fun calculateRadians(n: Int): List<Double> {
         val negativeCount = floor(n / 2.0).toInt()
         val positiveCount = n - negativeCount
 

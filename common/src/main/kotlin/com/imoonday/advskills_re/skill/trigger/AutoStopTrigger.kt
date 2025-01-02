@@ -6,7 +6,7 @@ import net.minecraft.server.network.*
 
 interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
 
-    val timeParamName: String get() = "persist_time"
+    val timeParamName: String get() = PERSIST_TIME
 
     val defaultTime: Int get() = 0
 
@@ -33,5 +33,11 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
         super.postUnequipped(player, slot)
         onStop(player)
+    }
+
+    companion object {
+
+        const val PERSIST_TIME = "persist_time"
+        const val CHARGE_TIME = "charge_time"
     }
 }

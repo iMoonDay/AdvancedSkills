@@ -23,49 +23,44 @@ class ChargedSweepSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
-    override val timeParamName: String = "charge_time"
+    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
 
-    init {
-        this.settings.addParameter("damage_item", true, "no_item_damage")
-
-        addParameter(
-            name = timeParamName,
-            baseValue = 3 * 20,
-            enhancementId = "time",
-            value = -0.16,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "charge_slowdown",
-            baseValue = 0.8,
-            enhancementId = "slowdown_reduction",
-            value = -0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "range",
-            baseValue = 5.0,
-            enhancementId = "range",
-            value = 1.0,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5
-        )
-
-        addParameter(
-            name = "damage_multiplier",
-            baseValue = 1.0f,
-            enhancementId = "multiplier",
-            value = 0.2f,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("damage_item", true, "no_item_damage")
+            .addParameter(
+                name = AutoStopTrigger.CHARGE_TIME,
+                baseValue = 3 * 20,
+                enhancementId = "time",
+                value = -0.16,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "charge_slowdown",
+                baseValue = 0.8,
+                enhancementId = "slowdown_reduction",
+                value = -0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "range",
+                baseValue = 5.0,
+                enhancementId = "range",
+                value = 1.0,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            ).addParameter(
+                name = "damage_multiplier",
+                baseValue = 1.0f,
+                enhancementId = "multiplier",
+                value = 0.2f,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(

@@ -21,5 +21,7 @@ class EmptySkill : Skill(
 
     override fun updateSettings(settings: Settings) = Unit
 
+    override fun initDefaultSettings(settings: Settings) = Unit
+
     override fun resetSettings() = Unit
 }

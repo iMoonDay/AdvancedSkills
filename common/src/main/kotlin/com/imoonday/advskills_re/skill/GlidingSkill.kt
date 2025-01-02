@@ -20,16 +20,17 @@ class GlidingSkill : PassiveSkill(
     )
 ), TickTrigger, JumpStateTrigger, ProgressTrigger {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = "gliding_time",
             baseValue = 5 * 20,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
+        super.initDefaultSettings(settings)
     }
 
     override fun tick(player: PlayerEntity, usedTime: Int) {

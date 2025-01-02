@@ -15,26 +15,37 @@ import net.minecraft.server.network.*
 private const val REMAINING_EFFECTS = "RemainingEffects"
 
 class NegativeResistanceSkill : Skill(
-    id = "negative_resistance",
-    types = listOf(SkillType.ENHANCEMENT),
-    cooldown = 30,
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.EFFECT_COUNT)
+    Settings(
+        id = "negative_resistance",
+        types = listOf(SkillType.ENHANCEMENT),
+        cooldown = 30,
+        rarity = SkillRarity.SUPERB
+    )
 ), AutoStopTrigger, StatusEffectTrigger, UsingRenderTrigger {
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 5 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter(
+                name = timeParamName,
+                baseValue = 5 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "effect_count",
+                baseValue = 1,
+                enhancementId = "count",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this, NbtCompound().apply {
-        putInt(REMAINING_EFFECTS, user.getEnhancementLvl(SkillEnhancements.EFFECT_COUNT))
+        putInt(REMAINING_EFFECTS, getIntParam("effect_count", user, 1))
     })
 
     override fun cannotHaveStatusEffect(player: PlayerEntity, effect: StatusEffectInstance): Boolean =

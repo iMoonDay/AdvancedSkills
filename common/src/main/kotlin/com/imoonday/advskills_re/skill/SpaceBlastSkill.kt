@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.*
@@ -25,34 +24,60 @@ class SpaceBlastSkill : LongPressSkill(
         cooldown = 60,
         rarity = SkillRarity.MYTHIC
     )
-//    enhancements = setOf(
-//        SkillEnhancements.RANGE,
-//        SkillEnhancements.DAMAGE,
-//        SkillEnhancements.CHARGE_TIME,
-//        SkillEnhancements.CHARGE_SLOWDOWN,
-//        SkillEnhancements.DISTANCE
-//    )
 ), AttributeTrigger, WorldRendererTrigger, GlowingTrigger {
 
-    override val timeParamName: String = "charge_time"
+    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
 
-    init {
-        addParameter(
-            name = timeParamName,
-            baseValue = 5 * 20,
-            enhancementId = "time",
-            value = -0.16,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter(
+                name = AutoStopTrigger.CHARGE_TIME,
+                baseValue = 5 * 20,
+                enhancementId = "time",
+                value = -0.16,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "area_range",
+                baseValue = 4,
+                enhancementId = "range",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            ).addParameter(
+                name = "max_distance",
+                baseValue = 64.0,
+                enhancementId = "distance",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage",
+                baseValue = 15.0f,
+                enhancementId = "damage",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "charge_slowdown",
+                baseValue = 0.4,
+                enhancementId = "slowdown",
+                value = -0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Space Blast Charging"),
             "Space Blast Charging",
-            player.applyChargeSlowdownEnhancement(-0.4),
+            -getDoubleParam("charge_slowdown", player, 0.4),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -103,16 +128,16 @@ class SpaceBlastSkill : LongPressSkill(
         ).pos.toBlockPos()
 
     fun getAreaRange(player: PlayerEntity): Int =
-        4 + player.getEnhancementLvl(SkillEnhancements.RANGE)
+        getIntParam("area_range", player, 4)
 
     fun getMaxDistance(player: PlayerEntity): Double =
-        64.0 * (1.0 + player.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.2)
+        getDoubleParam("max_distance", player, 64.0)
 
     fun getArea(player: PlayerEntity): BlockBox =
         BlockBox(getTargetCenter(player)).expand(getAreaRange(player))
 
     fun getDamage(player: PlayerEntity): Float =
-        getEnhancedValue(player, SkillEnhancements.DAMAGE, 15f)
+        getFloatParam("damage", player, 15.0f)
 
     fun forEachBlock(player: PlayerEntity, filter: (BlockPos) -> Boolean = { true }, action: (BlockPos) -> Unit) {
         val area = getArea(player)
@@ -145,8 +170,7 @@ class SpaceBlastSkill : LongPressSkill(
         val center = getTargetCenter(player)
         val range = getAreaRange(player) + 0.5
         val world = player.world
-        val stream = world.getNonSpectatingEntities(T::class.java, Box.from(area))
+        return world.getNonSpectatingEntities(T::class.java, Box.from(area))
             .filter { it !== player && it.squaredDistanceTo(center.toCenterPos()) <= range * range && filter(it) }
-        return stream
     }
 }

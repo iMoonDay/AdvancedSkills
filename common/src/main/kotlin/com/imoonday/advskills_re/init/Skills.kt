@@ -324,7 +324,6 @@ object Skills {
         }
         if (!skill.isEmpty()) ITEMS.register(skill.id.path) { SkillItem(skill) }
         skills[skill.id] = skill
-        skill.initDefaultSettings()
         return skill
     }
 

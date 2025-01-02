@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
@@ -17,17 +16,25 @@ class GrapplingHookSkill : LongPressSkill(
         cooldown = 15,
         rarity = SkillRarity.EPIC
     )
-//    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.DISTANCE)
 ), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger {
 
-    init {
-        addParameter(
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
             name = timeParamName,
             baseValue = 3 * 20,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
+        ).addParameter(
+            name = "max_distance",
+            baseValue = 30.0,
+            enhancementId = "distance",
+            value = 4.0,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.FLOAT
         )
     }
 
@@ -76,5 +83,5 @@ class GrapplingHookSkill : LongPressSkill(
         if (player.isReady() && player.raycastBlock(getMaxDistance(player)).type == HitResult.Type.BLOCK)
             Crosshairs.RING else Crosshairs.NONE
 
-    fun getMaxDistance(player: PlayerEntity) = 30.0 + player.getEnhancementLvl(SkillEnhancements.DISTANCE) * 4.0
+    private fun getMaxDistance(player: PlayerEntity) = getDoubleParam("max_distance", player, 30.0)
 }

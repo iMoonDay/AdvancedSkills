@@ -1,5 +1,7 @@
 package com.imoonday.advskills_re.util
 
+import kotlin.random.*
+
 class DynamicDrawPool<P : Any, S : Any>(
     private val primaryItems: List<P>,
     private val secondaryItems: List<S>,
@@ -11,14 +13,13 @@ class DynamicDrawPool<P : Any, S : Any>(
     private val secondarySkipCondition: (S) -> Boolean = { false }
 ) {
 
-    private data class Entry(val item: Any, val cumulativeWeight: Int)
+    private val random = Random(System.currentTimeMillis())
 
-    private val normalizationFactor = 100.0 // 归一化权重的因子
+    private data class Entry(val item: Any, val cumulativeWeight: Double)
 
-    // 构建累积权重池
     private fun buildCumulativePool(): List<Entry> {
         val pool = mutableListOf<Entry>()
-        var cumulativeWeight = 0
+        var cumulativeWeight = 0.0
 
         // 过滤掉跳过的项目，重新计算有效的权重总和
         val filteredPrimary = primaryItems.filterNot(primarySkipCondition)
@@ -28,18 +29,18 @@ class DynamicDrawPool<P : Any, S : Any>(
         val secondaryTotalWeight = filteredSecondary.sumOf { getSecondaryWeight(it).coerceAtLeast(0) }
 
         // 防止系数过小的动态调整
-        val primaryCoefficient = (primaryRatio / primaryTotalWeight.coerceAtLeast(1)) * normalizationFactor
-        val secondaryCoefficient = (secondaryRatio / secondaryTotalWeight.coerceAtLeast(1)) * normalizationFactor
+        val primaryCoefficient = primaryRatio / primaryTotalWeight.coerceAtLeast(1)
+        val secondaryCoefficient = secondaryRatio / secondaryTotalWeight.coerceAtLeast(1)
 
         // 构建主条目权重池
         for (item in filteredPrimary) {
-            cumulativeWeight += (getPrimaryWeight(item) * primaryCoefficient).toInt()
+            cumulativeWeight += getPrimaryWeight(item) * primaryCoefficient
             pool.add(Entry(item, cumulativeWeight))
         }
 
         // 构建次条目权重池
         for (item in filteredSecondary) {
-            cumulativeWeight += (getSecondaryWeight(item) * secondaryCoefficient).toInt()
+            cumulativeWeight += getSecondaryWeight(item) * secondaryCoefficient
             pool.add(Entry(item, cumulativeWeight))
         }
 
@@ -51,8 +52,8 @@ class DynamicDrawPool<P : Any, S : Any>(
     // 抽取单个条目
     private fun randomDraw(cumulativePool: List<Entry>): Any? {
         if (cumulativePool.isEmpty()) return null
-        val totalWeight = cumulativePool.last().cumulativeWeight // 确保总权重的范围
-        val randomValue = (1..totalWeight).random() // 随机数范围覆盖所有权重
+        val totalWeight = cumulativePool.last().cumulativeWeight
+        val randomValue = random.nextDouble() * totalWeight // 使用 Double 随机数
 
         return cumulativePool.firstOrNull { it.cumulativeWeight >= randomValue }?.item
     }

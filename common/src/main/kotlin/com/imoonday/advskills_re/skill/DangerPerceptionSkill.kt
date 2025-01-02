@@ -28,37 +28,34 @@ class DangerPerceptionSkill : Skill(
     )
 ), AutoStopTrigger, AttributeTrigger, DamageTrigger, UsingRenderTrigger {
 
-    init {
-        this.settings.addParameter("speed_up_sound", ModSounds.DASH)
-
-        addParameter(
-            name = timeParamName,
-            baseValue = 2 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "speed_multiplier",
-            baseValue = 0.3,
-            enhancementId = "multiplier",
-            value = 0.06,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
-
-        addParameter(
-            name = "trigger_range",
-            baseValue = 3.0,
-            enhancementId = "range",
-            value = 0.4,
-            operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("speed_up_sound", ModSounds.DASH)
+            .addParameter(
+                name = timeParamName,
+                baseValue = 2 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "speed_multiplier",
+                baseValue = 0.3,
+                enhancementId = "speed",
+                value = 0.06,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "trigger_range",
+                baseValue = 3.0,
+                enhancementId = "range",
+                value = 0.4,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.FLOAT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)

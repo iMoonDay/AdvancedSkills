@@ -20,18 +20,18 @@ class AdvancedPurificationSkill : Skill(
     )
 ) {
 
-    init {
-        this.settings.addParameter("success_sound", ModSounds.PURIFY)
-
-        addParameter(
-            name = "max_removal_time",
-            baseValue = 30 * 20,
-            enhancementId = "time",
-            value = 0.2,
-            operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5,
-            descArg = Enhancement.ArgFormatters.INT_PERCENT
-        )
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("success_sound", ModSounds.PURIFY)
+            .addParameter(
+                name = "max_removal_time",
+                baseValue = 30 * 20,
+                enhancementId = "time",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = user.statusEffects

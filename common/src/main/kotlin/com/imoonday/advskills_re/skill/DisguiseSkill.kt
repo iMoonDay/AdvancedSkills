@@ -19,14 +19,15 @@ class DisguiseSkill : Skill(
     )
 ), DisguiseTrigger, UseInterruptTrigger, AutoStopTrigger {
 
-    init {
-        addParameter(
-            timeParamName,
-            30 * 20,
-            "time",
-            0.2,
-            Enhancement.Operation.MULTIPLY_TOTAL,
-            5
+    override fun initDefaultSettings(settings: Settings) {
+        settings.addParameter(
+            name = timeParamName,
+            baseValue = 30 * 20,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
     }
 

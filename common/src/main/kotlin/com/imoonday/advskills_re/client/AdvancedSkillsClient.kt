@@ -2,7 +2,9 @@ package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.client.modifier.*
 import com.imoonday.advskills_re.client.render.skill.*
+import com.imoonday.advskills_re.init.*
 import dev.architectury.platform.*
+import net.minecraft.client.resource.language.*
 
 object AdvancedSkillsClient {
 

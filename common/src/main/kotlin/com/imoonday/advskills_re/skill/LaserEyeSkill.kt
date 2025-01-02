@@ -3,38 +3,69 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
-import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.projectile.*
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
+import net.minecraft.sound.*
 import net.minecraft.util.hit.*
 import org.joml.*
 
 class LaserEyeSkill : Skill(
-    id = "laser_eye",
-    types = listOf(SkillType.ATTACK),
-    cooldown = 15,
-    rarity = SkillRarity.EPIC,
-    enhancements = setOf(SkillEnhancements.LAUNCH_COUNT, SkillEnhancements.DISTANCE, SkillEnhancements.DAMAGE)
+    Settings(
+        id = "laser_eye",
+        types = listOf(SkillType.ATTACK),
+        cooldown = 15,
+        rarity = SkillRarity.EPIC
+    )
 ) {
 
+    override fun initDefaultSettings(settings: Settings) {
+        settings
+            .addParameter("laser_sound", ModSounds.LASER)
+            .addParameter(
+                name = "launch_count",
+                baseValue = 1,
+                enhancementId = "count",
+                value = 1,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT
+            ).addParameter(
+                name = "distance",
+                baseValue = 64.0,
+                enhancementId = "distance",
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = "damage",
+                baseValue = 8.0f,
+                enhancementId = "damage",
+                value = 0.2f,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
+            )
+    }
+
     override fun use(user: ServerPlayerEntity): UseResult {
-        val times = user.getEnhancementLvl(SkillEnhancements.LAUNCH_COUNT) + 1
-        val distanceMultiplier = 1.0 + user.getEnhancementLvl(SkillEnhancements.DISTANCE) * 0.2
-        val distance = 64.0 * distanceMultiplier
-        val damage = getEnhancedValue(user, SkillEnhancements.DAMAGE, 8f)
+        val times = getIntParam("launch_count", user, 1)
+        val distance = getDoubleParam("distance", user, 64.0)
+        val damage = getFloatParam("damage", user, 8.0f)
+        val sound = getSoundEventParam("laser_sound", ModSounds.LASER.get())
 
         user.executeAndAddTask(5, times) {
-            execute(user, distance, damage)
+            execute(user, distance, damage, sound)
             true
         }
         return UseResult.success()
     }
 
-    private fun execute(player: ServerPlayerEntity, distance: Double, damage: Float) {
+    private fun execute(player: ServerPlayerEntity, distance: Double, damage: Float, sound: SoundEvent?) {
         val cameraPos = player.getCameraPosVec(0f)
         val maxDistance = player.raycastVisualBlock(distance).let {
             if (it.type == HitResult.Type.MISS) distance else it.pos.distanceTo(cameraPos)
@@ -54,7 +85,8 @@ class LaserEyeSkill : Skill(
         }
         player.serverWorld.players.forEach { it.sendPacket(BundleS2CPacket(particles)) }
 
-        player.playSound(ModSounds.LASER.get())
+        sound?.let { player.playSound(it) }
+
         val entities: MutableList<LivingEntity> = mutableListOf()
         while (true) {
             ProjectileUtil.raycast(

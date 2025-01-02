@@ -169,34 +169,85 @@ advskills_re:
     extreme_reflection:
       name: Extreme Reflection
       description: Reflects the first arbitrary damage within 0.25 seconds at a 75% probability, and resets the cooldown immediately after the reflection
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      multiplier:
+        name: Damage Enhancement
+        description: '%s Damage'
     rapid_reflection:
       name: Rapid Reflection
       description: Reflects the first arbitrary damage with a 50% damage reduction within 0.5 seconds at a 50% probability, and halves the cooldown immediately after the reflection
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      multiplier:
+        name: Damage Enhancement
+        description: '%s Damage'
     micro_reflection:
       name: Micro Reflection
       description: Reflects 50% of the first arbitrary damage with a 25% reduction within 1 seconds at a 25% probability
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      multiplier:
+        name: Damage Enhancement
+        description: '%s Damage'
     perfect_reflection:
       name: Perfect Reflection
       description: Reflects 150% of the first arbitrary damage with a 100% reduction with a 10% healing within 0.1 seconds at a 100% probability, and resets the cooldown immediately and the source of damage is bounced after the reflection
       success: Perfect Deflection!%s
+      healing_multiplier:
+        name: Healing Amount Enhancement
+        description: '%s Healing Amount'
+      power:
+        name: Power Enhancement
+        description: '%s Power'
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      multiplier:
+        name: Damage Enhancement
+        description: '%s Damage'
     wall_climbing:
       name: Wall Climbing
       description: Allow to climb the wall
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
     piercing:
       name: Piercing
       description: Dash forward for a distance, dealing damage and knocking back creatures on contact
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      damage:
+        name: Damage Enhancement
+        description: '%s Damage'
+      velocity:
+        name: Speed Enhancement
+        description: '%s Speed'
     primary_healing:
       name: Primary Healing
       description: Instantly heals 4 HP, and then all healing skills enter cooldown
+      amount:
+        name: Healing Amount Enhancement
+        description: '%s Healing Amount'
     intermediate_healing:
       name: Intermediate Healing
       description: Instantly heals 8 HP, and then all healing skills enter cooldown
+      amount:
+        name: Healing Amount Enhancement
+        description: '%s Healing Amount'
     advanced_healing:
       name: Advanced Healing
       description: Instantly heals 12 HP, and then all healing skills enter cooldown
     top_healing:
       name: Top Healing
       description: Instantly heals 16 HP, and then all healing skills enter cooldown
+      amount:
+        name: Healing Amount Enhancement
+        description: '%s Healing Amount'
     extreme_evasion:
       name: Extreme Evasion
       description: Dodge based on the direction of your movement, making you immune to any damage while moving
@@ -216,6 +267,15 @@ advskills_re:
     dying_counterattack:
       name: Dying Counterattack
       description: 'When receiving fatal damage, the HP returns to the upper limit, and then enters death mode: HP is continuously deducted, and HP can be sucked by attacking other creatures. When the HP is insufficient, you will die'
+      healing_amount:
+        name: Healing Amount Enhancement
+        description: '%s Healing Amount'
+      damage_amount:
+        name: Damage Enhancement
+        description: '%s Continuous Damage'
+      damage_interval:
+        name: Damage Interval Enhancement
+        description: '%s Damage Interval'
     disarm:
       name: Disarm
       description: The next attack has a 45% chance to disarm the target, and there is a very small chance to capture the target's handheld item after the disarm
@@ -255,6 +315,12 @@ advskills_re:
     self_repair:
       name: Self Repair
       description: Automatically repair your equipment, up to 50%
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      limit:
+        name: Limit Enhancement
+        description: '%s Limit'
     instant_explosive:
       name: Instant Explosive
       description: Throw a unstable tnt
@@ -341,6 +407,15 @@ advskills_re:
     doping:
       name: Doping
       description: Gain a lot of speed at the cost of a little health
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      cost:
+        name: Health Cost Enhancement
+        description: '%s Health Cost'
+      speed:
+        name: Speed Enhancement
+        description: '%s Speed'
     grappling_hook:
       name: Grappling Hook
       description: Grab a block and move towards it
@@ -371,50 +446,140 @@ advskills_re:
     counterblast:
       name: Counterblast
       description: When attacked, there is a chance to knock back nearby mobs, and the more times you go, the higher the chance
+      additional_probability:
+        name: Additional Probability Enhancement
+        description: '%s Additional Probability'
     time_rewind:
       name: Time Rewind
       description: Backtrack position and health. If you die while charging, you will immediately rewind
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
     living_detection:
       name: Living Detection
       description: Detect nearby moving creatures
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      range:
+        name: Range Enhancement
+        description: '%s Range'
     blood_seal:
       name: Blood Seal
       description: Seal the healing effect of the creature
       interrupt: Charge interrupted
       failed: No Target selected
+      time:
+        name: Charge Time Enhancement
+        description: '%s Charge Time'
+      slowdown_reduction:
+        name: Slowdown Reduction
+        description: '%s Slowdown'
+      damage:
+        name: Damage Enhancement
+        description: '%s Damage'
+      distance:
+        name: Distance Enhancement
+        description: '%s Distance'
+      duration:
+        name: Duration Enhancement
+        description: '%s Duration'
     sword_soul_guarding:
       name: Sword Soul Guarding
       description: Summons an enchanted sword to follow the battle. There is a probability of launching an additional attack when attacking. An additional attack will definitely be triggered when injured
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      chance:
+        name: Probability Enhancement
+        description: '%s Probability'
+      amount:
+        name: Amount Enhancement
+        description: '%s Amount'
+      interval:
+        name: Interval Enhancement
+        description: '%s Interval'
     wind_blade:
       name: Wind Blade
       description: Creates a small tornado when triggering Sweeping Blade
+      velocity:
+        name: Speed Enhancement
+        description: '%s Speed'
+      amount:
+        name: Amount Enhancement
+        description: '%s Amount'
     biological_hook:
       name: Biological Hook
       description: Launches a biological grappling hook, with a certain probability of being broken free
     duplication:
       name: Duplication
       description: Summons a clone and becomes invisible for 3 second
+      amount:
+        name: Amount Enhancement
+        description: '%s Amount'
+      duration:
+        name: Invisibility Duration Enhancement
+        description: '%s Invisibility Duration'
     magnetic_trap:
       name: Magnetic Trap
       description: Generate a slowdown trap
+      range:
+        name: Range Enhancement
+        description: '%s Range'
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
     multiple_laser:
       name: Multiple Laser
       description: Fires a laser continuously, causing small damage to all entities in its path
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
+      damage:
+        name: Damage Enhancement
+        description: '%s Damage'
+      distance:
+        name: Distance Enhancement
+        description: '%s Distance'
     super_shadow_clone:
       name: Super Shadow Clone
       description: Summons several clones towards different directions and becomes invisible for 5 seconds
+      amount:
+        name: Amount Enhancement
+        description: '%s Amount'
+      duration:
+        name: Duration Enhancement
+        description: '%s Duration'
     arrow_rain:
       name: Arrow Rain
       description: Summons several arrows randomly above the target
       launch_count: '%s Summon Waves'
       range: '%s Summon Range Radius'
       summon_amount: '%s Arrow Count/Wave'
+      damage:
+        name: Damage Enhancement
+        description: '%s Damage'
+      count:
+        name: Count Enhancement
+        description: '%s Count'
+      range:
+        name: Range Enhancement
+        description: '%s Range'
+      amount:
+        name: Wave Enhancement
+        description: '%s Waves'
     weed_cleaner:
       name: Weed Cleaner
       description: Clean up weeds around
+      range:
+        name: Range Enhancement
+        description: '%s Range'
     unhindered_stride:
       name: Unhindered Stride
       description: You can cross any obstacle without being blocked
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
     damage_absorption:
       name: Damage Absorption
       description: Within a certain period of time, absorb one damage and restore your own health according to the amount of damage
@@ -424,16 +589,25 @@ advskills_re:
     wall_jump:
       name: Wall Jump
       description: You can jump while on the wall
+      power:
+        name: Jump Power Enhancement
+        description: '%s Jump Power'
     return:
       name: Return
       description: Stay where you are, charge up, and then return to your spawn point
       failed: Return interrupted
+      time:
+        name: Charge Time Enhancement
+        description: '%s Charge Time'
     portable_chest:
       name: Portable Chest
       description: Access your Ender Chest from anywhere, anytime
     lava_walker:
       name: Lava Walker
       description: You can walk on lava and are immune to magma blocks
+      time:
+        name: Duration Enhancement
+        description: '%s Duration'
     armor_shatterer:
       name: Armor Shatterer
       description: Fires an energy ball with an 80% chance to weaken nearby entities, increasing the damage they take
@@ -510,7 +684,7 @@ advskills_re:
       suggestion: Have a new skill suggestion? Click to go to github to submit an issue or PR!
     list:
       level: 'Level: %s'
-      exp: 'Exp: %d'
+      exp: 'Exp: %d / %d'
       empty: No skills learned yet
       button:
         tooltip: Displayed in Creative Mode Only
@@ -590,7 +764,7 @@ advskills_re:
     generic: 'Generic Skill Slot %d'
     active: 'Active Skill Slot %d'
     passive: 'Passive Skill Slot %d'
-  skillEnhancement:
+  enhancement:
     empty:
       name: No Enhancement
       description: No Effect
@@ -735,3 +909,8 @@ subtitles:
     laser: Laser
     return: Return
     enhance: Enhance
+modmenu:
+  nameTranslation:
+    advskills_re: 'Advanced Skills: Remastered'
+  descriptionTranslation:
+    advskills_re: A variety of skills for more exciting combat experience
