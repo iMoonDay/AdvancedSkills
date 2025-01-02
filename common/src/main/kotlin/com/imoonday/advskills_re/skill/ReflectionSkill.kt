@@ -14,32 +14,54 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
 abstract class ReflectionSkill(
-    id: String,
-    types: List<SkillType> = listOf(SkillType.DEFENSE),
-    cooldown: Int,
-    rarity: SkillRarity,
-    duration: Int,
-    enhancements: Set<SkillEnhancementType<*>> = emptySet()
+    settings: Settings,
+    val duration: Int,
+    val damageMultiplier: Float = 1.0f,
+    private val baseChance: Float?
 ) : Skill(
-    id = id,
-    types = types,
-    cooldown = cooldown,
-    rarity = rarity,
-    enhancements = enhancements + setOf(
-        SkillEnhancements.PERSISTENT_TIME,
-        SkillEnhancements.DAMAGE
-    )
+    settings
 ), DamageTrigger, ReflectionTrigger, UsingRenderTrigger {
 
+    override val defaultTime: Int = duration
+
     init {
+        if (!this.settings.types.contains(SkillType.DEFENSE)) {
+            this.settings.addTypeToTop(SkillType.DEFENSE)
+        }
+
+        this.settings.addParameter("reflection_sound", SoundEvents.ITEM_SHIELD_BLOCK)
+
         addParameter(
             name = timeParamName,
             baseValue = duration,
             enhancementId = "time",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
-            maxLevel = 5
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
         )
+
+        addParameter(
+            name = "damage_multiplier",
+            baseValue = damageMultiplier,
+            enhancementId = "multiplier",
+            value = 0.1f,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        baseChance?.let {
+            addParameter(
+                name = "reflection_chance",
+                baseValue = it,
+                enhancementId = "chance",
+                value = 0.05f,
+                operation = Enhancement.Operation.ADDITION,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatters.INT_PERCENT
+            )
+        }
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
@@ -52,8 +74,8 @@ abstract class ReflectionSkill(
         attacker: LivingEntity?,
         amount: Float,
     ) {
-        player.playSound(SoundEvents.ITEM_SHIELD_BLOCK)
-        val damage = getEnhancedValue(player, SkillEnhancements.DAMAGE, amount)
+        player.playSoundFromParam("reflection_sound", SoundEvents.ITEM_SHIELD_BLOCK)
+        val damage = amount * getFloatParam("damage_multiplier", player, 1.0f, 0f)
         attacker?.damage(player.damageSources.thorns(player), damage)?.let {
             player.sendMessage(
                 translate("reflection.${if (it) "success" else "failed"}"),
@@ -63,12 +85,11 @@ abstract class ReflectionSkill(
     }
 
     protected fun ServerPlayerEntity.reflect(
-        chance: Float,
         attacker: LivingEntity?,
         amount: Float,
     ): Boolean {
-        val extraChance = this.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.05f
-        return if (random.nextFloat() < chance + extraChance) {
+        val chance = getFloatParam("reflection_chance", this, baseChance, 0f, 1f)
+        return if (random.nextFloat() < chance) {
             reflect(this, attacker, amount)
             true
         } else {

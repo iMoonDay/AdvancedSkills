@@ -50,8 +50,7 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
 
     override fun onDeath(damageSource: DamageSource) {
         if (!world.isClient) (owner as? ServerPlayerEntity)?.run {
-            stopCooling(summonSkill)
-            startCooling(summonSkill)
+            cooldown(summonSkill)
             val attacker = damageSource.attacker ?: damageSource.source
             sendMessage(
                 if (attacker == null) {
@@ -70,8 +69,7 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
         super.onDeath(damageSource)
     }
 
-    override fun drop(source: DamageSource) {
-    }
+    override fun drop(source: DamageSource) = Unit
 
     fun tryTeleport() {
         val blockPos = owner!!.blockPos

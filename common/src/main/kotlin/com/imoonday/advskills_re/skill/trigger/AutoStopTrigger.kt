@@ -8,8 +8,10 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
 
     val timeParamName: String get() = "persist_time"
 
+    val defaultTime: Int get() = 0
+
     fun getPersistTime(player: PlayerEntity): Int =
-        getIntParam(timeParamName, player, 0, 0)
+        getIntParam(timeParamName, player, defaultTime, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)

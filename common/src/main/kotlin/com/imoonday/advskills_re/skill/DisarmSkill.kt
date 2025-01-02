@@ -13,12 +13,47 @@ import net.minecraft.item.*
 import net.minecraft.server.network.*
 
 class DisarmSkill : Skill(
-    id = "disarm",
-    types = listOf(SkillType.ENHANCEMENT),
-    cooldown = 15,
-    rarity = SkillRarity.SUPERB,
-    enhancements = setOf(SkillEnhancements.CHANCE, SkillEnhancements.STATUS_EFFECT_DURATION)
+    Settings(
+        id = "disarm",
+        types = listOf(SkillType.ENHANCEMENT),
+        cooldown = 15,
+        rarity = SkillRarity.SUPERB
+    )
 ), PostAttackTrigger, PersistentTrigger, DeathTrigger {
+
+    init {
+        this.settings.addParameter("disarm_sound", ModSounds.DISARM)
+
+        addParameter(
+            name = "disarm_probability",
+            baseValue = 0.45f,
+            enhancementId = "success_probability",
+            value = 0.05f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addParameter(
+            name = "disarm_duration",
+            baseValue = 5 * 20,
+            enhancementId = "duration",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addParameter(
+            name = "loot_probability",
+            baseValue = 0.01f,
+            enhancementId = "loot_probability",
+            value = 0.01f,
+            operation = Enhancement.Operation.ADDITION,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
@@ -26,16 +61,19 @@ class DisarmSkill : Skill(
         super.postAttack(source, player, target)
         if (!player.isUsing()) return
 
-        val chance = player.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.05f
         val random = player.random
-        if (random.nextFloat() < 0.45f + chance) {
-            val duration = getEnhancedValue(player, SkillEnhancements.STATUS_EFFECT_DURATION, 5 * 20)
+
+        val probability = getFloatParam("disarm_probability", player, 0.45f)
+        if (random.nextFloat() < probability) {
+            val duration = getIntParam("disarm_duration", player, 5 * 20)
             target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM.get(), duration))
+
             player.sendMessage(translate("skill.disarm.success"), true)
-            player.playSound(ModSounds.DISARM.get())
+            player.playSoundFromParam("disarm_sound", ModSounds.DISARM.get())
             (target as? PlayerEntity)?.sendMessage(translate("skill.disarm.disarmed"), true)
-            val dropChance = player.getEnhancementLvl(SkillEnhancements.CHANCE) * 0.01f
-            if (random.nextFloat() < 0.01f + dropChance) {
+
+            val lootProbability = getFloatParam("loot_probability", player, 0.01f)
+            if (random.nextFloat() < lootProbability) {
                 if (target is ServerPlayerEntity)
                     target.dropSelectedItem(true)
                 else if (target.dropStack(target.mainHandStack) != null) {

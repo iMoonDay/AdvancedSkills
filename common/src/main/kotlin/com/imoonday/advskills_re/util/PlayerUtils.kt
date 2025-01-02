@@ -100,7 +100,7 @@ fun PlayerEntity.startCooling(skill: Skill, cooldown: Int? = null) {
     cooldown(skill, cooldown)
 }
 
-private fun PlayerEntity.cooldown(skill: Skill, cooldown: Int? = null) {
+fun PlayerEntity.cooldown(skill: Skill, cooldown: Int? = null) {
     modifySkillData(skill) {
         var time = skill.applyCooldownEnhancements(this, cooldown ?: skill.cooldown)
         forEachTrigger<CooldownTrigger> { trigger -> time = trigger.getCooldown(this, time) }
@@ -119,7 +119,7 @@ fun PlayerEntity.stopCooling(skill: Skill) {
 
 fun PlayerEntity.modifyCooldown(skill: Skill, operation: (Int) -> Int) {
     modifySkillData(skill) {
-        it.cooldown = skill.applyCooldownEnhancements(this, operation(getCooldown(skill)))
+        it.cooldown = skill.applyCooldownEnhancements(this, operation(it.cooldown))
         true
     }
 }

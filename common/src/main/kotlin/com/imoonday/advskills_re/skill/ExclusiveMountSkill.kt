@@ -8,11 +8,12 @@ import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
 class ExclusiveMountSkill : Skill(
-    id = "exclusive_mount",
-    types = listOf(SkillType.SUMMON),
-    cooldown = 60,
-    rarity = SkillRarity.EPIC,
-    sound = SoundEvents::ENTITY_HORSE_SADDLE
+    Settings(
+        id = "exclusive_mount",
+        types = listOf(SkillType.SUMMON),
+        cooldown = 60,
+        rarity = SkillRarity.EPIC
+    )
 ) {
 
     override fun use(user: ServerPlayerEntity): UseResult {
@@ -37,7 +38,7 @@ class ExclusiveMountSkill : Skill(
             user.world.spawnEntity(newHorse)
             newHorse.putPlayerOnBack(user)
             user.startCooling()
-            return UseResult.consume()
+            return UseResult.consume(sound = SoundEvents.ENTITY_HORSE_SADDLE)
         } else return UseResult.fail(message("unsupportedPlace"))
     }
 }

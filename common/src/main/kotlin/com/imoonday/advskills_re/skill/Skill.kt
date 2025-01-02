@@ -392,8 +392,8 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             return this
         }
 
-        fun addParameter(name: String, baseValue: Any): Settings {
-            parameters[name] = Parameter.create(baseValue)
+        fun addParameter(name: String, baseValue: Any, vararg enhancementIds: String): Settings {
+            parameters[name] = Parameter.create(baseValue, enhancementIds.toList())
             return this
         }
 

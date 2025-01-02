@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
@@ -16,12 +15,27 @@ import net.minecraft.sound.*
 import net.minecraft.util.math.*
 
 class DeathArchiveSkill : Skill(
-    id = "death_archive",
-    types = listOf(SkillType.DEFENSE, SkillType.RESTORATION),
-    cooldown = 300,
-    rarity = SkillRarity.UNIQUE,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME)
+    Settings(
+        id = "death_archive",
+        types = listOf(SkillType.DEFENSE, SkillType.RESTORATION),
+        cooldown = 300,
+        rarity = SkillRarity.UNIQUE
+    )
 ), UsingProgressTrigger, DeathTrigger, DamageTrigger, TickTrigger, UnequipTrigger {
+
+    init {
+        this.settings.addParameter("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
+
+        addParameter(
+            name = "invulnerable_time",
+            baseValue = 5 * 20,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+    }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         if (user.isUsing() && user.isInInvulnerableState()) {
@@ -43,19 +57,21 @@ class DeathArchiveSkill : Skill(
                 NbtUtils.readGlobalPosFromTag(player.getActiveData()).ifPresent { globalPos ->
                     player.server.getWorld(globalPos.dimension)?.let { world ->
                         val pos = Vec3d.ofBottomCenter(globalPos.pos)
-                        player.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT)
+                        player.playSoundFromParam("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
                         player.teleport(world, pos.x, pos.y, pos.z, emptySet(), player.yaw, player.pitch)
                         while (!world.isSpaceEmpty(player) && player.y < world.topY) {
                             player.teleport(player.x, player.y + 1.0, player.z)
                         }
-                        player.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT)
+                        player.playSoundFromParam("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
                     }
                 }
                 player.getActiveData().putBoolean("invulnerable", true)
                 player.resetUsedTime(this)
             }
             false
-        } else true
+        } else {
+            true
+        }
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
@@ -66,7 +82,7 @@ class DeathArchiveSkill : Skill(
     }
 
     private fun getMaxInvulnerableTime(player: PlayerEntity) =
-        getEnhancedValue(player, SkillEnhancements.PERSISTENT_TIME, 5 * 20.0)
+        getIntParam("invulnerable_time", player, 5 * 20)
 
     override fun ignoreDamage(
         amount: Float,
@@ -77,10 +93,16 @@ class DeathArchiveSkill : Skill(
 
     private fun PlayerEntity.isInInvulnerableState(): Boolean = getActiveData().getBoolean("invulnerable")
 
-    override fun getProgress(player: PlayerEntity): Double = if (player.isUsing()) {
-        if (player.isInInvulnerableState()) 1 - player.getUsedTime() / getMaxInvulnerableTime(player)
-        else player.health.toDouble() / player.maxHealth
-    } else 0.0
+    override fun getProgress(player: PlayerEntity): Double =
+        if (player.isUsing()) {
+            if (player.isInInvulnerableState()) {
+                1.0 - player.getUsedTime() / getMaxInvulnerableTime(player).toDouble()
+            } else {
+                player.health.toDouble() / player.maxHealth
+            }
+        } else {
+            0.0
+        }
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
         super.postUnequipped(player, slot)

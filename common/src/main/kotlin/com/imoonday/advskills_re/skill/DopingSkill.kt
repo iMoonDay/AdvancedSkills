@@ -12,14 +12,11 @@ import net.minecraft.server.network.*
 import kotlin.math.*
 
 class DopingSkill : Skill(
-    id = "doping",
-    types = listOf(SkillType.ENHANCEMENT),
-    cooldown = 3,
-    rarity = SkillRarity.MYTHIC,
-    enhancements = setOf(
-        SkillEnhancements.PERSISTENT_TIME,
-        SkillEnhancements.MOVEMENT_SPEED,
-        SkillEnhancements.USE_COST
+    Settings(
+        id = "doping",
+        types = listOf(SkillType.ENHANCEMENT),
+        cooldown = 3,
+        rarity = SkillRarity.MYTHIC
     )
 ), AttributeTrigger, AutoStopTrigger, UsingRenderTrigger {
 
@@ -32,20 +29,40 @@ class DopingSkill : Skill(
             Enhancement.Operation.MULTIPLY_TOTAL,
             5
         )
+
+        addParameter(
+            name = "speed_multiplier",
+            baseValue = 0.5,
+            enhancementId = "multiplier",
+            value = 0.05,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addParameter(
+            name = "health_cost",
+            baseValue = 5f,
+            enhancementId = "cost",
+            value = -0.16f,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
     }
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Doping"),
             "Doping",
-            0.5 + player.getEnhancementLvl(SkillEnhancements.MOVEMENT_SPEED) * 0.05,
+            getDoubleParam("speed_multiplier", player, 0.5, 0.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this) {
         user.addAttributes()
-        val cost = 5f * (1 - user.getEnhancementLvl(SkillEnhancements.USE_COST) * 0.16f)
+        val cost = getFloatParam("health_cost", user, 5f)
         user.health = max(user.health - cost, 1f)
         user.playSound(ModSounds.DASH.get())
     }

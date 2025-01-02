@@ -9,22 +9,33 @@ import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
-import net.minecraft.server.world.*
 
 class ExtremeEvasionSkill : Skill(
-    id = "extreme_evasion",
-    types = listOf(SkillType.MOVEMENT),
-    cooldown = 10,
-    rarity = SkillRarity.EPIC,
-    sound = ModSounds.DASH,
-    enhancements = setOf(SkillEnhancements.PERSISTENT_TIME, SkillEnhancements.POWER)
+    Settings(
+        id = "extreme_evasion",
+        types = listOf(SkillType.MOVEMENT),
+        cooldown = 10,
+        rarity = SkillRarity.EPIC
+    )
 ), AutoStopTrigger, DamageTrigger, SendPlayerVelocityTrigger {
 
     init {
+        this.settings.addParameter("moving_sound", ModSounds.DASH)
+
         addParameter(
             name = timeParamName,
             baseValue = 10,
             enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatters.INT_PERCENT
+        )
+
+        addParameter(
+            name = "velocity_multiplier",
+            baseValue = 2.0,
+            enhancementId = "multiplier",
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
@@ -35,18 +46,19 @@ class ExtremeEvasionSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this) {
         user.run {
             stopFallFlying()
-            val multiplier = 2.0 + user.getEnhancementLvl(SkillEnhancements.POWER) * 0.2
+            val multiplier = getDoubleParam("velocity_multiplier", user, 2.0)
             velocity = (if (velocity.x == 0.0 && velocity.z == 0.0) rotationVector else velocity)
                 .normalize()
                 .multiply(multiplier, 0.0, multiplier)
             updateVelocity()
-            (world as ServerWorld).spawnParticles(
+
+            serverWorld.spawnParticles(
                 ParticleTypes.CLOUD,
                 x, y, z, 10,
                 -velocity.x, 0.0, -velocity.z, 0.0
             )
         }
-    }
+    }.withSound(getSoundEventParam("moving_sound", ModSounds.DASH.get()))
 
     override fun ignoreDamage(
         amount: Float,
