@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.component.choice.*
+import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
@@ -95,7 +96,9 @@ data class ChoiceData(
         except: MutableSet<Choosable>,
         skill: Skill,
         player: PlayerEntity
-    ) = player.hasLearned(skill) || !skill.settings.drawable || except.any { !it.compatibleWith(SkillChoice(skill)) }
+    ) = player.hasLearned(skill)
+        || !skill.settings.drawable
+        || except.any { !it.compatibleWith(SkillChoice(skill)) }
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
         put("choice", choice.toNbt())

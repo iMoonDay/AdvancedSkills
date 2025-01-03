@@ -18,12 +18,10 @@ class SelfRepairSkill : Skill(
     )
 ), AutoTrigger, AutoStopTrigger {
 
-    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
-
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = AutoStopTrigger.CHARGE_TIME,
+                name = "charge_time",
                 baseValue = 10 * 20,
                 enhancementId = "time",
                 value = -0.16,
@@ -45,6 +43,8 @@ class SelfRepairSkill : Skill(
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean =
         player.armorItems.filter { it.isDamaged }.any { it.damage > getMaxRepairLimit(player, it) }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 10 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

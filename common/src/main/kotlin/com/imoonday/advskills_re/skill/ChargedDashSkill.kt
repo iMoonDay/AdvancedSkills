@@ -18,11 +18,11 @@ class ChargedDashSkill : LongPressSkill(
     )
 ), AttributeTrigger {
 
-    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 3 * 20, 0)
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = AutoStopTrigger.CHARGE_TIME,
+            name = "charge_time",
             baseValue = 3 * 20,
             enhancementId = "time",
             value = -0.16,
@@ -68,7 +68,7 @@ class ChargedDashSkill : LongPressSkill(
             removeAttributes()
             val multiplier = getDoubleParam("velocity_multiplier", player, 1.0)
             velocity =
-                rotationVector.normalize().multiply(2.0 * pressedTime / getPersistTime(player) * multiplier)
+                rotationVector.normalize().multiply(2.0 * pressedTime / getMaxUseTime(player) * multiplier)
             updateVelocity()
             spawnParticles(ParticleTypes.CLOUD, false, pos, 10, 0.5, 0.0, 0.5, 0.1)
         }

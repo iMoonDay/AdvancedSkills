@@ -1,13 +1,13 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.effect.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
 class ResuscitationSkill : Skill(
@@ -23,7 +23,7 @@ class ResuscitationSkill : Skill(
         settings
             .addParameter("revive_health", 1.0f)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 2 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -60,4 +60,6 @@ class ResuscitationSkill : Skill(
         player: ServerPlayerEntity,
         attacker: Entity?,
     ): Boolean = player.isUsing()
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 2 * 20, 0)
 }

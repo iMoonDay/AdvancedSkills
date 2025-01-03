@@ -23,7 +23,7 @@ class DopingSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 10 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -71,6 +71,8 @@ class DopingSkill : Skill(
             player.isSprinting = true
         }
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         player.removeAttributes()

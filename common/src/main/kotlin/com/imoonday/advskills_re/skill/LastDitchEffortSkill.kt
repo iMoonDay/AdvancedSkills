@@ -26,7 +26,7 @@ class LastDitchEffortSkill : Skill(
             .addParameter("healing_sound", ModSounds.HEAL)
             .addParameter("health_threshold", 0.3f)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 15 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -119,6 +119,8 @@ class LastDitchEffortSkill : Skill(
         attacker: LivingEntity?,
     ): Float = if (!player.isUsing()) amount
     else amount + getFloatParam("damage_taken_bonus", player, 1.0f)
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 15 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         player.startCooling()

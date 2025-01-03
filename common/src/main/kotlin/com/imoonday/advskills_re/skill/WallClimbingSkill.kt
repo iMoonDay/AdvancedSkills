@@ -20,7 +20,7 @@ class WallClimbingSkill : PassiveSkill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = timeParamName,
+            name = "persist_time",
             baseValue = 15 * 20,
             enhancementId = "time",
             value = 0.2,
@@ -31,6 +31,8 @@ class WallClimbingSkill : PassiveSkill(
     }
 
     override fun isClimbing(player: PlayerEntity): Boolean = player.isUsing() && player.shouldClimb()
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 15 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

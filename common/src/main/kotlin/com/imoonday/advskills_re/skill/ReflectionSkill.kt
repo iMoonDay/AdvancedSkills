@@ -22,8 +22,6 @@ abstract class ReflectionSkill(
     settings
 ), DamageTrigger, ReflectionTrigger, UsingRenderTrigger {
 
-    override val defaultTime: Int = duration
-
     override fun initDefaultSettings(settings: Settings) {
         if (!settings.types.contains(SkillType.DEFENSE)) {
             settings.addTypeToTop(SkillType.DEFENSE)
@@ -32,7 +30,7 @@ abstract class ReflectionSkill(
         settings
             .addParameter("reflection_sound", SoundEvents.ITEM_SHIELD_BLOCK)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = duration,
                 enhancementId = "time",
                 value = 0.2,
@@ -63,6 +61,8 @@ abstract class ReflectionSkill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = startReflecting(user)
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, duration, 0)
 
     protected fun reflectedFailed(player: ServerPlayerEntity) =
         player.sendMessage(translate("reflection.failed"), true)

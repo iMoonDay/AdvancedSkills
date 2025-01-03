@@ -28,7 +28,7 @@ class MultipleLaserSkill : LongPressSkill(
             .addParameter("damage_interval", 2)
             .addParameter("laser_sound", ModSounds.LASER)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 10 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -107,6 +107,8 @@ class MultipleLaserSkill : LongPressSkill(
         }
     }
 
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
+
     private fun getMaxDistance(player: PlayerEntity): Double =
         getDoubleParam("distance", player, 64.0)
 
@@ -116,7 +118,7 @@ class MultipleLaserSkill : LongPressSkill(
     }
 
     private fun calculateCooldown(player: PlayerEntity, pressedTime: Int) =
-        (pressedTime.toFloat() / getPersistTime(player) * cooldown).toInt()
+        (pressedTime.toFloat() / getMaxUseTime(player) * cooldown).toInt()
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(calculateCooldown(player, player.getUsedTime()))

@@ -23,7 +23,7 @@ class ItemAttractionSkill : LongPressSkill(
         settings
             .addParameter("attract_exp", false, "exp")
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 10 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -82,6 +82,8 @@ class ItemAttractionSkill : LongPressSkill(
             }
         }
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
 
     private fun checkAttractiveEntity(player: PlayerEntity, entity: Entity) =
         entity is ItemEntity && !entity.cannotPickup() ||

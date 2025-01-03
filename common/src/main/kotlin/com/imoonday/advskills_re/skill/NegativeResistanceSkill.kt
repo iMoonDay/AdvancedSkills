@@ -26,7 +26,7 @@ class NegativeResistanceSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 5 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -68,6 +68,8 @@ class NegativeResistanceSkill : Skill(
             }
             true
         } else false
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 5 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

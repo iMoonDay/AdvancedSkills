@@ -4,6 +4,7 @@ import com.google.gson.*
 import com.imoonday.advskills_re.component.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
+import net.minecraft.server.*
 import net.minecraft.text.*
 import java.io.*
 import java.nio.file.*
@@ -50,6 +51,27 @@ object RarityManager {
         }
 
         LOGGER.info("Loaded $loadedCount Skill Rarities")
+    }
+
+    @JvmStatic
+    fun loadFromServerConfig(server: MinecraftServer): Map<String, SkillRarity> = buildMap {
+        val serverConfigPath = server.serverConfigPath
+        if (serverConfigPath.isDirectory()) {
+            val skillsDir = serverConfigPath.resolve("advskills_re/rarities")
+            if (!skillsDir.isDirectory()) {
+                runCatching {
+                    skillsDir.createDirectories()
+                }.onFailure {
+                    LOGGER.error("Failed to create rarities directory in serverconfig", it)
+                }
+            } else {
+                skillsDir.listAllFiles(".*\\.json").map { it.toFile() }.count { file ->
+                    tryLoad(file)?.also { put(it.id, it) } != null
+                }.also {
+                    LOGGER.info("Loaded $it Skill Rarities from server config")
+                }
+            }
+        }
     }
 
     @JvmStatic
@@ -105,12 +127,6 @@ object RarityManager {
         }
 
         LOGGER.info("Skill Rarities saved: $successCount succeeded, ${rarities.size - successCount} failed")
-    }
-
-    @JvmStatic
-    fun loadOrSaveFiles(skills: Collection<SkillRarity>) {
-        loadFiles()
-        saveMissing(skills)
     }
 
     @JvmStatic

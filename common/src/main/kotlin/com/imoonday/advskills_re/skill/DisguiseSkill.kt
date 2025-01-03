@@ -21,7 +21,7 @@ class DisguiseSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = timeParamName,
+            name = "persist_time",
             baseValue = 30 * 20,
             enhancementId = "time",
             value = 0.2,
@@ -32,6 +32,8 @@ class DisguiseSkill : Skill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 30 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

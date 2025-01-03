@@ -7,6 +7,7 @@ import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
 import net.minecraft.registry.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
@@ -25,7 +26,7 @@ class TimeRewindSkill : LongPressSkill(
             .addParameter("teleport_sound", SoundEvents.ENTITY_FOX_TELEPORT)
             .addParameter("heal_sound", ModSounds.HEAL)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 5 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -63,6 +64,8 @@ class TimeRewindSkill : LongPressSkill(
         player.stopUsing()
         return UseResult.success()
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 5 * 20, 0)
 
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean =
         if (player.isUsing()) {

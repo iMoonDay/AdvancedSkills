@@ -20,7 +20,7 @@ class GrapplingHookSkill : LongPressSkill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = timeParamName,
+            name = "persist_time",
             baseValue = 3 * 20,
             enhancementId = "time",
             value = 0.2,
@@ -78,6 +78,8 @@ class GrapplingHookSkill : LongPressSkill(
         }
         super.tick(player, usedTime)
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 3 * 20, 0)
 
     override fun getCrosshair(player: PlayerEntity): Crosshair =
         if (player.isReady() && player.raycastBlock(getMaxDistance(player)).type == HitResult.Type.BLOCK)

@@ -26,12 +26,10 @@ class SpaceBlastSkill : LongPressSkill(
     )
 ), AttributeTrigger, WorldRendererTrigger, GlowingTrigger {
 
-    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
-
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = AutoStopTrigger.CHARGE_TIME,
+                name = "charge_time",
                 baseValue = 5 * 20,
                 enhancementId = "time",
                 value = -0.16,
@@ -117,6 +115,8 @@ class SpaceBlastSkill : LongPressSkill(
         super<AttributeTrigger>.postUnequipped(player, slot)
 
     override fun alwaysKeepCharging(player: PlayerEntity): Boolean = true
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 5 * 20, 0)
 
     override fun isGlowing(entity: Entity, clientPlayer: PlayerEntity): Boolean =
         clientPlayer.isUsing() && entity !== clientPlayer && getEntityStream<Entity>(clientPlayer).contains(entity)

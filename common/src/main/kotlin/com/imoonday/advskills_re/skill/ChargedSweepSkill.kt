@@ -23,13 +23,13 @@ class ChargedSweepSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
-    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 3 * 20, 0)
 
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter("damage_item", true, "no_item_damage")
             .addParameter(
-                name = AutoStopTrigger.CHARGE_TIME,
+                name = "charge_time",
                 baseValue = 3 * 20,
                 enhancementId = "time",
                 value = -0.16,
@@ -86,7 +86,7 @@ class ChargedSweepSkill : LongPressSkill(
         val range = getDoubleParam("range", player, 5.0)
         val baseDamage = player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
         val multiplier =
-            pressedTime.toFloat() / getPersistTime(player) * 2f * getFloatParam("damage_multiplier", player, 1f)
+            pressedTime.toFloat() / getMaxUseTime(player) * 2f * getFloatParam("damage_multiplier", player, 1f)
         val stack = player.mainHandStack
         player.world.getOtherEntities(player, player.boundingBox.expand(range)) {
             it is LivingEntity &&

@@ -20,14 +20,12 @@ class MeteorShowerSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
-    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
-
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter("min_summon_amount", 5)
             .addParameter("max_summon_amount", 10)
             .addParameter(
-                name = AutoStopTrigger.CHARGE_TIME,
+                name = "charge_time",
                 baseValue = 10 * 20,
                 enhancementId = "time",
                 value = -0.16,
@@ -94,7 +92,7 @@ class MeteorShowerSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.removeAttributes()
         player.stopUsing()
-        if (pressedTime < getPersistTime(player)) {
+        if (pressedTime < getMaxUseTime(player)) {
             player.startCooling(10)
             return UseResult.fail(failedMessage())
         }
@@ -124,6 +122,8 @@ class MeteorShowerSkill : LongPressSkill(
         }
         return UseResult.success()
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 10 * 20, 0)
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(10)

@@ -21,7 +21,7 @@ interface LongPressTrigger : TickTrigger, AutoStopTrigger {
     fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult
 
     override fun onStop(player: ServerPlayerEntity) {
-        val result = onRelease(player, getPersistTime(player))
+        val result = onRelease(player, getMaxUseTime(player))
         getAsSkill().handleResult(player, result)
         super.onStop(player)
     }

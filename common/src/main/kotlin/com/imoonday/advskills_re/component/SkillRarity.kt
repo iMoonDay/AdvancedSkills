@@ -5,6 +5,7 @@ import com.google.gson.JsonSerializer
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import net.minecraft.nbt.*
+import net.minecraft.server.*
 import net.minecraft.text.*
 import net.minecraft.util.*
 import java.lang.reflect.*
@@ -195,9 +196,10 @@ class SkillRarity {
         fun init() = Unit
 
         @JvmStatic
-        fun reload() {
+        fun reload(server: MinecraftServer) {
             RarityManager.loadFiles()
-            predefinedRarities.forEach { _rarities[it.key]?.copyFrom(getOrDefault(it.value)) }
+            val serverRarities = RarityManager.loadFromServerConfig(server)
+            predefinedRarities.forEach { _rarities[it.key]?.copyFrom(serverRarities[it.key] ?: getOrDefault(it.value)) }
             RarityManager.saveMissing(rarities)
         }
 

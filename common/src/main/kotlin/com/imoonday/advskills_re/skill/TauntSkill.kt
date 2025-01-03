@@ -8,6 +8,7 @@ import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
 class TauntSkill : Skill(
@@ -22,7 +23,7 @@ class TauntSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 15 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -52,6 +53,8 @@ class TauntSkill : Skill(
         else amount * (1f - getFloatParam("damage_reduction", player, 0.25f, max = 1.0f))
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean = !player.isUsing()
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 15 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

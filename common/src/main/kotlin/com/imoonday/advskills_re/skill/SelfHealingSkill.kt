@@ -18,12 +18,10 @@ class SelfHealingSkill : Skill(
     )
 ), AutoTrigger, AutoStopTrigger, PostDamagedTrigger {
 
-    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
-
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = AutoStopTrigger.CHARGE_TIME,
+                name = "charge_time",
                 baseValue = 10 * 20,
                 enhancementId = "time",
                 value = -0.16,
@@ -44,6 +42,8 @@ class SelfHealingSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = !player.isDead && player.health < player.maxHealth
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 10 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

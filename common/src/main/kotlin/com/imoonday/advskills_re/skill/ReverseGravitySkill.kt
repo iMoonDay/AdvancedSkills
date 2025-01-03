@@ -28,17 +28,19 @@ class ReverseGravitySkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-                name = timeParamName,
-                baseValue = 15 * 20,
-                enhancementId = "time",
-                value = 0.2,
-                operation = Enhancement.Operation.MULTIPLY_TOTAL,
-                maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
-            )
+            name = "persist_time",
+            baseValue = 15 * 20,
+            enhancementId = "time",
+            value = 0.2,
+            operation = Enhancement.Operation.MULTIPLY_TOTAL,
+            maxLevel = 5,
+            descArg = Enhancement.ArgFormatter.INT_PERCENT
+        )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 15 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super<AutoStopTrigger>.onStop(player)

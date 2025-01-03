@@ -24,7 +24,7 @@ class LiquidShieldSkill : Skill(
         settings
             .addParameter("use_sound", SoundEvents.BLOCK_WATER_AMBIENT)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 15 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -63,6 +63,8 @@ class LiquidShieldSkill : Skill(
         if (player.isUsing()) 0.0 else speed
 
     override fun canBreatheInWater(player: PlayerEntity): Boolean = player.isUsing()
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 15 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

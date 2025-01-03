@@ -5,6 +5,7 @@ import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
+import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
@@ -24,7 +25,7 @@ class AbsoluteDomainSkill : Skill(
             .addParameter("max_hardness_excluded", Blocks.OBSIDIAN.hardness)
             .addParameter("above_player_y", true)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 3 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -48,6 +49,8 @@ class AbsoluteDomainSkill : Skill(
         putFloat("MaxHardness", getFloatParam("max_hardness_excluded", user, Blocks.OBSIDIAN.hardness))
         putBoolean("AbovePlayerY", getBooleanParam("above_player_y", user, true))
     })
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 3 * 20, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)

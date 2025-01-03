@@ -25,7 +25,7 @@ class PiercingSkill : Skill(
         settings
             .addParameter("piercing_sound", ModSounds.PIERCING)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 8,
                 enhancementId = "time",
                 value = 0.2,
@@ -67,6 +67,8 @@ class PiercingSkill : Skill(
         player.updateVelocity()
         super.onStop(player)
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 8, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return

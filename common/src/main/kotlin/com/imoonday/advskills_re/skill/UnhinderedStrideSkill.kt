@@ -18,7 +18,7 @@ class UnhinderedStrideSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = timeParamName,
+            name = "persist_time",
             baseValue = 10 * 20,
             enhancementId = "time",
             value = 0.2,
@@ -32,6 +32,8 @@ class UnhinderedStrideSkill : Skill(
 
     override fun getStepHeight(player: PlayerEntity): Float? =
         if (player.isUsing()) player.world.height.toFloat() else null
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

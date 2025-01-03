@@ -31,7 +31,7 @@ class LavaWalkerSkill : Skill(
         settings
             .addParameter("use_sound", SoundEvents.BLOCK_LAVA_AMBIENT)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 20 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -47,6 +47,8 @@ class LavaWalkerSkill : Skill(
 
     override fun canWalkOnFluid(player: PlayerEntity, state: FluidState): Boolean =
         player.isUsing() && state.isOf(Fluids.LAVA) && player.getFluidHeight(FluidTags.LAVA) < 0.02
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 20 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

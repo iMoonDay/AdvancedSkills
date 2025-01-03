@@ -32,7 +32,7 @@ class DangerPerceptionSkill : Skill(
         settings
             .addParameter("speed_up_sound", ModSounds.DASH)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 2 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -73,6 +73,8 @@ class DangerPerceptionSkill : Skill(
         super<AttributeTrigger>.postUnequipped(player, slot)
         super<AutoStopTrigger>.postUnequipped(player, slot)
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 2 * 20, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isCreative && !player.isSpectator && !player.abilities.invulnerable && (player.isUsing() || !player.isCooling())) {

@@ -18,6 +18,7 @@ import net.minecraft.loot.entry.*
 import net.minecraft.loot.function.*
 import net.minecraft.loot.provider.number.*
 import net.minecraft.registry.tag.*
+import net.minecraft.server.*
 import net.minecraft.server.network.*
 
 object EventHandler {
@@ -77,11 +78,11 @@ object EventHandler {
         DataPackReloadEvents.START.register { server, _ ->
             SkillConfig.get().load()
             GlobalConfig.get().load()
-            reloadSkillConfigs()
+            reloadSkillConfigs(server)
             syncServerConfigs(server.playerManager.playerList)
         }
         LifecycleEvent.SERVER_BEFORE_START.register {
-            reloadSkillConfigs()
+            reloadSkillConfigs(it)
         }
         LifecycleEvent.SERVER_STARTED.register {
             SkillConfig.init(it)
@@ -95,9 +96,9 @@ object EventHandler {
         }
     }
 
-    private fun reloadSkillConfigs() {
-        SkillRarity.reload()
-        Skills.reload()
+    private fun reloadSkillConfigs(server: MinecraftServer) {
+        SkillRarity.reload(server)
+        Skills.reload(server)
     }
 
     private fun syncServerConfigs(player: ServerPlayerEntity) {
@@ -107,7 +108,7 @@ object EventHandler {
                 SyncConfigS2CPacket.ConfigType.BOTH
             )
         )
-        Channels.SYNC_RARITIES_S2C.sendToPlayer(player, SyncRaritiesS2CPacket(RarityManager.getLoadedRarities()))
+        Channels.SYNC_RARITIES_S2C.sendToPlayer(player, SyncRaritiesS2CPacket(SkillRarity.rarities))
         Channels.SYNC_SETTINGS_S2C.sendToPlayer(
             player,
             SyncSettingsS2CPacket(Skills.getSkills().map { it.settings })
@@ -121,7 +122,7 @@ object EventHandler {
                 SyncConfigS2CPacket.ConfigType.BOTH
             )
         )
-        Channels.SYNC_RARITIES_S2C.sendToPlayers(players, SyncRaritiesS2CPacket(RarityManager.getLoadedRarities()))
+        Channels.SYNC_RARITIES_S2C.sendToPlayers(players, SyncRaritiesS2CPacket(SkillRarity.rarities))
         Channels.SYNC_SETTINGS_S2C.sendToPlayers(
             players,
             SyncSettingsS2CPacket(Skills.getSkills().map { it.settings })

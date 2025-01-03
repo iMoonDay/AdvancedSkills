@@ -25,7 +25,7 @@ class RisingShockSkill : Skill(
         settings
             .addParameter("use_sound", ModSounds.DASH)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 8,
                 enhancementId = "time",
                 value = 0.2,
@@ -56,6 +56,8 @@ class RisingShockSkill : Skill(
         user.velocity = Vec3d(0.0, user.getVelocityY(), 0.0)
         user.updateVelocity()
     }.withSound(getSoundEventParam("use_sound", ModSounds.DASH.get()))
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 8, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return

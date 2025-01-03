@@ -8,6 +8,7 @@ import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
+import net.minecraft.entity.player.*
 import net.minecraft.registry.tag.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
@@ -36,7 +37,7 @@ class OrePerceptionSkill : Skill(
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 10 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -47,6 +48,8 @@ class OrePerceptionSkill : Skill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).also { updateOres(user) }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)

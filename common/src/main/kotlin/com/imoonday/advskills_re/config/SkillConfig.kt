@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.config
 
 import com.imoonday.advskills_re.*
-import com.imoonday.advskills_re.component.*
+import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -10,7 +10,6 @@ import net.minecraft.server.*
 import net.minecraft.util.*
 import org.slf4j.*
 import java.io.*
-import java.nio.file.*
 
 @Serializable
 class SkillConfig {
@@ -56,6 +55,11 @@ class SkillConfig {
         val file = file ?: return
 
         try {
+            if (!file.exists()) {
+                file.parentFile.mkdirs()
+                file.createNewFile()
+            }
+
             file.writeText(instance.toJson(), Charsets.UTF_8)
         } catch (e: Exception) {
             LOGGER.error("Couldn't save $MOD_ID-server configuration file", e)
@@ -66,10 +70,8 @@ class SkillConfig {
         if (tag.contains("skillBlackList")) {
             skillBlackList.clear()
 
-            val skillBlackListTag = tag.getList("skillBlackList", NbtElement.STRING_TYPE.toInt())
-            skillBlackListTag.forEach {
-                skillBlackList.add(it.asString())
-            }
+            val listTag = tag.getList("skillBlackList", NbtElement.STRING_TYPE.toInt())
+            skillBlackList.addAll(listTag.toStringList())
         }
 
         if (tag.contains("skillCooldownMultiplier")) {
@@ -82,9 +84,7 @@ class SkillConfig {
     }
 
     fun writeToNbt(tag: NbtCompound = NbtCompound()): NbtCompound = tag.apply {
-        put("skillBlackList", NbtList().apply {
-            skillBlackList.forEach { add(NbtString.of(it)) }
-        })
+        put("skillBlackList", skillBlackList.toNbtStringList())
         if (skillCooldownMultiplier != null) {
             putDouble("skillCooldownMultiplier", skillCooldownMultiplier!!)
         }
@@ -107,7 +107,6 @@ class SkillConfig {
             ignoreUnknownKeys = true
             encodeDefaults = true
         }
-        private val serverConfig: WorldSavePath = WorldSavePath("serverconfig")
         private var file: File? = null
         private var instance = SkillConfig()
 
@@ -123,7 +122,7 @@ class SkillConfig {
                 .get(SkillConfigState.Companion::fromNbt, MOD_ID)
                 ?.let { instance.loadFromNbt(it.config.writeToNbt()) }
 
-            file = getServerConfigPath(server).resolve("$MOD_ID-server.json").toFile()
+            file = server.serverConfigPath.resolve("advskills_re/server.json").toFile()
 
             instance.load()
         }
@@ -131,18 +130,6 @@ class SkillConfig {
         @JvmStatic
         fun resetFile() {
             file = null
-        }
-
-        private fun getServerConfigPath(server: MinecraftServer): Path {
-            val serverConfig = server.getSavePath(serverConfig)
-            if (!Files.isDirectory(serverConfig)) {
-                try {
-                    Files.createDirectories(serverConfig)
-                } catch (e: IOException) {
-                    throw RuntimeException(e)
-                }
-            }
-            return serverConfig
         }
     }
 }

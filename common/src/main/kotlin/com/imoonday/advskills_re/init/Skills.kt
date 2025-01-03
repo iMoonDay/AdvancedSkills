@@ -6,6 +6,7 @@ import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
+import net.minecraft.server.*
 import net.minecraft.util.*
 import org.slf4j.*
 
@@ -300,12 +301,13 @@ object Skills {
     fun init() = Unit
 
     @JvmStatic
-    fun reload() {
+    fun reload(server: MinecraftServer) {
         val skills = skills.values.filterNot { it.isEmpty() }
         skills.forEach { it.resetSettings() }
         SettingsManager.loadOrSaveFiles(skills)
+        val serverSkills = SettingsManager.loadFromServerConfig(server)
         skills.forEach {
-            SettingsManager.getSettings(it)?.run {
+            (serverSkills[it.id] ?: SettingsManager.getSettings(it))?.run {
                 it.updateSettings(this)
             }
         }

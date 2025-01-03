@@ -25,7 +25,7 @@ class ActiveDefenseSkill : LongPressSkill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 5 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -70,12 +70,14 @@ class ActiveDefenseSkill : LongPressSkill(
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopAndCooldown()
-        if (pressedTime.toFloat() / getPersistTime(player) < 0.5f) {
+        if (pressedTime.toFloat() / getMaxUseTime(player) < 0.5f) {
             player.modifyCooldown { it / 2 }
         }
         player.removeAttributes()
         return UseResult.consume()
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 5 * 20, 0)
 
     override fun onDamaged(
         amount: Float,

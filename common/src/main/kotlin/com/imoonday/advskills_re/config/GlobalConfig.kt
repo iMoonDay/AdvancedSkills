@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.config
 
 import com.imoonday.advskills_re.*
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
@@ -60,7 +59,6 @@ class GlobalConfig {
         this.skillXpMultiplier = 1.0
         this.skillBlackList += "$MOD_ID:example ($MOD_ID can ignore)"
     }
-    val learningBlacklist: MutableSet<String> = mutableSetOf()
 
     fun getDefaultSkillSlots(slot: String): Int = defaultSkillSlots[slot] ?: 0
 
@@ -68,9 +66,6 @@ class GlobalConfig {
         defaultSkillSlots[slot] = count
         save()
     }
-
-    fun getLearningFilter(): (Skill) -> Boolean =
-        { learningBlacklist.isEmpty() || it.id.toString() !in learningBlacklist }
 
     fun toJson(): String = JSON.encodeToString(serializer(), this)
 
@@ -107,6 +102,11 @@ class GlobalConfig {
 
     fun save() {
         try {
+            if (!file.exists()) {
+                file.parentFile.mkdirs()
+                file.createNewFile()
+            }
+
             file.writeText(instance.toJson(), Charsets.UTF_8)
         } catch (e: Exception) {
             LOGGER.error("Couldn't save $MOD_ID-common configuration file", e)
@@ -114,9 +114,7 @@ class GlobalConfig {
     }
 
     fun toNbt(): NbtCompound = NbtCompound().apply {
-        put("defaultSkillSlots", NbtCompound().apply {
-            defaultSkillSlots.forEach { (k, v) -> putInt(k, v) }
-        })
+        put("defaultSkillSlots", defaultSkillSlots.toNbtCompound(NbtCompound::putInt))
         putBoolean("disableSkillFruitGeneration", disableSkillFruitGeneration)
         putFloat("oakLeavesDropChance", oakLeavesDropChance)
         putFloat("darkOakLeavesDropChance", darkOakLeavesDropChance)
@@ -125,7 +123,6 @@ class GlobalConfig {
         putFloat("endCityTreasureChestGenerationChance", endCityTreasureChestGenerationChance)
         putFloat("spawnBonusChestGenerationChance", spawnBonusChestGenerationChance)
         put("skillConfig", skillConfig.writeToNbt())
-        put("learningBlacklist", learningBlacklist.toNbtStringList())
     }
 
     fun getSkillConfigNbt(): NbtCompound = NbtCompound().apply {
@@ -137,10 +134,7 @@ class GlobalConfig {
 
         if (nbt.contains("defaultSkillSlots")) {
             defaultSkillSlots.clear()
-            val defaultSkillSlotsNbt = nbt.getCompound("defaultSkillSlots")
-            defaultSkillSlotsNbt.keys.forEach {
-                defaultSkillSlots[it] = defaultSkillSlotsNbt.getInt(it)
-            }
+            defaultSkillSlots.putAll(nbt.getCompound("defaultSkillSlots").toStringMap(NbtCompound::getInt))
         }
         if (nbt.contains("disableSkillFruitGeneration")) {
             disableSkillFruitGeneration = nbt.getBoolean("disableSkillFruitGeneration")
@@ -165,10 +159,6 @@ class GlobalConfig {
         }
         if (nbt.contains("skillConfig")) {
             skillConfig.loadFromNbt(nbt.getCompound("skillConfig"))
-        }
-        if (nbt.contains("learningBlacklist")) {
-            learningBlacklist.clear()
-            learningBlacklist.addAll(nbt.getList("learningBlacklist", NbtElement.STRING_TYPE.toInt()).toStringList())
         }
 
         loading = false

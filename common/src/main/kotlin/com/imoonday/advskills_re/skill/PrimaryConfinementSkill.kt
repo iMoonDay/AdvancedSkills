@@ -23,13 +23,11 @@ class PrimaryConfinementSkill : LongPressSkill(
     )
 ), UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
 
-    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
-
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter("confinement_sound", SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE)
             .addParameter(
-                name = AutoStopTrigger.CHARGE_TIME,
+                name = "charge_time",
                 baseValue = 5 * 20,
                 enhancementId = "time",
                 value = -0.16,
@@ -68,7 +66,7 @@ class PrimaryConfinementSkill : LongPressSkill(
         player.swingHand(Hand.MAIN_HAND, true)
         player.raycastLivingEntity(getRange(player))?.takeIf { it.type == HitResult.Type.ENTITY }?.let {
             val baseChance = getFloatParam("success_chance", player, 0.8f, max = 1.0f)
-            if (player.random.nextFloat() < baseChance * pressedTime / getPersistTime(player)) {
+            if (player.random.nextFloat() < baseChance * pressedTime / getMaxUseTime(player)) {
                 val duration = getIntParam("confinement_duration", player, 3 * 20)
                 (it.entity as LivingEntity).addStatusEffect(
                     StatusEffectInstance(ModEffects.CONFINEMENT.get(), duration, 0, false, false, true)
@@ -82,6 +80,8 @@ class PrimaryConfinementSkill : LongPressSkill(
         }
         return UseResult.pass(message("empty"))
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 5 * 20, 0)
 
     override fun getCrosshair(player: PlayerEntity): Crosshair {
         player.run {

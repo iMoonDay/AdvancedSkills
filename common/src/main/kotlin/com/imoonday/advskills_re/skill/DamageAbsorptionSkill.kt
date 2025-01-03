@@ -7,6 +7,7 @@ import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
 import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
@@ -27,7 +28,7 @@ class DamageAbsorptionSkill : Skill(
             .addParameter("absorption_sound", SoundEvents.ITEM_SHIELD_BLOCK)
             .addParameter("break_sound", SoundEvents.ITEM_SHIELD_BREAK)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 30 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -73,6 +74,8 @@ class DamageAbsorptionSkill : Skill(
         }
         return true
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 30 * 20, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

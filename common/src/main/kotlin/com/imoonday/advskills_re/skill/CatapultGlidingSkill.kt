@@ -6,6 +6,7 @@ import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
+import net.minecraft.entity.player.*
 import net.minecraft.item.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
@@ -19,13 +20,11 @@ class CatapultGlidingSkill : LongPressSkill(
     )
 ) {
 
-    override val timeParamName: String = AutoStopTrigger.CHARGE_TIME
-
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter("fly_out_sound", ModSounds.DASH)
             .addParameter(
-                name = AutoStopTrigger.CHARGE_TIME,
+                name = "charge_time",
                 baseValue = 3 * 20,
                 enhancementId = "time",
                 value = -0.16,
@@ -46,6 +45,8 @@ class CatapultGlidingSkill : LongPressSkill(
     override fun use(user: ServerPlayerEntity): UseResult =
         if (!user.canUse()) failedResult() else if (user.isFallFlying) fallFlyingResult() else super.use(user)
 
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 3 * 20, 0)
+
     override fun onPress(player: ServerPlayerEntity): UseResult =
         if (!player.canUse()) failedResult() else if (player.isFallFlying) fallFlyingResult() else super.onPress(player)
 
@@ -57,7 +58,7 @@ class CatapultGlidingSkill : LongPressSkill(
         player.setOnGround(false)
         player.startFallFlying()
         val multiplier = getDoubleParam("velocity_multiplier", player, 1.0, 0.0)
-        val progress = pressedTime.toDouble() / getPersistTime(player) * multiplier
+        val progress = pressedTime.toDouble() / getMaxUseTime(player) * multiplier
         player.velocity =
             player.rotationVector.normalize().multiply(1.5, 0.0, 1.5)
                 .withAxis(Direction.Axis.Y, 3.0) * progress

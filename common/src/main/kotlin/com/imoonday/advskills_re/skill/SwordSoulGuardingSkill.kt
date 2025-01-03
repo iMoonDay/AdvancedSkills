@@ -8,6 +8,7 @@ import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
@@ -24,7 +25,7 @@ class SwordSoulGuardingSkill : Skill(
         settings
             .addParameter("summon_sound", SoundEvents.ENTITY_ARROW_SHOOT)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 20 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -96,6 +97,8 @@ class SwordSoulGuardingSkill : Skill(
             true
         }
     }
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 20 * 20, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)

@@ -46,7 +46,7 @@ object SkillRenderer {
         var flashed = false
         if (player != null && skill is AutoStopTrigger && skill.shouldFlashIcon(player)) {
             flashed = true
-            val persistTime = skill.getPersistTime(player)
+            val persistTime = skill.getMaxUseTime(player)
             val leftUseTime = persistTime - player.getUsedTime(skill)
             if (persistTime > 5 * 20 && leftUseTime < (persistTime / 5).coerceAtMost(10 * 20)) {
                 val alpha = 0.5 * sin(2 * PI / 20 * (leftUseTime - persistTime / 5)) + 0.5

@@ -6,16 +6,11 @@ import net.minecraft.server.network.*
 
 interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
 
-    val timeParamName: String get() = PERSIST_TIME
-
-    val defaultTime: Int get() = 0
-
-    fun getPersistTime(player: PlayerEntity): Int =
-        getIntParam(timeParamName, player, defaultTime, 0)
+    fun getMaxUseTime(player: PlayerEntity): Int
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
-        if (canAutoStop(player) && usedTime >= getPersistTime(player)) {
+        if (canAutoStop(player) && usedTime >= getMaxUseTime(player)) {
             onStop(player)
             player.stopUsing()
         }
@@ -26,7 +21,7 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
     fun canAutoStop(player: PlayerEntity): Boolean = true
 
     override fun getProgress(player: PlayerEntity): Double {
-        val time = getPersistTime(player)
+        val time = getMaxUseTime(player)
         return (time - player.getUsedTime()) / time.toDouble()
     }
 

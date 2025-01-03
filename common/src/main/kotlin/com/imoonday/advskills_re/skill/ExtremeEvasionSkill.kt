@@ -7,6 +7,7 @@ import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
+import net.minecraft.entity.player.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
@@ -23,7 +24,7 @@ class ExtremeEvasionSkill : Skill(
         settings
             .addParameter("moving_sound", ModSounds.DASH)
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 10,
                 enhancementId = "time",
                 value = 0.2,
@@ -64,6 +65,8 @@ class ExtremeEvasionSkill : Skill(
         player: ServerPlayerEntity,
         attacker: Entity?,
     ): Boolean = player.isUsing()
+
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)

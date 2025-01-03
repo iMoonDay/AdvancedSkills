@@ -4,6 +4,7 @@ import com.imoonday.advskills_re.*
 import com.imoonday.advskills_re.skill.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
+import net.minecraft.server.*
 import net.minecraft.util.*
 import java.io.*
 import java.nio.file.*
@@ -13,6 +14,7 @@ object SettingsManager {
 
     private val LOGGER = LogUtils.getLogger()
     private const val VERSION = 1
+    private const val BACKUP_SUFFIX = ".bak"
     private val settingsDir = Platform.getConfigFolder().resolve("advskills_re/skills")
     private val versionFile = settingsDir.resolve("version")
     private val settings: MutableMap<Identifier, Skill.Settings> = mutableMapOf()
@@ -46,13 +48,16 @@ object SettingsManager {
         if (!checkOrCreateDirectory(settingsDir)) return
 
         val settings = skill.settings
-
         val id = settings.id
         val namespaceDir = getNamespaceDir(id)
         if (!checkOrCreateDirectory(namespaceDir)) return
 
         val file = namespaceDir.resolve("${id.path}.json")
         try {
+            if (file.exists()) {
+                tryBackupFile(file)
+            }
+
             val json = try {
                 settings.toJson()
             } catch (e: Exception) {
@@ -74,7 +79,6 @@ object SettingsManager {
 
         for (skill in skills) {
             val settings = skill.settings
-
             val id = settings.id
             val namespaceDir = getNamespaceDir(id)
             if (!checkOrCreateDirectory(namespaceDir, false)) {
@@ -83,6 +87,10 @@ object SettingsManager {
 
             val file = namespaceDir.resolve("${id.path}.json")
             try {
+                if (file.exists()) {
+                    tryBackupFile(file)
+                }
+
                 val json = try {
                     settings.toJson()
                 } catch (e: Exception) {
@@ -96,7 +104,6 @@ object SettingsManager {
         }
 
         LOGGER.info("Skill Settings saved: $successCount succeeded, ${skills.size - successCount} failed")
-
         saveVersion()
     }
 
@@ -113,6 +120,27 @@ object SettingsManager {
             else -> loadFiles()
         }
         saveMissing(skills)
+    }
+
+    @JvmStatic
+    fun loadFromServerConfig(server: MinecraftServer): Map<Identifier, Skill.Settings> = buildMap {
+        val serverConfigPath = server.serverConfigPath
+        if (serverConfigPath.isDirectory()) {
+            val skillsDir = serverConfigPath.resolve("advskills_re/skills")
+            if (!skillsDir.isDirectory()) {
+                runCatching {
+                    skillsDir.createDirectories()
+                }.onFailure {
+                    LOGGER.error("Failed to create skills directory in serverconfig", it)
+                }
+            } else {
+                skillsDir.listAllFiles(".*\\.json").map { it.toFile() }.count { file ->
+                    tryLoad(file)?.also { put(it.id, it) } != null
+                }.also {
+                    LOGGER.info("Loaded $it Skill Settings from server config")
+                }
+            }
+        }
     }
 
     @JvmStatic
@@ -160,4 +188,17 @@ object SettingsManager {
 
     @JvmStatic
     fun getSettings(skill: Skill): Skill.Settings? = getSettings(skill.id)
+
+    private fun tryBackupFile(file: Path) {
+        try {
+            val currentVersion = loadVersion()
+            if (currentVersion == null || currentVersion < VERSION) {
+                val backupFile = file.resolveSibling(file.name + BACKUP_SUFFIX)
+                Files.copy(file, backupFile, StandardCopyOption.REPLACE_EXISTING)
+                LOGGER.info("Created backup of outdated settings file: ${backupFile.fileName}")
+            }
+        } catch (e: Exception) {
+            LOGGER.error("Failed to create backup for file: ${file.fileName}", e)
+        }
+    }
 }

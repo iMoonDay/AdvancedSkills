@@ -4,6 +4,7 @@ import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
+import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import kotlin.math.*
 
@@ -19,7 +20,7 @@ class TemporaryShieldSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = timeParamName,
+                name = "persist_time",
                 baseValue = 10 * 20,
                 enhancementId = "time",
                 value = 0.2,
@@ -47,12 +48,14 @@ class TemporaryShieldSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(true)
 
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
+
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (!player.isUsing()) return
         val interval = getIntParam("shield_interval", player, 20)
         val maxShield = getFloatParam("max_shield", player, 10.0f)
-        if (usedTime % min(interval, (getPersistTime(player) / maxShield).toInt()).coerceAtLeast(1) == 0) {
+        if (usedTime % min(interval, (getMaxUseTime(player) / maxShield).toInt()).coerceAtLeast(1) == 0) {
             player.absorptionAmount = (player.absorptionAmount + 1).coerceAtMost(maxShield)
         }
     }
