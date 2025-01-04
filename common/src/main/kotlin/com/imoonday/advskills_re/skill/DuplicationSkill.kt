@@ -19,20 +19,20 @@ class DuplicationSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("summon_interval", 10)
-            .addParameter("movement_time", 3 * 20)
+            .addParameter(PARAM_CLONE_INTERVAL, DEFAULT_CLONE_INTERVAL)
+            .addParameter(PARAM_CLONE_MOVE_TIME, DEFAULT_CLONE_MOVE_TIME)
             .addParameter(
-                name = "invisible_duration",
-                baseValue = 3 * 20,
-                enhancementId = "duration",
+                name = PARAM_INVISIBLE_DURATION,
+                baseValue = DEFAULT_INVISIBLE_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "summon_amount",
-                baseValue = 1,
-                enhancementId = "amount",
+                name = PARAM_CLONE_COUNT,
+                baseValue = DEFAULT_CLONE_COUNT,
+                enhancementId = ENHANCEMENT_COUNT,
                 value = 1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -41,11 +41,11 @@ class DuplicationSkill : Skill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val interval = getIntParam("summon_interval", user, 10, 0)
-        val amount = getIntParam("summon_amount", user, 1)
-        val time = getIntParam("movement_time", user, 3 * 20)
+        val interval = getIntParam(PARAM_CLONE_INTERVAL, user, DEFAULT_CLONE_INTERVAL, 0)
+        val amount = getIntParam(PARAM_CLONE_COUNT, user, DEFAULT_CLONE_COUNT)
+        val time = getIntParam(PARAM_CLONE_MOVE_TIME, user, DEFAULT_CLONE_MOVE_TIME)
         user.executeAndAddTask(interval, amount) { summonClones(user, time) }
-        val duration = getIntParam("invisible_duration", user, 3 * 20)
+        val duration = getIntParam(PARAM_INVISIBLE_DURATION, user, DEFAULT_INVISIBLE_DURATION)
         user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, duration, 0, true, false, true))
         return UseResult.success()
     }
@@ -59,5 +59,23 @@ class DuplicationSkill : Skill(
                 setJumping(true)
             }
         })
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CLONE_INTERVAL = 10
+        private const val DEFAULT_CLONE_MOVE_TIME = 3 * 20
+        private const val DEFAULT_INVISIBLE_DURATION = 3 * 20
+        private const val DEFAULT_CLONE_COUNT = 1
+
+        // Parameter Names
+        private const val PARAM_CLONE_INTERVAL = "clone_interval"  // 分身间隔
+        private const val PARAM_CLONE_MOVE_TIME = "clone_move_time"  // 分身移动时间
+        private const val PARAM_INVISIBLE_DURATION = "invisible_duration"  // 隐身时长
+        private const val PARAM_CLONE_COUNT = "clone_count"  // 分身数量
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应隐身时长
+        private const val ENHANCEMENT_COUNT = "count"  // 对应分身数量
     }
 }

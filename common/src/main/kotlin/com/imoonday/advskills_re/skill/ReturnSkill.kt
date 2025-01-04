@@ -24,15 +24,16 @@ class ReturnSkill : LongPressSkill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("return_sound", ModSounds.RETURN)
+            .addParameter(PARAM_RETURN_SOUND, DEFAULT_RETURN_SOUND)
             .addParameter(
-                name = "charge_time",
-                baseValue = 5 * 20,
-                enhancementId = "time",
+                name = PARAM_CHARGE_DURATION,
+                baseValue = DEFAULT_CHARGE_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = -0.16,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             )
     }
 
@@ -46,15 +47,15 @@ class ReturnSkill : LongPressSkill(
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (player.isUsing()) {
-            val usePos = NbtUtils.readEntityPositionFromTag(player.getActiveData())
-            if (usePos != player.pos) {
+            val startPos = NbtUtils.readEntityPositionFromTag(player.getActiveData())
+            if (startPos != player.pos) {
                 player.stopUsing()
                 player.sendMessage(failedMessage(), true)
             } else {
-                var (_, world, teleportPos) = getTeleportInfo(player)
+                var (_, world, targetPos) = getTeleportInfo(player)
                 val dimensions = player.getDimensions(player.pose)
-                while (!world.isSpaceEmpty(player, dimensions.getBoxAt(teleportPos)) && teleportPos.y < world.topY) {
-                    teleportPos = teleportPos.offset(Direction.UP, 1.0)
+                while (!world.isSpaceEmpty(player, dimensions.getBoxAt(targetPos)) && targetPos.y < world.topY) {
+                    targetPos = targetPos.offset(Direction.UP, 1.0)
                 }
 
                 val random = player.random
@@ -62,7 +63,7 @@ class ReturnSkill : LongPressSkill(
                 player.spawnParticles(
                     ParticleTypes.PORTAL,
                     false,
-                    teleportPos.add(
+                    targetPos.add(
                         random.nextDouble() - 0.5,
                         random.nextDouble() * height,
                         random.nextDouble() - 0.5
@@ -98,17 +99,18 @@ class ReturnSkill : LongPressSkill(
         }
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 5 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopUsing()
         if (pressedTime < getMaxUseTime(player)) {
             return UseResult.fail(failedMessage())
         }
-        val (spawnAngle, world, teleportPos) = getTeleportInfo(player)
-        player.playSoundFromParam("return_sound", ModSounds.RETURN.get())
+        val (spawnAngle, world, targetPos) = getTeleportInfo(player)
+        player.playSoundFromParam(PARAM_RETURN_SOUND, DEFAULT_RETURN_SOUND.get())
         player.teleport(
-            world, teleportPos.x, teleportPos.y, teleportPos.z,
+            world, targetPos.x, targetPos.y, targetPos.z,
             emptySet(),
             spawnAngle, 0f
         )
@@ -125,5 +127,18 @@ class ReturnSkill : LongPressSkill(
         val teleportPos =
             PlayerEntity.findRespawnPosition(world, pos, spawnAngle, false, true).orElse(pos.toCenterPos())
         return Triple(spawnAngle, world, teleportPos)
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CHARGE_DURATION = 5 * 20
+        private val DEFAULT_RETURN_SOUND = ModSounds.RETURN
+
+        // Parameter Names
+        private const val PARAM_RETURN_SOUND = "return_sound"  // 返回音效
+        private const val PARAM_CHARGE_DURATION = "charge_duration"  // 蓄力时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "charge_time"  // 对应持续时间
     }
 }

@@ -22,27 +22,27 @@ class DyingCounterattackSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("effect_sound", SoundEvents.ITEM_TOTEM_USE)
+            .addParameter(PARAM_REVIVE_SOUND, DEFAULT_REVIVE_SOUND)
             .addParameter(
-                name = "healing_amount_multiplier",
-                baseValue = 0.1f,
-                enhancementId = "healing_amount",
+                name = PARAM_HEAL_RATIO,
+                baseValue = DEFAULT_HEAL_RATIO,
+                enhancementId = ENHANCEMENT_HEAL,
                 value = 0.1f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 4,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "damage_multiplier",
-                baseValue = 1.0f,
-                enhancementId = "damage_amount",
+                name = PARAM_DAMAGE_PENALTY,
+                baseValue = DEFAULT_DAMAGE_PENALTY,
+                enhancementId = ENHANCEMENT_PENALTY,
                 value = -0.1f,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "damage_interval",
-                baseValue = 20,
-                enhancementId = "damage_interval",
+                name = PARAM_WITHER_INTERVAL,
+                baseValue = DEFAULT_WITHER_INTERVAL,
+                enhancementId = ENHANCEMENT_INTERVAL,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -56,7 +56,7 @@ class DyingCounterattackSkill : Skill(
         if (player.isUsing() || player.isCooling()) return true
         player.health = player.maxHealth
         player.startUsing()
-        player.playSoundFromParam("effect_sound", SoundEvents.ITEM_TOTEM_USE)
+        player.playSoundFromParam(PARAM_REVIVE_SOUND, DEFAULT_REVIVE_SOUND)
         return false
     }
 
@@ -67,7 +67,7 @@ class DyingCounterattackSkill : Skill(
         target: LivingEntity,
     ): Float {
         if (player.isUsing() && amount > 0) {
-            val healingAmount = amount * getFloatParam("healing_amount_multiplier", player, 0.1f, 0.0f)
+            val healingAmount = amount * getFloatParam(PARAM_HEAL_RATIO, player, DEFAULT_HEAL_RATIO, 0.0f)
             player.heal(healingAmount)
         }
         return amount
@@ -76,9 +76,9 @@ class DyingCounterattackSkill : Skill(
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isUsing()) return
 
-        val interval = getIntParam("damage_interval", player, 20, 1)
+        val interval = getIntParam(PARAM_WITHER_INTERVAL, player, DEFAULT_WITHER_INTERVAL, 1)
         if (usedTime % interval == 0) {
-            val multiplier = getFloatParam("damage_multiplier", player, 1.0f, 0.0f)
+            val multiplier = getFloatParam(PARAM_DAMAGE_PENALTY, player, DEFAULT_DAMAGE_PENALTY, 0.0f)
             val amount = 2.0f * (usedTime / 200 + if (usedTime % 200 == 0) 0 else 1) * multiplier
             player.damage(player.damageSources.wither(), amount)
         }
@@ -90,4 +90,23 @@ class DyingCounterattackSkill : Skill(
 
     override fun shouldHaveStatusEffect(player: PlayerEntity, effect: StatusEffect): Boolean =
         player.isUsing() && effect == StatusEffects.WITHER || super.shouldHaveStatusEffect(player, effect)
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_HEAL_RATIO = 0.1f
+        private const val DEFAULT_DAMAGE_PENALTY = 1.0f
+        private const val DEFAULT_WITHER_INTERVAL = 20
+        private val DEFAULT_REVIVE_SOUND = SoundEvents.ITEM_TOTEM_USE
+
+        // Parameter Names
+        private const val PARAM_REVIVE_SOUND = "revive_sound"  // 复活音效
+        private const val PARAM_HEAL_RATIO = "heal_ratio"  // 治疗比例
+        private const val PARAM_DAMAGE_PENALTY = "damage_penalty"  // 伤害惩罚
+        private const val PARAM_WITHER_INTERVAL = "wither_interval"  // 凋零间隔
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_HEAL = "heal"  // 对应治疗比例
+        private const val ENHANCEMENT_PENALTY = "penalty"  // 对应伤害惩罚
+        private const val ENHANCEMENT_INTERVAL = "interval"  // 对应凋零间隔
+    }
 }

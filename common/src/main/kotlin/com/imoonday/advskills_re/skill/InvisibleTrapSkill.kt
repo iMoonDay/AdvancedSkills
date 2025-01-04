@@ -21,25 +21,25 @@ class InvisibleTrapSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "range",
-            baseValue = 0,
-            enhancementId = "range",
+            name = PARAM_TRAP_RANGE,
+            baseValue = DEFAULT_TRAP_RANGE,
+            enhancementId = ENHANCEMENT_RANGE,
             value = 1,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT
         ).addParameter(
-            name = "trap_count",
-            baseValue = 1,
-            enhancementId = "count",
+            name = PARAM_TRAP_COUNT,
+            baseValue = DEFAULT_TRAP_COUNT,
+            enhancementId = ENHANCEMENT_COUNT,
             value = 1,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT
         ).addParameter(
-            name = "damage",
-            baseValue = 2.0f,
-            enhancementId = "damage",
+            name = PARAM_TRAP_DAMAGE,
+            baseValue = DEFAULT_TRAP_DAMAGE,
+            enhancementId = ENHANCEMENT_DAMAGE,
             value = 0.2f,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
@@ -50,11 +50,11 @@ class InvisibleTrapSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         val world = user.world
         val pos = user.blockPos
-        val range = getIntParam("range", user, 0)
-        val times = getIntParam("trap_count", user, 1)
+        val range = getIntParam(PARAM_TRAP_RANGE, user, DEFAULT_TRAP_RANGE)
+        val times = getIntParam(PARAM_TRAP_COUNT, user, DEFAULT_TRAP_COUNT)
         val trapBlock = ModBlocks.INVISIBLE_TRAP.get()
         val defaultState = trapBlock.defaultState
-        val damage = getFloatParam("damage", user, 2.0f)
+        val damage = getFloatParam(PARAM_TRAP_DAMAGE, user, DEFAULT_TRAP_DAMAGE)
         val uuid = user.uuid
 
         var success = false
@@ -82,6 +82,24 @@ class InvisibleTrapSkill : Skill(
             }
         }
 
-        return if (success) UseResult.success() else UseResult.fail(failedMessage())
+        return UseResult.of(success, failMessage = failedMessage())
+    }
+
+    companion object {
+
+        // Default Values
+        private const val DEFAULT_TRAP_RANGE = 0
+        private const val DEFAULT_TRAP_COUNT = 1
+        private const val DEFAULT_TRAP_DAMAGE = 2.0f
+
+        // Parameter Names
+        private const val PARAM_TRAP_RANGE = "trap_range"  // 陷阱范围
+        private const val PARAM_TRAP_COUNT = "trap_count"  // 陷阱数量
+        private const val PARAM_TRAP_DAMAGE = "trap_damage"  // 陷阱伤害
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_RANGE = "range"  // 对应陷阱范围
+        private const val ENHANCEMENT_COUNT = "count"  // 对应陷阱数量
+        private const val ENHANCEMENT_DAMAGE = "damage"  // 对应陷阱伤害
     }
 }

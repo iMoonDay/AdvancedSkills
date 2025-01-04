@@ -18,17 +18,17 @@ class MagneticTrapSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = "radius_multiplier",
-                baseValue = 1.0f,
-                enhancementId = "range",
+                name = PARAM_ATTRACT_RANGE,
+                baseValue = DEFAULT_ATTRACT_RANGE,
+                enhancementId = ENHANCEMENT_RANGE,
                 value = 0.2f,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "additional_age",
-                baseValue = 0,
-                enhancementId = "time",
+                name = PARAM_TRAP_DURATION,
+                baseValue = DEFAULT_TRAP_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 20 * 60,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -38,9 +38,23 @@ class MagneticTrapSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.world.spawnEntity(MagnetEntity(user.world, user.pos, user).apply {
-            radius *= getFloatParam("radius_multiplier", user, 1.0f)
-            maxAge += getIntParam("additional_age", user, 0)
+            radius *= getFloatParam(PARAM_ATTRACT_RANGE, user, DEFAULT_ATTRACT_RANGE)
+            maxAge += getIntParam(PARAM_TRAP_DURATION, user, DEFAULT_TRAP_DURATION)
         })
         return UseResult.success()
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_ATTRACT_RANGE = 1.0f
+        private const val DEFAULT_TRAP_DURATION = 0
+
+        // Parameter Names
+        private const val PARAM_ATTRACT_RANGE = "attract_range"  // 吸引范围
+        private const val PARAM_TRAP_DURATION = "trap_duration"  // 陷阱持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_RANGE = "range"  // 对应吸引范围
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
     }
 }

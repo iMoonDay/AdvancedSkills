@@ -5,14 +5,12 @@ import net.minecraft.entity.*
 import net.minecraft.entity.damage.*
 import net.minecraft.server.network.*
 
-class ExtremeReflectionSkill : ReflectionSkill(
+class ExtremeBounceSkill : BounceSkill(
     Settings(
-        id = "extreme_reflection",
+        id = "extreme_bounce",
         cooldown = 3,
         rarity = SkillRarity.RARE
-    ),
-    duration = 5,
-    baseChance = 0.75f
+    )
 ) {
 
     override fun ignoreDamage(
@@ -24,6 +22,12 @@ class ExtremeReflectionSkill : ReflectionSkill(
         if (!player.isUsing()) return false
         player.stopUsing()
         player.stopCooling()
-        return player.reflect(attacker as? LivingEntity, amount)
+        return player.bounce(attacker as? LivingEntity, amount)
     }
+
+    override fun getDuration(): Int = 5
+
+    override fun getDamageMultiplier(): Float = 1f
+
+    override fun getBaseChance(): Float = 0.75f
 }

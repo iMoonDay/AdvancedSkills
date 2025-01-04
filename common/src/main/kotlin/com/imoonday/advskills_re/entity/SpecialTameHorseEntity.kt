@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.entity
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
 import net.minecraft.entity.*
@@ -126,10 +127,10 @@ class SpecialTameHorseEntity(entityType: EntityType<out HorseEntity>, world: Wor
         if (!world.isClient) {
             owner?.let {
                 val properties = it.properties
-                if (!properties.containsUuid("horseUuid")) {
-                    properties.putUuid("horseUuid", uuid)
+                if (!properties.containsUuid(ExclusiveMountSkill.NBT_HORSE_UUID)) {
+                    properties.putUuid(ExclusiveMountSkill.NBT_HORSE_UUID, uuid)
                     it.syncProperties()
-                } else if (properties.getUuid("horseUuid") != uuid) {
+                } else if (properties.getUuid(ExclusiveMountSkill.NBT_HORSE_UUID) != uuid) {
                     discard()
                     return
                 }

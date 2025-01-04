@@ -29,26 +29,28 @@ class LavaWalkerSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("use_sound", SoundEvents.BLOCK_LAVA_AMBIENT)
+            .addParameter(PARAM_WALK_SOUND, DEFAULT_WALK_SOUND)
             .addParameter(
-                name = "persist_time",
-                baseValue = 20 * 20,
-                enhancementId = "time",
+                name = PARAM_WALK_DURATION,
+                baseValue = DEFAULT_WALK_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {
-        user.playSoundFromParam("use_sound", SoundEvents.BLOCK_LAVA_AMBIENT)
+        user.playSoundFromParam(PARAM_WALK_SOUND, DEFAULT_WALK_SOUND)
     }
 
     override fun canWalkOnFluid(player: PlayerEntity, state: FluidState): Boolean =
         player.isUsing() && state.isOf(Fluids.LAVA) && player.getFluidHeight(FluidTags.LAVA) < 0.02
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 20 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int =
+        getIntParam(PARAM_WALK_DURATION, player, DEFAULT_WALK_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
@@ -74,4 +76,18 @@ class LavaWalkerSkill : Skill(
         player.isUsing() && source.isOf(DamageTypes.HOT_FLOOR) || super.ignoreDamage(amount, source, player, attacker)
 
     override fun ignoreLava(player: PlayerEntity): Boolean = ignoreFluid(player, FluidTags.LAVA)
+
+    companion object {
+
+        // Default Values
+        private const val DEFAULT_WALK_DURATION = 20 * 20
+        private val DEFAULT_WALK_SOUND = SoundEvents.BLOCK_LAVA_AMBIENT
+
+        // Parameter Names
+        private const val PARAM_WALK_SOUND = "walk_sound"  // 行走音效
+        private const val PARAM_WALK_DURATION = "walk_duration"  // 行走持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+    }
 }

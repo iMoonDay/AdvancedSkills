@@ -4,14 +4,14 @@ import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
 
-interface ReflectionTrigger : AutoStopTrigger {
+interface BounceTrigger : AutoStopTrigger {
 
-    fun startReflecting(user: ServerPlayerEntity): UseResult {
+    fun startBouncing(user: ServerPlayerEntity): UseResult {
         val startTime = System.currentTimeMillis()
         return UseResult.of(
             user.startUsing { it.putLong("startTime", startTime) },
             null,
-            translate("reflection.active")
+            translate("bounce.active")
         )
     }
 
@@ -19,17 +19,17 @@ interface ReflectionTrigger : AutoStopTrigger {
         super.onStop(player)
         if (!player.hasEquipped()) return
 
-        player.lastReflectedTime = System.currentTimeMillis()
+        player.lastBounceTime = System.currentTimeMillis()
         getStartTime(player)?.let {
             val time = player.lastDamagedTime
             val l = it - time
             if (l < 1000) {
                 player.sendMessage(
-                    translate("reflection.late", (l / 1000.0).toString()),
+                    translate("bounce.late", (l / 1000.0).toString()),
                     true
                 )
                 player.lastDamagedTime = 0
-                player.lastReflectedTime = 0
+                player.lastBounceTime = 0
             }
         }
     }

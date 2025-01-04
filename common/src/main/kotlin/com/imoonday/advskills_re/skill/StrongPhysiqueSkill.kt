@@ -10,26 +10,29 @@ class StrongPhysiqueSkill : PassiveSkill(
     Settings(
         id = "strong_physique",
         rarity = SkillRarity.SUPERB
-    ), customToggles = true
+    )
 ), StopTrigger {
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "health_bonus",
-            baseValue = 4.0,
-            enhancementId = "value",
+            name = PARAM_HEALTH_BOOST,
+            baseValue = DEFAULT_HEALTH_BOOST,
+            enhancementId = ENHANCEMENT_BOOST,
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
+        super.initDefaultSettings(settings)
     }
+
+    override fun isCustomToggles(): Boolean = true
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MAX_HEALTH to EntityAttributeModifier(
             createUuid("Strong Physique"),
             "Strong Physique",
-            getDoubleParam("health_bonus", player, 4.0),
+            getDoubleParam(PARAM_HEALTH_BOOST, player, DEFAULT_HEALTH_BOOST),
             EntityAttributeModifier.Operation.ADDITION
         )
     )
@@ -47,5 +50,16 @@ class StrongPhysiqueSkill : PassiveSkill(
         if (player.health > player.maxHealth) {
             player.health = player.maxHealth
         }
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_HEALTH_BOOST = 4.0
+
+        // Parameter Names
+        private const val PARAM_HEALTH_BOOST = "health_boost"  // 生命值提升
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_BOOST = "boost"  // 对应提升值
     }
 }

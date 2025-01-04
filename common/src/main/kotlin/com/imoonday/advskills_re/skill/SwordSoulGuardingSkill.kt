@@ -23,35 +23,36 @@ class SwordSoulGuardingSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("summon_sound", SoundEvents.ENTITY_ARROW_SHOOT)
+            .addParameter(PARAM_SWORD_SOUND, DEFAULT_SWORD_SOUND)
             .addParameter(
-                name = "persist_time",
-                baseValue = 20 * 20,
-                enhancementId = "time",
+                name = PARAM_GUARD_DURATION,
+                baseValue = DEFAULT_GUARD_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             ).addParameter(
-                name = "spawn_chance",
-                baseValue = 0.3f,
-                enhancementId = "chance",
+                name = PARAM_TRIGGER_CHANCE,
+                baseValue = DEFAULT_TRIGGER_CHANCE,
+                enhancementId = ENHANCEMENT_CHANCE,
                 value = 0.1f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "summon_amount",
-                baseValue = 1,
-                enhancementId = "amount",
+                name = PARAM_SWORD_COUNT,
+                baseValue = DEFAULT_SWORD_COUNT,
+                enhancementId = ENHANCEMENT_COUNT,
                 value = 1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
             ).addParameter(
-                name = "spawn_interval",
-                baseValue = 25,
-                enhancementId = "interval",
+                name = PARAM_SPAWN_INTERVAL,
+                baseValue = DEFAULT_SPAWN_INTERVAL,
+                enhancementId = ENHANCEMENT_INTERVAL,
                 value = -2,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -63,7 +64,7 @@ class SwordSoulGuardingSkill : Skill(
 
     override fun postAttack(source: DamageSource, player: ServerPlayerEntity, target: LivingEntity) {
         super.postAttack(source, player, target)
-        val chance = getFloatParam("spawn_chance", player, 0.3f)
+        val chance = getFloatParam(PARAM_TRIGGER_CHANCE, player, DEFAULT_TRIGGER_CHANCE)
         if (player.isUsing() && source.source !is EnchantedSwordEntity && player.random.nextFloat() < chance) {
             spawnSword(player, target)
         }
@@ -83,29 +84,49 @@ class SwordSoulGuardingSkill : Skill(
         player.startCooling()
     }
 
-    private fun spawnSword(
-        player: ServerPlayerEntity,
-        target: LivingEntity,
-    ) {
+    private fun spawnSword(player: ServerPlayerEntity, target: LivingEntity) {
         if (target.isRemoved || target.isDead) return
-        val summonAmount = getIntParam("summon_amount", player, 1)
-        player.executeAndAddTask(5, summonAmount) {
+        val swordCount = getIntParam(PARAM_SWORD_COUNT, player, DEFAULT_SWORD_COUNT)
+        player.executeAndAddTask(5, swordCount) {
             player.world.spawnEntity(EnchantedSwordEntity(player.world, player, target).apply {
                 setPosition(player.eyePos - player.rotationVector)
             })
-            player.playSoundFromParam("summon_sound", SoundEvents.ENTITY_ARROW_SHOOT)
+            player.playSoundFromParam(PARAM_SWORD_SOUND, DEFAULT_SWORD_SOUND)
             true
         }
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 20 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_GUARD_DURATION, player, DEFAULT_GUARD_DURATION, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
         if (!player.isUsing()) return
-        val interval = getIntParam("spawn_interval", player, 25).coerceAtLeast(1)
+        val interval = getIntParam(PARAM_SPAWN_INTERVAL, player, DEFAULT_SPAWN_INTERVAL).coerceAtLeast(1)
         if (usedTime % interval == 0) {
             player.attacking?.let { spawnSword(player, it) } ?: player.attacker?.let { spawnSword(player, it) }
         }
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_GUARD_DURATION = 20 * 20
+        private const val DEFAULT_TRIGGER_CHANCE = 0.3f
+        private const val DEFAULT_SWORD_COUNT = 1
+        private const val DEFAULT_SPAWN_INTERVAL = 25
+        private val DEFAULT_SWORD_SOUND = SoundEvents.ENTITY_ARROW_SHOOT
+
+        // Parameter Names
+        private const val PARAM_SWORD_SOUND = "sword_sound"  // 剑气音效
+        private const val PARAM_GUARD_DURATION = "guard_duration"  // 守护持续时间
+        private const val PARAM_TRIGGER_CHANCE = "trigger_chance"  // 触发概率
+        private const val PARAM_SWORD_COUNT = "sword_count"  // 剑气数量
+        private const val PARAM_SPAWN_INTERVAL = "spawn_interval"  // 生成间隔
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_CHANCE = "chance"  // 对应概率
+        private const val ENHANCEMENT_COUNT = "count"  // 对应数量
+        private const val ENHANCEMENT_INTERVAL = "interval"  // 对应间隔
     }
 }

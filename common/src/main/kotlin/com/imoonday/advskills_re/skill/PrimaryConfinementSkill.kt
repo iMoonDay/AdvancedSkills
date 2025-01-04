@@ -25,35 +25,36 @@ class PrimaryConfinementSkill : LongPressSkill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("confinement_sound", SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE)
+            .addParameter(PARAM_CONFINE_SOUND, DEFAULT_CONFINE_SOUND)
             .addParameter(
-                name = "charge_time",
-                baseValue = 5 * 20,
-                enhancementId = "time",
+                name = PARAM_CHARGE_DURATION,
+                baseValue = DEFAULT_CHARGE_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = -0.16,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             ).addParameter(
-                name = "range",
-                baseValue = 5.0,
-                enhancementId = "range",
+                name = PARAM_CONFINE_RANGE,
+                baseValue = DEFAULT_CONFINE_RANGE,
+                enhancementId = ENHANCEMENT_RANGE,
                 value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
             ).addParameter(
-                name = "success_chance",
-                baseValue = 0.8f,
-                enhancementId = "chance",
+                name = PARAM_SUCCESS_CHANCE,
+                baseValue = DEFAULT_SUCCESS_CHANCE,
+                enhancementId = ENHANCEMENT_CHANCE,
                 value = 0.04f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "confinement_duration",
-                baseValue = 3 * 20,
-                enhancementId = "duration",
+                name = PARAM_EFFECT_DURATION,
+                baseValue = DEFAULT_EFFECT_DURATION,
+                enhancementId = ENHANCEMENT_EFFECT,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -65,15 +66,15 @@ class PrimaryConfinementSkill : LongPressSkill(
         player.stopAndCooldown()
         player.swingHand(Hand.MAIN_HAND, true)
         player.raycastLivingEntity(getRange(player))?.takeIf { it.type == HitResult.Type.ENTITY }?.let {
-            val baseChance = getFloatParam("success_chance", player, 0.8f, max = 1.0f)
-            if (player.random.nextFloat() < baseChance * pressedTime / getMaxUseTime(player)) {
-                val duration = getIntParam("confinement_duration", player, 3 * 20)
+            val chance = getFloatParam(PARAM_SUCCESS_CHANCE, player, DEFAULT_SUCCESS_CHANCE, max = 1.0f)
+            if (player.random.nextFloat() < chance * pressedTime / getMaxUseTime(player)) {
+                val duration = getIntParam(PARAM_EFFECT_DURATION, player, DEFAULT_EFFECT_DURATION)
                 (it.entity as LivingEntity).addStatusEffect(
                     StatusEffectInstance(ModEffects.CONFINEMENT.get(), duration, 0, false, false, true)
                 )
                 return UseResult.success(
                     message("success"),
-                    getSoundEventParam("confinement_sound", SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE)
+                    getSoundEventParam(PARAM_CONFINE_SOUND, DEFAULT_CONFINE_SOUND)
                 )
             }
             return UseResult.pass(failedMessage())
@@ -81,7 +82,8 @@ class PrimaryConfinementSkill : LongPressSkill(
         return UseResult.pass(message("empty"))
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 5 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun getCrosshair(player: PlayerEntity): Crosshair {
         player.run {
@@ -97,5 +99,27 @@ class PrimaryConfinementSkill : LongPressSkill(
     }
 
     private fun getRange(player: PlayerEntity): Double =
-        getDoubleParam("range", player, 5.0)
+        getDoubleParam(PARAM_CONFINE_RANGE, player, DEFAULT_CONFINE_RANGE)
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CHARGE_DURATION = 5 * 20
+        private const val DEFAULT_CONFINE_RANGE = 5.0
+        private const val DEFAULT_SUCCESS_CHANCE = 0.8f
+        private const val DEFAULT_EFFECT_DURATION = 3 * 20
+        private val DEFAULT_CONFINE_SOUND = SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE
+
+        // Parameter Names
+        private const val PARAM_CONFINE_SOUND = "confine_sound"  // 禁锢音效
+        private const val PARAM_CHARGE_DURATION = "charge_duration"  // 蓄力时间
+        private const val PARAM_CONFINE_RANGE = "confine_range"  // 禁锢范围
+        private const val PARAM_SUCCESS_CHANCE = "success_chance"  // 成功概率
+        private const val PARAM_EFFECT_DURATION = "effect_duration"  // 效果持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "charge_time"  // 对应蓄力时间
+        private const val ENHANCEMENT_RANGE = "range"  // 对应范围
+        private const val ENHANCEMENT_CHANCE = "chance"  // 对应概率
+        private const val ENHANCEMENT_EFFECT = "effect"  // 对应效果持续时间
+    }
 }

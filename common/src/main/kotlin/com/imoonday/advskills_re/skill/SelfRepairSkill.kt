@@ -21,17 +21,17 @@ class SelfRepairSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = "charge_time",
-                baseValue = 10 * 20,
-                enhancementId = "time",
+                name = PARAM_CHARGE_DURATION,
+                baseValue = DEFAULT_CHARGE_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = -0.16,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "max_repair_limit",
-                baseValue = 0.5f,
-                enhancementId = "limit",
+                name = PARAM_REPAIR_THRESHOLD,
+                baseValue = DEFAULT_REPAIR_THRESHOLD,
+                enhancementId = ENHANCEMENT_THRESHOLD,
                 value = 0.1f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -44,7 +44,8 @@ class SelfRepairSkill : Skill(
     override fun shouldStart(player: ServerPlayerEntity): Boolean =
         player.armorItems.filter { it.isDamaged }.any { it.damage > getMaxRepairLimit(player, it) }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 10 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
@@ -64,11 +65,25 @@ class SelfRepairSkill : Skill(
     }
 
     fun getMaxRepairLimit(player: PlayerEntity, stack: ItemStack): Int {
-        val threshold = 1.0f - getFloatParam("max_repair_limit", player, 0.5f, max = 1.0f)
+        val threshold = 1.0f - getFloatParam(PARAM_REPAIR_THRESHOLD, player, DEFAULT_REPAIR_THRESHOLD, max = 1.0f)
         return (stack.maxDamage * threshold).toInt().coerceAtLeast(0)
     }
 
     override fun shouldFlashIcon(player: PlayerEntity): Boolean = false
 
     override fun getProgress(player: PlayerEntity): Double = 1.0 - super.getProgress(player)
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CHARGE_DURATION = 10 * 20
+        private const val DEFAULT_REPAIR_THRESHOLD = 0.5f
+
+        // Parameter Names
+        private const val PARAM_CHARGE_DURATION = "charge_duration"  // 充能时间
+        private const val PARAM_REPAIR_THRESHOLD = "repair_threshold"  // 修复阈值
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_THRESHOLD = "threshold"  // 对应阈值
+    }
 }

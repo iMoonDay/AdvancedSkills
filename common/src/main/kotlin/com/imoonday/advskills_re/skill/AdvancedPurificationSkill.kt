@@ -22,11 +22,11 @@ class AdvancedPurificationSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("success_sound", ModSounds.PURIFY)
+            .addParameter(PARAM_SUCCESS_SOUND, DEFAULT_SUCCESS_SOUND)
             .addParameter(
-                name = "max_removal_time",
-                baseValue = 30 * 20,
-                enhancementId = "time",
+                name = PARAM_MAX_DURATION,
+                baseValue = DEFAULT_MAX_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -68,8 +68,22 @@ class AdvancedPurificationSkill : Skill(
         }
     ?: UseResult.fail(failedMessage())
 
-    private fun getSuccessSound() = getSoundEventParam("success_sound", ModSounds.PURIFY.get())
+    private fun getSuccessSound() = getSoundEventParam(PARAM_SUCCESS_SOUND, DEFAULT_SUCCESS_SOUND.get())
 
     private fun getTimeUpLimit(player: PlayerEntity) =
-        getIntParam("max_removal_time", player, 30 * 20, 0)
+        getIntParam(PARAM_MAX_DURATION, player, DEFAULT_MAX_DURATION, 0)
+
+    companion object {
+
+        // Default Values
+        private const val DEFAULT_MAX_DURATION = 30 * 20
+        private val DEFAULT_SUCCESS_SOUND = ModSounds.PURIFY
+
+        // Parameter Names
+        private const val PARAM_SUCCESS_SOUND = "success_sound"  // 成功音效
+        private const val PARAM_MAX_DURATION = "max_removable_duration"  // 最大可净化持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应最大净化时间
+    }
 }

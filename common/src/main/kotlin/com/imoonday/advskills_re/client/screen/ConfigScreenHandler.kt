@@ -246,6 +246,15 @@ object ConfigScreenHandler {
                     .setSaveConsumer { config.quickCastWheelHoldTime = it }
                     .build()
             )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.developmentMode"),
+                    config.developmentMode
+                ).setDefaultValue(false)
+                    .setSaveConsumer { config.developmentMode = it }
+                    .build()
+            )
         }
     }
 

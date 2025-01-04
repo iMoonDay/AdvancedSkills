@@ -22,20 +22,21 @@ class LiquidShieldSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("use_sound", SoundEvents.BLOCK_WATER_AMBIENT)
+            .addParameter(PARAM_SHIELD_SOUND, DEFAULT_SHIELD_SOUND)
             .addParameter(
-                name = "persist_time",
-                baseValue = 15 * 20,
-                enhancementId = "time",
+                name = PARAM_SHIELD_DURATION,
+                baseValue = DEFAULT_SHIELD_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {
-        user.playSoundFromParam("use_sound", SoundEvents.BLOCK_WATER_AMBIENT)
+        user.playSoundFromParam(PARAM_SHIELD_SOUND, DEFAULT_SHIELD_SOUND)
     }
 
     override fun clientTick(player: PlayerEntity, usedTime: Int) {
@@ -64,10 +65,24 @@ class LiquidShieldSkill : Skill(
 
     override fun canBreatheInWater(player: PlayerEntity): Boolean = player.isUsing()
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 15 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_SHIELD_DURATION, player, DEFAULT_SHIELD_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
         player.startCooling()
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_SHIELD_DURATION = 15 * 20
+        private val DEFAULT_SHIELD_SOUND = SoundEvents.BLOCK_WATER_AMBIENT
+
+        // Parameter Names
+        private const val PARAM_SHIELD_SOUND = "shield_sound"  // 护盾音效
+        private const val PARAM_SHIELD_DURATION = "shield_duration"  // 护盾持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
     }
 }

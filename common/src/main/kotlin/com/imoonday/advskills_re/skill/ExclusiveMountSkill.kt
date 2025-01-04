@@ -31,16 +31,24 @@ class ExclusiveMountSkill : Skill(
         }
         if (user.world.isSpaceEmpty(newHorse, newHorse.boundingBox.offset(user.pos.subtract(newHorse.pos)))) {
             val properties = user.properties
-            if (properties.containsUuid("horseUuid")) {
-                user.serverWorld.getEntity(properties.getUuid("horseUuid"))?.discard()
+            if (properties.containsUuid(NBT_HORSE_UUID)) {
+                user.serverWorld.getEntity(properties.getUuid(NBT_HORSE_UUID))?.discard()
             }
-            properties.putUuid("horseUuid", newHorse.uuid)
+            properties.putUuid(NBT_HORSE_UUID, newHorse.uuid)
             user.syncProperties()
             newHorse.requestTeleport(user.x, user.y, user.z)
             user.world.spawnEntity(newHorse)
             newHorse.putPlayerOnBack(user)
             user.startCooling()
-            return UseResult.consume(sound = SoundEvents.ENTITY_HORSE_SADDLE)
+            return UseResult.consume(sound = DEFAULT_MOUNT_SOUND)
         } else return UseResult.fail(message("unsupportedPlace"))
+    }
+
+    companion object {
+        // NBT Keys
+        const val NBT_HORSE_UUID = "HorseUuid"  // 坐骑UUID
+
+        // Default Values
+        private val DEFAULT_MOUNT_SOUND = SoundEvents.ENTITY_HORSE_SADDLE  // 坐骑音效
     }
 }

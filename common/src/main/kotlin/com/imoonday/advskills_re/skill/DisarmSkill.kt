@@ -23,27 +23,27 @@ class DisarmSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("disarm_sound", ModSounds.DISARM)
+            .addParameter(PARAM_DISARM_SOUND, DEFAULT_DISARM_SOUND)
             .addParameter(
-                name = "disarm_probability",
-                baseValue = 0.45f,
-                enhancementId = "success_probability",
+                name = PARAM_SUCCESS_CHANCE,
+                baseValue = DEFAULT_SUCCESS_CHANCE,
+                enhancementId = ENHANCEMENT_SUCCESS_CHANCE,
                 value = 0.05f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "disarm_duration",
-                baseValue = 5 * 20,
-                enhancementId = "duration",
+                name = PARAM_DISARM_DURATION,
+                baseValue = DEFAULT_DISARM_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "loot_probability",
-                baseValue = 0.01f,
-                enhancementId = "loot_probability",
+                name = PARAM_DROP_CHANCE,
+                baseValue = DEFAULT_DROP_CHANCE,
+                enhancementId = ENHANCEMENT_DROP_CHANCE,
                 value = 0.01f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -59,17 +59,17 @@ class DisarmSkill : Skill(
 
         val random = player.random
 
-        val probability = getFloatParam("disarm_probability", player, 0.45f)
+        val probability = getFloatParam(PARAM_SUCCESS_CHANCE, player, DEFAULT_SUCCESS_CHANCE)
         if (random.nextFloat() < probability) {
-            val duration = getIntParam("disarm_duration", player, 5 * 20)
+            val duration = getIntParam(PARAM_DISARM_DURATION, player, DEFAULT_DISARM_DURATION)
             target.addStatusEffect(StatusEffectInstance(ModEffects.DISARM.get(), duration))
 
             player.sendMessage(translate("skill.disarm.success"), true)
-            player.playSoundFromParam("disarm_sound", ModSounds.DISARM.get())
+            player.playSoundFromParam(PARAM_DISARM_SOUND, DEFAULT_DISARM_SOUND.get())
             (target as? PlayerEntity)?.sendMessage(translate("skill.disarm.disarmed"), true)
 
-            val lootProbability = getFloatParam("loot_probability", player, 0.01f)
-            if (random.nextFloat() < lootProbability) {
+            val dropChance = getFloatParam(PARAM_DROP_CHANCE, player, DEFAULT_DROP_CHANCE)
+            if (random.nextFloat() < dropChance) {
                 if (target is ServerPlayerEntity)
                     target.dropSelectedItem(true)
                 else if (target.dropStack(target.mainHandStack) != null) {
@@ -90,5 +90,24 @@ class DisarmSkill : Skill(
         if (player.isUsing()) {
             player.startCooling()
         }
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_SUCCESS_CHANCE = 0.45f
+        private const val DEFAULT_DISARM_DURATION = 5 * 20
+        private const val DEFAULT_DROP_CHANCE = 0.01f
+        private val DEFAULT_DISARM_SOUND = ModSounds.DISARM
+
+        // Parameter Names
+        private const val PARAM_DISARM_SOUND = "disarm_sound"  // 缴械音效
+        private const val PARAM_SUCCESS_CHANCE = "success_chance"  // 成功概率
+        private const val PARAM_DISARM_DURATION = "disarm_duration"  // 缴械时长
+        private const val PARAM_DROP_CHANCE = "drop_chance"  // 掉落概率
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_SUCCESS_CHANCE = "success_chance"  // 对应成功概率
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应缴械时长
+        private const val ENHANCEMENT_DROP_CHANCE = "drop_chance"  // 对应掉落概率
     }
 }

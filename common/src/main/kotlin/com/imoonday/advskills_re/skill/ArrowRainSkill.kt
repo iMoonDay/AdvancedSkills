@@ -22,39 +22,39 @@ class ArrowRainSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("max_distance", 256.0)
-            .addParameter("min_summon_amount", 50)
-            .addParameter("max_summon_amount", 100)
-            .addParameter("summon_interval", 2)
-            .addParameter("launch_sound", SoundEvents.ENTITY_ARROW_SHOOT)
+            .addParameter(PARAM_MAX_DISTANCE, DEFAULT_MAX_DISTANCE)
+            .addParameter(PARAM_MIN_ARROWS, DEFAULT_MIN_ARROWS)
+            .addParameter(PARAM_MAX_ARROWS, DEFAULT_MAX_ARROWS)
+            .addParameter(PARAM_WAVE_INTERVAL, DEFAULT_WAVE_INTERVAL)
+            .addParameter(PARAM_LAUNCH_SOUND, DEFAULT_LAUNCH_SOUND)
             .addParameter(
-                name = "arrow_damage",
-                baseValue = 2.0,
-                enhancementId = "damage",
+                name = PARAM_ARROW_DAMAGE,
+                baseValue = DEFAULT_ARROW_DAMAGE,
+                enhancementId = ENHANCEMENT_DAMAGE,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "wave_count",
-                baseValue = 5,
-                enhancementId = "count",
+                name = PARAM_WAVE_COUNT,
+                baseValue = DEFAULT_WAVE_COUNT,
+                enhancementId = ENHANCEMENT_COUNT,
                 value = 1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
             ).addParameter(
-                name = "summon_range",
-                baseValue = 20.0,
-                enhancementId = "range",
+                name = PARAM_SUMMON_RANGE,
+                baseValue = DEFAULT_SUMMON_RANGE,
+                enhancementId = ENHANCEMENT_RANGE,
                 value = 2.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.FLOAT
             ).addParameter(
-                name = "extra_arrows",
-                baseValue = 0,
-                enhancementId = "amount",
+                name = PARAM_EXTRA_ARROWS,
+                baseValue = DEFAULT_EXTRA_ARROWS,
+                enhancementId = ENHANCEMENT_AMOUNT,
                 value = 10,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -63,17 +63,17 @@ class ArrowRainSkill : Skill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val damage = getDoubleParam("arrow_damage", user, 2.0)
-        val maxDistance = getDoubleParam("max_distance", user, 256.0)
+        val damage = getDoubleParam(PARAM_ARROW_DAMAGE, user, DEFAULT_ARROW_DAMAGE)
+        val maxDistance = getDoubleParam(PARAM_MAX_DISTANCE, user, DEFAULT_MAX_DISTANCE)
         val raycast = user.raycast(maxDistance, 0f, true)
         val center = if (raycast.type == HitResult.Type.MISS) user.pos else raycast.pos
-        val waveCount = getIntParam("wave_count", user, 5)
-        val range = getDoubleParam("summon_range", user, 20.0)
-        val extraArrows = getIntParam("extra_arrows", user, 0)
-        val minAmount = getIntParam("min_summon_amount", user, 50)
-        val maxAmount = getIntParam("max_summon_amount", user, 100)
-        val interval = getIntParam("summon_interval", user, 2)
-        val sound = getSoundEventParam("launch_sound", SoundEvents.ENTITY_ARROW_SHOOT)
+        val waveCount = getIntParam(PARAM_WAVE_COUNT, user, DEFAULT_WAVE_COUNT)
+        val range = getDoubleParam(PARAM_SUMMON_RANGE, user, DEFAULT_SUMMON_RANGE)
+        val extraArrows = getIntParam(PARAM_EXTRA_ARROWS, user, DEFAULT_EXTRA_ARROWS)
+        val minAmount = getIntParam(PARAM_MIN_ARROWS, user, DEFAULT_MIN_ARROWS)
+        val maxAmount = getIntParam(PARAM_MAX_ARROWS, user, DEFAULT_MAX_ARROWS)
+        val interval = getIntParam(PARAM_WAVE_INTERVAL, user, DEFAULT_WAVE_INTERVAL)
+        val sound = getSoundEventParam(PARAM_LAUNCH_SOUND, DEFAULT_LAUNCH_SOUND)
         user.executeAndAddTask(interval, waveCount) {
             spawnArrows(user, center, damage, range, minAmount, maxAmount, extraArrows, sound)
         }
@@ -127,5 +127,36 @@ class ArrowRainSkill : Skill(
             user.sendPacket(BundleS2CPacket(particles))
         }
         return result
+    }
+
+    companion object {
+
+        // Default Values
+        private const val DEFAULT_MAX_DISTANCE = 256.0
+        private const val DEFAULT_MIN_ARROWS = 50
+        private const val DEFAULT_MAX_ARROWS = 100
+        private const val DEFAULT_WAVE_INTERVAL = 2
+        private const val DEFAULT_ARROW_DAMAGE = 2.0
+        private const val DEFAULT_WAVE_COUNT = 5
+        private const val DEFAULT_SUMMON_RANGE = 20.0
+        private const val DEFAULT_EXTRA_ARROWS = 0
+        private val DEFAULT_LAUNCH_SOUND = SoundEvents.ENTITY_ARROW_SHOOT
+
+        // Parameter Names
+        private const val PARAM_MAX_DISTANCE = "maximum_distance"  // 最大射程
+        private const val PARAM_MIN_ARROWS = "minimum_arrows"  // 最小箭矢数量
+        private const val PARAM_MAX_ARROWS = "maximum_arrows"  // 最大箭矢数量
+        private const val PARAM_WAVE_INTERVAL = "wave_interval"  // 波次间隔
+        private const val PARAM_LAUNCH_SOUND = "launch_sound"  // 发射音效
+        private const val PARAM_ARROW_DAMAGE = "arrow_damage"  // 箭矢伤害
+        private const val PARAM_WAVE_COUNT = "wave_count"  // 波次数量
+        private const val PARAM_SUMMON_RANGE = "summon_range"  // 召唤范围
+        private const val PARAM_EXTRA_ARROWS = "extra_arrows"  // 额外箭矢数量
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DAMAGE = "damage"  // 对应箭矢伤害
+        private const val ENHANCEMENT_COUNT = "count"  // 对应波次数量
+        private const val ENHANCEMENT_RANGE = "range"  // 对应召唤范围
+        private const val ENHANCEMENT_AMOUNT = "amount"  // 对应额外箭矢
     }
 }

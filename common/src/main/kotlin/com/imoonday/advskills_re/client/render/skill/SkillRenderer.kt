@@ -87,7 +87,10 @@ object SkillRenderer {
         ) {
             val progress = skill.getProgress(player).coerceIn(0.0, 1.0)
             val centerX =
-                if (skill.canBeEmpty(player)) x + (width * progress).toInt() else x + 1 + ((width - 1) * progress).toInt()
+                if (skill.canBeEmpty(
+                        player
+                    )
+                ) x + (width * progress).toInt() else x + 1 + ((width - 1) * progress).toInt()
             context.fill(x, y, centerX, y + height, ClientConfig.get().progressBarColor)
             context.fill(centerX, y, x + width, y + height, Color.GRAY.rgb)
         }
@@ -153,6 +156,28 @@ object SkillRenderer {
             list.addAll(tooltips)
         }
         list.add(skill.id.toString().toText().formatted(Formatting.DARK_GRAY))
+
+        if (ClientConfig.get().developmentMode) {
+            val parameters = skill.settings.parameters
+            if (parameters.isNotEmpty()) {
+                list.add(Text.empty())
+                list.add("Params:".toText().formatted(Formatting.WHITE))
+                parameters.forEach { (id, param) ->
+                    list.add("$id: ${param.asString().baseValue}".toText().formatted(Formatting.GRAY))
+                }
+            }
+
+            val enhancements = player.getEnhancements(skill)
+            if (enhancements.isNotEmpty()) {
+                list.add(Text.empty())
+                list.add("Enhancements:".toText().formatted(Formatting.WHITE))
+                enhancements.forEach { (enhancement, data) ->
+                    val value = String.format("%.2f", enhancement.getValue(data.currentLevel))
+                    list.add("${enhancement.id}: $value".toText().formatted(Formatting.GRAY))
+                }
+            }
+        }
+
         val orderedList = list.map(Text::asOrderedText).toMutableList()
         val lines = Tooltip.wrapLines(client, list[1])
         if (lines.size > 1) {

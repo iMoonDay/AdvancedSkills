@@ -27,39 +27,41 @@ class ChargedSweepSkill : LongPressSkill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("damage_item", true, "no_item_damage")
+            .addParameter(PARAM_DAMAGE_ITEM, DEFAULT_DAMAGE_ITEM, ENHANCEMENT_NO_DAMAGE)
             .addParameter(
-                name = "charge_time",
-                baseValue = 3 * 20,
-                enhancementId = "time",
+                name = PARAM_CHARGE_TIME,
+                baseValue = DEFAULT_CHARGE_TIME,
+                enhancementId = ENHANCEMENT_CHARGE_TIME,
                 value = -0.16,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             ).addParameter(
-                name = "charge_slowdown",
-                baseValue = 0.8,
-                enhancementId = "slowdown_reduction",
+                name = PARAM_MOVEMENT_PENALTY,
+                baseValue = DEFAULT_MOVEMENT_PENALTY,
+                enhancementId = ENHANCEMENT_MOVEMENT,
                 value = -0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "range",
-                baseValue = 5.0,
-                enhancementId = "range",
+                name = PARAM_SWEEP_RANGE,
+                baseValue = DEFAULT_SWEEP_RANGE,
+                enhancementId = ENHANCEMENT_RANGE,
                 value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.FLOAT
             ).addParameter(
-                name = "damage_multiplier",
-                baseValue = 1.0f,
-                enhancementId = "multiplier",
+                name = PARAM_DAMAGE_BOOST,
+                baseValue = DEFAULT_DAMAGE_BOOST,
+                enhancementId = ENHANCEMENT_DAMAGE,
                 value = 0.2f,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             )
     }
 
@@ -67,7 +69,7 @@ class ChargedSweepSkill : LongPressSkill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Charged Sweep Charging"),
             "Charged Sweep Charging",
-            -getDoubleParam("charge_slowdown", player, 0.8, 0.0, 1.0),
+            -getDoubleParam(PARAM_MOVEMENT_PENALTY, player, DEFAULT_MOVEMENT_PENALTY, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -83,10 +85,10 @@ class ChargedSweepSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.removeAttributes()
         player.stopUsing()
-        val range = getDoubleParam("range", player, 5.0)
+        val range = getDoubleParam(PARAM_SWEEP_RANGE, player, DEFAULT_SWEEP_RANGE)
         val baseDamage = player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
         val multiplier =
-            pressedTime.toFloat() / getMaxUseTime(player) * 2f * getFloatParam("damage_multiplier", player, 1f)
+            pressedTime.toFloat() / getMaxUseTime(player) * 2f * getFloatParam(PARAM_DAMAGE_BOOST, player, DEFAULT_DAMAGE_BOOST)
         val stack = player.mainHandStack
         player.world.getOtherEntities(player, player.boundingBox.expand(range)) {
             it is LivingEntity &&
@@ -103,7 +105,7 @@ class ChargedSweepSkill : LongPressSkill(
         player.spawnSweepAttackParticles()
         player.playSound(SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP)
         player.startCooling(pressedTime * 3)
-        if (getBooleanParam("damage_item", player, true)) {
+        if (getBooleanParam(PARAM_DAMAGE_ITEM, player, DEFAULT_DAMAGE_ITEM)) {
             stack.damage(1, player) { it.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND) }
         }
         return UseResult.consume()
@@ -116,5 +118,28 @@ class ChargedSweepSkill : LongPressSkill(
         val vector = rotationVector.normalize()
         val product = vectorX * vector.x + vectorZ * vector.z
         return acos(product / magnitude)
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CHARGE_TIME = 3 * 20
+        private const val DEFAULT_MOVEMENT_PENALTY = 0.8
+        private const val DEFAULT_SWEEP_RANGE = 5.0
+        private const val DEFAULT_DAMAGE_BOOST = 1.0f
+        private const val DEFAULT_DAMAGE_ITEM = true
+
+        // Parameter Names
+        private const val PARAM_DAMAGE_ITEM = "damage_item"  // 是否消耗物品耐久
+        private const val PARAM_CHARGE_TIME = "charge_time"  // 蓄力时间
+        private const val PARAM_MOVEMENT_PENALTY = "movement_penalty"  // 移动速度惩罚
+        private const val PARAM_SWEEP_RANGE = "sweep_range"  // 横扫范围
+        private const val PARAM_DAMAGE_BOOST = "damage_boost"  // 伤害倍率
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_NO_DAMAGE = "no_item_damage"  // 对应不消耗耐久
+        private const val ENHANCEMENT_CHARGE_TIME = "charge_time"  // 对应蓄力时间
+        private const val ENHANCEMENT_MOVEMENT = "movement"  // 对应移动速度
+        private const val ENHANCEMENT_RANGE = "range"  // 对应横扫范围
+        private const val ENHANCEMENT_DAMAGE = "damage"  // 对应伤害倍率
     }
 }

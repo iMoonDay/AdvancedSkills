@@ -17,10 +17,10 @@ class MasterySkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "cooldown_multiplier",
-            baseValue = 0.8,
-            enhancementId = "multiplier",
-            value = -0.06,
+            name = PARAM_COOLDOWN_REDUCTION,
+            baseValue = DEFAULT_COOLDOWN_REDUCTION,
+            enhancementId = ENHANCEMENT_REDUCTION,
+            value = 0.06,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
@@ -30,7 +30,18 @@ class MasterySkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.passive(name)
 
     override fun getCooldown(player: PlayerEntity, original: Int): Int {
-        val multiplier = getDoubleParam("cooldown_multiplier", player, 0.8, 0.0)
-        return (original * multiplier).toInt()
+        val reduction = 1.0 - getDoubleParam(PARAM_COOLDOWN_REDUCTION, player, DEFAULT_COOLDOWN_REDUCTION, max = 1.0)
+        return (original * reduction).toInt()
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_COOLDOWN_REDUCTION = 0.8
+
+        // Parameter Names
+        private const val PARAM_COOLDOWN_REDUCTION = "cooldown_reduction"  // 冷却缩减
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_REDUCTION = "reduction"  // 对应冷却缩减
     }
 }

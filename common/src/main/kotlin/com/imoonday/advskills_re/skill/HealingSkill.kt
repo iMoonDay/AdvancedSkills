@@ -7,20 +7,23 @@ import net.minecraft.entity.player.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
-abstract class HealingSkill(settings: Settings, private val amount: Float) : Skill(settings),
+abstract class HealingSkill(settings: Settings) : Skill(settings),
     SynchronousCoolingTrigger {
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "healing_amount",
-            baseValue = amount,
-            enhancementId = "amount",
+            name = PARAM_HEAL_AMOUNT,
+            baseValue = getDefaultHealingAmount(),
+            enhancementId = ENHANCEMENT_AMOUNT,
             value = 0.2f,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatter.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT,
+            genericText = true
         )
     }
+
+    abstract fun getDefaultHealingAmount(): Float
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val healingAmount = getHealingAmount(user)
@@ -33,8 +36,18 @@ abstract class HealingSkill(settings: Settings, private val amount: Float) : Ski
         return UseResult.success()
     }
 
-    fun getHealingAmount(player: ServerPlayerEntity): Float = getFloatParam("healing_amount", player, amount, 0f)
+    fun getHealingAmount(player: ServerPlayerEntity): Float =
+        getFloatParam(PARAM_HEAL_AMOUNT, player, getDefaultHealingAmount(), 0f)
 
     override fun getOtherSkills(player: PlayerEntity): Set<Skill> =
         player.learnedSkills.filter { it is HealingSkill && it != this }.toSet()
+
+    companion object {
+
+        // Parameter Names
+        private const val PARAM_HEAL_AMOUNT = "heal_amount"  // 治疗量
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_AMOUNT = "heal_amount"  // 对应治疗量
+    }
 }

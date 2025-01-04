@@ -10,8 +10,6 @@ import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
 
-private const val REMAINING_TIME_KEY = "remainingTime"
-
 class GlidingSkill : PassiveSkill(
     Settings(
         id = "gliding",
@@ -22,9 +20,9 @@ class GlidingSkill : PassiveSkill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "gliding_time",
-            baseValue = 5 * 20,
-            enhancementId = "time",
+            name = PARAM_GLIDE_DURATION,
+            baseValue = DEFAULT_GLIDE_DURATION,
+            enhancementId = ENHANCEMENT_DURATION,
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
@@ -36,7 +34,7 @@ class GlidingSkill : PassiveSkill(
     override fun tick(player: PlayerEntity, usedTime: Int) {
         if (!player.isUsing()) {
             val data = player.getPersistentData()
-            val time = data.getInt(REMAINING_TIME_KEY)
+            val time = data.getInt(NBT_REMAINING_TIME)
             if (player.isGliding()) {
                 if (player.fallDistance > player.safeFallDistance / 2f && time > 0) {
                     player.startUsing()
@@ -45,7 +43,7 @@ class GlidingSkill : PassiveSkill(
                 val totalTime = player.getTotalGlidingTime()
                 if (time < totalTime) {
                     val newTime = (time + (totalTime / 50).coerceAtLeast(1)).coerceAtMost(totalTime)
-                    data.putInt(REMAINING_TIME_KEY, newTime)
+                    data.putInt(NBT_REMAINING_TIME, newTime)
                     if (newTime == totalTime) {
                         player.syncData()
                     }
@@ -55,7 +53,7 @@ class GlidingSkill : PassiveSkill(
 
         if (player.isUsing()) {
             val data = player.getPersistentData()
-            val time = data.getInt(REMAINING_TIME_KEY)
+            val time = data.getInt(NBT_REMAINING_TIME)
             if (!player.isGliding() || time <= 0) {
                 player.stopUsing()
                 return
@@ -75,11 +73,11 @@ class GlidingSkill : PassiveSkill(
                     )
                 }
 
-                data.putInt(REMAINING_TIME_KEY, time - 1)
+                data.putInt(NBT_REMAINING_TIME, time - 1)
             }
 
-            if (data.getInt(REMAINING_TIME_KEY) <= 0) {
-                data.remove(REMAINING_TIME_KEY)
+            if (data.getInt(NBT_REMAINING_TIME) <= 0) {
+                data.remove(NBT_REMAINING_TIME)
                 player.stopUsing()
             }
         }
@@ -91,13 +89,27 @@ class GlidingSkill : PassiveSkill(
     private fun PlayerEntity.canResetGliding(): Boolean =
         isOnGround || abilities.flying || isTouchingWater || isClimbing
 
-    fun PlayerEntity.getTotalGlidingTime() = getIntParam("gliding_time", this, 5 * 20)
+    fun PlayerEntity.getTotalGlidingTime() = getIntParam(PARAM_GLIDE_DURATION, this, DEFAULT_GLIDE_DURATION)
 
     override fun shouldDisplay(player: PlayerEntity): Boolean =
-        player.isUsing() || player.getPersistentData().getInt(REMAINING_TIME_KEY) < player.getTotalGlidingTime()
+        player.isUsing() || player.getPersistentData().getInt(NBT_REMAINING_TIME) < player.getTotalGlidingTime()
 
     override fun getProgress(player: PlayerEntity): Double =
-        player.getPersistentData().getInt(REMAINING_TIME_KEY) / player.getTotalGlidingTime().toDouble()
+        player.getPersistentData().getInt(NBT_REMAINING_TIME) / player.getTotalGlidingTime().toDouble()
 
     override fun canBeEmpty(player: PlayerEntity): Boolean = true
+
+    companion object {
+        // NBT Keys
+        private const val NBT_REMAINING_TIME = "RemainingTime"  // 剩余时间
+
+        // Default Values
+        private const val DEFAULT_GLIDE_DURATION = 5 * 20
+
+        // Parameter Names
+        private const val PARAM_GLIDE_DURATION = "glide_duration"  // 滑翔时长
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应滑翔时长
+    }
 }

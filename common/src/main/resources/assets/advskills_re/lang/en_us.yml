@@ -127,10 +127,10 @@ advskills_re:
   command:
     unknown: Unknown skill ID
     invalid: Invalid skill ID
-  reflection:
-    success: Successful Deflection!
-    failed: Failed Deflection
-    active: Reflection is not finished
+  bounce:
+    success: Successful Bounce!
+    failed: Failed Bounce
+    active: Bounce is not finished
     early: '%ds early!'
     late: '%ds late!'
   skill:
@@ -139,203 +139,340 @@ advskills_re:
     fireball:
       name: Fireball
       description: Fire a fireball
+      power:
+        name: Power Enhancement
+        description: '%s Fireball Power'
+      count:
+        name: Count Enhancement
+        description: '%s Fireball Count'
+      force:
+        name: Force Enhancement
+        description: '%s Launch Force'
     horizontal_dash:
       name: Horizontal Dash
       description: Dash forward horizontally
+      force:
+        name: Force Enhancement
+        description: '%s Dash Force'
     teleport:
       name: Teleport
       description: Teleport forward
       collide: No space
+      range:
+        name: Range Enhancement
+        description: '%s Teleport Distance'
     jump:
       name: Jump
       description: Jump without the help of the ground
+      force:
+        name: Force Enhancement
+        description: '%s Jump Force'
     double_jump:
       name: Double Jump
       description: Double height jump without the help of the ground
+      force:
+        name: Force Enhancement
+        description: '%s Jump Force'
     triple_jump:
       name: Triple Jump
       description: Triple height jump without the help of the ground
+      force:
+        name: Force Enhancement
+        description: '%s Jump Force'
     dash:
       name: Dash
       description: Dash forward
+      force:
+        name: Force Enhancement
+        description: '%s Dash Force'
     ground_whack:
       name: Ground Whack
       description: Smashed from the air to the ground, immune to fall damage below 10 blocks, and half damage from falls above 10 blocks
       failed: Not in the air!
+      speed:
+        name: Speed Enhancement
+        description: '%s Fall Speed'
+      range:
+        name: Range Enhancement
+        description: '%s Whack Range'
+      damage:
+        name: Damage Enhancement
+        description: '%s Whack Damage'
+      knockback:
+        name: Knockback Enhancement
+        description: '%s Knockback Force'
+      reduction:
+        name: Reduction Enhancement
+        description: '%s Fall Damage Reduction'
+      immune_height:
+        name: Immune Height Enhancement
+        description: '%s Immune Height'
+      effect_height:
+        name: Height Enhancement
+        description: '%s Effective Height'
     absolute_defense:
       name: Absolute Defense
       description: Block any damage once. The skill lasts for 30s
-      effect_count: '%s Block Count'
-    extreme_reflection:
-      name: Extreme Reflection
-      description: Reflects the first arbitrary damage within 0.25 seconds at a 75% probability, and resets the cooldown immediately after the reflection
-      time:
+      duration:
         name: Duration Enhancement
         description: '%s Duration'
-      multiplier:
-        name: Damage Enhancement
-        description: '%s Damage'
-    rapid_reflection:
-      name: Rapid Reflection
-      description: Reflects the first arbitrary damage with a 50% damage reduction within 0.5 seconds at a 50% probability, and halves the cooldown immediately after the reflection
-      time:
-        name: Duration Enhancement
-        description: '%s Duration'
-      multiplier:
-        name: Damage Enhancement
-        description: '%s Damage'
-    micro_reflection:
-      name: Micro Reflection
-      description: Reflects 50% of the first arbitrary damage with a 25% reduction within 1 seconds at a 25% probability
-      time:
-        name: Duration Enhancement
-        description: '%s Duration'
-      multiplier:
-        name: Damage Enhancement
-        description: '%s Damage'
-    perfect_reflection:
-      name: Perfect Reflection
-      description: Reflects 150% of the first arbitrary damage with a 100% reduction with a 10% healing within 0.1 seconds at a 100% probability, and resets the cooldown immediately and the source of damage is bounced after the reflection
-      success: Perfect Deflection!%s
-      healing_multiplier:
-        name: Healing Amount Enhancement
-        description: '%s Healing Amount'
-      power:
-        name: Power Enhancement
-        description: '%s Power'
-      time:
-        name: Duration Enhancement
-        description: '%s Duration'
-      multiplier:
-        name: Damage Enhancement
-        description: '%s Damage'
+      count:
+        name: Block Count Enhancement
+        description: '%s Block Count'
+    extreme_bounce:
+      name: Extreme Bounce
+      description: Bounces the first arbitrary damage within 0.25 seconds at a 75% probability, and resets the cooldown immediately after the bounce
+    rapid_bounce:
+      name: Rapid Bounce
+      description: Bounces the first arbitrary damage with a 50% damage reduction within 0.5 seconds at a 50% probability, and halves the cooldown immediately after the bounce
+      reduction:
+        name: Reduction Enhancement
+        description: '%s Damage Reduction'
+    micro_bounce:
+      name: Micro Bounce
+      description: Bounces 50% of the first arbitrary damage with a 25% reduction within 1 seconds at a 25% probability
+      reduction:
+        name: Damage Reduction Enhancement
+        description: '%s Damage Reduction'
+    perfect_bounce:
+      name: Perfect Bounce
+      description: Bounces 150% of the first arbitrary damage with a 100% reduction with a 10% healing within 0.1 seconds at a 100% probability, and resets the cooldown immediately and the source of damage is bounced after the bounce
+      success: Perfect Bounce!%s
+      heal_ratio:
+        name: Healing Enhancement
+        description: '%s Healing'
+      force:
+        name: Force Enhancement
+        description: '%s Knockback Force'
     wall_climbing:
       name: Wall Climbing
       description: Allow to climb the wall
-      time:
+      duration:
         name: Duration Enhancement
         description: '%s Duration'
     piercing:
       name: Piercing
       description: Dash forward for a distance, dealing damage and knocking back creatures on contact
-      time:
+      duration:
         name: Duration Enhancement
         description: '%s Duration'
       damage:
         name: Damage Enhancement
         description: '%s Damage'
-      velocity:
+      speed:
         name: Speed Enhancement
         description: '%s Speed'
     primary_healing:
       name: Primary Healing
       description: Instantly heals 4 HP, and then all healing skills enter cooldown
-      amount:
-        name: Healing Amount Enhancement
-        description: '%s Healing Amount'
     intermediate_healing:
       name: Intermediate Healing
       description: Instantly heals 8 HP, and then all healing skills enter cooldown
-      amount:
-        name: Healing Amount Enhancement
-        description: '%s Healing Amount'
     advanced_healing:
       name: Advanced Healing
       description: Instantly heals 12 HP, and then all healing skills enter cooldown
     top_healing:
       name: Top Healing
       description: Instantly heals 16 HP, and then all healing skills enter cooldown
-      amount:
-        name: Healing Amount Enhancement
-        description: '%s Healing Amount'
     extreme_evasion:
       name: Extreme Evasion
       description: Dodge based on the direction of your movement, making you immune to any damage while moving
+      duration:
+        name: Duration Enhancement
+        description: '%s Evasion Duration'
+      force:
+        name: Force Enhancement
+        description: '%s Evasion Force'
     self_healing:
       name: Self Healing
       description: Naturally regenerates 2 HP every 10 seconds, resetting time when injured
+      duration:
+        name: Time Enhancement
+        description: '%s Interval Duration'
     strong_physique:
       name: Strong Physique
       description: Increases 4 max health
+      boost:
+        name: Health Enhancement
+        description: '%s Health Increase'
     agility:
       name: Agility
       description: Slightly increases movement speed
-      movement_speed: '%s Movement Speed'
+      speed:
+        name: Speed Enhancement
+        description: '%s Movement Speed'
     resuscitation:
       name: Resuscitation
       description: Blocks fatal damage, becomes invincible for 2 seconds and gains 30 seconds health regeneration
+      immune:
+        name: Duration Enhancement
+        description: '%s Invincible Duration'
+      regen:
+        name: Recovery Enhancement
+        description: '%s Recovery Duration'
     dying_counterattack:
       name: Dying Counterattack
       description: 'When receiving fatal damage, the HP returns to the upper limit, and then enters death mode: HP is continuously deducted, and HP can be sucked by attacking other creatures. When the HP is insufficient, you will die'
-      healing_amount:
-        name: Healing Amount Enhancement
-        description: '%s Healing Amount'
-      damage_amount:
-        name: Damage Enhancement
-        description: '%s Continuous Damage'
-      damage_interval:
-        name: Damage Interval Enhancement
-        description: '%s Damage Interval'
+      heal:
+        name: Healing Enhancement
+        description: '%s Lifesteal Amount'
+      penalty:
+        name: Health Enhancement
+        description: '%s Health Deduction'
+      interval:
+        name: Interval Enhancement
+        description: '%s Deduction Interval'
     disarm:
       name: Disarm
       description: The next attack has a 45% chance to disarm the target, and there is a very small chance to capture the target's handheld item after the disarm
       success: Disarm Successful!
       failed: Disarm Failed
       disarmed: You are disarmed!
+      success_chance:
+        name: Disarm Chance Enhancement
+        description: '%s Disarm Chance'
+      duration:
+        name: Duration Enhancement
+        description: '%s Disarm Duration'
+      drop_chance:
+        name: Drop Chance Enhancement
+        description: '%s Drop Chance'
     primary_silence:
       name: Primary Silence
       description: Fires an energy ball with a 30% probability of silencing and a 100% probability of slowing down creatures within a small area
+      range:
+        name: Range Enhancement
+        description: '%s Silence Range'
+      count:
+        name: Count Enhancement
+        description: '%s Energy Ball Count'
+      self_immune:
+        name: Immunity Enhancement
+        description: 'Immune to Self Effect'
     last_ditch_effort:
       name: Last Ditch Effort
       description: When the HP is lower than 30%, the HP will be restored to 50%, the movement speed will be greatly increased, the damage will increase 1, and the damage received will increase 1, lasting for 15 seconds
+      duration:
+        name: Duration Enhancement
+        description: '%s Effect Duration'
+      speed:
+        name: Speed Enhancement
+        description: '%s Speed'
+      reduction:
+        name: Damage Reduction Enhancement
+        description: '%s Damage Taken'
+      heal_boost:
+        name: Healing Enhancement
+        description: '%s Recovery Amount'
     mastery:
       name: Mastery
       description: Reduce the cooldown time of all skills by 20%
+      reduction:
+        name: Time Enhancement
+        description: '%s Time Reduction'
     primary_purification:
       name: Primary Purification
       description: Randomly reduces the remaining time of a negative effect by 20%, up to 15 seconds
       success: '%s has been reduced by %d seconds'
       failed: No negative effects
+      duration:
+        name: Time Enhancement
+        description: '%s Reduction Time'
     advanced_purification:
       name: Advanced Purification
       description: Remove the longest negative effect within 30 seconds remaining. If there is no negative effect within 30 seconds, the remaining time of a random negative effect will be reduced by 30 seconds
       success: 'Successfully purified %s'
       failed: No matching negative effects
+      duration:
+        name: Time Enhancement
+        description: '%s Purification Time'
     absolute_domain:
       name: Absolute Domain
       description: Break the blocks within 1 square around
-      range: '%s Range'
+      duration:
+        name: Duration Enhancement
+        description: '%s Duration'
+      range:
+        name: Range Enhancement
+        description: '%s Range'
     charged_sweep:
       name: Charged Sweep
       description: After charging, it will cause damage to entities within the fan-shaped range in front. The amount of damage depends on the item held.
+      range:
+        name: Range Enhancement
+        description: '%s Sweep Range'
+      no_item_damage:
+        name: Durability Enhancement
+        description: 'No Item Durability Cost'
+      movement:
+        name: Speed Enhancement
+        description: '%s Speed Penalty'
     active_defense:
       name: Active Defense
       description: Reduce damage by 20% when long pressed
-      defense_effect: '%s Damage Reduction'
+      duration:
+        name: Duration Enhancement
+        description: '%s Duration'
+      defense:
+        name: Defense Enhancement
+        description: '%s Damage Reduction'
+      movement:
+        name: Speed Enhancement
+        description: '%s Speed Penalty'
     self_repair:
       name: Self Repair
       description: Automatically repair your equipment, up to 50%
-      time:
-        name: Duration Enhancement
-        description: '%s Duration'
-      limit:
-        name: Limit Enhancement
-        description: '%s Limit'
+      duration:
+        name: Time Enhancement
+        description: '%s Interval Duration'
+      threshold:
+        name: Threshold Enhancement
+        description: '%s Repair Limit'
     instant_explosive:
       name: Instant Explosive
       description: Throw a unstable tnt
+      count:
+        name: Count Enhancement
+        description: '%s TNT Count'
     primary_freeze:
       name: Primary Freeze
       description: Fires an ice ball with a 30% chance of freezing surrounding creatures
+      range:
+        name: Range Enhancement
+        description: '%s Freeze Range'
+      count:
+        name: Count Enhancement
+        description: '%s Ice Ball Count'
+      self_immune:
+        name: Immunity Enhancement
+        description: 'Immune to Self Freeze'
     primary_slowness:
       name: Primary Slowness
       description: Fires an small ice ball with a 50% chance of slowing surrounding creatures
+      range:
+        name: Range Enhancement
+        description: '%s Slow Range'
+      count:
+        name: Count Enhancement
+        description: '%s Ice Ball Count'
+      self_immune:
+        name: Immunity Enhancement
+        description: 'Immune to Self Slow'
     primary_confinement:
       name: Primary Confinement
-      description: Within a certain range, there is a maximum 80% probability of confining the pointed creature for 3 seconds
-      success: Confinement successful
-      failed: Confinement failed
+      description: In a certain range, the highest 80% probability of confining the targeted creature for 3s
+      success: Confine Successful
+      failed: Confine Failed
       empty: No Target selected
+      range:
+        name: Range Enhancement
+        description: '%s Detection Range'
+      chance:
+        name: Chance Enhancement
+        description: '%s Success Probability'
+      effect:
+        name: Duration Enhancement
+        description: '%s Confine Duration'
     exclusive_mount:
       name: Exclusive Mount
       description: Summons a unique horse with enhanced health, defense, speed, and jumping ability. Summoning replaces any existing horse, resetting its state. If the horse dies, the skill enters cooldown
@@ -353,9 +490,18 @@ advskills_re:
       name: Undead Summoning
       description: Summon some undead minions
       customName: "%s's servant"
+      count:
+        name: Count Enhancement
+        description: '%s Servant Count'
     taunt:
       name: Taunt
       description: Taunt other players' minions and gain minion damage reduction for 15 s, but cannot be canceled during use
+      duration:
+        name: Duration Enhancement
+        description: '%s Taunt Duration'
+      reduction:
+        name: Reduction Enhancement
+        description: '%s Minion Damage Reduction'
     liquid_shield:
       name: Liquid Shield
       description: You will isolate the liquid
@@ -365,6 +511,9 @@ advskills_re:
     automatic_uphill:
       name: Automatic Uphill
       description: You can step up blocks smoothly
+      height:
+        name: Height Enhancement
+        description: '%s Step Height'
     water_breathing:
       name: Water Breathing
       description: You can breathe in water
@@ -374,44 +523,113 @@ advskills_re:
     faster_eating:
       name: Faster Eating
       description: Increase the speed of eating
+      speed:
+        name: Speed Enhancement
+        description: '%s Eating Speed'
     danger_perception:
       name: Danger Perception
       description: Gain temporary speed when in danger
+      duration:
+        name: Duration Enhancement
+        description: '%s Speed Duration'
+      speed:
+        name: Speed Enhancement
+        description: '%s Speed'
+      range:
+        name: Range Enhancement
+        description: '%s Detection Range'
     rising_shock:
       name: Rising Shock
       description: Rise up a certain distance and take the creatures around you with it
+      duration:
+        name: Duration Enhancement
+        description: '%s Rising Duration'
+      range:
+        name: Range Enhancement
+        description: '%s Rising Range'
+      speed:
+        name: Speed Enhancement
+        description: '%s Rising Speed'
     catapult_gliding:
       name: Catapult Gliding
       description: Charge up, then pop out and use elytra to glide
       failed: You have no elytra or your elytra is broken
       fallFlying: Cannot be used while gliding
+      force:
+        name: Force Enhancement
+        description: '%s Launch Force'
     charged_dash:
       name: Charged Dash
       description: Charge up and pop out, which can be used to glide
+      movement:
+        name: Speed Enhancement
+        description: '%s Speed Penalty'
+      force:
+        name: Force Enhancement
+        description: '%s Dash Force'
     laser_eye:
       name: Laser Eye
       description: Fires a laser beam, damaging all entities in its path
+      count:
+        name: Count Enhancement
+        description: '%s Laser Count'
+      range:
+        name: Range Enhancement
+        description: '%s Laser Range'
+      damage:
+        name: Damage Enhancement
+        description: '%s Laser Damage'
     meteor_shower:
       name: Meteor Shower
       description: Summon a meteor shower
       failed: Charge interrupted
+      penalty:
+        name: Speed Enhancement
+        description: '%s Speed Penalty'
+      count:
+        name: Count Enhancement
+        description: '%s Meteor Count'
+      range:
+        name: Range Enhancement
+        description: '%s Fall Range'
+      size:
+        name: Size Enhancement
+        description: '%s Meteor Size'
+      speed:
+        name: Speed Enhancement
+        description: '%s Fall Speed'
     negative_resistance:
       name: Negative Resistance
       description: Resist a negative effect once for a short period of time
+      count:
+        name: Count Enhancement
+        description: '%s Resistance Count'
     insightful_eye:
       name: Insightful Eye
       description: Can see the skills of other players
     item_attraction:
       name: Item Attraction
       description: Attract surrounding items
+      duration:
+        name: Duration Enhancement
+        description: '%s Attraction Duration'
+      range:
+        name: Range Enhancement
+        description: '%s Attraction Range'
+      force:
+        name: Force Enhancement
+        description: '%s Attraction Force'
+      exp:
+        name: Experience Enhancement
+        description: Attract Experience Orbs
     doping:
       name: Doping
       description: Gain a lot of speed at the cost of a little health
-      time:
+      duration:
         name: Duration Enhancement
-        description: '%s Duration'
+        description: '%s Speed Duration'
       cost:
-        name: Health Cost Enhancement
+        name: Health Enhancement
         description: '%s Health Cost'
       speed:
         name: Speed Enhancement
@@ -420,216 +638,302 @@ advskills_re:
       name: Grappling Hook
       description: Grab a block and move towards it
       failed: No blocks to grab
+      range:
+        name: Range Enhancement
+        description: '%s Grab Range'
     reverse_gravity:
       name: Reverse Gravity
-      description: Reverse gravity
+      description: Invert gravity
     ore_perception:
       name: Ore Perception
       description: Can see through surrounding ores
+      range:
+        name: Range Enhancement
+        description: '%s Detection Range'
+      duration:
+        name: Duration Enhancement
+        description: '%s X-Ray Duration'
     invisible_trap:
       name: Invisible Trap
       description: Place a invisible trap
       failed: No empty place
+      range:
+        name: Range Enhancement
+        description: '%s Trap Range'
+      count:
+        name: Count Enhancement
+        description: '%s Trap Count'
+      damage:
+        name: Damage Enhancement
+        description: '%s Trap Damage'
     frost_trap:
       name: Frost Trap
       description: Place a snow trap
       failed: No empty place
+      range:
+        name: Range Enhancement
+        description: '%s Trap Range'
+      count:
+        name: Count Enhancement
+        description: '%s Trap Count'
+      duration:
+        name: Duration Enhancement
+        description: '%s Freeze Duration'
     temporary_shield:
       name: Temporary Shield
       description: Slowly increase the absorption amount, the upper limit is 10
+      duration:
+        name: Duration Enhancement
+        description: '%s Increase Duration'
+      interval:
+        name: Interval Enhancement
+        description: '%s Interval Duration'
+      absorption:
+        name: Shield Enhancement
+        description: '%s Shield Amount'
     pain_feedback:
       name: Pain Feedback
       description: When injured, rebounding 50% of the damage
+      ratio:
+        name: Damage Enhancement
+        description: '%s Bounce Damage'
     thunder_fury:
       name: Thunder Fury
       description: Summon a lightning bolt
+      lightning_immune:
+        name: Immunity Enhancement
+        description: Immune to Self Lightning
+      count:
+        name: Count Enhancement
+        description: '%s Lightning Count'
     counterblast:
       name: Counterblast
       description: When attacked, there is a chance to knock back nearby mobs, and the more times you go, the higher the chance
+      range:
+        name: Range Enhancement
+        description: '%s Blast Range'
+      force:
+        name: Force Enhancement
+        description: '%s Knockback Force'
+      chance:
+        name: Chance Enhancement
+        description: '%s Trigger Chance'
       additional_probability:
         name: Additional Probability Enhancement
-        description: '%s Additional Probability'
+        description: '%s Additional Chance'
     time_rewind:
       name: Time Rewind
       description: Backtrack position and health. If you die while charging, you will immediately rewind
-      time:
+      duration:
         name: Duration Enhancement
-        description: '%s Duration'
+        description: '%s Rewind Duration'
     living_detection:
       name: Living Detection
       description: Detect nearby moving creatures
-      time:
+      duration:
         name: Duration Enhancement
-        description: '%s Duration'
+        description: '%s Detection Duration'
       range:
         name: Range Enhancement
-        description: '%s Range'
+        description: '%s Detection Range'
     blood_seal:
       name: Blood Seal
       description: Seal the healing effect of the creature
       interrupt: Charge interrupted
       failed: No Target selected
-      time:
-        name: Charge Time Enhancement
+      charge_time:
+        name: Charge Enhancement
         description: '%s Charge Time'
-      slowdown_reduction:
-        name: Slowdown Reduction
-        description: '%s Slowdown'
-      damage:
-        name: Damage Enhancement
-        description: '%s Damage'
+      movement:
+        name: Speed Enhancement
+        description: '%s Speed Penalty'
       distance:
         name: Distance Enhancement
-        description: '%s Distance'
+        description: '%s Detection Distance'
       duration:
         name: Duration Enhancement
-        description: '%s Duration'
+        description: '%s Seal Duration'
     sword_soul_guarding:
       name: Sword Soul Guarding
       description: Summons an enchanted sword to follow the battle. There is a probability of launching an additional attack when attacking. An additional attack will definitely be triggered when injured
-      time:
-        name: Duration Enhancement
-        description: '%s Duration'
       chance:
-        name: Probability Enhancement
-        description: '%s Probability'
-      amount:
-        name: Amount Enhancement
-        description: '%s Amount'
+        name: Chance Enhancement
+        description: '%s Attack Follow-up Chance'
+      count:
+        name: Count Enhancement
+        description: '%s Follow-up Count'
       interval:
         name: Interval Enhancement
-        description: '%s Interval'
+        description: '%s Interval Duration'
     wind_blade:
       name: Wind Blade
       description: Creates a small tornado when triggering Sweeping Blade
-      velocity:
+      speed:
         name: Speed Enhancement
-        description: '%s Speed'
-      amount:
-        name: Amount Enhancement
-        description: '%s Amount'
+        description: '%s Tornado Speed'
+      count:
+        name: Count Enhancement
+        description: '%s Tornado Count'
     biological_hook:
       name: Biological Hook
       description: Launches a biological grappling hook, with a certain probability of being broken free
+      duration:
+        name: Duration Enhancement
+        description: '%s Hook Duration'
     duplication:
       name: Duplication
       description: Summons a clone and becomes invisible for 3 second
-      amount:
-        name: Amount Enhancement
-        description: '%s Amount'
+      count:
+        name: Count Enhancement
+        description: '%s Clone Count'
       duration:
-        name: Invisibility Duration Enhancement
+        name: Duration Enhancement
         description: '%s Invisibility Duration'
     magnetic_trap:
       name: Magnetic Trap
       description: Generate a slowdown trap
       range:
         name: Range Enhancement
-        description: '%s Range'
-      time:
+        description: '%s Slow Range'
+      duration:
         name: Duration Enhancement
-        description: '%s Duration'
+        description: '%s Trap Duration'
     multiple_laser:
       name: Multiple Laser
       description: Fires a laser continuously, causing small damage to all entities in its path
-      time:
-        name: Duration Enhancement
-        description: '%s Duration'
       damage:
         name: Damage Enhancement
-        description: '%s Damage'
-      distance:
-        name: Distance Enhancement
-        description: '%s Distance'
+        description: '%s Laser Damage'
+      range:
+        name: Range Enhancement
+        description: '%s Laser Range'
     super_shadow_clone:
       name: Super Shadow Clone
       description: Summons several clones towards different directions and becomes invisible for 5 seconds
-      amount:
-        name: Amount Enhancement
-        description: '%s Amount'
+      count:
+        name: Count Enhancement
+        description: '%s Clone Count'
       duration:
         name: Duration Enhancement
-        description: '%s Duration'
+        description: '%s Invisibility Duration'
     arrow_rain:
       name: Arrow Rain
       description: Summons several arrows randomly above the target
-      launch_count: '%s Summon Waves'
-      range: '%s Summon Range Radius'
-      summon_amount: '%s Arrow Count/Wave'
       damage:
         name: Damage Enhancement
-        description: '%s Damage'
+        description: '%s Arrow Damage'
       count:
-        name: Count Enhancement
-        description: '%s Count'
+        name: Wave Enhancement
+        description: '%s Summon Waves'
       range:
         name: Range Enhancement
-        description: '%s Range'
+        description: '%s Summon Range'
       amount:
-        name: Wave Enhancement
-        description: '%s Waves'
+        name: Count Enhancement
+        description: '%s Arrow Count'
     weed_cleaner:
       name: Weed Cleaner
       description: Clean up weeds around
       range:
         name: Range Enhancement
-        description: '%s Range'
+        description: '%s Clean Range'
     unhindered_stride:
       name: Unhindered Stride
       description: You can cross any obstacle without being blocked
-      time:
-        name: Duration Enhancement
-        description: '%s Duration'
     damage_absorption:
       name: Damage Absorption
       description: Within a certain period of time, absorb one damage and restore your own health according to the amount of damage
+      duration:
+        name: Duration Enhancement
+        description: '%s Duration'
+      count:
+        name: Count Enhancement
+        description: '%s Absorption Count'
     disguise:
       name: Disguise
       description: Disguises as a block beneath your feet, ending when any skill is used
+      duration:
+        name: Duration Enhancement
+        description: '%s Disguise Duration'
     wall_jump:
       name: Wall Jump
       description: You can jump while on the wall
-      power:
-        name: Jump Power Enhancement
-        description: '%s Jump Power'
+      force:
+        name: Force Enhancement
+        description: '%s Jump Force'
     return:
       name: Return
       description: Stay where you are, charge up, and then return to your spawn point
       failed: Return interrupted
-      time:
-        name: Charge Time Enhancement
-        description: '%s Charge Time'
     portable_chest:
       name: Portable Chest
       description: Access your Ender Chest from anywhere, anytime
     lava_walker:
       name: Lava Walker
       description: You can walk on lava and are immune to magma blocks
-      time:
-        name: Duration Enhancement
-        description: '%s Duration'
     armor_shatterer:
       name: Armor Shatterer
       description: Fires an energy ball with an 80% chance to weaken nearby entities, increasing the damage they take
-      launch_count: '%s Launch Count'
+      count:
+        name: Count Enhancement
+        description: '%s Launch Count'
+      immune_effect:
+        name: Immunity Enhancement
+        description: Immune to Self Vulnerable
     death_archive:
       name: Death Archive
       description: After activation, the player's position is recorded. Upon death, the skill is triggered to prevent the death, restore full health, and teleport the player back to the recorded position, granting 5 seconds of invincibility
       failed: Cannot use in current state
+      duration:
+        name: Duration Enhancement
+        description: '%s Invincible Duration'
     withering_touch:
       name: Withering Touch
       description: Strengthen your attacks for up to 3 hits. Each attack will apply the Wither effect to the target, lasting for 3 seconds and stacking with each hit
+      count:
+        name: Count Enhancement
+        description: '%s Enhancement Count'
+      duration:
+        name: Duration Enhancement
+        description: '%s Wither Duration'
+      level:
+        name: Level Enhancement
+        description: '%s Wither Level'
     forced_growth:
       name: Forced Growth
       description: Has a chance to ripen surrounding crops
       success: Successfully ripened %d crops
       failed: No crops are ripened
+      range:
+        name: Range Enhancement
+        description: '%s Growth Range'
+      times:
+        name: Count Enhancement
+        description: '%s Growth Count'
+      chance:
+        name: Chance Enhancement
+        description: '%s Success Rate'
     space_blast:
       name: Space Blast
       description: Blast the area ahead, destroying all destructible blocks and causing massive damage to entities in the area
+      range:
+        name: Range Enhancement
+        description: '%s Blast Range'
+      distance:
+        name: Distance Enhancement
+        description: '%s Blast Distance'
+      damage:
+        name: Damage Enhancement
+        description: '%s Blast Damage'
+      penalty:
+        name: Speed Enhancement
+        description: '%s Speed Penalty'
     gliding:
       name: Gliding
       description: Can glide through the air for a while
+      duration:
+        name: Duration Enhancement
+        description: '%s Glide Duration'
   skillType:
     attack: Attack
     defense: Defense
@@ -725,6 +1029,7 @@ advskills_re:
       skillSorter: Skill Sorter
       layout: Skill Slot Layout
       quickCastWheelHoldTime: Hold time for Quick Cast Wheel (ms)
+      developmentMode: Development Mode
       hideSkillCrosshair: Hide Skill Crosshair
       hideSkillInfo: Hide skill information by default (Shift-display)
       hideSkillSlotBackground: Hide skill slot background
@@ -765,84 +1070,30 @@ advskills_re:
     active: 'Active Skill Slot %d'
     passive: 'Passive Skill Slot %d'
   enhancement:
-    empty:
-      name: No Enhancement
-      description: No Effect
     cooldown:
       name: Cooldown Enhancement
       description: '%s Cooldown'
-    persistent_time:
-      name: Persistent Time Enhancement
-      description: '%s Persistent Time'
+    duration:
+      name: Duration Enhancement
+      description: '%s Duration'
     charge_time:
-      name: Charge Time Enhancement
+      name: Time Enhancement
       description: '%s Charge Time'
     damage:
       name: Damage Enhancement
       description: '%s Damage'
-    healing_amount:
-      name: Healing Amount Enhancement
+    heal_amount:
+      name: Healing Enhancement
       description: '%s Healing Amount'
-    use_times:
-      name: Use Times Enhancement
-      description: Use Times++
-    summon_amount:
-      name: Summon Amount Enhancement
-      description: Summon Amount++
-    range:
-      name: Range Enhancement
-      description: Range++
-    distance:
-      name: Distance Enhancement
-      description: Distance++
-    effect_count:
-      name: Effect Count Enhancement
-      description: Effect Count++
-    defense_effect:
-      name: Defense Effect Enhancement
-      description: Defense Effect++
-    charge_slowdown:
-      name: Charge Slowdown Enhancement
-      description: '%s Charge Slowdown'
-    time_up_limit:
-      name: Time Up Limit Enhancement
-      description: '%s Time Up Limit'
-    movement_speed:
-      name: Movement Speed Enhancement
-      description: Movement Speed++
-    launch_count:
-      name: Launch Count Enhancement
-      description: Launch Count++
-    effect_value:
-      name: Effect Value Enhancement
-      description: Effect Value++
-    status_effect_duration:
-      name: Status Effect Duration Enhancement
-      description: '%s Status Effect Duration'
-    status_effect_amplifier:
-      name: Status Effect Amplifier Enhancement
-      description: Status Effect Amplifier++
-    velocity:
-      name: Velocity Enhancement
-      description: Velocity++
-    power:
-      name: Power Enhancement
-      description: Power++
-    chance:
+    bounce_duration:
+      name: Duration Enhancement
+      description: '%s Bounce Duration'
+    bounce_boost:
+      name: Damage Enhancement
+      description: '%s Bounce Damage'
+    bounce_chance:
       name: Chance Enhancement
-      description: Chance++
-    use_cost:
-      name: Use Cost Enhancement
-      description: Use Cost--
-    effect_frequency:
-      name: Effect Frequency Enhancement
-      description: Effect Frequency++
-    self_immune:
-      name: Self Immune Enhancement
-      description: Immune to Negative Effects
-    experience_orb:
-      name: Experience Orb Enhancement
-      description: Treat experience orbs as items
+      description: '%s Bounce Chance'
   animationDirection:
     up: Up
     down: Down

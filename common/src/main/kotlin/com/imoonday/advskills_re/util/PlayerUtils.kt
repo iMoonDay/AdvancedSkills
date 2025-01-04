@@ -562,20 +562,20 @@ var ServerPlayerEntity.lastDamagedTime: Long
         properties.putLong("lastDamagedTime", value)
         syncProperties()
     }
-var ServerPlayerEntity.lastReflectedTime: Long
-    get() = properties.getLong("lastReflectedTime")
+var ServerPlayerEntity.lastBounceTime: Long
+    get() = properties.getLong("lastBounceTime")
     set(value) {
-        properties.putLong("lastReflectedTime", value)
+        properties.putLong("lastBounceTime", value)
         syncProperties()
     }
 
 fun ServerPlayerEntity.onDamage() {
-    if (equippedSkills.none { it is ReflectionTrigger }) return
+    if (equippedSkills.none { it is BounceTrigger }) return
     lastDamagedTime = System.currentTimeMillis()
-    val l = lastDamagedTime - lastReflectedTime
+    val l = lastDamagedTime - lastBounceTime
     if (l < 1000) {
-        sendMessage(translate("reflection.early", (l / 1000.0).toString()), true)
-        lastReflectedTime = 0
+        sendMessage(translate("bounce.early", (l / 1000.0).toString()), true)
+        lastBounceTime = 0
         lastDamagedTime = 0
     }
 }

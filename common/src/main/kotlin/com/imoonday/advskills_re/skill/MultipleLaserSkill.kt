@@ -25,28 +25,29 @@ class MultipleLaserSkill : LongPressSkill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("damage_interval", 2)
-            .addParameter("laser_sound", ModSounds.LASER)
+            .addParameter(PARAM_DAMAGE_INTERVAL, DEFAULT_DAMAGE_INTERVAL)
+            .addParameter(PARAM_LASER_SOUND, DEFAULT_LASER_SOUND)
             .addParameter(
-                name = "persist_time",
-                baseValue = 10 * 20,
-                enhancementId = "time",
+                name = PARAM_LASER_DURATION,
+                baseValue = DEFAULT_LASER_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
+                value = 0.2,
+                operation = Enhancement.Operation.MULTIPLY_TOTAL,
+                maxLevel = 5,
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
+            ).addParameter(
+                name = PARAM_LASER_DAMAGE,
+                baseValue = DEFAULT_LASER_DAMAGE,
+                enhancementId = ENHANCEMENT_DAMAGE,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "damage",
-                baseValue = 2.0f,
-                enhancementId = "damage",
-                value = 0.2,
-                operation = Enhancement.Operation.MULTIPLY_TOTAL,
-                maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
-            ).addParameter(
-                name = "distance",
-                baseValue = 64.0,
-                enhancementId = "distance",
+                name = PARAM_LASER_RANGE,
+                baseValue = DEFAULT_LASER_RANGE,
+                enhancementId = ENHANCEMENT_RANGE,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -58,14 +59,14 @@ class MultipleLaserSkill : LongPressSkill(
         super.serverTick(player, usedTime)
         if (!player.isUsing()) return
         val cameraPos = player.getCameraPosVec(0f)
-        val distance = getMaxDistance(player)
-        val maxDistance = player.raycastVisualBlock(distance).let {
-            (if (it.type == HitResult.Type.MISS) distance else it.pos.distanceTo(cameraPos))
+        val range = getMaxDistance(player)
+        val maxDistance = player.raycastVisualBlock(range).let {
+            (if (it.type == HitResult.Type.MISS) range else it.pos.distanceTo(cameraPos))
         }
         if (usedTime % 4 == 0) {
-            player.playSoundFromParam("laser_sound", ModSounds.LASER.get())
+            player.playSoundFromParam(PARAM_LASER_SOUND, DEFAULT_LASER_SOUND.get())
         }
-        val interval = getIntParam("damage_interval", player, 2, 1)
+        val interval = getIntParam(PARAM_DAMAGE_INTERVAL, player, DEFAULT_DAMAGE_INTERVAL, 1)
         if (usedTime % interval == 0) {
             val entities: MutableList<LivingEntity> = mutableListOf()
             while (true) {
@@ -80,7 +81,7 @@ class MultipleLaserSkill : LongPressSkill(
                     entities.add(it.entity as LivingEntity)
                 } ?: break
             }
-            val damage = getFloatParam("damage", player, 2.0f)
+            val damage = getFloatParam(PARAM_LASER_DAMAGE, player, DEFAULT_LASER_DAMAGE)
             entities.forEach { it.damage(player.damageSources.magic(), damage) }
         }
     }
@@ -88,7 +89,7 @@ class MultipleLaserSkill : LongPressSkill(
     override fun clientTick(player: PlayerEntity, usedTime: Int) {
         super.clientTick(player, usedTime)
         if (!player.isUsing()) return
-        val interval = getIntParam("damage_interval", player, 2, 1)
+        val interval = getIntParam(PARAM_DAMAGE_INTERVAL, player, DEFAULT_DAMAGE_INTERVAL, 1)
         if (usedTime % interval != 0) return
         val start = player.centerPos
         val length = player.raycastVisualBlock(getMaxDistance(player)).pos.distanceTo(start)
@@ -107,10 +108,11 @@ class MultipleLaserSkill : LongPressSkill(
         }
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_LASER_DURATION, player, DEFAULT_LASER_DURATION, 0)
 
     private fun getMaxDistance(player: PlayerEntity): Double =
-        getDoubleParam("distance", player, 64.0)
+        getDoubleParam(PARAM_LASER_RANGE, player, DEFAULT_LASER_RANGE)
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopAndCooldown(calculateCooldown(player, pressedTime))
@@ -123,5 +125,26 @@ class MultipleLaserSkill : LongPressSkill(
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(calculateCooldown(player, player.getUsedTime()))
         return true
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_DAMAGE_INTERVAL = 2
+        private const val DEFAULT_LASER_DURATION = 10 * 20
+        private const val DEFAULT_LASER_DAMAGE = 2.0f
+        private const val DEFAULT_LASER_RANGE = 64.0
+        private val DEFAULT_LASER_SOUND = ModSounds.LASER
+
+        // Parameter Names
+        private const val PARAM_DAMAGE_INTERVAL = "damage_interval"  // 伤害间隔
+        private const val PARAM_LASER_SOUND = "laser_sound"  // 激光音效
+        private const val PARAM_LASER_DURATION = "laser_duration"  // 激光持续时间
+        private const val PARAM_LASER_DAMAGE = "laser_damage"  // 激光伤害
+        private const val PARAM_LASER_RANGE = "laser_range"  // 激光射程
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_DAMAGE = "damage"  // 对应伤害
+        private const val ENHANCEMENT_RANGE = "range"  // 对应射程
     }
 }

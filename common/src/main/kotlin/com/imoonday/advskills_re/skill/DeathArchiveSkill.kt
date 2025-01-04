@@ -25,11 +25,11 @@ class DeathArchiveSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
+            .addParameter(PARAM_TELEPORT_SOUND, DEFAULT_TELEPORT_SOUND)
             .addParameter(
-                name = "invulnerable_time",
-                baseValue = 5 * 20,
-                enhancementId = "time",
+                name = PARAM_INVULNERABLE_DURATION,
+                baseValue = DEFAULT_INVULNERABLE_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -57,15 +57,15 @@ class DeathArchiveSkill : Skill(
                 NbtUtils.readGlobalPosFromTag(player.getActiveData()).ifPresent { globalPos ->
                     player.server.getWorld(globalPos.dimension)?.let { world ->
                         val pos = Vec3d.ofBottomCenter(globalPos.pos)
-                        player.playSoundFromParam("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
+                        player.playSoundFromParam(PARAM_TELEPORT_SOUND, DEFAULT_TELEPORT_SOUND)
                         player.teleport(world, pos.x, pos.y, pos.z, emptySet(), player.yaw, player.pitch)
                         while (!world.isSpaceEmpty(player) && player.y < world.topY) {
                             player.teleport(player.x, player.y + 1.0, player.z)
                         }
-                        player.playSoundFromParam("teleport_sound", SoundEvents.ENTITY_ENDERMAN_TELEPORT)
+                        player.playSoundFromParam(PARAM_TELEPORT_SOUND, DEFAULT_TELEPORT_SOUND)
                     }
                 }
-                player.getActiveData().putBoolean("invulnerable", true)
+                player.getActiveData().putBoolean(NBT_INVULNERABLE_STATE, true)
                 player.resetUsedTime(this)
             }
             false
@@ -82,7 +82,7 @@ class DeathArchiveSkill : Skill(
     }
 
     private fun getMaxInvulnerableTime(player: PlayerEntity) =
-        getIntParam("invulnerable_time", player, 5 * 20)
+        getIntParam(PARAM_INVULNERABLE_DURATION, player, DEFAULT_INVULNERABLE_DURATION)
 
     override fun ignoreDamage(
         amount: Float,
@@ -91,7 +91,8 @@ class DeathArchiveSkill : Skill(
         attacker: Entity?
     ): Boolean = player.isUsing() && player.isInInvulnerableState()
 
-    private fun PlayerEntity.isInInvulnerableState(): Boolean = getActiveData().getBoolean("invulnerable")
+    private fun PlayerEntity.isInInvulnerableState(): Boolean = 
+        getActiveData().getBoolean(NBT_INVULNERABLE_STATE)
 
     override fun getProgress(player: PlayerEntity): Double =
         if (player.isUsing()) {
@@ -109,5 +110,21 @@ class DeathArchiveSkill : Skill(
         if (player.isUsing() && player.isInInvulnerableState()) {
             player.startCooling()
         }
+    }
+
+    companion object {
+        // NBT Keys
+        private const val NBT_INVULNERABLE_STATE = "Invulnerable"
+
+        // Default Values
+        private const val DEFAULT_INVULNERABLE_DURATION = 5 * 20
+        private val DEFAULT_TELEPORT_SOUND = SoundEvents.ENTITY_ENDERMAN_TELEPORT
+
+        // Parameter Names
+        private const val PARAM_TELEPORT_SOUND = "teleport_sound"  // 传送音效
+        private const val PARAM_INVULNERABLE_DURATION = "invulnerable_duration"  // 无敌时长
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应无敌时长
     }
 }

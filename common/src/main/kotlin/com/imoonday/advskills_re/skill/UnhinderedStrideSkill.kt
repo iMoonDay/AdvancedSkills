@@ -18,13 +18,14 @@ class UnhinderedStrideSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "persist_time",
-            baseValue = 10 * 20,
-            enhancementId = "time",
+            name = PARAM_STRIDE_DURATION,
+            baseValue = DEFAULT_STRIDE_DURATION,
+            enhancementId = ENHANCEMENT_DURATION,
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatter.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT,
+            genericText = true
         )
     }
 
@@ -33,10 +34,22 @@ class UnhinderedStrideSkill : Skill(
     override fun getStepHeight(player: PlayerEntity): Float? =
         if (player.isUsing()) player.world.height.toFloat() else null
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_STRIDE_DURATION, player, DEFAULT_STRIDE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
         player.startCooling()
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_STRIDE_DURATION = 10 * 20
+
+        // Parameter Names
+        private const val PARAM_STRIDE_DURATION = "stride_duration"  // 无阻行走持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
     }
 }

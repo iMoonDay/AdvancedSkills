@@ -8,8 +8,10 @@ class NightVisionSkill : PassiveSkill(
     Settings(
         id = "night_vision",
         rarity = SkillRarity.SUPERB
-    ), true
+    )
 ), PersistentTrigger, NightVisionTrigger {
+
+    override fun isToggleable(): Boolean = true
 
     override fun hasNightVision(player: PlayerEntity): Boolean = player.isAvailable()
 }

@@ -28,19 +28,21 @@ class ReverseGravitySkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "persist_time",
-            baseValue = 15 * 20,
-            enhancementId = "time",
+            name = PARAM_REVERSE_DURATION,
+            baseValue = DEFAULT_REVERSE_DURATION,
+            enhancementId = ENHANCEMENT_DURATION,
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatter.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT,
+            genericText = true
         )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 15 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_REVERSE_DURATION, player, DEFAULT_REVERSE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super<AutoStopTrigger>.onStop(player)
@@ -57,10 +59,10 @@ class ReverseGravitySkill : Skill(
         player.run {
             if (isUsing()) {
                 val data = getActiveData()
-                if (!data.getBoolean("first")) {
+                if (!data.getBoolean(NBT_FIRST_TICK)) {
                     velocity = velocity.withAxis(Direction.Axis.Y, 0.0)
                     pitch = -pitch
-                    data.putBoolean("first", true)
+                    data.putBoolean(NBT_FIRST_TICK, true)
                 }
                 if (!abilities.flying) {
                     addVelocity(0.0, 0.15, 0.0)
@@ -97,4 +99,18 @@ class ReverseGravitySkill : Skill(
     }
 
     override fun getDelta(original: Float, clientPlayer: PlayerEntity): Float = 1f
+
+    companion object {
+        // NBT Keys
+        private const val NBT_FIRST_TICK = "First"  // 首次触发标记
+
+        // Default Values
+        private const val DEFAULT_REVERSE_DURATION = 15 * 20
+
+        // Parameter Names
+        private const val PARAM_REVERSE_DURATION = "reverse_duration"  // 反重力持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+    }
 }

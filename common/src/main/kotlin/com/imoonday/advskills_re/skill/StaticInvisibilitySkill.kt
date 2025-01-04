@@ -18,11 +18,11 @@ class StaticInvisibilitySkill : PassiveSkill(
         val pos = player.pos
 
         val data = player.getPersistentData()
-        if (!data.contains("lastPos")) {
+        if (!data.contains(NBT_LAST_POSITION)) {
             return false
         }
 
-        return NbtUtils.readEntityPositionFromTag(data.getCompound("lastPos")) == pos
+        return NbtUtils.readEntityPositionFromTag(data.getCompound(NBT_LAST_POSITION)) == pos
     }
 
     override fun shouldStop(player: ServerPlayerEntity): Boolean = !shouldStart(player)
@@ -30,12 +30,17 @@ class StaticInvisibilitySkill : PassiveSkill(
     override fun tick(player: ServerPlayerEntity) {
         super.tick(player)
         if (player.age % 5 == 0) {
-            player.getPersistentData().put("lastPos", NbtUtils.writeEntityPositionToTag(player.pos))
+            player.getPersistentData().put(NBT_LAST_POSITION, NbtUtils.writeEntityPositionToTag(player.pos))
         }
     }
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
         super.postUnequipped(player, slot)
         player.clearPersistentData()
+    }
+
+    companion object {
+        // NBT Keys
+        private const val NBT_LAST_POSITION = "LastPosition"  // 上一次位置
     }
 }

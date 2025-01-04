@@ -23,17 +23,17 @@ class TauntSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = "persist_time",
-                baseValue = 15 * 20,
-                enhancementId = "time",
+                name = PARAM_TAUNT_DURATION,
+                baseValue = DEFAULT_TAUNT_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "damage_reduction",
-                baseValue = 0.25f,
-                enhancementId = "defense",
+                name = PARAM_DAMAGE_REDUCTION,
+                baseValue = DEFAULT_DAMAGE_REDUCTION,
+                enhancementId = ENHANCEMENT_REDUCTION,
                 value = 0.1f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -50,14 +50,29 @@ class TauntSkill : Skill(
         attacker: LivingEntity?,
     ): Float =
         if (!player.isUsing() || attacker !is Servant) amount
-        else amount * (1f - getFloatParam("damage_reduction", player, 0.25f, max = 1.0f))
+        else amount * (1f - getFloatParam(PARAM_DAMAGE_REDUCTION, player, DEFAULT_DAMAGE_REDUCTION, max = 1.0f))
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean = !player.isUsing()
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 15 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_TAUNT_DURATION, player, DEFAULT_TAUNT_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
         player.startCooling()
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_TAUNT_DURATION = 15 * 20
+        private const val DEFAULT_DAMAGE_REDUCTION = 0.25f
+
+        // Parameter Names
+        private const val PARAM_TAUNT_DURATION = "taunt_duration"  // 嘲讽持续时间
+        private const val PARAM_DAMAGE_REDUCTION = "damage_reduction"  // 伤害减免
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_REDUCTION = "reduction"  // 对应减免
     }
 }

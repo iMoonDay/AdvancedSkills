@@ -20,19 +20,19 @@ class SuperShadowCloneSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("move_time", 5 * 20)
+            .addParameter(PARAM_CLONE_MOVE_TIME, DEFAULT_CLONE_MOVE_TIME)
             .addParameter(
-                name = "clone_amount",
-                baseValue = 8,
-                enhancementId = "amount",
+                name = PARAM_CLONE_COUNT,
+                baseValue = DEFAULT_CLONE_COUNT,
+                enhancementId = ENHANCEMENT_COUNT,
                 value = 2,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
             ).addParameter(
-                name = "invisibility_duration",
-                baseValue = 5 * 20,
-                enhancementId = "duration",
+                name = PARAM_STEALTH_DURATION,
+                baseValue = DEFAULT_STEALTH_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -41,11 +41,11 @@ class SuperShadowCloneSkill : Skill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val amount = getIntParam("clone_amount", user, 8)
-        val moveTime = getIntParam("move_time", user, 5 * 20)
-        spawnClones(user, amount, moveTime)
-        val duration = getIntParam("invisibility_duration", user, 5 * 20)
-        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, duration, 0, true, false, true))
+        val cloneCount = getIntParam(PARAM_CLONE_COUNT, user, DEFAULT_CLONE_COUNT)
+        val moveTime = getIntParam(PARAM_CLONE_MOVE_TIME, user, DEFAULT_CLONE_MOVE_TIME)
+        spawnClones(user, cloneCount, moveTime)
+        val stealthDuration = getIntParam(PARAM_STEALTH_DURATION, user, DEFAULT_STEALTH_DURATION)
+        user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, stealthDuration, 0, true, false, true))
         return UseResult.success()
     }
 
@@ -81,5 +81,21 @@ class SuperShadowCloneSkill : Skill(
                 setJumping(true)
             }
         }
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CLONE_MOVE_TIME = 5 * 20
+        private const val DEFAULT_CLONE_COUNT = 8
+        private const val DEFAULT_STEALTH_DURATION = 5 * 20
+
+        // Parameter Names
+        private const val PARAM_CLONE_MOVE_TIME = "clone_move_time"  // 分身移动时间
+        private const val PARAM_CLONE_COUNT = "clone_count"  // 分身数量
+        private const val PARAM_STEALTH_DURATION = "stealth_duration"  // 隐身持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_COUNT = "count"  // 对应数量
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
     }
 }

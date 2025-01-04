@@ -7,21 +7,21 @@ import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 
-abstract class PassiveSkill(
-    settings: Settings,
-    private val toggleable: Boolean = false,
-    private val customToggles: Boolean = toggleable
-) : Skill(settings), EquipTrigger, AttributeTrigger, RespawnTrigger {
+abstract class PassiveSkill(settings: Settings) : Skill(settings), EquipTrigger, AttributeTrigger, RespawnTrigger {
 
     override fun initDefaultSettings(settings: Settings) {
-        if (customToggles) {
-            settings.addParameter("toggleable", toggleable)
+        if (isCustomToggles()) {
+            settings.addParameter(PARAM_TOGGLEABLE, isToggleable())
         }
 
         if (!settings.types.contains(SkillType.PASSIVE)) {
             settings.addTypeToTop(SkillType.PASSIVE)
         }
     }
+
+    open fun isToggleable(): Boolean = false
+
+    open fun isCustomToggles(): Boolean = isToggleable()
 
     override fun use(user: ServerPlayerEntity): UseResult = if (user.isToggleable()) {
         val active = user.toggleUsing()
@@ -45,11 +45,14 @@ abstract class PassiveSkill(
 
     override fun keepUsingAfterRespawn(player: ServerPlayerEntity): Boolean = player.isToggleable()
 
-    fun PlayerEntity.isToggleable() = if (!customToggles) toggleable else getBooleanParam(
-        "toggleable",
-        this,
-        toggleable
-    )
+    fun PlayerEntity.isToggleable() = if (!isCustomToggles()) this@PassiveSkill.isToggleable()
+    else getBooleanParam(PARAM_TOGGLEABLE, this, this@PassiveSkill.isToggleable())
 
     fun PlayerEntity.isAvailable() = !isToggleable() || isUsing()
+
+    companion object {
+
+        // Parameter Names
+        private const val PARAM_TOGGLEABLE = "toggleable"  // 是否可切换
+    }
 }

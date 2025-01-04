@@ -25,17 +25,17 @@ class WindBladeSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = "blade_velocity",
-                baseValue = 0.25,
-                enhancementId = "velocity",
+                name = PARAM_TORNADO_SPEED,
+                baseValue = DEFAULT_TORNADO_SPEED,
+                enhancementId = ENHANCEMENT_SPEED,
                 value = 0.05,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.FLOAT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "extra_blades",
-                baseValue = 0,
-                enhancementId = "amount",
+                name = PARAM_TORNADO_COUNT,
+                baseValue = DEFAULT_TORNADO_COUNT,
+                enhancementId = ENHANCEMENT_COUNT,
                 value = 1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -48,11 +48,12 @@ class WindBladeSkill : Skill(
     override fun postSweepAttack(player: PlayerEntity, target: LivingEntity) {
         super.postSweepAttack(player, target)
         if (!player.isUsing() || player.world.isClient) return
-        val velocity = player.horizontalRotationVector * getDoubleParam("blade_velocity", player, 0.25)
-        val extraBlades = getIntParam("extra_blades", player, 0)
-        spawnTornado(player, velocity, target)
-        calculateRadians(extraBlades).forEach {
-            spawnTornado(player, velocity.rotateY(-it.toFloat()), target)
+        val tornadoSpeed =
+            player.horizontalRotationVector * getDoubleParam(PARAM_TORNADO_SPEED, player, DEFAULT_TORNADO_SPEED)
+        val extraTornados = getIntParam(PARAM_TORNADO_COUNT, player, DEFAULT_TORNADO_COUNT)
+        spawnTornado(player, tornadoSpeed, target)
+        calculateRadians(extraTornados).forEach {
+            spawnTornado(player, tornadoSpeed.rotateY(-it.toFloat()), target)
         }
         player.stopAndCooldown()
     }
@@ -65,14 +66,14 @@ class WindBladeSkill : Skill(
 
         if (negativeCount > 0) {
             for (i in 0 until negativeCount) {
-                val r = -(i + 1) * 45 / (negativeCount + 1)
+                val r = -(i + 1) * SPREAD_ANGLE / (negativeCount + 1)
                 radians.add(r * PI / 180.0)
             }
         }
 
         if (positiveCount > 0) {
             for (i in 0 until positiveCount) {
-                val r = (i + 1) * 45 / (positiveCount + 1)
+                val r = (i + 1) * SPREAD_ANGLE / (positiveCount + 1)
                 radians.add(r * PI / 180.0)
             }
         }
@@ -95,5 +96,21 @@ class WindBladeSkill : Skill(
         if (player.isUsing()) {
             player.startCooling()
         }
+    }
+
+    companion object {
+
+        // Default Values
+        private const val DEFAULT_TORNADO_SPEED = 0.25
+        private const val DEFAULT_TORNADO_COUNT = 0
+        private const val SPREAD_ANGLE = 45.0  // 扩散角度
+
+        // Parameter Names
+        private const val PARAM_TORNADO_SPEED = "tornado_speed"  // 龙卷风速度
+        private const val PARAM_TORNADO_COUNT = "tornado_count"  // 龙卷风数量
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_SPEED = "speed"  // 对应速度
+        private const val ENHANCEMENT_COUNT = "count"  // 对应数量
     }
 }

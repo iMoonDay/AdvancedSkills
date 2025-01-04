@@ -23,52 +23,45 @@ class LastDitchEffortSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("healing_sound", ModSounds.HEAL)
-            .addParameter("health_threshold", 0.3f)
+            .addParameter(PARAM_HEAL_SOUND, DEFAULT_HEAL_SOUND)
+            .addParameter(PARAM_HEALTH_THRESHOLD, DEFAULT_HEALTH_THRESHOLD)
             .addParameter(
-                name = "persist_time",
-                baseValue = 15 * 20,
-                enhancementId = "time",
+                name = PARAM_EFFECT_DURATION,
+                baseValue = DEFAULT_EFFECT_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "movement_speed",
-                baseValue = 0.4,
-                enhancementId = "speed",
+                name = PARAM_SPEED_BOOST,
+                baseValue = DEFAULT_SPEED_BOOST,
+                enhancementId = ENHANCEMENT_SPEED,
                 value = 0.06,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "damage_bonus",
-                baseValue = 1.0f,
-                enhancementId = "damage",
+                name = PARAM_DAMAGE_BOOST,
+                baseValue = DEFAULT_DAMAGE_BOOST,
+                enhancementId = ENHANCEMENT_DAMAGE,
                 value = 0.2f,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             ).addParameter(
-                name = "healing_amount_multiplier",
-                baseValue = 0.5f,
-                enhancementId = "healing_multiplier",
-                value = 0.1f,
-                operation = Enhancement.Operation.MULTIPLY_TOTAL,
-                maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
-            ).addParameter(
-                name = "damage_taken_bonus",
-                baseValue = 1.0f,
-                enhancementId = "damage_taken",
+                name = PARAM_DAMAGE_REDUCTION,
+                baseValue = DEFAULT_DAMAGE_REDUCTION,
+                enhancementId = ENHANCEMENT_REDUCTION,
                 value = -0.2f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "healing_amount",
-                baseValue = 0.2f,
-                enhancementId = "healing",
+                name = PARAM_HEAL_BOOST,
+                baseValue = DEFAULT_HEAL_BOOST,
+                enhancementId = ENHANCEMENT_HEAL_BOOST,
                 value = 0.1f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -80,7 +73,7 @@ class LastDitchEffortSkill : Skill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Last Ditch Effort"),
             "Last Ditch Effort",
-            getDoubleParam("movement_speed", player, 0.4, 0.0),
+            getDoubleParam(PARAM_SPEED_BOOST, player, DEFAULT_SPEED_BOOST, 0.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -98,15 +91,15 @@ class LastDitchEffortSkill : Skill(
         player: ServerPlayerEntity,
         target: LivingEntity,
     ): Float = if (!player.isUsing()) amount
-    else (amount + 1) * getFloatParam("damage_bonus", player, 1.0f)
+    else (amount + 1) * getFloatParam(PARAM_DAMAGE_BOOST, player, DEFAULT_DAMAGE_BOOST)
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean =
         if (player.isReady() && !player.isDead) {
-            val threshold = getFloatParam("health_threshold", player, 0.3f, 0.0f)
+            val threshold = getFloatParam(PARAM_HEALTH_THRESHOLD, player, DEFAULT_HEALTH_THRESHOLD, 0.0f)
             if ((player.health / player.maxHealth) < threshold) {
-                val healingBonus = getFloatParam("healing_amount", player, 0.2f, 0.0f)
-                player.health = player.maxHealth * (threshold + healingBonus)
-                player.playSoundFromParam("healing_sound", ModSounds.HEAL.get())
+                val healBoost = getFloatParam(PARAM_HEAL_BOOST, player, DEFAULT_HEAL_BOOST, 0.0f)
+                player.health = player.maxHealth * (threshold + healBoost)
+                player.playSoundFromParam(PARAM_HEAL_SOUND, DEFAULT_HEAL_SOUND.get())
                 player.addAttributes()
                 true
             } else false
@@ -118,9 +111,10 @@ class LastDitchEffortSkill : Skill(
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
     ): Float = if (!player.isUsing()) amount
-    else amount + getFloatParam("damage_taken_bonus", player, 1.0f)
+    else amount + getFloatParam(PARAM_DAMAGE_REDUCTION, player, DEFAULT_DAMAGE_REDUCTION)
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 15 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int =
+        getIntParam(PARAM_EFFECT_DURATION, player, DEFAULT_EFFECT_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         player.startCooling()
@@ -133,5 +127,34 @@ class LastDitchEffortSkill : Skill(
         if (player.isUsing()) {
             player.startCooling()
         }
+    }
+
+    companion object {
+
+        // Default Values
+        private const val DEFAULT_EFFECT_DURATION = 15 * 20
+        private const val DEFAULT_SPEED_BOOST = 0.4
+        private const val DEFAULT_DAMAGE_BOOST = 1.0f
+        private const val DEFAULT_HEAL_RATIO = 0.5f
+        private const val DEFAULT_DAMAGE_REDUCTION = 1.0f
+        private const val DEFAULT_HEAL_BOOST = 0.2f
+        private const val DEFAULT_HEALTH_THRESHOLD = 0.3f
+        private val DEFAULT_HEAL_SOUND = ModSounds.HEAL
+
+        // Parameter Names
+        private const val PARAM_HEAL_SOUND = "heal_sound"  // 治疗音效
+        private const val PARAM_HEALTH_THRESHOLD = "health_threshold"  // 生命阈值
+        private const val PARAM_EFFECT_DURATION = "effect_duration"  // 效果持续时间
+        private const val PARAM_SPEED_BOOST = "speed_boost"  // 速度提升
+        private const val PARAM_DAMAGE_BOOST = "damage_boost"  // 伤害提升
+        private const val PARAM_DAMAGE_REDUCTION = "damage_reduction"  // 伤害减免
+        private const val PARAM_HEAL_BOOST = "heal_boost"  // 治疗提升
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_SPEED = "speed"  // 对应速度提升
+        private const val ENHANCEMENT_DAMAGE = "damage"  // 对应伤害提升
+        private const val ENHANCEMENT_REDUCTION = "reduction"  // 对应伤害减免
+        private const val ENHANCEMENT_HEAL_BOOST = "heal_boost"  // 对应治疗提升
     }
 }

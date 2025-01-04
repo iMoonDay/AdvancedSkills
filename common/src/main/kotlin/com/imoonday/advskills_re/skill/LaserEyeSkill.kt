@@ -24,27 +24,27 @@ class LaserEyeSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("laser_sound", ModSounds.LASER)
+            .addParameter(PARAM_LASER_SOUND, DEFAULT_LASER_SOUND)
             .addParameter(
-                name = "launch_count",
-                baseValue = 1,
-                enhancementId = "count",
+                name = PARAM_LASER_COUNT,
+                baseValue = DEFAULT_LASER_COUNT,
+                enhancementId = ENHANCEMENT_COUNT,
                 value = 1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
             ).addParameter(
-                name = "distance",
-                baseValue = 64.0,
-                enhancementId = "distance",
+                name = PARAM_LASER_RANGE,
+                baseValue = DEFAULT_LASER_RANGE,
+                enhancementId = ENHANCEMENT_RANGE,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "damage",
-                baseValue = 8.0f,
-                enhancementId = "damage",
+                name = PARAM_LASER_DAMAGE,
+                baseValue = DEFAULT_LASER_DAMAGE,
+                enhancementId = ENHANCEMENT_DAMAGE,
                 value = 0.2f,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -53,29 +53,29 @@ class LaserEyeSkill : Skill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        val times = getIntParam("launch_count", user, 1)
-        val distance = getDoubleParam("distance", user, 64.0)
-        val damage = getFloatParam("damage", user, 8.0f)
-        val sound = getSoundEventParam("laser_sound", ModSounds.LASER.get())
+        val times = getIntParam(PARAM_LASER_COUNT, user, DEFAULT_LASER_COUNT)
+        val range = getDoubleParam(PARAM_LASER_RANGE, user, DEFAULT_LASER_RANGE)
+        val damage = getFloatParam(PARAM_LASER_DAMAGE, user, DEFAULT_LASER_DAMAGE)
+        val sound = getSoundEventParam(PARAM_LASER_SOUND, DEFAULT_LASER_SOUND.get())
 
         user.executeAndAddTask(5, times) {
-            execute(user, distance, damage, sound)
+            execute(user, range, damage, sound)
             true
         }
         return UseResult.success()
     }
 
-    private fun execute(player: ServerPlayerEntity, distance: Double, damage: Float, sound: SoundEvent?) {
+    private fun execute(player: ServerPlayerEntity, range: Double, damage: Float, sound: SoundEvent?) {
         val cameraPos = player.getCameraPosVec(0f)
-        val maxDistance = player.raycastVisualBlock(distance).let {
-            if (it.type == HitResult.Type.MISS) distance else it.pos.distanceTo(cameraPos)
+        val maxDistance = player.raycastVisualBlock(range).let {
+            if (it.type == HitResult.Type.MISS) range else it.pos.distanceTo(cameraPos)
         }
         val particles: MutableList<ParticleS2CPacket> = mutableListOf()
         var offset = 0.1
         while (offset <= maxDistance) {
             val pos = player.eyePos + player.rotationVector * offset
             particles += ParticleS2CPacket(
-                DustParticleEffect(particleColor, 1f),
+                DustParticleEffect(LASER_COLOR, 1f),
                 true,
                 pos.x, pos.y, pos.z,
                 0f, 0f, 0f,
@@ -105,6 +105,22 @@ class LaserEyeSkill : Skill(
 
     companion object {
 
-        private val particleColor = Vector3f(237 / 255f, 47 / 255f, 50 / 255f)
+        // Default Values
+        private const val DEFAULT_LASER_COUNT = 1
+        private const val DEFAULT_LASER_RANGE = 64.0
+        private const val DEFAULT_LASER_DAMAGE = 8.0f
+        private val DEFAULT_LASER_SOUND = ModSounds.LASER
+        private val LASER_COLOR = Vector3f(237 / 255f, 47 / 255f, 50 / 255f)
+
+        // Parameter Names
+        private const val PARAM_LASER_SOUND = "laser_sound"  // 激光音效
+        private const val PARAM_LASER_COUNT = "laser_count"  // 激光数量
+        private const val PARAM_LASER_RANGE = "laser_range"  // 激光范围
+        private const val PARAM_LASER_DAMAGE = "laser_damage"  // 激光伤害
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_COUNT = "count"  // 对应激光数量
+        private const val ENHANCEMENT_RANGE = "range"  // 对应激光范围
+        private const val ENHANCEMENT_DAMAGE = "damage"  // 对应激光伤害
     }
 }

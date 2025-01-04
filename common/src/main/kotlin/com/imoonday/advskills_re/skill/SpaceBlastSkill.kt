@@ -29,41 +29,42 @@ class SpaceBlastSkill : LongPressSkill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = "charge_time",
-                baseValue = 5 * 20,
-                enhancementId = "time",
+                name = PARAM_CHARGE_DURATION,
+                baseValue = DEFAULT_CHARGE_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = -0.16,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             ).addParameter(
-                name = "area_range",
-                baseValue = 4,
-                enhancementId = "range",
+                name = PARAM_BLAST_RANGE,
+                baseValue = DEFAULT_BLAST_RANGE,
+                enhancementId = ENHANCEMENT_RANGE,
                 value = 1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
             ).addParameter(
-                name = "max_distance",
-                baseValue = 64.0,
-                enhancementId = "distance",
+                name = PARAM_TARGET_DISTANCE,
+                baseValue = DEFAULT_TARGET_DISTANCE,
+                enhancementId = ENHANCEMENT_DISTANCE,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "damage",
-                baseValue = 15.0f,
-                enhancementId = "damage",
+                name = PARAM_BLAST_DAMAGE,
+                baseValue = DEFAULT_BLAST_DAMAGE,
+                enhancementId = ENHANCEMENT_DAMAGE,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "charge_slowdown",
-                baseValue = 0.4,
-                enhancementId = "slowdown",
+                name = PARAM_MOVEMENT_PENALTY,
+                baseValue = DEFAULT_MOVEMENT_PENALTY,
+                enhancementId = ENHANCEMENT_PENALTY,
                 value = -0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -75,7 +76,7 @@ class SpaceBlastSkill : LongPressSkill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Space Blast Charging"),
             "Space Blast Charging",
-            -getDoubleParam("charge_slowdown", player, 0.4),
+            -getDoubleParam(PARAM_MOVEMENT_PENALTY, player, DEFAULT_MOVEMENT_PENALTY),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -116,7 +117,8 @@ class SpaceBlastSkill : LongPressSkill(
 
     override fun alwaysKeepCharging(player: PlayerEntity): Boolean = true
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 5 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun isGlowing(entity: Entity, clientPlayer: PlayerEntity): Boolean =
         clientPlayer.isUsing() && entity !== clientPlayer && getEntityStream<Entity>(clientPlayer).contains(entity)
@@ -128,16 +130,16 @@ class SpaceBlastSkill : LongPressSkill(
         ).pos.toBlockPos()
 
     fun getAreaRange(player: PlayerEntity): Int =
-        getIntParam("area_range", player, 4)
+        getIntParam(PARAM_BLAST_RANGE, player, DEFAULT_BLAST_RANGE)
 
     fun getMaxDistance(player: PlayerEntity): Double =
-        getDoubleParam("max_distance", player, 64.0)
+        getDoubleParam(PARAM_TARGET_DISTANCE, player, DEFAULT_TARGET_DISTANCE)
 
     fun getArea(player: PlayerEntity): BlockBox =
         BlockBox(getTargetCenter(player)).expand(getAreaRange(player))
 
     fun getDamage(player: PlayerEntity): Float =
-        getFloatParam("damage", player, 15.0f)
+        getFloatParam(PARAM_BLAST_DAMAGE, player, DEFAULT_BLAST_DAMAGE)
 
     fun forEachBlock(player: PlayerEntity, filter: (BlockPos) -> Boolean = { true }, action: (BlockPos) -> Unit) {
         val area = getArea(player)
@@ -172,5 +174,28 @@ class SpaceBlastSkill : LongPressSkill(
         val world = player.world
         return world.getNonSpectatingEntities(T::class.java, Box.from(area))
             .filter { it !== player && it.squaredDistanceTo(center.toCenterPos()) <= range * range && filter(it) }
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CHARGE_DURATION = 5 * 20
+        private const val DEFAULT_BLAST_RANGE = 4
+        private const val DEFAULT_TARGET_DISTANCE = 64.0
+        private const val DEFAULT_BLAST_DAMAGE = 15.0f
+        private const val DEFAULT_MOVEMENT_PENALTY = 0.4
+
+        // Parameter Names
+        private const val PARAM_CHARGE_DURATION = "charge_duration"  // 蓄力时间
+        private const val PARAM_BLAST_RANGE = "blast_range"  // 爆炸范围
+        private const val PARAM_TARGET_DISTANCE = "target_distance"  // 目标距离
+        private const val PARAM_BLAST_DAMAGE = "blast_damage"  // 爆炸伤害
+        private const val PARAM_MOVEMENT_PENALTY = "movement_penalty"  // 移动减速
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "charge_time"  // 对应持续时间
+        private const val ENHANCEMENT_RANGE = "range"  // 对应范围
+        private const val ENHANCEMENT_DISTANCE = "distance"  // 对应距离
+        private const val ENHANCEMENT_DAMAGE = "damage"  // 对应伤害
+        private const val ENHANCEMENT_PENALTY = "penalty"  // 对应减速
     }
 }

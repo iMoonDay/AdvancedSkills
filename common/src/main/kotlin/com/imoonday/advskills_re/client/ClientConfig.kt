@@ -102,6 +102,11 @@ class ClientConfig {
             field = value
             save()
         }
+    var developmentMode: Boolean = false
+        set(value) {
+            field = value
+            save()
+        }
     var displayedSkills: MutableSet<String> = mutableSetOf()
         set(value) {
             field = value

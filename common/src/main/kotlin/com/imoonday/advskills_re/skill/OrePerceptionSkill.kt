@@ -9,6 +9,7 @@ import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.block.*
 import net.minecraft.entity.player.*
+import net.minecraft.registry.*
 import net.minecraft.registry.tag.*
 import net.minecraft.server.network.*
 import net.minecraft.util.math.*
@@ -27,19 +28,20 @@ class OrePerceptionSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("update_interval", 5)
+            .addParameter(PARAM_ORE_BLOCKS, emptyList<String>())
+            .addParameter(PARAM_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
             .addParameter(
-                name = "detection_range",
-                baseValue = 15.0,
-                enhancementId = "range",
+                name = PARAM_DETECT_RANGE,
+                baseValue = DEFAULT_DETECT_RANGE,
+                enhancementId = ENHANCEMENT_RANGE,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "persist_time",
-                baseValue = 10 * 20,
-                enhancementId = "time",
+                name = PARAM_DETECT_DURATION,
+                baseValue = DEFAULT_DETECT_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -49,11 +51,12 @@ class OrePerceptionSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).also { updateOres(user) }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int =
+        getIntParam(PARAM_DETECT_DURATION, player, DEFAULT_DETECT_DURATION, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         super.serverTick(player, usedTime)
-        val interval = getIntParam("update_interval", player, 5, 1)
+        val interval = getIntParam(PARAM_UPDATE_INTERVAL, player, DEFAULT_UPDATE_INTERVAL, 1)
         if (player.isUsing() && usedTime % interval == 0) {
             player.server.execute {
                 updateOres(player)
@@ -63,7 +66,8 @@ class OrePerceptionSkill : Skill(
 
     private fun updateOres(player: ServerPlayerEntity) {
         val world = player.world
-        val range = getDoubleParam("detection_range", player, 15.0)
+        val range = getDoubleParam(PARAM_DETECT_RANGE, player, DEFAULT_DETECT_RANGE)
+        val oreBlocks = getListParam(PARAM_ORE_BLOCKS).getStringList()
         player.boundingBox.expand(range).blockPosSet
             .filter { pos -> world.isChunkLoaded(pos) }
             .filter { pos ->
@@ -71,7 +75,8 @@ class OrePerceptionSkill : Skill(
                 !state.isAir
                     && (state.isTagMatches("ores")
                     || state.isTagMatches { it.id.path.endsWith("_ores") }
-                    || state.isOf(Blocks.ANCIENT_DEBRIS))
+                    || state.isOf(Blocks.ANCIENT_DEBRIS)
+                    || oreBlocks.contains(Registries.BLOCK.getId(state.block).toString()))
             }.associateWith { pos -> getColor(world, pos) }
             .also { Channels.UPDATE_ORE_CACHE_S2C.sendToPlayer(player, UpdateOreCacheS2CPacket(it)) }
     }
@@ -125,5 +130,23 @@ class OrePerceptionSkill : Skill(
                 return ((block as? Colorful) ?: colorfulBlocks[block])?.getColor(world, pos, state)
             }
         }
+    }
+
+    companion object {
+
+        // Default Values
+        private const val DEFAULT_UPDATE_INTERVAL = 5
+        private const val DEFAULT_DETECT_RANGE = 15.0
+        private const val DEFAULT_DETECT_DURATION = 10 * 20
+
+        // Parameter Names
+        private const val PARAM_UPDATE_INTERVAL = "update_interval"  // 更新间隔
+        private const val PARAM_DETECT_RANGE = "detect_range"  // 探测范围
+        private const val PARAM_DETECT_DURATION = "detect_duration"  // 探测持续时间
+        private const val PARAM_ORE_BLOCKS = "ore_blocks"  // 矿石方块列表
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_RANGE = "range"  // 对应探测范围
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
     }
 }

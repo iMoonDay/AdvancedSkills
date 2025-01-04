@@ -17,9 +17,9 @@ class DoubleJumpSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "jump_power",
-            baseValue = 1.35,
-            enhancementId = "power",
+            name = PARAM_JUMP_FORCE,
+            baseValue = DEFAULT_JUMP_FORCE,
+            enhancementId = ENHANCEMENT_FORCE,
             value = 0.1,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
@@ -31,11 +31,22 @@ class DoubleJumpSkill : Skill(
         user.run {
             stopFallFlying()
             jump()
-            val power = getDoubleParam("jump_power", user, 1.35)
+            val power = getDoubleParam(PARAM_JUMP_FORCE, user, DEFAULT_JUMP_FORCE)
             velocity = velocity.multiply(1.0, power, 1.0)
             updateVelocity()
             user.spawnParticles(ParticleTypes.CLOUD, false, pos, 10, 0.5, 0.0, 0.5, 0.1)
         }
         return UseResult.success()
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_JUMP_FORCE = 1.35
+
+        // Parameter Names
+        private const val PARAM_JUMP_FORCE = "jump_force"  // 跳跃力度
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_FORCE = "force"  // 对应跳跃力度
     }
 }

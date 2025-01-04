@@ -23,25 +23,25 @@ class DopingSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = "persist_time",
-                baseValue = 10 * 20,
-                enhancementId = "time",
+                name = PARAM_DOPING_DURATION,
+                baseValue = DEFAULT_DOPING_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "speed_multiplier",
-                baseValue = 0.5,
-                enhancementId = "speed",
+                name = PARAM_SPEED_BOOST,
+                baseValue = DEFAULT_SPEED_BOOST,
+                enhancementId = ENHANCEMENT_SPEED,
                 value = 0.05,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "health_cost",
-                baseValue = 5f,
-                enhancementId = "cost",
+                name = PARAM_HEALTH_COST,
+                baseValue = DEFAULT_HEALTH_COST,
+                enhancementId = ENHANCEMENT_COST,
                 value = -0.16f,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -53,14 +53,14 @@ class DopingSkill : Skill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Doping"),
             "Doping",
-            getDoubleParam("speed_multiplier", player, 0.5, 0.0),
+            getDoubleParam(PARAM_SPEED_BOOST, player, DEFAULT_SPEED_BOOST, 0.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this) {
         user.addAttributes()
-        val cost = getFloatParam("health_cost", user, 5f)
+        val cost = getFloatParam(PARAM_HEALTH_COST, user, DEFAULT_HEALTH_COST)
         user.health = max(user.health - cost, 1f)
         user.playSound(ModSounds.DASH.get())
     }
@@ -72,7 +72,8 @@ class DopingSkill : Skill(
         }
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_DOPING_DURATION, player, DEFAULT_DOPING_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         player.removeAttributes()
@@ -83,5 +84,22 @@ class DopingSkill : Skill(
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
         super<AttributeTrigger>.postUnequipped(player, slot)
         super<AutoStopTrigger>.postUnequipped(player, slot)
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_DOPING_DURATION = 10 * 20
+        private const val DEFAULT_SPEED_BOOST = 0.5
+        private const val DEFAULT_HEALTH_COST = 5f
+
+        // Parameter Names
+        private const val PARAM_DOPING_DURATION = "doping_duration"  // 兴奋时长
+        private const val PARAM_SPEED_BOOST = "speed_boost"  // 速度提升
+        private const val PARAM_HEALTH_COST = "health_cost"  // 生命消耗
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应兴奋时长
+        private const val ENHANCEMENT_SPEED = "speed"  // 对应速度提升
+        private const val ENHANCEMENT_COST = "cost"  // 对应生命消耗
     }
 }

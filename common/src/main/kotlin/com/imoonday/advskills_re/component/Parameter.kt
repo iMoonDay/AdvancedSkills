@@ -147,6 +147,7 @@ sealed class Parameter {
         override fun asFloat(): FloatParameter? = null
         override fun asDouble(): DoubleParameter? = null
         override fun asBoolean(): BooleanParameter = BooleanParameter(true, enhancements)
+        override fun asString(): StringParameter = StringParameter(baseValue.orElse(null)?.id.toString(), enhancements)
         override fun asSoundEvent(): SoundEventParameter = this
         override fun toNbt(): NbtCompound = NbtCompound().apply {
             putInt("type", 5)
@@ -183,6 +184,9 @@ sealed class Parameter {
         override fun asFloat(): FloatParameter = FloatParameter(baseValue.size.toFloat(), enhancements)
         override fun asDouble(): DoubleParameter = DoubleParameter(baseValue.size.toDouble(), enhancements)
         override fun asBoolean(): BooleanParameter = BooleanParameter(baseValue.isNotEmpty(), enhancements)
+        override fun asString(): StringParameter =
+            StringParameter(baseValue.joinToString(", ") { it.asString() }, enhancements)
+
         override fun asList(): ListParameter = this
         override fun toNbt(): NbtCompound = NbtCompound().apply {
             putInt("type", 6)
@@ -206,6 +210,8 @@ sealed class Parameter {
             abstract fun asBoolean(): Boolean?
             abstract fun asString(): String
             abstract fun toNbt(): NbtCompound
+
+            override fun toString(): String = asString()
 
             data class PrimitiveInt(val value: Int) : PrimitiveType() {
 
@@ -357,7 +363,9 @@ sealed class Parameter {
         ): Parameter {
             val jsonObj = json.asJsonObject
             val enhancements =
-                if (jsonObj.has("enhancements")) jsonObj.get("enhancements").asJsonArray.map { it.asString } else emptyList()
+                if (jsonObj.has("enhancements")) jsonObj.get(
+                    "enhancements"
+                ).asJsonArray.map { it.asString } else emptyList()
             val baseValue = jsonObj.get("baseValue")
             try {
                 return if (baseValue.isJsonPrimitive) {
@@ -366,7 +374,9 @@ sealed class Parameter {
                         primitive.isNumber -> create(primitive.asNumber, enhancements)
                         primitive.isBoolean -> create(primitive.asBoolean, enhancements)
                         else -> {
-                            LOGGER.warn("Invalid primitive ${primitive.asString} with type: ${primitive.javaClass.name}")
+                            LOGGER.warn(
+                                "Invalid primitive ${primitive.asString} with type: ${primitive.javaClass.name}"
+                            )
                             create(primitive.asString, enhancements)
                         }
                     }
@@ -429,7 +439,7 @@ sealed class Parameter {
             is Boolean -> BooleanParameter(baseValue, enhancements)
             is SoundEvent -> SoundEventParameter(baseValue, enhancements)
             is StringIdentifiable -> StringParameter(baseValue.asString(), enhancements)
-            is List<*> -> ListParameter(baseValue.map(ListParameter.PrimitiveType::parse), enhancements)
+            is Collection<*> -> ListParameter(baseValue.map(ListParameter.PrimitiveType::parse), enhancements)
             else -> StringParameter(baseValue.toString(), enhancements)
         }
 

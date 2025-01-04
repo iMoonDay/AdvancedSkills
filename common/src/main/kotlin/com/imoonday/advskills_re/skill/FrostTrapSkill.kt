@@ -20,25 +20,25 @@ class FrostTrapSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "range",
-            baseValue = 0,
-            enhancementId = "range",
+            name = PARAM_TRAP_RANGE,
+            baseValue = DEFAULT_TRAP_RANGE,
+            enhancementId = ENHANCEMENT_RANGE,
             value = 1,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT
         ).addParameter(
-            name = "trap_count",
-            baseValue = 1,
-            enhancementId = "count",
+            name = PARAM_TRAP_COUNT,
+            baseValue = DEFAULT_TRAP_COUNT,
+            enhancementId = ENHANCEMENT_COUNT,
             value = 1,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT
         ).addParameter(
-            name = "freeze_duration",
-            baseValue = 10,
-            enhancementId = "duration",
+            name = PARAM_FREEZE_DURATION,
+            baseValue = DEFAULT_FREEZE_DURATION,
+            enhancementId = ENHANCEMENT_DURATION,
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
@@ -49,12 +49,12 @@ class FrostTrapSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         val world = user.world
         val pos = user.blockPos
-        val range = getIntParam("range", user, 0)
-        val times = getIntParam("trap_count", user, 1)
+        val range = getIntParam(PARAM_TRAP_RANGE, user, DEFAULT_TRAP_RANGE)
+        val times = getIntParam(PARAM_TRAP_COUNT, user, DEFAULT_TRAP_COUNT)
         var success = false
         val trapBlock = ModBlocks.FROST_TRAP.get()
         val defaultState = trapBlock.defaultState
-        val duration = getIntParam("freeze_duration", user, 10)
+        val duration = getIntParam(PARAM_FREEZE_DURATION, user, DEFAULT_FREEZE_DURATION)
         val uuid = user.uuid
 
         BlockPos.iterateOutwards(pos, range, 0, range).forEach {
@@ -82,5 +82,22 @@ class FrostTrapSkill : Skill(
             }
         }
         return if (success) UseResult.success() else UseResult.fail(failedMessage())
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_TRAP_RANGE = 0
+        private const val DEFAULT_TRAP_COUNT = 1
+        private const val DEFAULT_FREEZE_DURATION = 10
+
+        // Parameter Names
+        private const val PARAM_TRAP_RANGE = "trap_range"  // 陷阱范围
+        private const val PARAM_TRAP_COUNT = "trap_count"  // 陷阱数量
+        private const val PARAM_FREEZE_DURATION = "freeze_duration"  // 冻结时长
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_RANGE = "range"  // 对应陷阱范围
+        private const val ENHANCEMENT_COUNT = "count"  // 对应陷阱数量
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应冻结时长
     }
 }

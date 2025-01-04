@@ -30,27 +30,27 @@ class DangerPerceptionSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("speed_up_sound", ModSounds.DASH)
+            .addParameter(PARAM_SPEED_SOUND, DEFAULT_SPEED_SOUND)
             .addParameter(
-                name = "persist_time",
-                baseValue = 2 * 20,
-                enhancementId = "time",
+                name = PARAM_DURATION,
+                baseValue = DEFAULT_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "speed_multiplier",
-                baseValue = 0.3,
-                enhancementId = "speed",
+                name = PARAM_SPEED_BOOST,
+                baseValue = DEFAULT_SPEED_BOOST,
+                enhancementId = ENHANCEMENT_SPEED,
                 value = 0.06,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "trigger_range",
-                baseValue = 3.0,
-                enhancementId = "range",
+                name = PARAM_DETECT_RANGE,
+                baseValue = DEFAULT_DETECT_RANGE,
+                enhancementId = ENHANCEMENT_RANGE,
                 value = 0.4,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -64,7 +64,7 @@ class DangerPerceptionSkill : Skill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Danger Perception"),
             "Danger Perception",
-            getDoubleParam("speed_multiplier", player, 0.3, 0.0),
+            getDoubleParam(PARAM_SPEED_BOOST, player, DEFAULT_SPEED_BOOST, 0.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -74,11 +74,11 @@ class DangerPerceptionSkill : Skill(
         super<AutoStopTrigger>.postUnequipped(player, slot)
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 2 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam(PARAM_DURATION, player, DEFAULT_DURATION, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
         if (!player.isCreative && !player.isSpectator && !player.abilities.invulnerable && (player.isUsing() || !player.isCooling())) {
-            val range = getDoubleParam("trigger_range", player, 3.0)
+            val range = getDoubleParam(PARAM_DETECT_RANGE, player, DEFAULT_DETECT_RANGE)
             val hasDanger = player.world
                 .getOtherEntities(player, player.boundingBox.expand(range)) { dangerTest(player, it) }
                 .isNotEmpty()
@@ -121,7 +121,7 @@ class DangerPerceptionSkill : Skill(
     }
 
     private fun start(player: ServerPlayerEntity) {
-        player.playSoundFromParam("speed_up_sound", ModSounds.DASH.get())
+        player.playSoundFromParam(PARAM_SPEED_SOUND, DEFAULT_SPEED_SOUND.get())
         player.startUsing()
         player.addAttributes()
         player.spawnParticles(
@@ -146,6 +146,23 @@ class DangerPerceptionSkill : Skill(
 
         private val dangerList: MutableList<(ServerPlayerEntity, Entity) -> Boolean> = mutableListOf()
         private val safetyList: MutableList<(ServerPlayerEntity, Entity) -> Boolean> = mutableListOf()
+
+        // Default Values
+        private const val DEFAULT_DURATION = 2 * 20
+        private const val DEFAULT_SPEED_BOOST = 0.3
+        private const val DEFAULT_DETECT_RANGE = 3.0
+        private val DEFAULT_SPEED_SOUND = ModSounds.DASH
+
+        // Parameter Names
+        private const val PARAM_SPEED_SOUND = "speed_up_sound"  // 加速音效
+        private const val PARAM_DURATION = "duration"  // 持续时间
+        private const val PARAM_SPEED_BOOST = "speed_boost"  // 速度提升
+        private const val PARAM_DETECT_RANGE = "detect_range"  // 检测范围
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_SPEED = "speed"  // 对应速度提升
+        private const val ENHANCEMENT_RANGE = "range"  // 对应检测范围
 
         init {
             DangerTestEvents.addDangerCondition { player, entity ->

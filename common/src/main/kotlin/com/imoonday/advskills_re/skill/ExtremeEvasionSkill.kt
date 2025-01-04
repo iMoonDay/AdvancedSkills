@@ -22,19 +22,19 @@ class ExtremeEvasionSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("moving_sound", ModSounds.DASH)
+            .addParameter(PARAM_EVASION_SOUND, DEFAULT_EVASION_SOUND)
             .addParameter(
-                name = "persist_time",
-                baseValue = 10,
-                enhancementId = "time",
+                name = PARAM_EVASION_DURATION,
+                baseValue = DEFAULT_EVASION_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "velocity_multiplier",
-                baseValue = 2.0,
-                enhancementId = "velocity",
+                name = PARAM_EVASION_FORCE,
+                baseValue = DEFAULT_EVASION_FORCE,
+                enhancementId = ENHANCEMENT_FORCE,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -45,7 +45,7 @@ class ExtremeEvasionSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this) {
         user.run {
             stopFallFlying()
-            val multiplier = getDoubleParam("velocity_multiplier", user, 2.0)
+            val multiplier = getDoubleParam(PARAM_EVASION_FORCE, user, DEFAULT_EVASION_FORCE)
             velocity = (if (velocity.x == 0.0 && velocity.z == 0.0) rotationVector else velocity)
                 .normalize()
                 .multiply(multiplier, 0.0, multiplier)
@@ -57,7 +57,7 @@ class ExtremeEvasionSkill : Skill(
                 -velocity.x, 0.0, -velocity.z, 0.0
             )
         }
-    }.withSound(getSoundEventParam("moving_sound", ModSounds.DASH.get()))
+    }.withSound(getSoundEventParam(PARAM_EVASION_SOUND, DEFAULT_EVASION_SOUND.get()))
 
     override fun ignoreDamage(
         amount: Float,
@@ -66,10 +66,27 @@ class ExtremeEvasionSkill : Skill(
         attacker: Entity?,
     ): Boolean = player.isUsing()
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 10, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_EVASION_DURATION, player, DEFAULT_EVASION_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
         player.startCooling()
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_EVASION_DURATION = 10
+        private const val DEFAULT_EVASION_FORCE = 2.0
+        private val DEFAULT_EVASION_SOUND = ModSounds.DASH
+
+        // Parameter Names
+        private const val PARAM_EVASION_SOUND = "evasion_sound"  // 闪避音效
+        private const val PARAM_EVASION_DURATION = "evasion_duration"  // 闪避时长
+        private const val PARAM_EVASION_FORCE = "evasion_force"  // 闪避力度
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应闪避时长
+        private const val ENHANCEMENT_FORCE = "force"  // 对应闪避力度
     }
 }

@@ -18,29 +18,30 @@ class ChargedDashSkill : LongPressSkill(
     )
 ), AttributeTrigger {
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 3 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam(PARAM_CHARGE_TIME, player, DEFAULT_CHARGE_TIME, 0)
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "charge_time",
-            baseValue = 3 * 20,
-            enhancementId = "time",
+            name = PARAM_CHARGE_TIME,
+            baseValue = DEFAULT_CHARGE_TIME,
+            enhancementId = ENHANCEMENT_CHARGE_TIME,
             value = -0.16,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatter.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT,
+            genericText = true
         ).addParameter(
-            name = "charge_slowdown",
-            baseValue = 0.2,
-            enhancementId = "slowdown_reduction",
+            name = PARAM_MOVEMENT_PENALTY,
+            baseValue = DEFAULT_MOVEMENT_PENALTY,
+            enhancementId = ENHANCEMENT_MOVEMENT,
             value = -0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
         ).addParameter(
-            name = "velocity_multiplier",
-            baseValue = 1.0,
-            enhancementId = "multiplier",
+            name = PARAM_DASH_FORCE,
+            baseValue = DEFAULT_DASH_FORCE,
+            enhancementId = ENHANCEMENT_FORCE,
             value = 0.2,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
@@ -52,7 +53,7 @@ class ChargedDashSkill : LongPressSkill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Charged Dash Charging"),
             "Charged Dash Charging",
-            -getDoubleParam("charge_slowdown", player, 0.2, 0.0, 1.0),
+            -getDoubleParam(PARAM_MOVEMENT_PENALTY, player, DEFAULT_MOVEMENT_PENALTY, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -66,7 +67,7 @@ class ChargedDashSkill : LongPressSkill(
         player.run {
             stopUsing()
             removeAttributes()
-            val multiplier = getDoubleParam("velocity_multiplier", player, 1.0)
+            val multiplier = getDoubleParam(PARAM_DASH_FORCE, player, DEFAULT_DASH_FORCE)
             velocity =
                 rotationVector.normalize().multiply(2.0 * pressedTime / getMaxUseTime(player) * multiplier)
             updateVelocity()
@@ -77,4 +78,21 @@ class ChargedDashSkill : LongPressSkill(
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) =
         super<AttributeTrigger>.postUnequipped(player, slot)
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CHARGE_TIME = 3 * 20
+        private const val DEFAULT_MOVEMENT_PENALTY = 0.2
+        private const val DEFAULT_DASH_FORCE = 1.0
+
+        // Parameter Names
+        private const val PARAM_CHARGE_TIME = "charge_time"  // 蓄力时间
+        private const val PARAM_MOVEMENT_PENALTY = "movement_penalty"  // 移动速度惩罚
+        private const val PARAM_DASH_FORCE = "dash_force"  // 冲刺力度
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_CHARGE_TIME = "charge_time"  // 对应蓄力时间
+        private const val ENHANCEMENT_MOVEMENT = "movement"  // 对应移动速度
+        private const val ENHANCEMENT_FORCE = "force"  // 对应冲刺力度
+    }
 }

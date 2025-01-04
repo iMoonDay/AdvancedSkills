@@ -20,17 +20,18 @@ class GrapplingHookSkill : LongPressSkill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "persist_time",
-            baseValue = 3 * 20,
-            enhancementId = "time",
+            name = PARAM_HOOK_DURATION,
+            baseValue = DEFAULT_HOOK_DURATION,
+            enhancementId = ENHANCEMENT_DURATION,
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatter.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT,
+            genericText = true
         ).addParameter(
-            name = "max_distance",
-            baseValue = 30.0,
-            enhancementId = "distance",
+            name = PARAM_HOOK_RANGE,
+            baseValue = DEFAULT_HOOK_RANGE,
+            enhancementId = ENHANCEMENT_RANGE,
             value = 4.0,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
@@ -79,11 +80,27 @@ class GrapplingHookSkill : LongPressSkill(
         super.tick(player, usedTime)
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 3 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_HOOK_DURATION, player, DEFAULT_HOOK_DURATION, 0)
 
     override fun getCrosshair(player: PlayerEntity): Crosshair =
         if (player.isReady() && player.raycastBlock(getMaxDistance(player)).type == HitResult.Type.BLOCK)
             Crosshairs.RING else Crosshairs.NONE
 
-    private fun getMaxDistance(player: PlayerEntity) = getDoubleParam("max_distance", player, 30.0)
+    private fun getMaxDistance(player: PlayerEntity) = 
+        getDoubleParam(PARAM_HOOK_RANGE, player, DEFAULT_HOOK_RANGE)
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_HOOK_DURATION = 3 * 20
+        private const val DEFAULT_HOOK_RANGE = 30.0
+
+        // Parameter Names
+        private const val PARAM_HOOK_DURATION = "hook_duration"  // 钩爪持续时间
+        private const val PARAM_HOOK_RANGE = "hook_range"  // 钩爪范围
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_RANGE = "range"  // 对应钩爪范围
+    }
 }

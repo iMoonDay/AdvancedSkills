@@ -21,21 +21,22 @@ class SelfHealingSkill : Skill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = "charge_time",
-                baseValue = 10 * 20,
-                enhancementId = "time",
+                name = PARAM_CHARGE_DURATION,
+                baseValue = DEFAULT_CHARGE_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = -0.16,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "healing_amount",
-                baseValue = 2.0f,
-                enhancementId = "amount",
+                name = PARAM_HEAL_AMOUNT,
+                baseValue = DEFAULT_HEAL_AMOUNT,
+                enhancementId = ENHANCEMENT_AMOUNT,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             )
     }
 
@@ -43,13 +44,14 @@ class SelfHealingSkill : Skill(
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = !player.isDead && player.health < player.maxHealth
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 10 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
         if (!player.hasEquipped()) return
 
-        val amount = getFloatParam("healing_amount", player, 2.0f)
+        val amount = getFloatParam(PARAM_HEAL_AMOUNT, player, DEFAULT_HEAL_AMOUNT)
         player.heal(amount)
         player.spawnParticles(
             ParticleTypes.HEART, false, player.centerPos, amount.toInt(), 0.5, 0.5, 0.5, 0.1
@@ -68,4 +70,18 @@ class SelfHealingSkill : Skill(
     override fun shouldFlashIcon(player: PlayerEntity): Boolean = false
 
     override fun getProgress(player: PlayerEntity): Double = 1.0 - super.getProgress(player)
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CHARGE_DURATION = 10 * 20
+        private const val DEFAULT_HEAL_AMOUNT = 2.0f
+
+        // Parameter Names
+        private const val PARAM_CHARGE_DURATION = "charge_duration"  // 充能时间
+        private const val PARAM_HEAL_AMOUNT = "heal_amount"  // 治疗量
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_AMOUNT = "heal_amount"  // 对应治疗量
+    }
 }

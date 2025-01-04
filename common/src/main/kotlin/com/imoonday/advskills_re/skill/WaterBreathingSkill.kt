@@ -20,19 +20,21 @@ class WaterBreathingSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "persist_time",
-            baseValue = 30 * 20,
-            enhancementId = "time",
+            name = PARAM_BREATH_DURATION,
+            baseValue = DEFAULT_BREATH_DURATION,
+            enhancementId = ENHANCEMENT_DURATION,
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
-            descArg = Enhancement.ArgFormatter.INT_PERCENT
+            descArg = Enhancement.ArgFormatter.INT_PERCENT,
+            genericText = true
         )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 30 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_BREATH_DURATION, player, DEFAULT_BREATH_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
@@ -40,10 +42,10 @@ class WaterBreathingSkill : Skill(
     }
 
     override fun clientTick(player: PlayerEntity, usedTime: Int) {
-        val shouldAdd = (player.isUsing()
-            && usedTime % 4 == 0
+        val shouldAddBubble = (player.isUsing()
+            && usedTime % BUBBLE_INTERVAL == 0
             && player.world.getFluidState(player.eyePos.toBlockPos()).isOf(Fluids.WATER))
-        if (shouldAdd) {
+        if (shouldAddBubble) {
             val rotation = player.rotationVector.normalize().multiply(player.width / 2.0)
             player.world.addParticle(
                 ParticleTypes.BUBBLE,
@@ -54,5 +56,17 @@ class WaterBreathingSkill : Skill(
             )
         }
         super.clientTick(player, usedTime)
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_BREATH_DURATION = 30 * 20
+        private const val BUBBLE_INTERVAL = 4  // 气泡生成间隔
+
+        // Parameter Names
+        private const val PARAM_BREATH_DURATION = "breath_duration"  // 水下呼吸持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
     }
 }

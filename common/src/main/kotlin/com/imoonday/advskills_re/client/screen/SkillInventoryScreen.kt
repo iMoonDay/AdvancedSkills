@@ -16,7 +16,6 @@ import net.minecraft.client.gui.screen.*
 import net.minecraft.client.gui.screen.narration.*
 import net.minecraft.client.gui.tooltip.*
 import net.minecraft.client.gui.widget.*
-import net.minecraft.client.resource.language.*
 import net.minecraft.entity.player.*
 import net.minecraft.text.*
 import net.minecraft.util.*
@@ -323,36 +322,14 @@ class SkillInventoryScreen(
 
         override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
             if (!visible) return
-            context.drawTexture(
-                slotTexture,
-                x,
-                y,
-                skill.rarity.level * 24f,
-                32f,
-                width,
-                height,
-                256,
-                256
-            )
-            context.fill(
-                x + width - 3,
-                y + 1,
-                x + width - 1,
-                y + 3,
-                skill.rarity.color
-            )
+            context.drawTexture(slotTexture, x, y, skill.rarity.level * 24f, 32f, width, height, 256, 256)
+            context.fill(x + width - 3, y + 1, x + width - 1, y + 3, skill.rarity.color)
             if (!skill.invalid && selectedSlot?.skill != skill) {
                 SkillRenderer.renderIcon(skill, context, x + 4, y + 4)
             }
             if (hovered) {
                 val edge = 4
-                context.overlayHighlight(
-                    x + edge,
-                    y + edge,
-                    x + width - edge,
-                    y + height - edge,
-                    true
-                )
+                context.overlayHighlight(x + edge, y + edge, x + width - edge, y + height - edge, true)
                 selectingSlot = if (!skill.invalid) {
                     if (selectedSlot == null) {
                         if (!ClientConfig.get().hideSkillInfo || hasShiftDown()) {
@@ -440,15 +417,7 @@ class SkillInventoryScreen(
             }
             slot?.let {
                 context.drawTexture(
-                    indexTexture,
-                    indexX,
-                    indexY,
-                    it.u.toFloat(),
-                    it.v.toFloat(),
-                    indexSize,
-                    indexSize,
-                    256,
-                    256
+                    indexTexture, indexX, indexY, it.u.toFloat(), it.v.toFloat(), indexSize, indexSize, 256, 256
                 )
                 if (isMouseOverIndex(mouseX, mouseY)) {
                     setTooltip(slot.tooltip)
@@ -628,16 +597,8 @@ class SkillInventoryScreen(
 
         override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
             context.drawTexture(
-                tabTexture,
-                x,
-                y,
-                if (selected) 0 else -1,
-                26f,
-                v.toFloat(),
-                width,
-                if (selected) height else height - 4,
-                256,
-                256
+                tabTexture, x, y, if (selected) 0 else -1, 26f, v.toFloat(), width,
+                if (selected) height else height - 4, 256, 256
             )
             SkillRenderer.renderIcon(
                 displaySkill,

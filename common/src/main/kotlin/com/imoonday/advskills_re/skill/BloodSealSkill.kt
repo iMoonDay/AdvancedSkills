@@ -26,41 +26,42 @@ class BloodSealSkill : LongPressSkill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = "charge_time",
-                baseValue = 5 * 20,
-                enhancementId = "time",
+                name = PARAM_CHARGE_TIME,
+                baseValue = DEFAULT_CHARGE_TIME,
+                enhancementId = ENHANCEMENT_CHARGE_TIME,
                 value = -0.16,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "charge_slowdown",
-                baseValue = 0.25,
-                enhancementId = "slowdown_reduction",
+                name = PARAM_MOVEMENT_PENALTY,
+                baseValue = DEFAULT_MOVEMENT_PENALTY,
+                enhancementId = ENHANCEMENT_MOVEMENT,
                 value = -0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "damage",
-                baseValue = 3f,
-                enhancementId = "damage",
+                name = PARAM_DAMAGE,
+                baseValue = DEFAULT_DAMAGE,
+                enhancementId = ENHANCEMENT_DAMAGE,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.INT_PERCENT,
+                genericText = true
             ).addParameter(
-                name = "distance",
-                baseValue = 5.0,
-                enhancementId = "distance",
+                name = PARAM_DISTANCE,
+                baseValue = DEFAULT_DISTANCE,
+                enhancementId = ENHANCEMENT_DISTANCE,
                 value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.FLOAT
             ).addParameter(
-                name = "status_effect_duration",
-                baseValue = 7 * 20,
-                enhancementId = "duration",
+                name = PARAM_EFFECT_DURATION,
+                baseValue = DEFAULT_EFFECT_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -68,13 +69,14 @@ class BloodSealSkill : LongPressSkill(
             )
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 5 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_CHARGE_TIME, player, DEFAULT_CHARGE_TIME, 0)
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Blood Seal Charging"),
             "Blood Seal Charging",
-            -getDoubleParam("charge_slowdown", player, 0.25, 0.0, 1.0),
+            -getDoubleParam(PARAM_MOVEMENT_PENALTY, player, DEFAULT_MOVEMENT_PENALTY, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -97,12 +99,12 @@ class BloodSealSkill : LongPressSkill(
             ?.let {
                 it.entity.damage(
                     player.damageSources.playerAttack(player),
-                    getFloatParam("damage", player, 3f)
+                    getFloatParam(PARAM_DAMAGE, player, DEFAULT_DAMAGE)
                 )
                 (it.entity as? LivingEntity)?.addStatusEffect(
                     StatusEffectInstance(
                         ModEffects.SERIOUS_INJURY.get(),
-                        getIntParam("status_effect_duration", player, 7 * 20, 0),
+                        getIntParam(PARAM_EFFECT_DURATION, player, DEFAULT_EFFECT_DURATION, 0),
                     )
                 )
                 return UseResult.success()
@@ -111,7 +113,7 @@ class BloodSealSkill : LongPressSkill(
     }
 
     private fun PlayerEntity.getRaycastDistance() =
-        getDoubleParam("distance", this, 5.0, 0.0)
+        getDoubleParam(PARAM_DISTANCE, this, DEFAULT_DISTANCE, 0.0)
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean {
         if (player.isUsing()) player.startCooling(10)
@@ -132,5 +134,28 @@ class BloodSealSkill : LongPressSkill(
     override fun isTarget(clientPlayer: PlayerEntity, entity: LivingEntity): Boolean {
         if (!clientPlayer.isUsing()) return false
         return clientPlayer.raycastLivingEntity(clientPlayer.getRaycastDistance())?.entity == entity
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_CHARGE_TIME = 5 * 20
+        private const val DEFAULT_MOVEMENT_PENALTY = 0.25
+        private const val DEFAULT_DAMAGE = 3f
+        private const val DEFAULT_DISTANCE = 5.0
+        private const val DEFAULT_EFFECT_DURATION = 7 * 20
+
+        // Parameter Names
+        private const val PARAM_CHARGE_TIME = "charge_time"  // 蓄力时间
+        private const val PARAM_MOVEMENT_PENALTY = "movement_penalty"  // 移动速度惩罚
+        private const val PARAM_DAMAGE = "damage"  // 伤害值
+        private const val PARAM_DISTANCE = "attack_range"  // 攻击范围
+        private const val PARAM_EFFECT_DURATION = "effect_duration"  // 效果持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_CHARGE_TIME = "charge_time"  // 对应蓄力时间
+        private const val ENHANCEMENT_MOVEMENT = "movement"  // 对应移动速度
+        private const val ENHANCEMENT_DAMAGE = "damage"  // 对应伤害值
+        private const val ENHANCEMENT_DISTANCE = "distance"  // 对应攻击范围
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应效果持续时间
     }
 }

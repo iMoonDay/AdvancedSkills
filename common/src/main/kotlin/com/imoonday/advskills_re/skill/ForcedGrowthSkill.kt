@@ -21,25 +21,25 @@ class ForcedGrowthSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "range",
-            baseValue = 5.0,
-            enhancementId = "range",
+            name = PARAM_GROWTH_RANGE,
+            baseValue = DEFAULT_GROWTH_RANGE,
+            enhancementId = ENHANCEMENT_RANGE,
             value = 1.0,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.FLOAT
         ).addParameter(
-            name = "growth_count",
-            baseValue = 1,
-            enhancementId = "count",
+            name = PARAM_GROWTH_TIMES,
+            baseValue = DEFAULT_GROWTH_TIMES,
+            enhancementId = ENHANCEMENT_TIMES,
             value = 1,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT
         ).addParameter(
-            name = "success_chance",
-            baseValue = 0.5f,
-            enhancementId = "chance",
+            name = PARAM_GROWTH_CHANCE,
+            baseValue = DEFAULT_GROWTH_CHANCE,
+            enhancementId = ENHANCEMENT_CHANCE,
             value = 0.1f,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
@@ -49,9 +49,9 @@ class ForcedGrowthSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val world = user.serverWorld
-        val range = getDoubleParam("range", user, 5.0)
-        val times = getIntParam("growth_count", user, 1)
-        val chance = getFloatParam("success_chance", user, 0.5f)
+        val range = getDoubleParam(PARAM_GROWTH_RANGE, user, DEFAULT_GROWTH_RANGE)
+        val times = getIntParam(PARAM_GROWTH_TIMES, user, DEFAULT_GROWTH_TIMES)
+        val chance = getFloatParam(PARAM_GROWTH_CHANCE, user, DEFAULT_GROWTH_CHANCE)
         val random = user.random
         val result = user.boundingBox.expand(range)
             .blockPosSet
@@ -99,5 +99,22 @@ class ForcedGrowthSkill : Skill(
         }
 
         return grow
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_GROWTH_RANGE = 5.0
+        private const val DEFAULT_GROWTH_TIMES = 1
+        private const val DEFAULT_GROWTH_CHANCE = 0.5f
+
+        // Parameter Names
+        private const val PARAM_GROWTH_RANGE = "growth_range"  // 生长范围
+        private const val PARAM_GROWTH_TIMES = "growth_times"  // 生长次数
+        private const val PARAM_GROWTH_CHANCE = "growth_chance"  // 生长概率
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_RANGE = "range"  // 对应生长范围
+        private const val ENHANCEMENT_TIMES = "times"  // 对应生长次数
+        private const val ENHANCEMENT_CHANCE = "chance"  // 对应生长概率
     }
 }

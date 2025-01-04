@@ -10,14 +10,14 @@ class FasterEatingSkill : PassiveSkill(
     Settings(
         id = "faster_eating",
         rarity = SkillRarity.SUPERB
-    ), customToggles = true
+    )
 ), ItemMaxUseTimeTrigger {
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "speed_multiplier",
-            baseValue = 0.5f,
-            enhancementId = "multiplier",
+            name = PARAM_SPEED_BOOST,
+            baseValue = DEFAULT_SPEED_BOOST,
+            enhancementId = ENHANCEMENT_SPEED,
             value = 0.05f,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
@@ -25,6 +25,8 @@ class FasterEatingSkill : PassiveSkill(
         )
         super.initDefaultSettings(settings)
     }
+
+    override fun isCustomToggles(): Boolean = true
 
     override fun getItemMaxUseTimeMultiplier(player: PlayerEntity, stack: ItemStack): Float {
         if (!player.isAvailable()) return 0f
@@ -36,6 +38,18 @@ class FasterEatingSkill : PassiveSkill(
                 || useAction == UseAction.DRINK)
         ) return 0f
 
-        return -getFloatParam("speed_multiplier", player, 0.5f, 0f, 1f)
+        return -getFloatParam(PARAM_SPEED_BOOST, player, DEFAULT_SPEED_BOOST, 0f, 1f)
+    }
+
+    companion object {
+
+        // Default Values
+        private const val DEFAULT_SPEED_BOOST = 0.5f
+
+        // Parameter Names
+        private const val PARAM_SPEED_BOOST = "consume_speed_boost"  // 消耗速度提升
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_SPEED = "speed"  // 对应速度提升
     }
 }

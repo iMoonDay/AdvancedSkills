@@ -19,9 +19,9 @@ class BiologicalHookSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "hook_life",
-            baseValue = 5 * 20,
-            enhancementId = "time",
+            name = PARAM_DURATION,
+            baseValue = DEFAULT_DURATION,
+            enhancementId = ENHANCEMENT_DURATION,
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
@@ -33,8 +33,19 @@ class BiologicalHookSkill : Skill(
         user.world.spawnEntity(HookEntity(user.world, user).apply {
             velocity = user.rotationVector
             setPosition(user.eyePos + user.rotationVector * 0.5)
-            life = getIntParam("hook_life", user, 5 * 20)
+            life = getIntParam(PARAM_DURATION, user, DEFAULT_DURATION)
         })
         return UseResult.success()
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_DURATION = 5 * 20
+
+        // Parameter Names
+        private const val PARAM_DURATION = "hook_duration"  // 钩子持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
     }
 }

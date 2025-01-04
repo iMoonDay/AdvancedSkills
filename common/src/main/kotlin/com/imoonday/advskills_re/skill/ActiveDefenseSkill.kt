@@ -25,25 +25,25 @@ class ActiveDefenseSkill : LongPressSkill(
     override fun initDefaultSettings(settings: Settings) {
         settings
             .addParameter(
-                name = "persist_time",
-                baseValue = 5 * 20,
-                enhancementId = "time",
+                name = PARAM_DURATION,
+                baseValue = DEFAULT_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "damage_reduction",
-                baseValue = 0.2f,
-                enhancementId = "reduction_value",
+                name = PARAM_DEFENSE_VALUE,
+                baseValue = DEFAULT_DEFENSE_VALUE,
+                enhancementId = ENHANCEMENT_DEFENSE,
                 value = 0.06f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             ).addParameter(
-                name = "charge_slowdown",
-                baseValue = 0.5,
-                enhancementId = "slowdown_reduction",
+                name = PARAM_MOVEMENT_PENALTY,
+                baseValue = DEFAULT_MOVEMENT_PENALTY,
+                enhancementId = ENHANCEMENT_MOVEMENT,
                 value = -0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -55,7 +55,7 @@ class ActiveDefenseSkill : LongPressSkill(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(
             createUuid("Active Defense"),
             "Active Defense",
-            -getDoubleParam("charge_slowdown", player, 0.5, 0.0, 1.0),
+            -getDoubleParam(PARAM_MOVEMENT_PENALTY, player, DEFAULT_MOVEMENT_PENALTY, 0.0, 1.0),
             EntityAttributeModifier.Operation.MULTIPLY_TOTAL
         )
     )
@@ -77,7 +77,7 @@ class ActiveDefenseSkill : LongPressSkill(
         return UseResult.consume()
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 5 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam(PARAM_DURATION, player, DEFAULT_DURATION, 0)
 
     override fun onDamaged(
         amount: Float,
@@ -85,8 +85,26 @@ class ActiveDefenseSkill : LongPressSkill(
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
     ): Float = if (!player.isUsing()) amount
-    else amount * (1f - getFloatParam("damage_reduction", player, 0.2f, 0f, 1f))
+    else amount * (1f - getFloatParam(PARAM_DEFENSE_VALUE, player, DEFAULT_DEFENSE_VALUE, 0f, 1f))
 
     override fun shouldRenderFeature(target: PlayerEntity, clientPlayer: PlayerEntity): Boolean =
         target.isUsing() && !target.isUsing(Skills.ABSOLUTE_DEFENSE)
+
+    companion object {
+
+        // Default Values
+        private const val DEFAULT_DURATION = 5 * 20
+        private const val DEFAULT_DEFENSE_VALUE = 0.2f
+        private const val DEFAULT_MOVEMENT_PENALTY = 0.5
+
+        // Parameter Names
+        private const val PARAM_DURATION = "duration"  // 持续时间
+        private const val PARAM_DEFENSE_VALUE = "defense_value"  // 伤害减免值
+        private const val PARAM_MOVEMENT_PENALTY = "movement_penalty"  // 移动速度惩罚
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_DEFENSE = "defense"  // 对应伤害减免
+        private const val ENHANCEMENT_MOVEMENT = "movement"  // 对应移动速度
+    }
 }

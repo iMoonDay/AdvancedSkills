@@ -21,12 +21,12 @@ class ArmorShattererSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addEnhancement("immune_effect")
-            .addParameter("launch_sound", ModSounds.FIRE)
+            .addEnhancement(ENHANCEMENT_SELF_IMMUNE)
+            .addParameter(PARAM_LAUNCH_SOUND, DEFAULT_LAUNCH_SOUND)
             .addParameter(
-                name = "launch_count",
-                baseValue = 1,
-                enhancementId = "count",
+                name = PARAM_PROJECTILE_COUNT,
+                baseValue = DEFAULT_PROJECTILE_COUNT,
+                enhancementId = ENHANCEMENT_COUNT,
                 value = 1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
@@ -36,9 +36,9 @@ class ArmorShattererSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
-            val count = getIntParam("launch_count", user, 1)
-            val ignoreSelf = hasEnhancement("immune_effect")
-            val sound = getSoundEventParam("launch_sound", ModSounds.FIRE.get())
+            val count = getIntParam(PARAM_PROJECTILE_COUNT, user, DEFAULT_PROJECTILE_COUNT)
+            val ignoreSelf = hasEnhancement(ENHANCEMENT_SELF_IMMUNE)
+            val sound = getSoundEventParam(PARAM_LAUNCH_SOUND, DEFAULT_LAUNCH_SOUND.get())
             user.executeAndAddTask(5, count) { spawnEnergyBall(ignoreSelf, sound) }
         }
         return UseResult.success()
@@ -67,4 +67,18 @@ class ArmorShattererSkill : Skill(
     }
 
     override fun isInSpecialState(player: PlayerEntity): Boolean = player.isVulnerable
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_PROJECTILE_COUNT = 1
+        private val DEFAULT_LAUNCH_SOUND = ModSounds.FIRE
+
+        // Parameter Names
+        private const val PARAM_LAUNCH_SOUND = "launch_sound"  // 发射音效
+        private const val PARAM_PROJECTILE_COUNT = "projectile_count"  // 发射数量
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_SELF_IMMUNE = "immune_effect"  // 自身免疫
+        private const val ENHANCEMENT_COUNT = "count"  // 对应发射数量
+    }
 }

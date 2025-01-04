@@ -22,11 +22,11 @@ class PrimaryPurificationSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter("purify_sound", ModSounds.PURIFY)
+            .addParameter(PARAM_PURIFY_SOUND, DEFAULT_PURIFY_SOUND)
             .addParameter(
-                name = "max_duration",
-                baseValue = 15 * 20,
-                enhancementId = "time",
+                name = PARAM_PURIFY_DURATION,
+                baseValue = DEFAULT_PURIFY_DURATION,
+                enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
@@ -38,23 +38,37 @@ class PrimaryPurificationSkill : Skill(
         .filter { it.effectType.category == StatusEffectCategory.HARMFUL }
         .randomOrNull()
         ?.let { effect ->
-            val duration = effect.duration
-            val maxTime = getIntParam("max_duration", user, 15 * 20).toDouble()
-            effect.setDuration(effect.mapDuration { (it - min(it * 0.2, maxTime)).toInt() })
+            val originalDuration = effect.duration
+            val maxDuration = getIntParam(PARAM_PURIFY_DURATION, user, DEFAULT_PURIFY_DURATION).toDouble()
+            effect.setDuration(effect.mapDuration { (it - min(it * 0.2, maxDuration)).toInt() })
             user.sendPacket(EntityStatusEffectS2CPacket(user.id, effect))
-            val amount = (duration - effect.duration) / 20.0
+            
+            val reducedSeconds = (originalDuration - effect.duration) / 20.0
             user.spawnParticles(
                 ParticleTypes.GLOW,
-                false, user.centerPos, (amount.toInt() * 10).coerceAtLeast(1),
+                false, user.centerPos, (reducedSeconds.toInt() * 10).coerceAtLeast(1),
                 0.5, 0.5, 0.5, 0.1
             )
             return UseResult.success(
                 message(
                     "success",
                     Text.translatable(effect.translationKey),
-                    amount
+                    reducedSeconds
                 ),
-                getSoundEventParam("purify_sound", ModSounds.PURIFY.get())
+                getSoundEventParam(PARAM_PURIFY_SOUND, DEFAULT_PURIFY_SOUND.get())
             )
         } ?: UseResult.fail(failedMessage())
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_PURIFY_DURATION = 15 * 20
+        private val DEFAULT_PURIFY_SOUND = ModSounds.PURIFY
+
+        // Parameter Names
+        private const val PARAM_PURIFY_SOUND = "purify_sound"  // 净化音效
+        private const val PARAM_PURIFY_DURATION = "purify_duration"  // 净化持续时间
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+    }
 }

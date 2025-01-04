@@ -46,16 +46,16 @@ object Skills {
     val ABSOLUTE_DEFENSE = register(AbsoluteDefenseSkill())
 
     @JvmField
-    val EXTREME_REFLECTION = register(ExtremeReflectionSkill())
+    val EXTREME_BOUNCE = register(ExtremeBounceSkill())
 
     @JvmField
-    val RAPID_REFLECTION = register(RapidReflectionSkill())
+    val RAPID_BOUNCE = register(RapidBounceSkill())
 
     @JvmField
-    val PERFECT_REFLECTION = register(PerfectReflectionSkill())
+    val PERFECT_BOUNCE = register(PerfectBounceSkill())
 
     @JvmField
-    val MICRO_REFLECTION = register(MicroReflectionSkill())
+    val MICRO_BOUNCE = register(MicroBounceSkill())
 
     @JvmField
     val WALL_CLIMBING = register(WallClimbingSkill())

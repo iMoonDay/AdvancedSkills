@@ -10,14 +10,14 @@ class AutomaticUphillSkill : PassiveSkill(
         id = "automatic_uphill",
         types = listOf(SkillType.MOVEMENT),
         rarity = SkillRarity.RARE
-    ), true
+    )
 ), StepHeightTrigger, PersistentTrigger {
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "step_height",
-            baseValue = 1.0f,
-            enhancementId = "height",
+            name = PARAM_STEP_HEIGHT,
+            baseValue = DEFAULT_STEP_HEIGHT,
+            enhancementId = ENHANCEMENT_HEIGHT,
             value = 0.5f,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
@@ -26,8 +26,21 @@ class AutomaticUphillSkill : PassiveSkill(
         super.initDefaultSettings(settings)
     }
 
+    override fun isToggleable(): Boolean = true
+
     override fun getStepHeight(player: PlayerEntity): Float? {
         if (!player.isAvailable()) return null
-        return getFloatParam("step_height", player, 1.0f)
+        return getFloatParam(PARAM_STEP_HEIGHT, player, DEFAULT_STEP_HEIGHT)
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_STEP_HEIGHT = 1.0f
+
+        // Parameter Names
+        private const val PARAM_STEP_HEIGHT = "step_height"  // 跨越高度
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_HEIGHT = "height"  // 对应跨越高度
     }
 }

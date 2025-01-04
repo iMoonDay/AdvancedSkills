@@ -8,8 +8,10 @@ class InsightfulEyeSkill : PassiveSkill(
     Settings(
         id = "insightful_eye",
         rarity = SkillRarity.EPIC
-    ), customToggles = true
+    )
 ), FeatureRendererTrigger {
+
+    override fun isCustomToggles(): Boolean = true
 
     override fun shouldRenderFeature(target: PlayerEntity, clientPlayer: PlayerEntity): Boolean =
         clientPlayer.hasEquipped() && clientPlayer.isAvailable() && target != clientPlayer

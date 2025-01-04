@@ -21,9 +21,9 @@ class DisguiseSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings.addParameter(
-            name = "persist_time",
-            baseValue = 30 * 20,
-            enhancementId = "time",
+            name = PARAM_DISGUISE_DURATION,
+            baseValue = DEFAULT_DISGUISE_DURATION,
+            enhancementId = ENHANCEMENT_DURATION,
             value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
@@ -33,7 +33,8 @@ class DisguiseSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("persist_time", player, 30 * 20, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int = 
+        getIntParam(PARAM_DISGUISE_DURATION, player, DEFAULT_DISGUISE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
         super.onStop(player)
@@ -44,7 +45,8 @@ class DisguiseSkill : Skill(
         player.stopAndCooldown()
     }
 
-    override fun isDisguising(player: PlayerEntity): Boolean = player.isUsing() && getDisguisePos(player) != null
+    override fun isDisguising(player: PlayerEntity): Boolean = 
+        player.isUsing() && getDisguisePos(player) != null
 
     fun getDisguisePos(player: PlayerEntity): BlockPos? {
         var pos = player.steppingPos
@@ -57,5 +59,16 @@ class DisguiseSkill : Skill(
         }
         if (world.isAir(pos) || world.getBlockState(pos).block is FluidBlock) return null
         return pos
+    }
+
+    companion object {
+        // Default Values
+        private const val DEFAULT_DISGUISE_DURATION = 30 * 20
+
+        // Parameter Names
+        private const val PARAM_DISGUISE_DURATION = "disguise_duration"  // 伪装时长
+
+        // Enhancement IDs
+        private const val ENHANCEMENT_DURATION = "duration"  // 对应伪装时长
     }
 }
