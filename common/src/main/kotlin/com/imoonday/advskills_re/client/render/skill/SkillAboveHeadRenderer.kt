@@ -7,12 +7,13 @@ import net.minecraft.client.render.*
 import net.minecraft.client.render.entity.*
 import net.minecraft.client.render.entity.feature.*
 import net.minecraft.client.render.entity.model.*
+import net.minecraft.client.util.*
 import net.minecraft.client.util.math.*
 import net.minecraft.entity.player.*
 import net.minecraft.item.*
 import net.minecraft.util.math.*
 
-interface SkillAboveHeadRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill, T : UsingRenderTrigger {
+interface SkillAboveHeadRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill, T : FeatureRendererTrigger {
 
     override fun <E : PlayerEntity, M : EntityModel<E>> render(
         skill: T,
@@ -36,7 +37,7 @@ interface SkillAboveHeadRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill,
         matrices.push()
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180f))
         matrices.translate(-0.5, 0.65, -0.5)
-        val model = context.modelManager.getModel(skill.getRenderModel(player, clientPlayer))
+        val model = context.modelManager.getModel(getRenderModel(skill))
         context.itemRenderer.renderBakedItemQuads(
             matrices,
             provider.getBuffer(TexturedRenderLayers.getEntityTranslucentCull()),
@@ -48,9 +49,14 @@ interface SkillAboveHeadRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill,
         matrices.pop()
     }
 
+    fun getRenderModel(skill: T): ModelIdentifier = skill.modelId
+
     companion object {
 
-        fun <T> create(): SkillAboveHeadRenderer<T> where T : Skill, T : UsingRenderTrigger =
-            object : SkillAboveHeadRenderer<T> {}
+        fun <T> create(model: ModelIdentifier? = null): SkillAboveHeadRenderer<T> where T : Skill, T : FeatureRendererTrigger =
+            object : SkillAboveHeadRenderer<T> {
+
+                override fun getRenderModel(skill: T): ModelIdentifier = model ?: super.getRenderModel(skill)
+            }
     }
 }

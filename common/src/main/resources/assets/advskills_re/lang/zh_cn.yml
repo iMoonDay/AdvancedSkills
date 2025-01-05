@@ -33,7 +33,7 @@ advskills_re:
     failed: '%s 已学习 %s'
     failedSelf: '你已学习 %s'
     invalid: '无法学习 %s'
-    noLearnableSkills: 没有可学习的技能
+    noLearnableSkills: 没有可学习/强化的技能
   forgetSkill:
     message: '遗忘了 %s'
     failed: "%s 未学习 %s"
@@ -52,6 +52,8 @@ advskills_re:
     invalid: '%s 无法应用于 %s'
     allSuccess: '已将 %d 个增幅应用于 %s 的 %s'
     all: '已增幅 %s 的所有技能'
+    new: '%s 获得增幅：%s'
+    upgrade: '%s 的 %s 已升级至 %s 级'
   deEnhanceSkill:
     success: '已去除 %s 的 %s 的 %s'
     failed: '%s 尚未学习 %s'
@@ -265,6 +267,9 @@ advskills_re:
     primary_healing:
       name: 初级治疗术
       description: 瞬间恢复4点血量，然后所有治疗术进入冷却
+    instant_healing:
+      name: 瞬间治疗
+      description: 瞬间恢复6点血量
     intermediate_healing:
       name: 中级治疗术
       description: 瞬间恢复8点血量，然后所有治疗术进入冷却
@@ -366,7 +371,7 @@ advskills_re:
         description: '%s 恢复量'
     mastery:
       name: 技能精通
-      description: 所有技能进入冷却时减少20%时间
+      description: 所有技能进入冷却时减少20%时间，至少剩余1秒
       reduction:
         name: 时间增幅
         description: '%s 减少时间'
@@ -641,6 +646,9 @@ advskills_re:
       range:
         name: 范围增幅
         description: '%s 抓取范围'
+      grab_anything:
+        name: 抓取增幅
+        description: 抓取一切
     reverse_gravity:
       name: 反重力
       description: 颠倒重力

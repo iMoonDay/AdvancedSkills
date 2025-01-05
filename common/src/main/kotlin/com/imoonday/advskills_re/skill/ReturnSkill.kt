@@ -3,7 +3,6 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
-import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
@@ -99,7 +98,7 @@ class ReturnSkill : LongPressSkill(
         }
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
@@ -130,6 +129,7 @@ class ReturnSkill : LongPressSkill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_CHARGE_DURATION = 5 * 20
         private val DEFAULT_RETURN_SOUND = ModSounds.RETURN

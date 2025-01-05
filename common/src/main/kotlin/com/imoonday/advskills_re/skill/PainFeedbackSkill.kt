@@ -31,7 +31,7 @@ class PainFeedbackSkill : PassiveSkill(
 
     override fun postDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
         super.postDamaged(amount, source, player, attacker)
-        if (!player.isAvailable()) return
+        if (!isAvailable(player)) return
 
         if (attacker == null || player.isCooling()) return
         if (amount > 0f) {

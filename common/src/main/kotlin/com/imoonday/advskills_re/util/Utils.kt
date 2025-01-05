@@ -171,6 +171,7 @@ inline fun <reified T : Number> Number.toNumber(): T {
         Long::class -> this.toLong() as T
         Float::class -> this.toFloat() as T
         Double::class -> this.toDouble() as T
+        Number::class -> this as T
         else -> throw IllegalArgumentException("Unsupported type")
     }
 }

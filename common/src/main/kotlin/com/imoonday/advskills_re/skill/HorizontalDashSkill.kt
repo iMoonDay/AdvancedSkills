@@ -35,7 +35,7 @@ class HorizontalDashSkill : Skill(
         user.run {
             stopFallFlying()
             val dashForce = getDoubleParam(PARAM_DASH_FORCE, this, DEFAULT_DASH_FORCE)
-            velocity = rotationVector.withAxis(Direction.Axis.Y, velocity.y).normalize().multiply(dashForce)
+            velocity = horizontalRotationVector.normalize().multiply(dashForce).withAxis(Direction.Axis.Y, velocity.y)
             updateVelocity()
             spawnParticles(ParticleTypes.CLOUD, false, pos, 10, 0.5, 0.0, 0.5, 0.1)
         }
@@ -43,6 +43,7 @@ class HorizontalDashSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_DASH_FORCE = 1.5
         private val DEFAULT_DASH_SOUND = ModSounds.DASH

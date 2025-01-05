@@ -20,8 +20,13 @@ class SkillFruitItem(val rarity: SkillRarity, settings: Settings) : Item(setting
     )
 
     override fun finishUsing(stack: ItemStack, world: World, user: LivingEntity): ItemStack {
-        (user as? ServerPlayerEntity)?.learnRandomly { it.rarity.level <= rarity.level }?.let {
-            if (!it) {
+        if (user is ServerPlayerEntity) {
+            var result = user.learnRandomly { it.rarity.level <= rarity.level }
+            if (!result) {
+                result = user.enhanceRandomly { skill, _ -> skill.rarity.level <= rarity.level }
+            }
+
+            if (!result) {
                 user.sendMessage(translate("learnSkill.noLearnableSkills"), true)
             }
         }

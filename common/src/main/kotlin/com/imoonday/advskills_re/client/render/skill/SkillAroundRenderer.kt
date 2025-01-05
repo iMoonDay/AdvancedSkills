@@ -4,35 +4,30 @@ import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import net.minecraft.client.render.*
-import net.minecraft.client.render.entity.*
-import net.minecraft.client.render.entity.feature.*
-import net.minecraft.client.render.entity.model.*
 import net.minecraft.client.render.model.*
+import net.minecraft.client.util.*
 import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
 import net.minecraft.entity.player.*
 import net.minecraft.item.*
 import net.minecraft.util.math.*
 import kotlin.math.*
 
-interface SkillAroundRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill, T : FeatureRendererTrigger {
+interface SkillAroundRenderer<T> : IPostLivingEntityRenderer<T> where T : Skill, T : RenderPostLivingTrigger {
 
-    override fun <E : PlayerEntity, M : EntityModel<E>> render(
+    override fun render(
         skill: T,
-        matrices: MatrixStack,
-        provider: VertexConsumerProvider,
-        light: Int,
-        player: E,
-        limbAngle: Float,
-        limbDistance: Float,
+        entity: LivingEntity,
+        yaw: Float,
         tickDelta: Float,
-        animationProgress: Float,
-        headYaw: Float,
-        headPitch: Float,
-        renderer: FeatureRendererContext<E, M>,
-        context: EntityRendererFactory.Context
+        matrices: MatrixStack,
+        vertexConsumers: VertexConsumerProvider,
+        light: Int
     ) {
+        val client = client ?: return
+        val player = entity as? PlayerEntity ?: return
         val clientPlayer = clientPlayer ?: return
-        if (!skill.shouldRenderFeature(player, clientPlayer)) return
+        if (!skill.shouldRenderPostLiving(player, clientPlayer)) return
         if (player.isInvisible || player.isInvisibleTo(clientPlayer)) return
 
         val age: Float = player.age + tickDelta
@@ -44,16 +39,18 @@ interface SkillAroundRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill, T 
             matrices.push()
 
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180 + rotateAngleZ * (180f / Math.PI.toFloat())))
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotateAngleY * (180f / Math.PI.toFloat()) + (c * (360f / 4))))
+            matrices.multiply(
+                RotationAxis.POSITIVE_Y.rotationDegrees(rotateAngleY * (180f / Math.PI.toFloat()) + (c * (360f / 4)))
+            )
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotateAngleX * (180f / Math.PI.toFloat())))
             matrices.translate(-0.5, -0.65, -0.5)
 
             matrices.translate(0f, 0f, -0.75f)
-            val model: BakedModel = context.modelManager.getModel(skill.getRenderModel(player, clientPlayer))
+            val model: BakedModel = client.bakedModelManager.getModel(getRenderModel(skill))
             for (dir in Direction.entries) {
-                context.itemRenderer.renderBakedItemQuads(
+                client.itemRenderer.renderBakedItemQuads(
                     matrices,
-                    provider.getBuffer(TexturedRenderLayers.getEntityTranslucentCull()),
+                    vertexConsumers.getBuffer(TexturedRenderLayers.getEntityTranslucentCull()),
                     model.getQuads(null, dir, player.random).ifEmpty {
                         model.getQuads(null, null, player.random)
                     },
@@ -66,9 +63,14 @@ interface SkillAroundRenderer<T> : IPlayerFeatureRenderer<T> where T : Skill, T 
         }
     }
 
+    fun getRenderModel(skill: T): ModelIdentifier = skill.modelId
+
     companion object {
 
-        fun <T> create(): SkillAroundRenderer<T> where T : Skill, T : UsingRenderTrigger =
-            object : SkillAroundRenderer<T> {}
+        fun <T> create(model: ModelIdentifier? = null): SkillAroundRenderer<T> where T : Skill, T : RenderPostLivingTrigger =
+            object : SkillAroundRenderer<T> {
+
+                override fun getRenderModel(skill: T): ModelIdentifier = model ?: super.getRenderModel(skill)
+            }
     }
 }

@@ -1,5 +1,7 @@
 package com.imoonday.advskills_re.command
 
+import com.imoonday.advskills_re.network.*
+import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
 import com.mojang.brigadier.builder.*
@@ -7,6 +9,7 @@ import com.mojang.brigadier.context.*
 import net.minecraft.command.*
 import net.minecraft.server.command.*
 import net.minecraft.server.network.*
+import net.minecraft.text.*
 
 object EnhanceCommand : PlayerCommand("enhance") {
 
@@ -36,7 +39,8 @@ object EnhanceCommand : PlayerCommand("enhance") {
         context: CommandContext<ServerCommandSource>,
         player: ServerPlayerEntity,
     ): Int {
-        player.learnedSkills.forEach { player.enhanceAll(it) }
+        player.learnedSkills.forEach { player.enhanceAll(it, false) }
+        Channels.ENHANCE_SKILL_S2C.sendToPlayer(player, EnhanceSkillS2CPacket(Text.empty()))
         context.sendFeedback("enhanceSkill.all", player.displayName)
         return 1
     }

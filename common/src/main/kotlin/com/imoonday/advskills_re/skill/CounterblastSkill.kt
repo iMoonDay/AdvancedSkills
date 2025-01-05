@@ -51,7 +51,7 @@ class CounterblastSkill : PassiveSkill(
 
     override fun postAttacked(source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
         super.postAttacked(source, player, attacker)
-        if (!player.isAvailable()) return
+        if (!isAvailable(player)) return
 
         if (attacker != null) {
             val data = player.getPersistentData()

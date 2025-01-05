@@ -7,12 +7,17 @@ import dev.architectury.networking.*
 import dev.architectury.utils.*
 import net.minecraft.client.sound.*
 import net.minecraft.network.*
+import net.minecraft.text.*
 
-object EnhanceSkillS2CPacket : NetworkPacket {
+data class EnhanceSkillS2CPacket(
+    val message: Text
+) : NetworkPacket {
 
-    private var lastPlaySoundTime = 0L
+    constructor(buf: PacketByteBuf) : this(buf.readText())
 
-    override fun encode(buf: PacketByteBuf) = Unit
+    override fun encode(buf: PacketByteBuf) {
+        buf.writeText(message)
+    }
 
     override fun apply(context: NetworkManager.PacketContext) {
         if (context.environment != Env.CLIENT) return
@@ -21,6 +26,15 @@ object EnhanceSkillS2CPacket : NetworkPacket {
                 it.soundManager.play(PositionedSoundInstance.master(ModSounds.ENHANCE.get(), 1.0f, 1.0f))
                 lastPlaySoundTime = System.currentTimeMillis()
             }
+
+            if (message.content != TextContent.EMPTY) {
+                it.inGameHud.setOverlayMessage(message, false)
+            }
         }
+    }
+
+    companion object {
+
+        private var lastPlaySoundTime = 0L
     }
 }

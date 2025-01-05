@@ -37,13 +37,14 @@ class InsightfulEyeSkillRenderer : IPlayerFeatureRenderer<InsightfulEyeSkill> {
         val cameraPos = context.renderDispatcher.camera.pos
         if (!player.shouldRender(cameraPos.x, cameraPos.y, cameraPos.z)) return
         if (player.isInvisibleTo(player)) return
+        val size = player.equippedSkills.size
         player.equippedSkills.forEachIndexed { index, equippedSkill ->
             matrices.push()
             matrices.scale(0.5f, 0.5f, 0.5f)
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f))
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f))
             matrices.translate(
-                index - player.equippedSkills.size / 2f + 0.5f,
+                index - size / 2f + 0.5f,
                 if (player.shouldRenderName() && !player.isSneaky) player.nameLabelHeight else player.height,
                 0.0f
             )

@@ -1,9 +1,13 @@
 package com.imoonday.advskills_re.client.render.skill
 
 import com.imoonday.advskills_re.client.*
+import com.imoonday.advskills_re.client.render.skill.SkillRenderer.renderCooldownOverlay
+import com.imoonday.advskills_re.client.render.skill.SkillRenderer.renderIcon
+import com.imoonday.advskills_re.client.render.skill.SkillRenderer.renderProgressBar
 import com.imoonday.advskills_re.client.screen.*
 import com.imoonday.advskills_re.client.screen.SkillWheelScreen.Companion.quickCastSlot
 import com.imoonday.advskills_re.init.*
+import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.blaze3d.systems.*
 import kotlinx.serialization.*
@@ -112,16 +116,23 @@ object SkillSlotRenderer {
         }
     }
 
-    private fun shouldDisplay(player: PlayerEntity): Boolean {
-        return when (config.hideSkillSlots) {
-            HideMode.HIDE -> return false
-            HideMode.SHOW -> return true
-            HideMode.DYNAMICALLY_HIDE ->
-                player.equippedSkills.any { player.isUsing(it) || player.isCooling(it) }
-                    || client?.currentScreen?.let { it is SkillWheelScreen || it is SkillSlotScreen } == true
-                    || System.currentTimeMillis() - lastUseTime < 1000
+    private fun shouldDisplay(player: PlayerEntity): Boolean =
+        when (config.hideSkillSlots) {
+            HideMode.HIDE -> false
+            HideMode.SHOW -> true
+            HideMode.DYNAMICALLY_HIDE -> shouldDisplayDynamically(player)
         }
-    }
+
+    private fun shouldDisplayDynamically(player: PlayerEntity) = ((player.equippedSkills.any {
+        if (player.isCooling(it)) {
+            true
+        } else if (it is PassiveSkill) {
+            !it.isToggleable() && player.isUsing(it)
+        } else {
+            player.isUsing(it)
+        }
+    } || (client?.currentScreen?.let { it is SkillWheelScreen || it is SkillSlotScreen } == true)
+        || ((System.currentTimeMillis() - lastUseTime) < 1000)))
 
     private fun getMaxXOffset(layout: Array<IntArray>): Int {
         val direction = config.dynamicallyHideDirection
@@ -203,45 +214,45 @@ object SkillSlotRenderer {
 
         val slotSize = 22
         val (x, y) = config.selectedSlotPosition.getPosition(
-            player,
-            context.scaledWindowWidth,
-            context.scaledWindowHeight,
-            slotSize, slotSize
+            player, context.scaledWindowWidth, context.scaledWindowHeight, slotSize, slotSize
         )
         val skill = quickCastSlot?.let { player.getSkill(it) } ?: Skills.EMPTY
 
-        renderSelectedSlot(context, x, y)
-        SkillRenderer.render(skill, context, x + 3, y + 3, player, 0, belowCrosshair)
+        renderSelectedSlot(context, x, y) { iconX, iconY ->
+            val endY = iconY + 16
+
+            renderIcon(skill, context, iconX, iconY, player)
+            if (!belowCrosshair) {
+                renderProgressBar(skill, context, iconX, endY - 1, 16, 2, player)
+            }
+            renderCooldownOverlay(skill, context, iconX - 1, endY + 1, 18, 18, player)
+        }
 
         if (config.displayQuickCastKey) {
             val text = "[".toText().append(ModKeyBindings.QUICK_CAST.boundKeyLocalizedText).append("]")
             val textRenderer = client!!.textRenderer
-            context.drawCenteredTextWithShadow(
-                textRenderer,
-                text,
-                x + 11,
-                y - textRenderer.fontHeight,
-                0xFFFFFF
-            )
+            context.drawCenteredTextWithShadow(textRenderer, text, x + 11, y - textRenderer.fontHeight, 0xFFFFFF)
         }
 
         if (belowCrosshair) {
-            SkillRenderer.renderProgressBar(
-                skill,
-                context,
-                context.scaledWindowWidth / 2 - 8,
-                context.scaledWindowHeight / 2 + 16 + config.progressBarOffsetY,
-                16,
-                1,
-                player
+            renderProgressBar(
+                skill, context, context.scaledWindowWidth / 2 - 8,
+                context.scaledWindowHeight / 2 + 16 + config.progressBarOffsetY, 16, 1, player
             )
         }
     }
 
     @JvmStatic
-    fun renderSelectedSlot(context: DrawContext, x: Int, y: Int) {
+    fun renderSelectedSlot(
+        context: DrawContext,
+        x: Int,
+        y: Int,
+        renderBelowOutline: (iconX: Int, iconY: Int) -> Unit = { _, _ -> }
+    ) {
         RenderSystem.enableBlend()
-        context.drawTexture(slotsTexture, x, y, 22, 64, 22, 22)
+        context.drawTexture(slotsTexture, x, y, 22, 144, 22, 22)
+        renderBelowOutline(x + 3, y + 3)
+        context.drawTexture(slotsTexture, x, y, 0, 144, 22, 22)
         RenderSystem.disableBlend()
     }
 

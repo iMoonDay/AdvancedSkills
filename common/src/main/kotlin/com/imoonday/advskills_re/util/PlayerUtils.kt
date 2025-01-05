@@ -23,9 +23,11 @@ import net.minecraft.particle.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 import net.minecraft.text.*
+import net.minecraft.util.*
 import net.minecraft.util.hit.*
 import net.minecraft.util.math.*
 import net.minecraft.world.*
+import kotlin.Pair
 import kotlin.math.*
 
 object PlayerUtils {
@@ -205,6 +207,14 @@ fun PlayerEntity.learnRandomly(filter: (Skill) -> Boolean = { true }): Boolean =
         .takeUnless { it.isEmpty() }
         ?.let { learn(it) } ?: false
 
+fun PlayerEntity.enhanceRandomly(filter: (Skill, Enhancement) -> Boolean = { _, _ -> true }): Boolean =
+    learnedSkills.flatMap { skill ->
+        skill.getAvailableEnhancements()
+            .filter { getEnhancementLvl(skill, it.id) < it.maxLevel }
+            .map { skill to it }
+            .filter { filter(it.first, it.second) }
+    }.randomOrNull()?.let { enhance(it.first, it.second.id) } ?: false
+
 val PlayerEntity.choiceData: ChoiceData
     get() = data.choiceData
 
@@ -264,29 +274,37 @@ private fun ServerPlayerEntity.choose(index: Int): Boolean {
 }
 
 fun PlayerEntity.enhance(skill: Skill, id: String, level: Int? = null): Boolean {
-    if (!skill.hasEnhancement(id)) return false
+    val enhancement = skill.getEnhancement(id) ?: return false
 
-    getData(skill)?.run {
-        val newEnhance = enhancements[id] == null
-        getOrCreateEnhancementData(id, level).apply {
+    getData(skill)?.let {
+        val newEnhance = it.enhancements[id] == null
+        val newLevel = it.getOrCreateEnhancementData(id, level).run {
             maxLevel = level ?: if (newEnhance) maxLevel else maxLevel + 1
+            maxLevel
+        }
+
+        if (this is ServerPlayerEntity) {
+            val enhancementName = enhancement.name.copy().formatted(Formatting.GREEN)
+            val message = if (newEnhance) translate("enhanceSkill.new", skill.formattedName, enhancementName)
+            else translate(
+                "enhanceSkill.upgrade", skill.formattedName, enhancementName,
+                newLevel.toString().toText().formatted(Formatting.AQUA)
+            )
+            Channels.ENHANCE_SKILL_S2C.sendToPlayer(this, EnhanceSkillS2CPacket(message))
         }
     } ?: return false
 
-    if (this is ServerPlayerEntity) {
-        Channels.ENHANCE_SKILL_S2C.sendToPlayer(this, EnhanceSkillS2CPacket)
-    }
     syncData()
     return true
 }
 
-fun PlayerEntity.enhanceAll(skill: Skill): Boolean = getData(skill)?.run {
+fun PlayerEntity.enhanceAll(skill: Skill, sendPacket: Boolean = true): Boolean = getData(skill)?.run {
     skill.getAvailableEnhancements().forEach {
         getOrCreateEnhancementData(it.id, it.maxLevel).maxLevel = it.maxLevel
     }
 
-    if (this@enhanceAll is ServerPlayerEntity) {
-        Channels.ENHANCE_SKILL_S2C.sendToPlayer(this@enhanceAll, EnhanceSkillS2CPacket)
+    if (this@enhanceAll is ServerPlayerEntity && sendPacket) {
+        Channels.ENHANCE_SKILL_S2C.sendToPlayer(this@enhanceAll, EnhanceSkillS2CPacket(Text.empty()))
     }
     syncData()
     true

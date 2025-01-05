@@ -30,6 +30,7 @@ class DoubleJumpSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             stopFallFlying()
+            fallDistance = 0.0f
             jump()
             val power = getDoubleParam(PARAM_JUMP_FORCE, user, DEFAULT_JUMP_FORCE)
             velocity = velocity.multiply(1.0, power, 1.0)

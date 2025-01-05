@@ -69,7 +69,7 @@ class BloodSealSkill : LongPressSkill(
             )
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_CHARGE_TIME, player, DEFAULT_CHARGE_TIME, 0)
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
@@ -136,7 +136,11 @@ class BloodSealSkill : LongPressSkill(
         return clientPlayer.raycastLivingEntity(clientPlayer.getRaycastDistance())?.entity == entity
     }
 
+    override fun shouldRenderPostLiving(living: LivingEntity, player: PlayerEntity): Boolean =
+        super<TargetRenderTrigger>.shouldRenderPostLiving(living, player)
+
     companion object {
+
         // Default Values
         private const val DEFAULT_CHARGE_TIME = 5 * 20
         private const val DEFAULT_MOVEMENT_PENALTY = 0.25

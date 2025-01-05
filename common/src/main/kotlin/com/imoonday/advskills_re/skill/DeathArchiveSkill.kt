@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
+import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import com.imoonday.advskills_re.util.UseResult.Companion.consume
 import com.imoonday.advskills_re.util.UseResult.Companion.fail
@@ -21,7 +22,7 @@ class DeathArchiveSkill : Skill(
         cooldown = 300,
         rarity = SkillRarity.UNIQUE
     )
-), UsingProgressTrigger, DeathTrigger, DamageTrigger, TickTrigger, UnequipTrigger {
+), UsingProgressTrigger, DeathTrigger, DamageTrigger, TickTrigger, UnequipTrigger, UsingRenderTrigger {
 
     override fun initDefaultSettings(settings: Settings) {
         settings
@@ -91,7 +92,7 @@ class DeathArchiveSkill : Skill(
         attacker: Entity?
     ): Boolean = player.isUsing() && player.isInInvulnerableState()
 
-    private fun PlayerEntity.isInInvulnerableState(): Boolean = 
+    private fun PlayerEntity.isInInvulnerableState(): Boolean =
         getActiveData().getBoolean(NBT_INVULNERABLE_STATE)
 
     override fun getProgress(player: PlayerEntity): Double =
@@ -112,7 +113,11 @@ class DeathArchiveSkill : Skill(
         }
     }
 
+    override fun shouldRenderFeature(target: PlayerEntity, clientPlayer: PlayerEntity): Boolean =
+        super.shouldRenderFeature(target, clientPlayer) && target.isInInvulnerableState()
+
     companion object {
+
         // NBT Keys
         private const val NBT_INVULNERABLE_STATE = "Invulnerable"
 

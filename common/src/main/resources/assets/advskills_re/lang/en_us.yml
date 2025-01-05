@@ -33,7 +33,7 @@ advskills_re:
     failed: '%s already know %s'
     failedSelf: 'You already know %s'
     invalid: 'Unable to learn %s'
-    noLearnableSkills: No skills to learn
+    noLearnableSkills: No skills to learn/enhance
   forgetSkill:
     message: 'Forgotten %s'
     failed: "%s don't know %s"
@@ -50,8 +50,10 @@ advskills_re:
     failed: '%s has not yet learned %s'
     unknown: 'Unknown enhancement type: %s'
     invalid: '%s cannot be applied to %s'
-    allSuccess: 'The %d enhancements has been applied to %3$s of %2$s'
+    allSuccess: 'The %d enhancements have been applied to %3$s of %2$s'
     all: 'All skills of %s have been enhanced'
+    new: '%s has obtained a enhancement: %s'
+    upgrade: '%2$s of %1$s has been upgraded to %s'
   deEnhanceSkill:
     success: '%2$s of %1$s removed'
     failed: '%s has not yet learned %s'
@@ -265,6 +267,9 @@ advskills_re:
     primary_healing:
       name: Primary Healing
       description: Instantly heals 4 HP, and then all healing skills enter cooldown
+    instant_healing:
+      name: Instant Healing
+      description: Instantly heals 6 HP
     intermediate_healing:
       name: Intermediate Healing
       description: Instantly heals 8 HP, and then all healing skills enter cooldown
@@ -366,7 +371,7 @@ advskills_re:
         description: '%s Recovery Amount'
     mastery:
       name: Mastery
-      description: Reduce the cooldown time of all skills by 20%
+      description: Reduces the duration of all skills on cooldown by 20% for at least 1 second remaining
       reduction:
         name: Time Enhancement
         description: '%s Time Reduction'
@@ -641,6 +646,9 @@ advskills_re:
       range:
         name: Range Enhancement
         description: '%s Grab Range'
+      grab_anything:
+        name: Grabbing Enhancement
+        description: Grab Everything
     reverse_gravity:
       name: Reverse Gravity
       description: Invert gravity

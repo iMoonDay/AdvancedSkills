@@ -36,12 +36,18 @@ class GrapplingHookSkill : LongPressSkill(
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.FLOAT
+        ).addParameter(
+            name = PARAM_GRAB_ANYTHING,
+            baseValue = DEFAULT_GRAB_ANYTHING,
+            enhancementId = ENHANCEMENT_GRAB_ANYTHING
         )
     }
 
     override fun onPress(player: ServerPlayerEntity): UseResult {
-        val raycast = player.raycastBlock(getMaxDistance(player))
-        return if (raycast.type == HitResult.Type.BLOCK) {
+        val grabAnything = getBooleanParam(PARAM_GRAB_ANYTHING, player, DEFAULT_GRAB_ANYTHING)
+        val raycast = if (grabAnything) player.raycastLivingEntity(getMaxDistance(player))
+            ?: player.raycastBlock(getMaxDistance(player)) else player.raycastBlock(getMaxDistance(player))
+        return if (grabAnything || raycast.type != HitResult.Type.MISS) {
             UseResult.startUsing(player, this, NbtUtils.writeVec3dToTag(raycast.pos))
         } else {
             UseResult.fail(failedMessage())
@@ -57,7 +63,7 @@ class GrapplingHookSkill : LongPressSkill(
         if (player.isUsing()) {
             player.fallDistance = 0f
             player.stopFallFlying()
-            NbtUtils.readVec3d(player.getActiveData())?.run {
+            getGrabbedPos(player)?.run {
                 val pos = player.pos
                 val distance = distanceTo(pos)
                 if (player.blockPos.down() == toBlockPos()
@@ -80,27 +86,35 @@ class GrapplingHookSkill : LongPressSkill(
         super.tick(player, usedTime)
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    fun getGrabbedPos(player: PlayerEntity) = NbtUtils.readVec3d(player.getActiveData())
+
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_HOOK_DURATION, player, DEFAULT_HOOK_DURATION, 0)
 
     override fun getCrosshair(player: PlayerEntity): Crosshair =
-        if (player.isReady() && player.raycastBlock(getMaxDistance(player)).type == HitResult.Type.BLOCK)
-            Crosshairs.RING else Crosshairs.NONE
+        if (player.isReady()
+            && (getBooleanParam(PARAM_GRAB_ANYTHING, player, DEFAULT_GRAB_ANYTHING)
+                || player.raycastBlock(getMaxDistance(player)).type != HitResult.Type.MISS)
+        ) Crosshairs.RING else Crosshairs.NONE
 
-    private fun getMaxDistance(player: PlayerEntity) = 
+    private fun getMaxDistance(player: PlayerEntity) =
         getDoubleParam(PARAM_HOOK_RANGE, player, DEFAULT_HOOK_RANGE)
 
     companion object {
+
         // Default Values
         private const val DEFAULT_HOOK_DURATION = 3 * 20
         private const val DEFAULT_HOOK_RANGE = 30.0
+        private const val DEFAULT_GRAB_ANYTHING = false
 
         // Parameter Names
         private const val PARAM_HOOK_DURATION = "hook_duration"  // 钩爪持续时间
         private const val PARAM_HOOK_RANGE = "hook_range"  // 钩爪范围
+        private const val PARAM_GRAB_ANYTHING = "grab_anything"  // 是否可以抓取任何东西
 
         // Enhancement IDs
         private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
         private const val ENHANCEMENT_RANGE = "range"  // 对应钩爪范围
+        private const val ENHANCEMENT_GRAB_ANYTHING = "grab_anything"  // 对应是否可以抓取任何东西
     }
 }

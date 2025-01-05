@@ -5,10 +5,8 @@ import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.render.*
-import net.minecraft.client.render.entity.*
-import net.minecraft.client.render.entity.feature.*
-import net.minecraft.client.render.entity.model.*
 import net.minecraft.client.util.math.*
+import net.minecraft.entity.*
 import net.minecraft.entity.player.*
 import net.minecraft.util.math.*
 import net.minecraft.world.*
@@ -16,24 +14,22 @@ import org.joml.*
 import java.lang.Math
 import kotlin.math.*
 
-class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>, IPlayerFeatureRenderer<GrapplingHookSkill>,
-    IWorldRenderer<GrapplingHookSkill> {
+class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>,
+    IPostLivingEntityRenderer<GrapplingHookSkill>, IWorldRenderer<GrapplingHookSkill> {
 
-    override fun <P : PlayerEntity, M : EntityModel<P>> render(
+    override fun render(
         skill: GrapplingHookSkill,
-        matrices: MatrixStack,
-        provider: VertexConsumerProvider,
-        light: Int,
-        player: P,
-        limbAngle: Float,
-        limbDistance: Float,
+        entity: LivingEntity,
+        yaw: Float,
         tickDelta: Float,
-        animationProgress: Float,
-        headYaw: Float,
-        headPitch: Float,
-        renderer: FeatureRendererContext<P, M>,
-        context: EntityRendererFactory.Context
-    ) = renderHook(skill, player, matrices, tickDelta, provider)
+        matrices: MatrixStack,
+        vertexConsumers: VertexConsumerProvider,
+        light: Int
+    ) {
+        if (entity !is PlayerEntity) return
+
+        renderHook(skill, entity, matrices, tickDelta, vertexConsumers, false)
+    }
 
     private fun renderHook(
         skill: GrapplingHookSkill,
@@ -41,13 +37,11 @@ class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>, IPlaye
         matrices: MatrixStack,
         tickDelta: Float,
         provider: VertexConsumerProvider,
-        thirdPerson: Boolean = true,
+        firstPerson: Boolean
     ) {
         if (!player.isUsing(skill)) return
-        val data = player.getActiveData(skill) ?: return
-        val pos = NbtUtils.readVec3d(data) ?: return
+        val pos = skill.getGrabbedPos(player) ?: return
 
-        if (thirdPerson) matrices.pop()
         matrices.push()
         val rotationAngle = (MathHelper.lerp(
             tickDelta,
@@ -61,7 +55,8 @@ class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>, IPlaye
         val entityPosYAdjusted = MathHelper.lerp(tickDelta.toDouble(), player.prevY, player.y) + leashOffset.y
         val entityPosZAdjusted = MathHelper.lerp(tickDelta.toDouble(), player.prevZ, player.z) + entityPosY
 
-        matrices.translate(entityPosX, if (thirdPerson) leashOffset.y else -0.5, entityPosY)
+        if (!firstPerson) matrices.scale(-1f, -1f, 1f)
+        matrices.translate(entityPosX, -0.5, entityPosY)
         val leashLengthX = (pos.x - entityPosZ).toFloat()
         val leashLengthY = (pos.y - entityPosYAdjusted).toFloat()
         val leashLengthZ = (pos.z - entityPosZAdjusted).toFloat()
@@ -122,7 +117,6 @@ class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>, IPlaye
         }
 
         matrices.pop()
-        if (thirdPerson) matrices.push()
     }
 
     private fun renderLeashPiece(
@@ -161,14 +155,7 @@ class GrapplingHookSkillRenderer : CrosshairRenderer<GrapplingHookSkill>, IPlaye
         val player = context.gameRenderer().client.player ?: return
         if (camera.focusedEntity != player) return
         context.consumers()?.let {
-            renderHook(
-                skill,
-                player,
-                context.matrixStack(),
-                context.tickDelta(),
-                it,
-                false
-            )
+            renderHook(skill, player, context.matrixStack(), context.tickDelta(), it, true)
         }
     }
 }

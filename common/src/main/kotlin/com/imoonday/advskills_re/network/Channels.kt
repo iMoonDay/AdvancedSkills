@@ -65,7 +65,7 @@ object Channels {
         SYNC_PLAYER_DATA_S2C.register(::SyncPlayerDataS2CPacket)
         REQUEST_SYNC_COMPONENT_C2S.register(::RequestSyncComponentC2SRequest)
         UPDATE_ORE_CACHE_S2C.register(::UpdateOreCacheS2CPacket)
-        ENHANCE_SKILL_S2C.register { EnhanceSkillS2CPacket }
+        ENHANCE_SKILL_S2C.register(::EnhanceSkillS2CPacket)
         UPDATE_JUMPING_C2S.register(::UpdateJumpingC2SPacket)
         SYNC_RARITIES_S2C.register(::SyncRaritiesS2CPacket)
         SYNC_SETTINGS_S2C.register(::SyncSettingsS2CPacket)

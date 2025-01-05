@@ -29,7 +29,7 @@ class AutomaticUphillSkill : PassiveSkill(
     override fun isToggleable(): Boolean = true
 
     override fun getStepHeight(player: PlayerEntity): Float? {
-        if (!player.isAvailable()) return null
+        if (!isAvailable(player)) return null
         return getFloatParam(PARAM_STEP_HEIGHT, player, DEFAULT_STEP_HEIGHT)
     }
 

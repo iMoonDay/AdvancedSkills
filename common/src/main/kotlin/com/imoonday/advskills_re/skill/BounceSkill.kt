@@ -99,9 +99,6 @@ abstract class BounceSkill(settings: Settings) : Skill(settings), DamageTrigger,
         }
     }
 
-    override fun getRenderModel(target: PlayerEntity, clientPlayer: PlayerEntity): ModelIdentifier =
-        Skills.ABSOLUTE_DEFENSE.modelId
-
     companion object {
 
         // Default Values

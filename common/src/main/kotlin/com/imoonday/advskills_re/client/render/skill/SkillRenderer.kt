@@ -105,6 +105,7 @@ object SkillRenderer {
         width: Int,
         maxHeight: Int,
         player: PlayerEntity,
+        textYOffset: Int = 0
     ) {
         if (!player.isCooling(skill)) return
         val cooldown = player.getCooldown(skill)
@@ -121,10 +122,10 @@ object SkillRenderer {
             context.matrices.push()
             context.matrices.translate(
                 startX + (width - textRenderer.getWidth(time)) / 2.0 + 0.5,
-                endY - width / 2.0 + 1,
+                endY - textRenderer.fontHeight + 1.0,
                 0.0
             )
-            context.drawText(textRenderer, time, 0, 0, 0xFFFFFF, false)
+            context.drawText(textRenderer, time, 0, textYOffset, 0xFFFFFF, false)
             context.matrices.pop()
         }
     }

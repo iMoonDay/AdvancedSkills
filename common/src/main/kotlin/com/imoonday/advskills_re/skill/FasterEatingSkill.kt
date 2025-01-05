@@ -29,7 +29,7 @@ class FasterEatingSkill : PassiveSkill(
     override fun isCustomToggles(): Boolean = true
 
     override fun getItemMaxUseTimeMultiplier(player: PlayerEntity, stack: ItemStack): Float {
-        if (!player.isAvailable()) return 0f
+        if (!isAvailable(player)) return 0f
 
         val useAction = stack.item.getUseAction(stack)
         if (!(stack.isFood

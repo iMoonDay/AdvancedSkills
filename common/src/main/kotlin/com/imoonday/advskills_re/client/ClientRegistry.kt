@@ -91,7 +91,6 @@ object ClientRegistry {
             SkillRendererHandler.renderCrosshair(context)
         }
         LivingEntityFeatureRenderEvent.EVENT.register { _, renderer, helper, context ->
-            helper.register(StatusEffectLayer(renderer, context))
             helper.register(IceLayer(renderer, context))
             if (renderer is PlayerEntityRenderer) {
                 SkillRendererHandler.forEachPlayerFeatureRenderer { skill, featureRenderer ->

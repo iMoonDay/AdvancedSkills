@@ -13,289 +13,293 @@ import org.slf4j.*
 object Skills {
 
     private val LOGGER: Logger = LogUtils.getLogger()
+    private val factories = mutableMapOf<Identifier, () -> Skill>()
     private val skills = linkedMapOf<Identifier, Skill>()
 
     @JvmField
-    val EMPTY = register(EmptySkill())
+    val EMPTY = register { EmptySkill }
 
     @JvmField
-    val FIREBALL = register(FireballSkill())
+    val FIREBALL = register(::FireballSkill)
 
     @JvmField
-    val HORIZONTAL_DASH = register(HorizontalDashSkill())
+    val HORIZONTAL_DASH = register(::HorizontalDashSkill)
 
     @JvmField
-    val TELEPORT = register(TeleportSkill())
+    val TELEPORT = register(::TeleportSkill)
 
     @JvmField
-    val JUMP = register(JumpSkill())
+    val JUMP = register(::JumpSkill)
 
     @JvmField
-    val SUPER_JUMP = register(DoubleJumpSkill())
+    val SUPER_JUMP = register(::DoubleJumpSkill)
 
     @JvmField
-    val TRIPLE_JUMP = register(TripleJumpSkill())
+    val TRIPLE_JUMP = register(::TripleJumpSkill)
 
     @JvmField
-    val DASH = register(DashSkill())
+    val DASH = register(::DashSkill)
 
     @JvmField
-    val GROUND_WHACK = register(GroundWhackSkill())
+    val GROUND_WHACK = register(::GroundWhackSkill)
 
     @JvmField
-    val ABSOLUTE_DEFENSE = register(AbsoluteDefenseSkill())
+    val ABSOLUTE_DEFENSE = register(::AbsoluteDefenseSkill)
 
     @JvmField
-    val EXTREME_BOUNCE = register(ExtremeBounceSkill())
+    val EXTREME_BOUNCE = register(::ExtremeBounceSkill)
 
     @JvmField
-    val RAPID_BOUNCE = register(RapidBounceSkill())
+    val RAPID_BOUNCE = register(::RapidBounceSkill)
 
     @JvmField
-    val PERFECT_BOUNCE = register(PerfectBounceSkill())
+    val PERFECT_BOUNCE = register(::PerfectBounceSkill)
 
     @JvmField
-    val MICRO_BOUNCE = register(MicroBounceSkill())
+    val MICRO_BOUNCE = register(::MicroBounceSkill)
 
     @JvmField
-    val WALL_CLIMBING = register(WallClimbingSkill())
+    val WALL_CLIMBING = register(::WallClimbingSkill)
 
     @JvmField
-    val PIERCING = register(PiercingSkill())
+    val PIERCING = register(::PiercingSkill)
 
     @JvmField
-    val PRIMARY_HEALING = register(PrimaryHealingSkill())
+    val PRIMARY_HEALING = register(::PrimaryHealingSkill)
 
     @JvmField
-    val INTERMEDIATE_HEALING = register(IntermediateHealingSkill())
+    val INSTANT_HEALING = register(::InstantHealingSkill)
 
     @JvmField
-    val ADVANCED_HEALING = register(AdvancedHealingSkill())
+    val INTERMEDIATE_HEALING = register(::IntermediateHealingSkill)
 
     @JvmField
-    val TOP_HEALING = register(TopHealingSkill())
+    val ADVANCED_HEALING = register(::AdvancedHealingSkill)
 
     @JvmField
-    val EXTREME_EVASION = register(ExtremeEvasionSkill())
+    val TOP_HEALING = register(::TopHealingSkill)
 
     @JvmField
-    val SELF_HEALING = register(SelfHealingSkill())
+    val EXTREME_EVASION = register(::ExtremeEvasionSkill)
 
     @JvmField
-    val STRONG_PHYSIQUE = register(StrongPhysiqueSkill())
+    val SELF_HEALING = register(::SelfHealingSkill)
 
     @JvmField
-    val AGILITY = register(AgilitySkill())
+    val STRONG_PHYSIQUE = register(::StrongPhysiqueSkill)
 
     @JvmField
-    val RESURRECTION = register(ResuscitationSkill())
+    val AGILITY = register(::AgilitySkill)
 
     @JvmField
-    val DYING_COUNTERATTACK = register(DyingCounterattackSkill())
+    val RESURRECTION = register(::ResuscitationSkill)
 
     @JvmField
-    val DISARM = register(DisarmSkill())
+    val DYING_COUNTERATTACK = register(::DyingCounterattackSkill)
 
     @JvmField
-    val PRIMARY_SILENCE = register(PrimarySilenceSkill())
+    val DISARM = register(::DisarmSkill)
 
     @JvmField
-    val LAST_DITCH_EFFORT = register(LastDitchEffortSkill())
+    val PRIMARY_SILENCE = register(::PrimarySilenceSkill)
 
     @JvmField
-    val MASTERY = register(MasterySkill())
+    val LAST_DITCH_EFFORT = register(::LastDitchEffortSkill)
 
     @JvmField
-    val PRIMARY_PURIFICATION = register(PrimaryPurificationSkill())
+    val MASTERY = register(::MasterySkill)
 
     @JvmField
-    val ADVANCED_PURIFICATION = register(AdvancedPurificationSkill())
+    val PRIMARY_PURIFICATION = register(::PrimaryPurificationSkill)
 
     @JvmField
-    val ABSOLUTE_DOMAIN = register(AbsoluteDomainSkill())
+    val ADVANCED_PURIFICATION = register(::AdvancedPurificationSkill)
 
     @JvmField
-    val CHARGED_SWEEP = register(ChargedSweepSkill())
+    val ABSOLUTE_DOMAIN = register(::AbsoluteDomainSkill)
 
     @JvmField
-    val ACTIVE_DEFENSE = register(ActiveDefenseSkill())
+    val CHARGED_SWEEP = register(::ChargedSweepSkill)
 
     @JvmField
-    val SELF_REPAIR = register(SelfRepairSkill())
+    val ACTIVE_DEFENSE = register(::ActiveDefenseSkill)
 
     @JvmField
-    val INSTANT_EXPLOSIVE = register(InstantExplosiveSkill())
+    val SELF_REPAIR = register(::SelfRepairSkill)
 
     @JvmField
-    val PRIMARY_FREEZE = register(PrimaryFreezeSkill())
+    val INSTANT_EXPLOSIVE = register(::InstantExplosiveSkill)
 
     @JvmField
-    val PRIMARY_SLOWNESS = register(PrimarySlownessSkill())
+    val PRIMARY_FREEZE = register(::PrimaryFreezeSkill)
 
     @JvmField
-    val PRIMARY_CONFINEMENT = register(PrimaryConfinementSkill())
+    val PRIMARY_SLOWNESS = register(::PrimarySlownessSkill)
 
     @JvmField
-    val EXCLUSIVE_MOUNT = register(ExclusiveMountSkill())
+    val PRIMARY_CONFINEMENT = register(::PrimaryConfinementSkill)
 
     @JvmField
-    val NIGHT_VISION = register(NightVisionSkill())
+    val EXCLUSIVE_MOUNT = register(::ExclusiveMountSkill)
 
     @JvmField
-    val UNDEAD_SUMMONING = register(UndeadSummoningSkill())
+    val NIGHT_VISION = register(::NightVisionSkill)
 
     @JvmField
-    val TAUNT = register(TauntSkill())
+    val UNDEAD_SUMMONING = register(::UndeadSummoningSkill)
 
     @JvmField
-    val LIQUID_SHIELD = register(LiquidShieldSkill())
+    val TAUNT = register(::TauntSkill)
 
     @JvmField
-    val WATER_WALKER = register(WaterWalkerSkill())
+    val LIQUID_SHIELD = register(::LiquidShieldSkill)
 
     @JvmField
-    val AUTOMATIC_UPHILL = register(AutomaticUphillSkill())
+    val WATER_WALKER = register(::WaterWalkerSkill)
 
     @JvmField
-    val WATER_BREATHING = register(WaterBreathingSkill())
+    val AUTOMATIC_UPHILL = register(::AutomaticUphillSkill)
 
     @JvmField
-    val STATIC_INVISIBILITY = register(StaticInvisibilitySkill())
+    val WATER_BREATHING = register(::WaterBreathingSkill)
 
     @JvmField
-    val FASTER_EATING = register(FasterEatingSkill())
+    val STATIC_INVISIBILITY = register(::StaticInvisibilitySkill)
 
     @JvmField
-    val DANGER_PERCEPTION = register(DangerPerceptionSkill())
+    val FASTER_EATING = register(::FasterEatingSkill)
 
     @JvmField
-    val RISING_SHOCK = register(RisingShockSkill())
+    val DANGER_PERCEPTION = register(::DangerPerceptionSkill)
 
     @JvmField
-    val CATAPULT_GLIDING = register(CatapultGlidingSkill())
+    val RISING_SHOCK = register(::RisingShockSkill)
 
     @JvmField
-    val CHARGED_DASH = register(ChargedDashSkill())
+    val CATAPULT_GLIDING = register(::CatapultGlidingSkill)
 
     @JvmField
-    val LASER_EYE = register(LaserEyeSkill())
+    val CHARGED_DASH = register(::ChargedDashSkill)
 
     @JvmField
-    val METEOR_SHOWER = register(MeteorShowerSkill())
+    val LASER_EYE = register(::LaserEyeSkill)
 
     @JvmField
-    val NEGATIVE_RESISTANCE = register(NegativeResistanceSkill())
+    val METEOR_SHOWER = register(::MeteorShowerSkill)
 
     @JvmField
-    val INSIGHTFUL_EYE = register(InsightfulEyeSkill())
+    val NEGATIVE_RESISTANCE = register(::NegativeResistanceSkill)
 
     @JvmField
-    val ITEM_ATTRACTION = register(ItemAttractionSkill())
+    val INSIGHTFUL_EYE = register(::InsightfulEyeSkill)
 
     @JvmField
-    val DOPING = register(DopingSkill())
+    val ITEM_ATTRACTION = register(::ItemAttractionSkill)
 
     @JvmField
-    val GRAPPLING_HOOK = register(GrapplingHookSkill())
+    val DOPING = register(::DopingSkill)
 
     @JvmField
-    val REVERSE_GRAVITY = register(ReverseGravitySkill())
+    val GRAPPLING_HOOK = register(::GrapplingHookSkill)
 
     @JvmField
-    val ORE_PERCEPTION = register(OrePerceptionSkill())
+    val REVERSE_GRAVITY = register(::ReverseGravitySkill)
 
     @JvmField
-    val INVISIBLE_TRAP = register(InvisibleTrapSkill())
+    val ORE_PERCEPTION = register(::OrePerceptionSkill)
 
     @JvmField
-    val FROST_TRAP = register(FrostTrapSkill())
+    val INVISIBLE_TRAP = register(::InvisibleTrapSkill)
 
     @JvmField
-    val TEMPORARY_SHIELD = register(TemporaryShieldSkill())
+    val FROST_TRAP = register(::FrostTrapSkill)
 
     @JvmField
-    val PAIN_FEEDBACK = register(PainFeedbackSkill())
+    val TEMPORARY_SHIELD = register(::TemporaryShieldSkill)
 
     @JvmField
-    val THUNDER_FURY = register(ThunderFurySkill())
+    val PAIN_FEEDBACK = register(::PainFeedbackSkill)
 
     @JvmField
-    val COUNTERBLAST = register(CounterblastSkill())
+    val THUNDER_FURY = register(::ThunderFurySkill)
 
     @JvmField
-    val TIME_REWIND = register(TimeRewindSkill())
+    val COUNTERBLAST = register(::CounterblastSkill)
 
     @JvmField
-    val LIVING_DETECTION = register(LivingDetectionSkill())
+    val TIME_REWIND = register(::TimeRewindSkill)
 
     @JvmField
-    val BLOOD_SEAL = register(BloodSealSkill())
+    val LIVING_DETECTION = register(::LivingDetectionSkill)
 
     @JvmField
-    val SWORD_SOUL_GUARDING = register(SwordSoulGuardingSkill())
+    val BLOOD_SEAL = register(::BloodSealSkill)
 
     @JvmField
-    val WIND_BLADE = register(WindBladeSkill())
+    val SWORD_SOUL_GUARDING = register(::SwordSoulGuardingSkill)
 
     @JvmField
-    val BIOLOGICAL_HOOK = register(BiologicalHookSkill())
+    val WIND_BLADE = register(::WindBladeSkill)
 
     @JvmField
-    val DUPLICATION = register(DuplicationSkill())
+    val BIOLOGICAL_HOOK = register(::BiologicalHookSkill)
 
     @JvmField
-    val MAGNETIC_TRAP = register(MagneticTrapSkill())
+    val DUPLICATION = register(::DuplicationSkill)
 
     @JvmField
-    val MULTIPLE_LASER = register(MultipleLaserSkill())
+    val MAGNETIC_TRAP = register(::MagneticTrapSkill)
 
     @JvmField
-    val SUPER_SHADOW_CLONE = register(SuperShadowCloneSkill())
+    val MULTIPLE_LASER = register(::MultipleLaserSkill)
 
     @JvmField
-    val ARROW_RAIN = register(ArrowRainSkill())
+    val SUPER_SHADOW_CLONE = register(::SuperShadowCloneSkill)
 
     @JvmField
-    val WEED_CLEANER = register(WeedCleanerSkill())
+    val ARROW_RAIN = register(::ArrowRainSkill)
 
     @JvmField
-    val UNHINDERED_STRIDE = register(UnhinderedStrideSkill())
+    val WEED_CLEANER = register(::WeedCleanerSkill)
 
     @JvmField
-    val DAMAGE_ABSORPTION = register(DamageAbsorptionSkill())
+    val UNHINDERED_STRIDE = register(::UnhinderedStrideSkill)
 
     @JvmField
-    val DISGUISE = register(DisguiseSkill())
+    val DAMAGE_ABSORPTION = register(::DamageAbsorptionSkill)
 
     @JvmField
-    val WALL_JUMP = register(WallJumpSkill())
+    val DISGUISE = register(::DisguiseSkill)
 
     @JvmField
-    val RETURN = register(ReturnSkill())
+    val WALL_JUMP = register(::WallJumpSkill)
 
     @JvmField
-    val PORTABLE_CHEST = register(PortableChestSkill())
+    val RETURN = register(::ReturnSkill)
 
     @JvmField
-    val LAVA_WALKER = register(LavaWalkerSkill())
+    val PORTABLE_CHEST = register(::PortableChestSkill)
 
     @JvmField
-    val ARMOR_SHATTERER = register(ArmorShattererSkill())
+    val LAVA_WALKER = register(::LavaWalkerSkill)
 
     @JvmField
-    val DEATH_ARCHIVE = register(DeathArchiveSkill())
+    val ARMOR_SHATTERER = register(::ArmorShattererSkill)
 
     @JvmField
-    val WITHERING_TOUCH = register(WitheringTouchSkill())
+    val DEATH_ARCHIVE = register(::DeathArchiveSkill)
 
     @JvmField
-    val FORCED_GROWTH = register(ForcedGrowthSkill())
+    val WITHERING_TOUCH = register(::WitheringTouchSkill)
 
     @JvmField
-    val SPACE_BLAST = register(SpaceBlastSkill())
+    val FORCED_GROWTH = register(::ForcedGrowthSkill)
 
     @JvmField
-    val GLIDING = register(GlidingSkill())
+    val SPACE_BLAST = register(::SpaceBlastSkill)
+
+    @JvmField
+    val GLIDING = register(::GlidingSkill)
 
     @JvmStatic
     fun init() = Unit
@@ -303,11 +307,11 @@ object Skills {
     @JvmStatic
     fun reload(server: MinecraftServer) {
         val skills = skills.values.filterNot { it.isEmpty() }
-        skills.forEach { it.resetSettings() }
+//        skills.forEach { skill -> createDefaultSkill(skill.id)?.let { skill.updateSettings(it.settings) } }
         SettingsManager.loadOrSaveFiles(skills)
         val serverSkills = SettingsManager.loadFromServerConfig(server)
         skills.forEach {
-            (serverSkills[it.id] ?: SettingsManager.getSettings(it))?.run {
+            (serverSkills[it.id] ?: SettingsManager.getSettings(it) ?: createDefaultSkill(it.id)?.settings)?.run {
                 it.updateSettings(this)
             }
         }
@@ -319,12 +323,14 @@ object Skills {
     }
 
     @JvmStatic
-    fun <T : Skill> register(skill: T): T {
+    fun <T : Skill> register(factory: () -> T): T {
+        val skill = factory()
         if (skill.id in skills.keys || skill in skills.values) {
             LOGGER.warn("Skill ${skill.id} is already registered")
             return skill
         }
         if (!skill.isEmpty()) ITEMS.register(skill.id.path) { SkillItem(skill) }
+        factories[skill.id] = factory
         skills[skill.id] = skill
         return skill
     }
@@ -372,4 +378,7 @@ object Skills {
         except: Collection<Skill> = emptyList(),
         filter: (Skill) -> Boolean = { true }
     ): Skill = getLearnableSkills(except, filter).randomByWeight(Skill::weight, EMPTY)
+
+    @JvmStatic
+    fun createDefaultSkill(id: Identifier): Skill? = factories[id]?.invoke()
 }

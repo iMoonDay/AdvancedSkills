@@ -30,6 +30,7 @@ class TripleJumpSkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         user.run {
             stopFallFlying()
+            fallDistance = 0.0f
             jump()
             val jumpForce = getDoubleParam(PARAM_JUMP_FORCE, user, DEFAULT_JUMP_FORCE)
             velocity = velocity.multiply(1.0, jumpForce, 1.0)
@@ -40,6 +41,7 @@ class TripleJumpSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_JUMP_FORCE = 1.7
 

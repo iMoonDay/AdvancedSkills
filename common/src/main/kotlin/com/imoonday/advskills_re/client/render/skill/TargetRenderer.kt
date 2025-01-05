@@ -7,44 +7,37 @@ import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.blaze3d.systems.*
 import net.minecraft.client.render.*
-import net.minecraft.client.render.entity.*
-import net.minecraft.client.render.entity.feature.*
-import net.minecraft.client.render.entity.model.*
 import net.minecraft.client.util.math.*
 import net.minecraft.entity.*
 import net.minecraft.util.math.*
 
-interface TargetRenderer<T> : ILivingFeatureRenderer<T> where T : Skill, T : TargetRenderTrigger {
+interface TargetRenderer<T> : IPostLivingEntityRenderer<T> where T : Skill, T : TargetRenderTrigger {
 
-    override fun <E : LivingEntity, M : EntityModel<E>> render(
+    override fun render(
         skill: T,
-        matrices: MatrixStack,
-        provider: VertexConsumerProvider,
-        light: Int,
-        entity: E,
-        limbAngle: Float,
-        limbDistance: Float,
+        entity: LivingEntity,
+        yaw: Float,
         tickDelta: Float,
-        animationProgress: Float,
-        headYaw: Float,
-        headPitch: Float,
-        renderer: FeatureRendererContext<E, M>,
-        context: EntityRendererFactory.Context
+        matrices: MatrixStack,
+        vertexConsumers: VertexConsumerProvider,
+        light: Int
     ) {
         val player = clientPlayer ?: return
         if (!skill.isTarget(player, entity)) return
 
-        renderIndicator(matrices, context, provider, entity)
+        renderIndicator(matrices, vertexConsumers, entity)
     }
 
     fun renderIndicator(
         matrices: MatrixStack,
-        context: EntityRendererFactory.Context,
         provider: VertexConsumerProvider,
         entity: Entity,
     ) {
         matrices.push()
-        matrices.translate(1f, 1.5f, -1f)
+
+        val scale = entity.width
+        matrices.scale(scale, scale, scale)
+        matrices.translate(1f, 0.99f / scale, -1f)
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180f))
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90f))
         RenderSystem.enableDepthTest()

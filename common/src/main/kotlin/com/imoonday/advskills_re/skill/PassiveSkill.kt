@@ -23,7 +23,7 @@ abstract class PassiveSkill(settings: Settings) : Skill(settings), EquipTrigger,
 
     open fun isCustomToggles(): Boolean = isToggleable()
 
-    override fun use(user: ServerPlayerEntity): UseResult = if (user.isToggleable()) {
+    override fun use(user: ServerPlayerEntity): UseResult = if (isToggleable(user)) {
         val active = user.toggleUsing()
         if (active) user.addAttributes() else user.removeAttributes()
         UseResult.consume(translateActive(this, active))
@@ -32,23 +32,23 @@ abstract class PassiveSkill(settings: Settings) : Skill(settings), EquipTrigger,
     }
 
     override fun postEquipped(player: ServerPlayerEntity, slot: SkillSlot) {
-        if (player.isAvailable()) {
+        if (isAvailable(player)) {
             player.addAttributes()
         }
     }
 
     override fun afterRespawn(player: ServerPlayerEntity) {
-        if (player.isAvailable()) {
+        if (isAvailable(player)) {
             player.addAttributes()
         }
     }
 
-    override fun keepUsingAfterRespawn(player: ServerPlayerEntity): Boolean = player.isToggleable()
+    override fun keepUsingAfterRespawn(player: ServerPlayerEntity): Boolean = isToggleable(player)
 
-    fun PlayerEntity.isToggleable() = if (!isCustomToggles()) this@PassiveSkill.isToggleable()
-    else getBooleanParam(PARAM_TOGGLEABLE, this, this@PassiveSkill.isToggleable())
+    fun isToggleable(player: PlayerEntity) = if (!isCustomToggles()) this.isToggleable()
+    else getBooleanParam(PARAM_TOGGLEABLE, player, isToggleable())
 
-    fun PlayerEntity.isAvailable() = !isToggleable() || isUsing()
+    fun isAvailable(player: PlayerEntity) = !isToggleable(player) || player.isUsing()
 
     companion object {
 

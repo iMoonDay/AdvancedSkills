@@ -5,7 +5,7 @@ import com.imoonday.advskills_re.util.*
 import net.minecraft.server.network.*
 import net.minecraft.text.*
 
-class EmptySkill : Skill(
+object EmptySkill : Skill(
     Settings(
         id = id("empty"),
         name = translateSkill("empty", "name"),
@@ -22,6 +22,4 @@ class EmptySkill : Skill(
     override fun updateSettings(settings: Settings) = Unit
 
     override fun initDefaultSettings(settings: Settings) = Unit
-
-    override fun resetSettings() = Unit
 }

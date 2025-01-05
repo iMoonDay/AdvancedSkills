@@ -93,10 +93,6 @@ abstract class Skill(settings: Settings) : SkillTrigger {
 
     abstract fun initDefaultSettings(settings: Settings)
 
-    open fun resetSettings() {
-        this.settings.copyFrom(defaultSettings)
-    }
-
     fun isEmpty(): Boolean = this === Skills.EMPTY || this is EmptySkill
 
     fun createUuid(content: String): UUID = UUID.nameUUIDFromBytes("$id-$content".toByteArray())

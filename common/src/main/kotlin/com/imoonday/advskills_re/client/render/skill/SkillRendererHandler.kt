@@ -9,6 +9,7 @@ import com.imoonday.advskills_re.skill.trigger.client.render.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.network.*
 import net.minecraft.client.render.*
+import net.minecraft.client.util.*
 import net.minecraft.client.util.math.*
 import net.minecraft.entity.*
 
@@ -23,6 +24,9 @@ object SkillRendererHandler {
     private val livingFeatureRenderers: MutableMap<Skill, ILivingFeatureRenderer<Skill>> = mutableMapOf()
     private val playerFeatureRenderers: MutableMap<Skill, IPlayerFeatureRenderer<Skill>> = mutableMapOf()
     private val worldRenderers: MutableMap<Skill, IWorldRenderer<Skill>> = mutableMapOf()
+    private val livingEntityRenderers: MutableMap<Skill, IPostLivingEntityRenderer<Skill>> = mutableMapOf()
+
+    private val shieldModel = Skills.ABSOLUTE_DEFENSE.modelId
 
     @JvmStatic
     @Suppress("UNCHECKED_CAST")
@@ -38,6 +42,8 @@ object SkillRendererHandler {
         if (renderer is IPlayerFeatureRenderer) playerFeatureRenderers[this] =
             renderer as IPlayerFeatureRenderer<Skill>
         if (renderer is IWorldRenderer) worldRenderers[this] = renderer as IWorldRenderer<Skill>
+        if (renderer is IPostLivingEntityRenderer) livingEntityRenderers[this] =
+            renderer as IPostLivingEntityRenderer<Skill>
     }
 
     @JvmStatic
@@ -112,6 +118,18 @@ object SkillRendererHandler {
         it.value.renderLast(it.key, context)
     }
 
+    @JvmStatic
+    fun renderPostLivingEntity(
+        entity: LivingEntity,
+        yaw: Float,
+        tickDelta: Float,
+        matrices: MatrixStack,
+        vertexConsumers: VertexConsumerProvider,
+        light: Int
+    ) = livingEntityRenderers.forEach {
+        it.value.render(it.key, entity, yaw, tickDelta, matrices, vertexConsumers, light)
+    }
+
     fun register() {
         Skills.CHARGED_SWEEP.registerSkillAboveHeadRenderer()
         Skills.DOPING.registerSkillAboveHeadRenderer()
@@ -127,11 +145,12 @@ object SkillRendererHandler {
         Skills.ABSOLUTE_DEFENSE.registerSkillAroundRenderer()
         Skills.ACTIVE_DEFENSE.registerSkillAroundRenderer()
         Skills.DAMAGE_ABSORPTION.registerSkillAroundRenderer()
-        Skills.MICRO_BOUNCE.registerSkillAroundRenderer()
-        Skills.RAPID_BOUNCE.registerSkillAroundRenderer()
-        Skills.EXTREME_BOUNCE.registerSkillAroundRenderer()
-        Skills.PERFECT_BOUNCE.registerSkillAroundRenderer()
+        Skills.MICRO_BOUNCE.registerSkillAroundRenderer(shieldModel)
+        Skills.RAPID_BOUNCE.registerSkillAroundRenderer(shieldModel)
+        Skills.EXTREME_BOUNCE.registerSkillAroundRenderer(shieldModel)
+        Skills.PERFECT_BOUNCE.registerSkillAroundRenderer(shieldModel)
         Skills.NEGATIVE_RESISTANCE.registerSkillAroundRenderer()
+        Skills.DEATH_ARCHIVE.registerSkillAroundRenderer(shieldModel)
 
         Skills.PRIMARY_FREEZE.registerRenderer(PrimaryFreezeSkillRenderer())
         Skills.DISGUISE.registerRenderer(DisguiseSkillRenderer())
@@ -144,9 +163,9 @@ object SkillRendererHandler {
         Skills.SPACE_BLAST.registerRenderer(SpaceBlastSkillRenderer())
     }
 
-    private fun <T> T.registerSkillAboveHeadRenderer() where T : Skill, T : UsingRenderTrigger =
-        this.registerRenderer(SkillAboveHeadRenderer.create())
+    private fun <T> T.registerSkillAboveHeadRenderer(model: ModelIdentifier? = null) where T : Skill, T : FeatureRendererTrigger =
+        this.registerRenderer(SkillAboveHeadRenderer.create(model))
 
-    private fun <T> T.registerSkillAroundRenderer() where T : Skill, T : UsingRenderTrigger =
-        this.registerRenderer(SkillAroundRenderer.create())
+    private fun <T> T.registerSkillAroundRenderer(model: ModelIdentifier? = null) where T : Skill, T : RenderPostLivingTrigger =
+        this.registerRenderer(SkillAroundRenderer.create(model))
 }

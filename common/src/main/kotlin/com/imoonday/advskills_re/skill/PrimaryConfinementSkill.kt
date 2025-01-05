@@ -3,7 +3,6 @@ package com.imoonday.advskills_re.skill
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
-import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
@@ -82,7 +81,7 @@ class PrimaryConfinementSkill : LongPressSkill(
         return UseResult.pass(message("empty"))
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun getCrosshair(player: PlayerEntity): Crosshair {
@@ -98,10 +97,14 @@ class PrimaryConfinementSkill : LongPressSkill(
         return clientPlayer.raycastLivingEntity(getRange(clientPlayer))?.entity == entity
     }
 
+    override fun shouldRenderPostLiving(living: LivingEntity, player: PlayerEntity): Boolean =
+        super<TargetRenderTrigger>.shouldRenderPostLiving(living, player)
+
     private fun getRange(player: PlayerEntity): Double =
         getDoubleParam(PARAM_CONFINE_RANGE, player, DEFAULT_CONFINE_RANGE)
 
     companion object {
+
         // Default Values
         private const val DEFAULT_CHARGE_DURATION = 5 * 20
         private const val DEFAULT_CONFINE_RANGE = 5.0

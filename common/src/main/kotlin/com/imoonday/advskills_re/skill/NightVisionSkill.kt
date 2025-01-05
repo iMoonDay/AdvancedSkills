@@ -13,5 +13,5 @@ class NightVisionSkill : PassiveSkill(
 
     override fun isToggleable(): Boolean = true
 
-    override fun hasNightVision(player: PlayerEntity): Boolean = player.isAvailable()
+    override fun hasNightVision(player: PlayerEntity): Boolean = isAvailable(player)
 }

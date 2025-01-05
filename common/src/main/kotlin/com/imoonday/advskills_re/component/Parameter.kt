@@ -371,7 +371,18 @@ sealed class Parameter {
                 return if (baseValue.isJsonPrimitive) {
                     val primitive = baseValue.asJsonPrimitive
                     when {
-                        primitive.isNumber -> create(primitive.asNumber, enhancements)
+                        primitive.isNumber -> {
+                            primitive.asString.let {
+                                create(
+                                    it.toIntOrNull()
+                                        ?: it.toFloatOrNull()
+                                        ?: it.toDoubleOrNull()
+                                        ?: primitive.asNumber,
+                                    enhancements
+                                )
+                            }
+                        }
+
                         primitive.isBoolean -> create(primitive.asBoolean, enhancements)
                         else -> {
                             LOGGER.warn(

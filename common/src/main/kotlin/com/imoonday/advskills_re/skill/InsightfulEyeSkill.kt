@@ -14,5 +14,5 @@ class InsightfulEyeSkill : PassiveSkill(
     override fun isCustomToggles(): Boolean = true
 
     override fun shouldRenderFeature(target: PlayerEntity, clientPlayer: PlayerEntity): Boolean =
-        clientPlayer.hasEquipped() && clientPlayer.isAvailable() && target != clientPlayer
+        clientPlayer.hasEquipped() && isAvailable(clientPlayer) && target != clientPlayer
 }

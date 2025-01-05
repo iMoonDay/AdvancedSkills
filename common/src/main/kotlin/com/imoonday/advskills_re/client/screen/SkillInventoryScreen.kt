@@ -10,6 +10,7 @@ import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
+import com.mojang.blaze3d.systems.*
 import net.minecraft.client.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.gui.screen.*
@@ -71,14 +72,15 @@ class SkillInventoryScreen(
         bgWidth = 9 * (SLOT_SIZE + 4) + 15 + 13
         bgHeight = 6 * (SLOT_SIZE + 4)
         val halfSize = SkillType.entries.size / 2
-        val gap = (bgWidth - 5 * 26) / 10
+        val widthWithGap = 24
+        val gap = (bgWidth - 5 * widthWithGap) / 10
         tabs.clear()
         SkillType.entries.forEachIndexed { index, type ->
             val reverse = index >= halfSize
             val (x, y) = if (!reverse) {
-                bgX + (26 + gap * 2) * index + gap to bgY - 28
+                bgX + (widthWithGap + gap * 2) * index + gap to bgY - 28
             } else {
-                bgX + (26 + gap * 2) * (index - halfSize) + gap to bgY + bgHeight - 4
+                bgX + (widthWithGap + gap * 2) * (index - halfSize) + gap to bgY + bgHeight - 4
             }
             Tab(type, index, x, y, reverse).also {
                 addDrawableChild(it)
@@ -91,7 +93,7 @@ class SkillInventoryScreen(
         equippedSlots.clear()
         player.skillContainer.getAllSlots().forEachIndexed { index, slot ->
             EquippedSlot(
-                slot, bgX + 25 + index * (SLOT_SIZE + 14 + 5) - equippedSlotOffset * 43, bgY + bgHeight - 8 - SLOT_SIZE
+                slot, bgX + 25 + index * (SLOT_SIZE + 14 + 5) - equippedSlotOffset * 43, bgY + bgHeight - 7 - SLOT_SIZE
             ).apply { visible = index in equippedSlotOffset..<equippedSlotOffset + 6 }
                 .also {
                     addDrawableChild(it)
@@ -290,7 +292,7 @@ class SkillInventoryScreen(
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean {
         if (mouseX.toInt() in bgX..bgX + bgWidth && mouseY.toInt() in bgY + bgHeight - 8 - SLOT_SIZE..bgY + bgHeight - 8) {
-            val slotWidth = 43
+            val slotWidth = 41
             if (amount > 0) {
                 equippedSlotOffset--
             } else if (amount < 0) {
@@ -322,13 +324,14 @@ class SkillInventoryScreen(
 
         override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
             if (!visible) return
-            context.drawTexture(slotTexture, x, y, skill.rarity.level * 24f, 32f, width, height, 256, 256)
-            context.fill(x + width - 3, y + 1, x + width - 1, y + 3, skill.rarity.color)
+
+            RenderSystem.enableBlend()
+            context.fill(x, y, x + width, y + height, 0x806A6869.toInt())
             if (!skill.invalid && selectedSlot?.skill != skill) {
-                SkillRenderer.renderIcon(skill, context, x + 4, y + 4)
+                SkillRenderer.renderIcon(skill, context, x + (width - 16) / 2, y + (height - 16) / 2)
             }
             if (hovered) {
-                val edge = 4
+                val edge = 2
                 context.overlayHighlight(x + edge, y + edge, x + width - edge, y + height - edge, true)
                 selectingSlot = if (!skill.invalid) {
                     if (selectedSlot == null) {
@@ -345,6 +348,11 @@ class SkillInventoryScreen(
             } else if (selectingSlot == this) {
                 selectingSlot = null
             }
+
+            context.drawTexture(
+                slotTexture, x, y, (skill.rarity.level * width).toFloat(), 112f, width, height, 256, 256
+            )
+            RenderSystem.disableBlend()
         }
 
         override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
@@ -402,7 +410,7 @@ class SkillInventoryScreen(
     inner class EquippedSlot(slot: SkillSlot, x: Int, y: Int) : Slot(slot, slot.skill, x, y) {
 
         val indexX: Int
-            get() = x - 14
+            get() = x - 12
         val indexY: Int
             get() = y + (height - 9) / 2
         val indexSize: Int = 9
@@ -626,6 +634,6 @@ class SkillInventoryScreen(
         private val sortTexture = id("sort.png")
         private val filterTexture = id("filter.png")
         private val rarityFilterTexture = id("rarity_filter.png")
-        private const val SLOT_SIZE = 24
+        private const val SLOT_SIZE = 22
     }
 }
