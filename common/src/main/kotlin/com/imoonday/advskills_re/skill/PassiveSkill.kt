@@ -25,21 +25,33 @@ abstract class PassiveSkill(settings: Settings) : Skill(settings), EquipTrigger,
 
     override fun use(user: ServerPlayerEntity): UseResult = if (isToggleable(user)) {
         val active = user.toggleUsing()
-        if (active) user.addAttributes() else user.removeAttributes()
+        if (active) onActivated(user) else onDeactivated(user)
         UseResult.consume(translateActive(this, active))
     } else {
         UseResult.passive(name)
     }
 
+    open fun onActivated(user: ServerPlayerEntity) {
+        user.addAttributes()
+    }
+
+    open fun onDeactivated(user: ServerPlayerEntity) {
+        user.removeAttributes()
+    }
+
     override fun postEquipped(player: ServerPlayerEntity, slot: SkillSlot) {
         if (isAvailable(player)) {
-            player.addAttributes()
+            onActivated(player)
         }
+    }
+
+    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
+        onDeactivated(player)
     }
 
     override fun afterRespawn(player: ServerPlayerEntity) {
         if (isAvailable(player)) {
-            player.addAttributes()
+            onActivated(player)
         }
     }
 

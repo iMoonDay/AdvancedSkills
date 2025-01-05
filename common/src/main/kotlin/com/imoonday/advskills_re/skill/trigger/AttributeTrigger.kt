@@ -32,7 +32,5 @@ interface AttributeTrigger : UnequipTrigger {
         }
     }
 
-    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
-        player.removeAttributes()
-    }
+    override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) = player.removeAttributes()
 }

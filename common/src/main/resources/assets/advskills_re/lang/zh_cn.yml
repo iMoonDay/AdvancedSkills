@@ -942,6 +942,18 @@ advskills_re:
       duration:
         name: 时间增幅
         description: '%s 滑翔时长'
+    light_landing:
+      name: 轻盈落地
+      description: 在一定时间内免疫摔落伤害
+      duration:
+        name: 时间增幅
+        description: '%s 免疫时长'
+    foodless:
+      name: 辟谷
+      description: 饱食度不会耗尽，始终至少有2点饱食度
+      min_hunger:
+        name: 饱食度增幅
+        description: '%s 最低饱食度'
   skillType:
     attack: 攻击
     defense: 防御

@@ -213,4 +213,11 @@ object SkillTriggerHandler {
     @JvmStatic
     fun shouldIgnoreGravity(player: PlayerEntity): Boolean =
         player.anyTrigger<GravityTrigger> { it.shouldIgnoreGravity(player) }
+
+    @JvmStatic
+    fun onFoodLevelChange(player: PlayerEntity, level: Int): Int {
+        var newLevel = level
+        player.forEachTrigger<HungerTrigger> { newLevel = it.onFoodLevelChange(player, newLevel) }
+        return newLevel
+    }
 }

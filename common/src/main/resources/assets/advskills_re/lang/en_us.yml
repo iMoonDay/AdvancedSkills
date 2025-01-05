@@ -942,6 +942,18 @@ advskills_re:
       duration:
         name: Duration Enhancement
         description: '%s Glide Duration'
+    light_landing:
+      name: Light Landing
+      description: Immune to fall damage for a period of time
+      duration:
+        name: Duration Enhancement
+        description: '%s Immune Duration'
+    foodless:
+      name: Foodless
+      description: Food level will never be depleted, always maintaining at least 2 food levels
+      min_hunger:
+        name: Level Enhancement
+        description: '%s Min Food Level'
   skillType:
     attack: Attack
     defense: Defense

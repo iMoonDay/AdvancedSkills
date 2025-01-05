@@ -301,13 +301,18 @@ object Skills {
     @JvmField
     val GLIDING = register(::GlidingSkill)
 
+    @JvmField
+    val LIGHT_LANDING = register(::LightLandingSkill)
+
+    @JvmField
+    val FOODLESS = register(::FoodlessSkill)
+
     @JvmStatic
     fun init() = Unit
 
     @JvmStatic
     fun reload(server: MinecraftServer) {
         val skills = skills.values.filterNot { it.isEmpty() }
-//        skills.forEach { skill -> createDefaultSkill(skill.id)?.let { skill.updateSettings(it.settings) } }
         SettingsManager.loadOrSaveFiles(skills)
         val serverSkills = SettingsManager.loadFromServerConfig(server)
         skills.forEach {

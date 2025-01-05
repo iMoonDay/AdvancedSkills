@@ -23,8 +23,8 @@ class AbsoluteDefenseSkill : Skill(
 
     override fun initDefaultSettings(settings: Settings) {
         settings
-            .addParameter(PARAM_BLOCK_SOUND, SoundEvents.ITEM_SHIELD_BLOCK)
-            .addParameter(PARAM_BREAK_SOUND, SoundEvents.ITEM_SHIELD_BREAK)
+            .addParameter(PARAM_BLOCK_SOUND, DEFAULT_BLOCK_SOUND)
+            .addParameter(PARAM_BREAK_SOUND, DEFAULT_BREAK_SOUND)
             .addParameter(
                 name = PARAM_DURATION,
                 baseValue = DEFAULT_DURATION,
@@ -65,32 +65,20 @@ class AbsoluteDefenseSkill : Skill(
         if (!player.isUsing() || amount <= 0) return false
 
         val data = player.getActiveData()
-        val remaining = data.getInt(NBT_REMAINING_COUNT)
+        val newRemaining = data.getInt(NBT_REMAINING_COUNT) - 1
+        data.putInt(NBT_REMAINING_COUNT, newRemaining)
 
-        return when {
-            remaining <= 0 -> handleNoRemainingDefense(player)
-            else -> handleRemainingDefense(player, data, remaining)
-        }
-    }
-
-    private fun handleNoRemainingDefense(player: ServerPlayerEntity): Boolean {
-        val sound = if (player.hasEnhancement(ENHANCEMENT_COUNT)) {
-            PARAM_BREAK_SOUND
+        if (newRemaining <= 0) {
+            if (player.hasEnhancement(ENHANCEMENT_COUNT)) {
+                player.playSoundFromParam(PARAM_BREAK_SOUND, DEFAULT_BREAK_SOUND)
+            } else {
+                player.playSoundFromParam(PARAM_BLOCK_SOUND, DEFAULT_BLOCK_SOUND)
+            }
+            player.stopAndCooldown()
         } else {
-            PARAM_BLOCK_SOUND
+            player.playSoundFromParam(PARAM_BLOCK_SOUND, DEFAULT_BLOCK_SOUND)
         }
-        player.playSoundFromParam(sound, SoundEvents.ITEM_SHIELD_BLOCK)
-        player.stopAndCooldown()
-        return true
-    }
 
-    private fun handleRemainingDefense(
-        player: ServerPlayerEntity,
-        data: NbtCompound,
-        remaining: Int
-    ): Boolean {
-        player.playSoundFromParam(PARAM_BLOCK_SOUND, SoundEvents.ITEM_SHIELD_BLOCK)
-        data.putInt(NBT_REMAINING_COUNT, remaining - 1)
         return true
     }
 
@@ -98,6 +86,8 @@ class AbsoluteDefenseSkill : Skill(
 
         private const val DEFAULT_DURATION = 30 * 20
         private const val DEFAULT_DEFENSE_COUNT = 1
+        private val DEFAULT_BLOCK_SOUND = SoundEvents.ITEM_SHIELD_BLOCK
+        private val DEFAULT_BREAK_SOUND = SoundEvents.ITEM_SHIELD_BREAK
 
         // NBT Keys
         private const val NBT_REMAINING_COUNT = "RemainingEffects"

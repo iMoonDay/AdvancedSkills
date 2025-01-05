@@ -58,8 +58,10 @@ class DamageAbsorptionSkill : Skill(
         player.heal(amount)
 
         val data = player.getActiveData()
-        val remaining = data.getInt(NBT_REMAINING_COUNT)
-        if (remaining <= 0) {
+        val newRemaining = data.getInt(NBT_REMAINING_COUNT) - 1
+        data.putInt(NBT_REMAINING_COUNT, newRemaining)
+
+        if (newRemaining <= 0) {
             if (player.hasEnhancement(ENHANCEMENT_COUNT)) {
                 player.playSoundFromParam(PARAM_BREAK_SOUND, DEFAULT_BREAK_SOUND)
             } else {
@@ -68,8 +70,8 @@ class DamageAbsorptionSkill : Skill(
             player.stopAndCooldown()
         } else {
             player.playSoundFromParam(PARAM_ABSORB_SOUND, DEFAULT_ABSORB_SOUND)
-            data.putInt(NBT_REMAINING_COUNT, remaining - 1)
         }
+
         return true
     }
 
