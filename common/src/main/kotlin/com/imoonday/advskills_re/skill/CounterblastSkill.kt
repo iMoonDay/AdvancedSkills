@@ -14,10 +14,10 @@ class CounterblastSkill : PassiveSkill(
     Settings(
         id = "counterblast",
         rarity = SkillRarity.SUPERB
-    )
+    ), customToggles = true
 ), PostAttackedTrigger, ProgressTrigger, StopTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_BASE_TRIGGER_CHANCE, DEFAULT_BASE_TRIGGER_CHANCE)
             .addParameter(PARAM_BLAST_SOUND, DEFAULT_BLAST_SOUND)
@@ -44,10 +44,7 @@ class CounterblastSkill : PassiveSkill(
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             )
-        super.initDefaultSettings(settings)
     }
-
-    override fun isCustomToggles(): Boolean = true
 
     override fun postAttacked(source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
         super.postAttacked(source, player, attacker)

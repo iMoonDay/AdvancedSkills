@@ -26,7 +26,7 @@ class OrePerceptionSkill : Skill(
     )
 ), AutoStopTrigger, WorldRendererTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_ORE_BLOCKS, emptyList<String>())
             .addParameter(PARAM_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)

@@ -1,30 +1,30 @@
 package com.imoonday.advskills_re.skill
 
-import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
 import com.imoonday.advskills_re.util.*
-import net.minecraft.client.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*
 import net.minecraft.sound.*
 
-abstract class BounceSkill(settings: Settings) : Skill(settings), DamageTrigger, BounceTrigger, UsingRenderTrigger {
+abstract class BounceSkill(
+    settings: Settings,
+    private val duration: Int,
+    private val damageBoost: Float = 1.0f,
+    private val baseChance: Float? = null
+) : Skill(settings), DamageTrigger, BounceTrigger, UsingRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
-        if (!settings.types.contains(SkillType.DEFENSE)) {
-            settings.addTypeToTop(SkillType.DEFENSE)
-        }
+    init {
+        settings.addTypeToTopIfAbsent(SkillType.DEFENSE)
 
         settings
             .addParameter(PARAM_BOUNCE_SOUND, DEFAULT_BOUNCE_SOUND)
             .addParameter(
                 name = PARAM_BOUNCE_DURATION,
-                baseValue = getDuration(),
+                baseValue = duration,
                 enhancementId = ENHANCEMENT_DURATION,
                 value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
@@ -33,7 +33,7 @@ abstract class BounceSkill(settings: Settings) : Skill(settings), DamageTrigger,
                 genericText = true
             ).addParameter(
                 name = PARAM_BOUNCE_BOOST,
-                baseValue = getDamageMultiplier(),
+                baseValue = damageBoost,
                 enhancementId = ENHANCEMENT_BOOST,
                 value = 0.1f,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
@@ -42,7 +42,7 @@ abstract class BounceSkill(settings: Settings) : Skill(settings), DamageTrigger,
                 genericText = true
             )
 
-        getBaseChance()?.let {
+        baseChance?.let {
             settings.addParameter(
                 name = PARAM_BOUNCE_CHANCE,
                 baseValue = it,
@@ -56,16 +56,10 @@ abstract class BounceSkill(settings: Settings) : Skill(settings), DamageTrigger,
         }
     }
 
-    abstract fun getDuration(): Int
-
-    abstract fun getDamageMultiplier(): Float
-
-    abstract fun getBaseChance(): Float?
-
     override fun use(user: ServerPlayerEntity): UseResult = startBouncing(user)
 
     override fun getMaxUseTime(player: PlayerEntity): Int =
-        getIntParam(PARAM_BOUNCE_DURATION, player, getDuration(), 0)
+        getIntParam(PARAM_BOUNCE_DURATION, player, duration, 0)
 
     protected fun bounceFailed(player: ServerPlayerEntity) =
         player.sendMessage(translate("bounce.failed"), true)
@@ -76,7 +70,7 @@ abstract class BounceSkill(settings: Settings) : Skill(settings), DamageTrigger,
         amount: Float,
     ) {
         player.playSoundFromParam(PARAM_BOUNCE_SOUND, DEFAULT_BOUNCE_SOUND)
-        val damage = amount * getFloatParam(PARAM_BOUNCE_BOOST, player, getDamageMultiplier(), 0f)
+        val damage = amount * getFloatParam(PARAM_BOUNCE_BOOST, player, damageBoost, 0f)
         attacker?.damage(player.damageSources.thorns(player), damage)?.let {
             player.sendMessage(
                 translate("bounce.${if (it) "success" else "failed"}"),
@@ -89,7 +83,7 @@ abstract class BounceSkill(settings: Settings) : Skill(settings), DamageTrigger,
         attacker: LivingEntity?,
         amount: Float,
     ): Boolean {
-        val chance = getFloatParam(PARAM_BOUNCE_CHANCE, this, getBaseChance(), 0f, 1f)
+        val chance = getFloatParam(PARAM_BOUNCE_CHANCE, this, baseChance, 0f, 1f)
         return if (random.nextFloat() < chance) {
             bounce(this, attacker, amount)
             true

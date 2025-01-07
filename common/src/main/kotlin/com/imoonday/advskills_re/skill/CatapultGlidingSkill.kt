@@ -19,7 +19,7 @@ class CatapultGlidingSkill : LongPressSkill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_LAUNCH_SOUND, DEFAULT_LAUNCH_SOUND)
             .addParameter(
@@ -72,7 +72,7 @@ class CatapultGlidingSkill : LongPressSkill(
         super.serverTick(player, usedTime)
     }
 
-    private fun failedResult() = UseResult.fail(failedMessage())
+    private fun failedResult() = UseResult.fail(failedMessage)
 
     private fun fallFlyingResult() = UseResult.fail(message("fallFlying"))
 

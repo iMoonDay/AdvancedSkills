@@ -312,13 +312,14 @@ object Skills {
 
     @JvmStatic
     fun reload(server: MinecraftServer) {
-        val skills = skills.values.filterNot { it.isEmpty() }
+        val skills = skills.values.filterNot { it.isEmpty }
         SettingsManager.loadOrSaveFiles(skills)
         val serverSkills = SettingsManager.loadFromServerConfig(server)
         skills.forEach {
-            (serverSkills[it.id] ?: SettingsManager.getSettings(it) ?: createDefaultSkill(it.id)?.settings)?.run {
-                it.updateSettings(this)
-            }
+            (serverSkills[it.id]
+                ?: SettingsManager.getSettings(it)
+                ?: createDefaultSkill(it.id)?.settings)
+                ?.run { it.updateSettings(this) }
         }
     }
 
@@ -334,7 +335,7 @@ object Skills {
             LOGGER.warn("Skill ${skill.id} is already registered")
             return skill
         }
-        if (!skill.isEmpty()) ITEMS.register(skill.id.path) { SkillItem(skill) }
+        if (!skill.isEmpty) ITEMS.register(skill.id.path) { SkillItem(skill) }
         factories[skill.id] = factory
         skills[skill.id] = skill
         return skill
@@ -347,10 +348,10 @@ object Skills {
     }
 
     @JvmStatic
-    fun getSkills(): List<Skill> = skills.values.filterNot { it.isEmpty() }
+    fun getSkills(): List<Skill> = skills.values.filterNot { it.isEmpty }
 
     @JvmStatic
-    fun getValidSkills(): List<Skill> = skills.values.filterNot { it.invalid }
+    fun getEnabledSkills(): List<Skill> = skills.values.filterNot { it.disabled }
 
     @JvmStatic
     fun fromId(id: Identifier): Skill = skills.getOrDefault(id, EMPTY)
@@ -374,7 +375,7 @@ object Skills {
     fun getLearnableSkills(
         except: Collection<Skill> = emptyList(),
         filter: (Skill) -> Boolean = { true },
-    ): List<Skill> = getValidSkills()
+    ): List<Skill> = getEnabledSkills()
         .filterNot { it in except }
         .filter(filter)
 

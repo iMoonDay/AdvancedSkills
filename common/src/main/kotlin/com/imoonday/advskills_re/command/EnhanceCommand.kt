@@ -20,7 +20,7 @@ object EnhanceCommand : PlayerCommand("enhance") {
                     argument("enhancement", StringArgumentType.word())
                         .suggests { context, builder1 ->
                             val skill = SkillArgumentType.getSkill(context)
-                            val enhancements = skill.getAvailableEnhancements()
+                            val enhancements = skill.availableEnhancements
                             CommandSource.suggestMatching(enhancements, builder1, { it.id }, { it.name })
                         }.then(
                             argument("level", IntegerArgumentType.integer(1))
@@ -50,7 +50,7 @@ object EnhanceCommand : PlayerCommand("enhance") {
         player: ServerPlayerEntity,
     ): Int {
         val skill = SkillArgumentType.getSkill(context)
-        val enhancements = skill.getAvailableEnhancements()
+        val enhancements = skill.availableEnhancements
         if (player.enhanceAll(skill)) {
             context.sendFeedback(
                 "enhanceSkill.allSuccess",

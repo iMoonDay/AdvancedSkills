@@ -19,7 +19,7 @@ class WallClimbingSkill : PassiveSkill(
     )
 ), ClimbingTrigger, AutoStopTrigger, AutoTrigger, SendPlayerDataTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_CLIMB_DURATION,
             baseValue = DEFAULT_CLIMB_DURATION,
@@ -29,7 +29,6 @@ class WallClimbingSkill : PassiveSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
-        super.initDefaultSettings(settings)
     }
 
     override fun isClimbing(player: PlayerEntity): Boolean = player.isUsing() && player.shouldClimb()

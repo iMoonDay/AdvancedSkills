@@ -21,7 +21,7 @@ class RisingShockSkill : Skill(
     )
 ), AutoStopTrigger, GravityTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_RISE_SOUND, DEFAULT_RISE_SOUND)
             .addParameter(

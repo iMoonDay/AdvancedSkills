@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.component.choice.*
-import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
@@ -111,8 +110,8 @@ data class ChoiceData(
         private val invalidCheck: (PlayerEntity, Choosable) -> Boolean = { player, choosable ->
             val skill = choosable.skill
             when (choosable) {
-                is SkillChoice -> skill.invalid || player.hasLearned(skill) || !skill.settings.drawable
-                is EnhancementChoice -> skill.invalid
+                is SkillChoice -> skill.disabled || player.hasLearned(skill) || !skill.settings.drawable
+                is EnhancementChoice -> skill.disabled
                     || !player.hasLearned(skill)
                     || !skill.settings.drawable
                     || player.isMaxEnhancement(skill, choosable.enhancementId)

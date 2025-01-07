@@ -43,7 +43,7 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
     override fun tick() {
         container.getAllSkills { skill, _ -> !entity.hasLearned(skill) }.forEach { container.forget(it) }
         container.forEachData { it.tick() }
-        container.getAllSlots { it.skill.invalid && !it.isEmpty() }.forEach {
+        container.getAllSlots { it.skill.disabled && !it.isEmpty() }.forEach {
             val name = it.skill.name
             it.unequip()
             if (!entity.world.isClient) {

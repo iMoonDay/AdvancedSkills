@@ -18,7 +18,7 @@ class InstantExplosiveSkill : Skill(
     )
 ), SendPlayerVelocityTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_LAUNCH_SOUND, DEFAULT_LAUNCH_SOUND)
             .addParameter(

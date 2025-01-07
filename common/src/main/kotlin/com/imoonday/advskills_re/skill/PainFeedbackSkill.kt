@@ -11,10 +11,10 @@ class PainFeedbackSkill : PassiveSkill(
         id = "pain_feedback",
         cooldown = 5,
         rarity = SkillRarity.SUPERB
-    )
+    ), customToggles = true
 ), PostDamagedTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_FEEDBACK_RATIO,
             baseValue = DEFAULT_FEEDBACK_RATIO,
@@ -24,10 +24,7 @@ class PainFeedbackSkill : PassiveSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
-        super.initDefaultSettings(settings)
     }
-
-    override fun isCustomToggles(): Boolean = true
 
     override fun postDamaged(amount: Float, source: DamageSource, player: ServerPlayerEntity, attacker: LivingEntity?) {
         super.postDamaged(amount, source, player, attacker)
@@ -43,6 +40,7 @@ class PainFeedbackSkill : PassiveSkill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_FEEDBACK_RATIO = 0.5f
 

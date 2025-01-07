@@ -18,7 +18,7 @@ class SuperShadowCloneSkill : Skill(
     )
 ), SendPlayerVelocityTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_CLONE_MOVE_TIME, DEFAULT_CLONE_MOVE_TIME)
             .addParameter(

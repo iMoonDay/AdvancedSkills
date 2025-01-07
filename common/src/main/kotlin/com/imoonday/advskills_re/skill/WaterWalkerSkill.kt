@@ -20,7 +20,7 @@ class WaterWalkerSkill : Skill(
     )
 ), WalkOnFluidTrigger, AutoStopTrigger, FluidMovementTrigger, UsingRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_WALK_SOUND, DEFAULT_WALK_SOUND)
             .addParameter(

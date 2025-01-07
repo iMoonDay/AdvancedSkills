@@ -20,11 +20,7 @@ import net.minecraft.text.*
 import net.minecraft.util.*
 import java.util.*
 
-@Suppress("LeakingThis")
-abstract class Skill(settings: Settings) : SkillTrigger {
-
-    private val defaultSettings: Settings = settings
-    val settings: Settings
+abstract class Skill(val settings: Settings) : SkillTrigger {
 
     val id: Identifier get() = settings.id
     val name: Text get() = settings.name
@@ -34,14 +30,14 @@ abstract class Skill(settings: Settings) : SkillTrigger {
     val defaultCooldown: Int get() = settings.cooldown
     val rarity: SkillRarity get() = settings.rarity
     val weight: Int get() = settings.weight
-    val invalid: Boolean
-        get() = settings.invalid
+    val disabled: Boolean
+        get() = settings.disabled
             || SkillConfig.get().isInBlackList(id)
             || GlobalConfig.get().skillConfig.isInBlackList(id)
     private val parameters: Map<String, Parameter> get() = settings.parameters
-    private val enhancements: List<Enhancement> get() = settings.enhancements.toList()
+    private val enhancements: List<Enhancement> get() = settings.enhancements
+    val availableEnhancements: List<Enhancement> get() = enhancements.filter { it.maxLevel > 0 }
     val item: SkillItem? get() = Registries.ITEM[id] as? SkillItem
-
     val cooldown: Int
         get() {
             val cooldown = defaultCooldown
@@ -50,29 +46,23 @@ abstract class Skill(settings: Settings) : SkillTrigger {
                 ?: return cooldown
             return (cooldown * multiplier).toInt()
         }
-
     val formattedName: MutableText
         get() = rarity.format(name)
-
     val hoverableName: MutableText
         get() = item?.run {
             formattedName.styled {
-                it.withHoverEvent(
-                    HoverEvent(
-                        HoverEvent.Action.SHOW_ITEM,
-                        HoverEvent.ItemStackContent(defaultStack)
-                    )
-                )
+                it.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_ITEM, HoverEvent.ItemStackContent(defaultStack)))
             }
         } ?: formattedName
-
     val cooldownText: MutableText get() = getCooldownText(cooldown)
     val defaultCooldownText: MutableText get() = getCooldownText(defaultCooldown)
     private val enhancementDescArgs: MutableMap<String, ((value: Double) -> Any)?> = mutableMapOf()
+    val failedMessage get() = translateSkill(id.path, "failed")
+    val isEmpty: Boolean get() = this === Skills.EMPTY || this == EmptySkill
 
     init {
-        if (this.defaultSettings.cooldown > 0) {
-            this.defaultSettings.addEnhancement(
+        if (this.settings.cooldown > 0) {
+            this.settings.addEnhancement(
                 id = "cooldown",
                 value = -0.16,
                 operation = MULTIPLY_TOTAL,
@@ -81,8 +71,6 @@ abstract class Skill(settings: Settings) : SkillTrigger {
                 genericText = true
             )
         }
-        initDefaultSettings(this.defaultSettings)
-        this.settings = Settings(this.defaultSettings)
     }
 
     open fun updateSettings(settings: Settings) {
@@ -90,10 +78,6 @@ abstract class Skill(settings: Settings) : SkillTrigger {
             this.settings.copyFrom(settings)
         }
     }
-
-    abstract fun initDefaultSettings(settings: Settings)
-
-    fun isEmpty(): Boolean = this === Skills.EMPTY || this is EmptySkill
 
     fun createUuid(content: String): UUID = UUID.nameUUIDFromBytes("$id-$content".toByteArray())
 
@@ -155,8 +139,6 @@ abstract class Skill(settings: Settings) : SkillTrigger {
 
     fun getParam(name: String): Parameter? = parameters[name]
 
-    fun getAvailableEnhancements(): List<Enhancement> = enhancements.filter { it.maxLevel > 0 }
-
     fun getEnhancement(id: String): Enhancement? = enhancements.firstOrNull { it.id == id }
 
     fun hasEnhancement(id: String): Boolean = enhancements.any { it.id == id }
@@ -177,7 +159,7 @@ abstract class Skill(settings: Settings) : SkillTrigger {
     }
 
     fun tryUse(player: ServerPlayerEntity, keyState: UseSkillC2SRequest.KeyState) {
-        if (invalid) return
+        if (disabled) return
         if ((this !is LongPressTrigger || !player.isUsing()) && keyState == UseSkillC2SRequest.KeyState.RELEASE) return
         if (this is LongPressTrigger && player.isUsing() && keyState == UseSkillC2SRequest.KeyState.PRESS) return
         if (player.isSilenced) {
@@ -222,13 +204,8 @@ abstract class Skill(settings: Settings) : SkillTrigger {
     }
 
     override fun getAsSkill(): Skill = this
-
-    fun failedMessage() = translateSkill(id.path, "failed")
-
     fun message(key: String, vararg args: Any) = translateSkill(id.path, key, *args)
-
     fun messageKey(key: String) = translateSkillKey(id.path, key)
-
     open fun applyCooldownEnhancements(player: PlayerEntity, cooldown: Int): Int {
         val (enhancement, data) = player.getEnhancement("cooldown") ?: return cooldown
         return enhancement.getEnhancedValue(data.currentLevel, cooldown).coerceAtLeast(0)
@@ -241,8 +218,11 @@ abstract class Skill(settings: Settings) : SkillTrigger {
             else Text.translatable(it.description)
         }
 
-    open fun getEnhancementTooltips(player: PlayerEntity): List<Text> =
-        player.getEnhancements().map {
+    open fun getEnhancementTooltips(
+        player: PlayerEntity,
+        filter: (Enhancement, EnhancementData) -> Boolean = { _, _ -> true }
+    ): List<Text> =
+        player.getEnhancements().filter { filter(it.key, it.value) }.map {
             val enhancement = it.key
             val level = it.value.currentLevel
             val arg = (enhancement.descArg ?: enhancementDescArgs[enhancement.id])?.invoke(enhancement.getValue(level))
@@ -250,7 +230,7 @@ abstract class Skill(settings: Settings) : SkillTrigger {
             else Text.translatable(enhancement.description)).formatted(Formatting.BLUE)
         }
 
-    fun getCooldownText(cooldown: Int) = if (cooldown <= 0) {
+    private fun getCooldownText(cooldown: Int) = if (cooldown <= 0) {
         translate("cooldown.none")
     } else {
         val text = (cooldown / 20.0).toString()
@@ -268,9 +248,8 @@ abstract class Skill(settings: Settings) : SkillTrigger {
     }
 
     override fun hashCode(): Int = id.hashCode()
-
     override fun toString(): String =
-        "Skill(id=$id, cooldown=$cooldown, icon=$icon, invalid=$invalid, parameters=$parameters, rarity=$rarity, types=$types, weight=$weight, enhancements=$enhancements)"
+        "Skill(id=$id, cooldown=$cooldown, icon=$icon, disabled=$disabled, parameters=$parameters, rarity=$rarity, types=$types, weight=$weight, enhancements=$enhancements)"
 
     data class Settings(
         val id: Identifier,
@@ -280,7 +259,7 @@ abstract class Skill(settings: Settings) : SkillTrigger {
         var types: Set<SkillType> = emptySet(),
         var cooldown: Int = 0,
         var rarity: SkillRarity,
-        var invalid: Boolean = false,
+        var disabled: Boolean = false,
         var weight: Int = rarity.weight,
         var drawable: Boolean = true,
         val parameters: MutableMap<String, Parameter> = mutableMapOf(),
@@ -310,7 +289,7 @@ abstract class Skill(settings: Settings) : SkillTrigger {
             types = settings.types.toSet(),
             cooldown = settings.cooldown,
             rarity = settings.rarity,
-            invalid = settings.invalid,
+            disabled = settings.disabled,
             weight = settings.weight,
             drawable = settings.drawable,
             parameters = settings.parameters.toMutableMap(),
@@ -343,7 +322,14 @@ abstract class Skill(settings: Settings) : SkillTrigger {
         }
 
         fun addTypeToTop(type: SkillType): Settings {
-            this.types = linkedSetOf(type) + this.types
+            this.types = setOf(type) + this.types
+            return this
+        }
+
+        fun addTypeToTopIfAbsent(type: SkillType): Settings {
+            if (type !in this.types) {
+                addTypeToTop(type)
+            }
             return this
         }
 
@@ -357,8 +343,8 @@ abstract class Skill(settings: Settings) : SkillTrigger {
             return this
         }
 
-        fun withInvalid(invalid: Boolean): Settings {
-            this.invalid = invalid
+        fun withDisabled(disabled: Boolean): Settings {
+            this.disabled = disabled
             return this
         }
 
@@ -492,7 +478,7 @@ abstract class Skill(settings: Settings) : SkillTrigger {
             this.types = other.types.toSet()
             this.cooldown = other.cooldown
             this.rarity = other.rarity
-            this.invalid = other.invalid
+            this.disabled = other.disabled
             this.weight = other.weight
             this.drawable = other.drawable
             this.parameters.clear()
@@ -509,7 +495,7 @@ abstract class Skill(settings: Settings) : SkillTrigger {
             putIntArray("types", types.map { it.ordinal })
             putInt("cooldown", cooldown)
             putString("rarity", rarity.id)
-            putBoolean("invalid", invalid)
+            putBoolean("disabled", disabled)
             putInt("weight", weight)
             putBoolean("drawable", drawable)
             put("parameters", parameters.toNbtCompound { k, v -> put(k, v.toNbt()) })
@@ -517,6 +503,13 @@ abstract class Skill(settings: Settings) : SkillTrigger {
         }
 
         fun toJson(): String = GSON.toJson(this)
+
+        fun toJsonWithVersion(version: Int): String = GSON.toJson(
+            JsonObject().apply {
+                addProperty("version", version)
+                add("settings", toJsonTree())
+            }
+        )
 
         fun toJsonTree(): JsonElement = GSON.toJsonTree(this)
 
@@ -553,7 +546,7 @@ abstract class Skill(settings: Settings) : SkillTrigger {
                 val types = nbt.getIntArray("types").map { SkillType.entries.getOrNull(it) }.filterNotNull().toSet()
                 val cooldown = nbt.getInt("cooldown")
                 val rarity = SkillRarity.fromId(nbt.getString("rarity"))
-                val invalid = nbt.getBoolean("invalid")
+                val disabled = if (nbt.contains("invalid")) nbt.getBoolean("invalid") else nbt.getBoolean("disabled")
                 val weight = nbt.getInt("weight")
                 val drawable = nbt.getBoolean("drawable")
                 val parameters = nbt.getCompound("parameters").toStringMap { Parameter.fromNbt(getCompound(it)) }
@@ -561,17 +554,48 @@ abstract class Skill(settings: Settings) : SkillTrigger {
                     .mapNotNull { element -> (element as? NbtCompound)?.let { Enhancement.fromNbt(it) } }
                 return Settings(
                     id, name, description, icon, types, cooldown, rarity,
-                    invalid, weight, drawable,
+                    disabled, weight, drawable,
                     parameters, enhancements.toMutableList()
                 )
             }
 
             @JvmStatic
-            fun fromJson(json: String): Settings? = try {
+            fun fromJson(json: String): Settings? = runCatching {
                 GSON.fromJson(json, Settings::class.java)
-            } catch (e: Exception) {
-                LOGGER.error("Failed to parse skill settings from json: $json", e)
-                null
+            }.getOrNull() ?: runCatching {
+                GSON.fromJson(
+                    GSON.fromJson(json, JsonObject::class.java).get("settings"), Settings::class.java
+                )
+            }.onFailure {
+                LOGGER.error("Failed to parse skill settings from json: $json", it)
+            }.getOrNull()
+
+            @JvmStatic
+            fun fromJsonWithVersion(json: String, version: Int): Settings? {
+                try {
+                    val obj = GSON.fromJson(json, JsonObject::class.java)
+                    if (!obj.has("settings")) {
+                        LOGGER.warn("Serializer: Missing settings: $json")
+                        return null
+                    }
+
+                    val invalidVersion = !obj.has("version")
+                        || obj.get("version").let { it !is JsonPrimitive || !it.isNumber || it.asInt != version }
+                    if (invalidVersion) {
+                        return try {
+                            fromJson(GSON.toJson(obj.get("settings")))
+                        } catch (e: Exception) {
+                            LOGGER.warn("Serializer: Invalid version: ${obj.get("version")}, expected: $version")
+                            null
+                        }
+                    }
+
+
+                    return fromJson(GSON.toJson(obj.get("settings")))
+                } catch (e: Exception) {
+                    LOGGER.error("Failed to parse skill settings from json: $json", e)
+                    return null
+                }
             }
         }
     }

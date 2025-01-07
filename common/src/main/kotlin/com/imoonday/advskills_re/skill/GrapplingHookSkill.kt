@@ -19,7 +19,7 @@ class GrapplingHookSkill : LongPressSkill(
     )
 ), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_HOOK_DURATION,
             baseValue = DEFAULT_HOOK_DURATION,
@@ -51,7 +51,7 @@ class GrapplingHookSkill : LongPressSkill(
         return if (grabAnything || raycast.type != HitResult.Type.MISS) {
             UseResult.startUsing(player, this, NbtUtils.writeVec3dToTag(raycast.pos))
         } else {
-            UseResult.fail(failedMessage())
+            UseResult.fail(failedMessage)
         }
     }
 

@@ -15,7 +15,7 @@ class MagneticTrapSkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(
                 name = PARAM_ATTRACT_RANGE,

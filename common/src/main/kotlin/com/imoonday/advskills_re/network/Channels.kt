@@ -53,6 +53,9 @@ object Channels {
     @JvmStatic
     val SYNC_SETTINGS_S2C: NetworkChannel = registerChannel("sync_settings_s2c")
 
+    @JvmStatic
+    val MODIFY_ENHANCEMENT_C2S: NetworkChannel = registerChannel("modify_enhancement_c2s")
+
     fun register() {
         USE_SKILL_C2S.register(::UseSkillC2SRequest)
         EQUIP_SKILL_C2S.register(::EquipSkillC2SRequest)
@@ -69,6 +72,7 @@ object Channels {
         UPDATE_JUMPING_C2S.register(::UpdateJumpingC2SPacket)
         SYNC_RARITIES_S2C.register(::SyncRaritiesS2CPacket)
         SYNC_SETTINGS_S2C.register(::SyncSettingsS2CPacket)
+        MODIFY_ENHANCEMENT_C2S.register(::ModifyEnhancementC2SRequest)
     }
 
     private fun registerChannel(name: String) = NetworkChannel.create(id(name))

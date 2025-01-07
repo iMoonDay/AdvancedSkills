@@ -10,10 +10,10 @@ class StrongPhysiqueSkill : PassiveSkill(
     Settings(
         id = "strong_physique",
         rarity = SkillRarity.SUPERB
-    )
+    ), customToggles = true
 ), StopTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_HEALTH_BOOST,
             baseValue = DEFAULT_HEALTH_BOOST,
@@ -23,10 +23,7 @@ class StrongPhysiqueSkill : PassiveSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
-        super.initDefaultSettings(settings)
     }
-
-    override fun isCustomToggles(): Boolean = true
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MAX_HEALTH to EntityAttributeModifier(

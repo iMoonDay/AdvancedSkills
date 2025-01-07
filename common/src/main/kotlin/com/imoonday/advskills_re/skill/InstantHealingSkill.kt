@@ -9,8 +9,8 @@ class InstantHealingSkill : HealingSkill(
         types = listOf(SkillType.RESTORATION),
         cooldown = 25,
         rarity = SkillRarity.EPIC
-    )
+    ), 6.0f
 ) {
 
-    override fun getDefaultHealingAmount(): Float = 6.0f
+    override fun cooldownWithOthers(skill: Skill): Boolean = false
 }

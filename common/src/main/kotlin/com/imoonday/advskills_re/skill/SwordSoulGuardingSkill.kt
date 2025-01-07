@@ -21,7 +21,7 @@ class SwordSoulGuardingSkill : Skill(
     )
 ), PostAttackTrigger, PostAttackedTrigger, AutoStopTrigger, UsingRenderTrigger, DangerTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_SWORD_SOUND, DEFAULT_SWORD_SOUND)
             .addParameter(

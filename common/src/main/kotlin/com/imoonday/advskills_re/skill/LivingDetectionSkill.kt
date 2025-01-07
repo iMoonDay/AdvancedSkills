@@ -18,7 +18,7 @@ class LivingDetectionSkill : Skill(
     )
 ), AutoStopTrigger, GlowingTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(
                 name = PARAM_DETECT_DURATION,

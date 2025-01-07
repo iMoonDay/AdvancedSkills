@@ -18,13 +18,13 @@ import java.util.concurrent.*
 import java.util.function.*
 import java.util.function.Function
 
-class SkillArgumentType(private val containsInvalid: Boolean) : ArgumentType<Skill> {
+class SkillArgumentType(private val containsDisabled: Boolean) : ArgumentType<Skill> {
 
     override fun <S : Any?> listSuggestions(
         context: CommandContext<S>,
         builder: SuggestionsBuilder,
     ): CompletableFuture<Suggestions> {
-        val skills = if (containsInvalid) Skills.getSkills() else Skills.getValidSkills()
+        val skills = if (containsDisabled) Skills.getSkills() else Skills.getEnabledSkills()
         val string = builder.remaining.lowercase()
         forEachMatching(skills, string, Skill::id) {
             builder.suggest(it.id.toString(), it.name)
@@ -44,7 +44,7 @@ class SkillArgumentType(private val containsInvalid: Boolean) : ArgumentType<Ski
         val string = reader.string.substring(i, reader.cursor)
         try {
             val skill = Skills.fromIdNullable(string) ?: throw UNKNOWN.create()
-            if (!containsInvalid && skill.invalid || skill.isEmpty()) throw INVALID.create()
+            if (!containsDisabled && skill.disabled || skill.isEmpty) throw INVALID.create()
             return skill
         } catch (e: InvalidIdentifierException) {
             reader.cursor = i
@@ -61,7 +61,7 @@ class SkillArgumentType(private val containsInvalid: Boolean) : ArgumentType<Ski
         override fun fromPacket(buf: PacketByteBuf): Properties = Properties(buf.readBoolean())
 
         override fun getArgumentTypeProperties(argumentType: SkillArgumentType): Properties =
-            Properties(argumentType.containsInvalid)
+            Properties(argumentType.containsDisabled)
 
         override fun writeJson(properties: Properties, json: JsonObject) =
             json.addProperty("containsInvalid", properties.containsInvalid)

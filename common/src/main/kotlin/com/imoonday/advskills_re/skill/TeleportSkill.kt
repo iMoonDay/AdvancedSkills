@@ -17,7 +17,7 @@ class TeleportSkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_TELEPORT_SOUND, DEFAULT_TELEPORT_SOUND)
             .addParameter(
@@ -27,7 +27,7 @@ class TeleportSkill : Skill(
                 value = 0.5,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
-                descArg = Enhancement.ArgFormatter.INT_PERCENT
+                descArg = Enhancement.ArgFormatter.FLOAT
             )
     }
 

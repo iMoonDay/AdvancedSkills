@@ -1,5 +1,6 @@
 package com.imoonday.advskills_re.client.render
 
+import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.render.Renderer2d.SLIDER_HEIGHT
 import com.imoonday.advskills_re.client.render.Renderer2d.SLIDER_WIDTH
 import com.imoonday.advskills_re.client.render.Renderer2d.sliderTexture
@@ -185,11 +186,11 @@ fun DrawContext.renderPanelInset(x: Int, y: Int, width: Int, height: Int) {
     val rightX = x + width
     val bottomY = y + height
 
-    this.drawVerticalLine(x, y, bottomY - 1, 0xFF000000.toInt())
-    this.drawHorizontalLine(x + 1, rightX - 1, y, 0xFF000000.toInt())
+    this.drawVerticalLine(x, y, bottomY, 0xFF000000.toInt())
+    this.drawHorizontalLine(x, rightX - 2, y, 0xFF000000.toInt())
     this.fill(rightX - 1, y, rightX, y + 1, 0xFF555555.toInt())
-    this.drawVerticalLine(rightX, y + 1, bottomY, 0xFFFFFFFF.toInt())
-    this.drawHorizontalLine(x + 1, rightX - 1, bottomY, 0xFFFFFFFF.toInt())
+    this.drawVerticalLine(rightX - 1, y, bottomY, 0xFFFFFFFF.toInt())
+    this.drawHorizontalLine(x + 1, rightX - 2, bottomY - 1, 0xFFFFFFFF.toInt())
     this.fill(x, bottomY - 1, x + 1, bottomY, 0xFF555555.toInt())
 }
 
@@ -309,10 +310,16 @@ fun DrawContext.drawTextWithBackground(
     backgroundColor: Int,
     shadow: Boolean = true,
 ) {
-    com.imoonday.advskills_re.client.client?.textRenderer?.run {
+    client?.textRenderer?.run {
         val width = getWidth(text)
         val x = centerX - width / 2
         fill(x - 1, y - 1, x + width + 1, y + fontHeight + 1, backgroundColor)
         drawText(this, text, x, y, color, shadow)
     }
+}
+
+fun DrawContext.drawBox(x: Int, y: Int, width: Int, height: Int, focused: Boolean) {
+    val i = if (focused) -1 else -6250336
+    fill(x, y, x + width, y + height, i)
+    fill(x + 1, y + 1, x + width - 1, y + height - 1, -16777216)
 }

@@ -10,10 +10,12 @@ class MicroBounceSkill : BounceSkill(
         id = "micro_bounce",
         cooldown = 6,
         rarity = SkillRarity.RARE
-    )
+    ),
+    duration = 20,
+    baseChance = 0.25f
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_DAMAGE_REDUCTION,
             baseValue = DEFAULT_DAMAGE_REDUCTION,
@@ -23,7 +25,6 @@ class MicroBounceSkill : BounceSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
-        super.initDefaultSettings(settings)
     }
 
     override fun onDamaged(
@@ -37,12 +38,6 @@ class MicroBounceSkill : BounceSkill(
         player.bounce(attacker, amount / 2)
         return amount * (1f - getFloatParam(PARAM_DAMAGE_REDUCTION, player, DEFAULT_DAMAGE_REDUCTION, max = 1f))
     }
-
-    override fun getDuration(): Int = 20
-
-    override fun getDamageMultiplier(): Float = 1.0f
-
-    override fun getBaseChance(): Float = 0.25f
 
     companion object {
 

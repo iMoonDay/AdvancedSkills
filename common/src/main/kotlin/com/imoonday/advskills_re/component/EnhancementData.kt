@@ -32,12 +32,30 @@ class EnhancementData(maxLevel: Int = 1, var activated: Boolean = true) {
         putBoolean("activated", activated)
     }
 
+    fun levelUp() {
+        currentLevel++
+    }
+
+    fun levelDown() {
+        currentLevel--
+    }
+
+    fun activate() {
+        activated = true
+    }
+
+    fun deactivate() {
+        activated = false
+    }
+
     companion object {
 
         @JvmStatic
         fun fromNbt(nbt: NbtCompound): EnhancementData = EnhancementData(
             nbt.getInt("maxLevel"),
             nbt.getBoolean("activated")
-        )
+        ).apply {
+            currentLevel = nbt.getInt("currentLevel")
+        }
     }
 }

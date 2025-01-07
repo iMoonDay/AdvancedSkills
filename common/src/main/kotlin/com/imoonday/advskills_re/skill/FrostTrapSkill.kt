@@ -18,7 +18,7 @@ class FrostTrapSkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_TRAP_RANGE,
             baseValue = DEFAULT_TRAP_RANGE,
@@ -81,7 +81,7 @@ class FrostTrapSkill : Skill(
                 success = true
             }
         }
-        return if (success) UseResult.success() else UseResult.fail(failedMessage())
+        return if (success) UseResult.success() else UseResult.fail(failedMessage)
     }
 
     companion object {

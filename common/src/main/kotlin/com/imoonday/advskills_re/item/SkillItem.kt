@@ -14,7 +14,7 @@ class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
 
     override fun getName(): Text {
         val name = skill.formattedName
-        return if (skill.invalid) name.formatted(Formatting.STRIKETHROUGH) else name
+        return if (skill.disabled) name.formatted(Formatting.STRIKETHROUGH) else name
     }
 
     override fun getName(stack: ItemStack): Text = name
@@ -32,7 +32,7 @@ class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         val stack = user.getStackInHand(hand)
         if (world.isClient) return TypedActionResult.success(stack)
-        if (skill.invalid) {
+        if (skill.disabled) {
             user.sendMessage(translate("learnSkill.invalid", skill.name))
             return TypedActionResult.fail(stack)
         }

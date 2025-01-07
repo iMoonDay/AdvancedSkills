@@ -27,7 +27,7 @@ data class SendPlayerDataC2SPacket(
 
     override fun apply(context: NetworkManager.PacketContext) {
         val player = context.player as? ServerPlayerEntity ?: return
-        if (!skill.invalid
+        if (!skill.disabled
             && skill is SendPlayerDataTrigger
             && player.hasLearned(skill)
             && skill.getSendTime().shouldSendOnTick(player, skill)

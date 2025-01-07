@@ -20,7 +20,7 @@ class PrimaryPurificationSkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_PURIFY_SOUND, DEFAULT_PURIFY_SOUND)
             .addParameter(
@@ -57,7 +57,7 @@ class PrimaryPurificationSkill : Skill(
                 ),
                 getSoundEventParam(PARAM_PURIFY_SOUND, DEFAULT_PURIFY_SOUND.get())
             )
-        } ?: UseResult.fail(failedMessage())
+        } ?: UseResult.fail(failedMessage)
 
     companion object {
         // Default Values

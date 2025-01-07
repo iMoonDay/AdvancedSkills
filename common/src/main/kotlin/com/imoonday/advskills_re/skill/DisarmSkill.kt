@@ -21,7 +21,7 @@ class DisarmSkill : Skill(
     )
 ), PostAttackTrigger, PersistentTrigger, DeathTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_DISARM_SOUND, DEFAULT_DISARM_SOUND)
             .addParameter(

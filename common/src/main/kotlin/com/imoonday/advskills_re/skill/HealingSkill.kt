@@ -8,15 +8,15 @@ import net.minecraft.entity.player.*
 import net.minecraft.particle.*
 import net.minecraft.server.network.*
 
-abstract class HealingSkill(settings: Settings) : Skill(settings),
+abstract class HealingSkill(settings: Settings, private val healingAmount: Float) : Skill(settings),
     SynchronousCoolingTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_HEAL_SOUND, DEFAULT_HEAL_SOUND)
             .addParameter(
                 name = PARAM_HEAL_AMOUNT,
-                baseValue = getDefaultHealingAmount(),
+                baseValue = healingAmount,
                 enhancementId = ENHANCEMENT_AMOUNT,
                 value = 0.2f,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
@@ -25,8 +25,6 @@ abstract class HealingSkill(settings: Settings) : Skill(settings),
                 genericText = true
             )
     }
-
-    abstract fun getDefaultHealingAmount(): Float
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val healingAmount = getHealingAmount(user)
@@ -40,10 +38,12 @@ abstract class HealingSkill(settings: Settings) : Skill(settings),
     }
 
     fun getHealingAmount(player: ServerPlayerEntity): Float =
-        getFloatParam(PARAM_HEAL_AMOUNT, player, getDefaultHealingAmount(), 0f)
+        getFloatParam(PARAM_HEAL_AMOUNT, player, healingAmount, 0f)
 
     override fun getOtherSkills(player: PlayerEntity): Set<Skill> =
-        player.learnedSkills.filter { it is HealingSkill && it != this }.toSet()
+        player.learnedSkills.filter { it is HealingSkill && it != this && it.cooldownWithOthers(this) }.toSet()
+
+    open fun cooldownWithOthers(skill: Skill): Boolean = true
 
     companion object {
 

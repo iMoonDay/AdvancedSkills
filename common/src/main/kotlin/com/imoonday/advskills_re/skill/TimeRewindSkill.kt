@@ -21,7 +21,7 @@ class TimeRewindSkill : LongPressSkill(
     )
 ), UsingRenderTrigger, DeathTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_REWIND_SOUND, DEFAULT_REWIND_SOUND)
             .addParameter(PARAM_HEAL_SOUND, DEFAULT_HEAL_SOUND)

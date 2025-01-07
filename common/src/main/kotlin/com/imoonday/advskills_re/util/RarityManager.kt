@@ -27,7 +27,7 @@ object RarityManager {
         return try {
             GSON.fromJson(file.readText(), SkillRarity::class.java)
         } catch (e: Exception) {
-            LOGGER.error("Failed to load Skill Rarity from file: $file", e)
+            LOGGER.error("Failed to load skill rarity from file: $file", e)
             null
         }
     }
@@ -50,7 +50,7 @@ object RarityManager {
             } ?: false
         }
 
-        LOGGER.info("Loaded $loadedCount Skill Rarities")
+        LOGGER.info("Loaded $loadedCount skill rarities")
     }
 
     @JvmStatic
@@ -68,7 +68,9 @@ object RarityManager {
                 skillsDir.listAllFiles(".*\\.json").map { it.toFile() }.count { file ->
                     tryLoad(file)?.also { put(it.id, it) } != null
                 }.also {
-                    LOGGER.info("Loaded $it Skill Rarities from server config")
+                    if (it > 0) {
+                        LOGGER.info("Loaded $it skill rarities from server config")
+                    }
                 }
             }
         }
@@ -84,13 +86,13 @@ object RarityManager {
             val json = try {
                 GSON.toJson(rarity)
             } catch (e: Exception) {
-                LOGGER.error("Failed to encode Skill Rarity: $rarity", e)
+                LOGGER.error("Failed to encode skill rarity: $rarity", e)
                 return
             }
             file.writeText(json)
-            LOGGER.info("Saved Skill Rarity with id $id")
+            LOGGER.info("Saved skill rarity with id $id")
         } catch (e: Exception) {
-            LOGGER.error("Failed to save Skill Rarity with id $id", e)
+            LOGGER.error("Failed to save skill rarity with id $id", e)
         }
     }
 
@@ -116,7 +118,7 @@ object RarityManager {
                 val json = try {
                     GSON.toJson(rarity)
                 } catch (e: Exception) {
-                    LOGGER.error("Failed to encode Skill Rarity: $rarity", e)
+                    LOGGER.error("Failed to encode skill rarity: $rarity", e)
                     continue
                 }
                 file.writeText(json)
@@ -126,7 +128,7 @@ object RarityManager {
             }
         }
 
-        LOGGER.info("Skill Rarities saved: $successCount succeeded, ${rarities.size - successCount} failed")
+        LOGGER.info("Skill rarities saved: $successCount succeeded, ${rarities.size - successCount} failed")
     }
 
     @JvmStatic

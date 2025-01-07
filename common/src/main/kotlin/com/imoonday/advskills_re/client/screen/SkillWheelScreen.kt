@@ -68,7 +68,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
                 }
             }
             slot.let { player.getSkill(it) }
-                .takeIf { !it.invalid }
+                .takeIf { !it.disabled }
                 ?.run {
                     var y = centerY + 60
                     textRenderer.textHandler
@@ -145,7 +145,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
 
             2 -> {
                 selectingSlot?.let { index ->
-                    clientPlayer?.getSkill(index)?.takeUnless { it.invalid }?.let {
+                    clientPlayer?.getSkill(index)?.takeUnless { it.disabled }?.let {
                         client!!.setScreen(SkillGalleryScreen(it))
                     }
                 } ?: run {

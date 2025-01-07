@@ -26,14 +26,14 @@ class SkillContainer(
     }
 
     fun getAllSkills(predicate: (Skill, SkillData) -> Boolean = { _, _ -> true }): Set<Skill> =
-        skills.filterNot { it.key.invalid }.filter { predicate(it.key, it.value) }.keys
+        skills.filterNot { it.key.disabled }.filter { predicate(it.key, it.value) }.keys
 
     fun learn(
         skill: Skill,
         data: SkillData = SkillData(),
         resultCallback: (Boolean) -> Unit = {}
     ): Boolean =
-        if (skills.containsKey(skill) || skill.invalid) {
+        if (skills.containsKey(skill) || skill.disabled) {
             resultCallback(false)
             false
         } else {

@@ -18,7 +18,7 @@ class SelfHealingSkill : Skill(
     )
 ), AutoTrigger, AutoStopTrigger, PostDamagedTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(
                 name = PARAM_CHARGE_DURATION,

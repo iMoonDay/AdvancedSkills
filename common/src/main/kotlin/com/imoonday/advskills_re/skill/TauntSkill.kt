@@ -20,7 +20,7 @@ class TauntSkill : Skill(
     )
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger, TauntTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(
                 name = PARAM_TAUNT_DURATION,

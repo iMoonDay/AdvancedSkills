@@ -17,7 +17,7 @@ class DuplicationSkill : Skill(
     )
 ), SendPlayerVelocityTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_CLONE_INTERVAL, DEFAULT_CLONE_INTERVAL)
             .addParameter(PARAM_CLONE_MOVE_TIME, DEFAULT_CLONE_MOVE_TIME)

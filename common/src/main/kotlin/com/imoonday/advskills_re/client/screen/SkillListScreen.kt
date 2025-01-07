@@ -8,6 +8,7 @@ import com.imoonday.advskills_re.component.SkillSlot.Companion.indexTexture
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
+import net.minecraft.client.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.gui.screen.*
 import net.minecraft.client.gui.screen.narration.*
@@ -31,11 +32,13 @@ class SkillListScreen(
     private val skillSlots = mutableListOf<EquippedSkillSlot>()
     private val container
         get() = player.skillContainer
+    private lateinit var enhancementList: EnhancementListWidget
     private lateinit var skillScroll: SkillContainerWidget
     private lateinit var learnButton: ButtonWidget
 
     override fun init() {
         super.init()
+        initEnhancementList()
         showCreativeButtons = player.isCreative && player.hasPermissionLevel(4)
         addSkillScroll()
         addSkillSlots()
@@ -75,6 +78,15 @@ class SkillListScreen(
             .also(::addDrawableChild)
     }
 
+    private fun initEnhancementList() {
+        enhancementList = EnhancementListWidget(
+            width / 2 - width / 4, height / 2 - height / 4, width / 2, height / 2, textRenderer, player, Skills.EMPTY
+        ).apply {
+            visible = false
+            fixOverflow(this@SkillListScreen.width, this@SkillListScreen.height)
+        }
+    }
+
     private fun createButton(x: Int, y: Int, text: Text, content: String, close: Boolean = false) =
         ButtonWidget.builder(text) {
             (player as ClientPlayerEntity).networkHandler.sendCommand("skills $content @s")
@@ -99,8 +111,13 @@ class SkillListScreen(
         button: Int,
         line: SkillContainerWidget.SkillLine,
     ): Boolean {
-        if (button != 0) return false
         val skill = line.skill
+        if (button == 1) {
+            openEnhancementList(skill, mouseX, mouseY)
+            return true
+        }
+
+        if (button != 0) return false
         val validSlot = getValidSlot(skill)
         val rightX = skillScroll.x + skillScroll.width
         if (validSlot != null && mouseX.toInt() in rightX - 22..rightX - 6) {
@@ -142,7 +159,7 @@ class SkillListScreen(
         val equipX = x + width - 22
         val right = x + width - 6
         val selected = selectedSkill == skill
-        if (selected || focused || hovered) {
+        if (!hasOverlay() && (selected || focused || hovered)) {
             context.overlayHighlightWithSize(x, y, width, height, selected)
         }
         val gap = 5
@@ -150,7 +167,7 @@ class SkillListScreen(
 
         val iconY = y + (height - 16) / 2
         SkillRenderer.renderIcon(skill, context, currentX, iconY)
-        if (mouseX in currentX..currentX + 16 && mouseY in iconY..iconY + 16) {
+        if (!hasOverlay() && mouseX in currentX..currentX + 16 && mouseY in iconY..iconY + 16) {
             setTooltip(SkillRenderer.getTooltip(client!!, skill, player))
         }
 
@@ -169,7 +186,7 @@ class SkillListScreen(
         val hasValidSlot = getValidSlot(skill) != null
         renderDescription(context, currentX, y + height / 2 + 1, equipX, skill.description, hasValidSlot)
         if (hasValidSlot) {
-            if (mouseX in equipX..<right && mouseY in y..<y + height) {
+            if (!hasOverlay() && mouseX in equipX..<right && mouseY in y..<y + height) {
                 context.overlayHighlight(equipX, y, right, y + height, false)
             }
             context.drawTexture(equipTexture, equipX, iconY, 0f, 0f, 16, 16, 16, 16)
@@ -223,6 +240,7 @@ class SkillListScreen(
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(context)
         super.render(context, mouseX, mouseY, delta)
+
         val level = player.skillLevel
         val cycle = player.skillCycle
         context.drawText(
@@ -265,6 +283,8 @@ class SkillListScreen(
                 false
             )
         }
+
+        enhancementList.render(context, mouseX, mouseY, delta)
     }
 
     override fun update() = updateScreen()
@@ -279,6 +299,8 @@ class SkillListScreen(
         } else {
             learnButton.message = translate("screen.list.button.learn")
         }
+
+        enhancementList.update()
     }
 
     override fun shouldPause(): Boolean = false
@@ -296,11 +318,78 @@ class SkillListScreen(
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+        if (enhancementList.keyPressed(keyCode, scanCode, modifiers)) {
+            return true
+        }
         if (client!!.options.inventoryKey.matchesKey(keyCode, scanCode)) {
             close()
             return true
         }
-        return super.keyPressed(keyCode, scanCode, modifiers)
+        return !hasOverlay() && super.keyPressed(keyCode, scanCode, modifiers)
+    }
+
+    override fun mouseMoved(mouseX: Double, mouseY: Double) {
+        if (hasOverlay()) {
+            enhancementList.mouseMoved(mouseX, mouseY)
+        } else {
+            super.mouseMoved(mouseX, mouseY)
+        }
+    }
+
+    override fun keyReleased(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+        if (enhancementList.keyReleased(keyCode, scanCode, modifiers)) {
+            return true
+        }
+        return !hasOverlay() && super.keyReleased(keyCode, scanCode, modifiers)
+    }
+
+    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        if (enhancementList.mouseClicked(mouseX, mouseY, button)) {
+            return true
+        }
+        if (hasOverlay() && !enhancementList.isMouseOver(mouseX, mouseY)) {
+            enhancementList.close()
+            return true
+        }
+        return !hasOverlay() && super.mouseClicked(mouseX, mouseY, button)
+    }
+
+    override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
+        if (enhancementList.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
+            return true
+        }
+        return !hasOverlay() && super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
+    }
+
+    override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        if (enhancementList.mouseReleased(mouseX, mouseY, button)) {
+            return true
+        }
+        return !hasOverlay() && super.mouseReleased(mouseX, mouseY, button)
+    }
+
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean {
+        if (enhancementList.mouseScrolled(mouseX, mouseY, amount)) {
+            return true
+        }
+        return !hasOverlay() && super.mouseScrolled(mouseX, mouseY, amount)
+    }
+
+    private fun hasOverlay() = enhancementList.visible
+
+    private fun openEnhancementList(skill: Skill, mouseX: Double, mouseY: Double) {
+        enhancementList.apply {
+            setPosition(mouseX.toInt() + 12, mouseY.toInt() - 12)
+            fixOverflow(this@SkillListScreen.width, this@SkillListScreen.height)
+            updateSkill(skill)
+            visible = true
+        }
+    }
+
+    override fun resize(client: MinecraftClient, width: Int, height: Int) {
+        val old = enhancementList
+        super.resize(client, width, height)
+        enhancementList.restoreFrom(old)
     }
 
     inner class EquippedSkillSlot(
@@ -316,8 +405,18 @@ class SkillListScreen(
             get() = player.getSlot(slot)
         private var lastClickTime: Long = 0
 
+        override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+            if (super.mouseClicked(mouseX, mouseY, button)) {
+                return true
+            } else if (button == 1 && clicked(mouseX, mouseY)) {
+                openEnhancementList(skill, mouseX, mouseY)
+                return true
+            }
+            return false
+        }
+
         override fun onClick(mouseX: Double, mouseY: Double) {
-            if (!skill.invalid && System.currentTimeMillis() - lastClickTime < 250L) {
+            if (!skill.disabled && System.currentTimeMillis() - lastClickTime < 250L) {
                 player.equip(Skills.EMPTY, slot)
             }
             lastClickTime = System.currentTimeMillis()
@@ -330,7 +429,7 @@ class SkillListScreen(
         override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
             context.renderTooltip(x, y, width, height)
             val selected = selectedSlot == slot
-            if (selected || hovered) {
+            if (!hasOverlay() && (selected || hovered)) {
                 context.fill(
                     x + 3,
                     y + 3,
@@ -340,11 +439,11 @@ class SkillListScreen(
                 )
             }
             val skill = skill
-            if (!skill.invalid) {
+            if (!skill.disabled) {
                 val iconX = x + 8
                 val iconY = y + (height - 16) / 2
                 SkillRenderer.renderIcon(skill, context, iconX, iconY)
-                if (mouseX in iconX..iconX + 16 && mouseY in iconY..iconY + 16) {
+                if (!hasOverlay() && mouseX in iconX..iconX + 16 && mouseY in iconY..iconY + 16) {
                     setTooltip(SkillRenderer.getTooltip(client!!, skill, player))
                 }
 
@@ -371,7 +470,7 @@ class SkillListScreen(
                 9,
                 9
             )
-            if (slot != null && mouseX in x + width - 13..x + width - 13 + 9 && mouseY in y + 4..y + 4 + 9) {
+            if (!hasOverlay() && slot != null && mouseX in x + width - 13..x + width - 13 + 9 && mouseY in y + 4..y + 4 + 9) {
                 setTooltip(slot.tooltip)
             }
         }

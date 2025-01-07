@@ -18,7 +18,7 @@ class LightLandingSkill : Skill(
     )
 ), FallTrigger, AutoStopTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_LANDING_SOUND, DEFAULT_LANDING_SOUND)
             .addParameter(PARAM_BREAK_SOUND, DEFAULT_BREAK_SOUND)
@@ -44,6 +44,11 @@ class LightLandingSkill : Skill(
         player.playSoundFromParam(PARAM_LANDING_SOUND, DEFAULT_LANDING_SOUND)
         player.serverWorld.spawnParticles(ParticleTypes.CLOUD, player.x, player.y, player.z, 10, 0.5, 0.0, 0.5, 0.1)
         return 0
+    }
+
+    override fun onStop(player: ServerPlayerEntity) {
+        super.onStop(player)
+        player.startCooling()
     }
 
     companion object {

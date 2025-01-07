@@ -24,7 +24,7 @@ class DeathArchiveSkill : Skill(
     )
 ), UsingProgressTrigger, DeathTrigger, DamageTrigger, TickTrigger, UnequipTrigger, UsingRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_TELEPORT_SOUND, DEFAULT_TELEPORT_SOUND)
             .addParameter(
@@ -40,7 +40,7 @@ class DeathArchiveSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult {
         if (user.isUsing() && user.isInInvulnerableState()) {
-            return fail(failedMessage())
+            return fail(failedMessage)
         }
         val active = user.toggleUsing(this, NbtCompound().apply { NbtUtils.writeEntityGlobalPosToTag(user, this) })
         return consume(translateActive(this, active))

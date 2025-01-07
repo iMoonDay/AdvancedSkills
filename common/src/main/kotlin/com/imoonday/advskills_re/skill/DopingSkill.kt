@@ -20,7 +20,7 @@ class DopingSkill : Skill(
     )
 ), AttributeTrigger, AutoStopTrigger, UsingRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(
                 name = PARAM_DOPING_DURATION,

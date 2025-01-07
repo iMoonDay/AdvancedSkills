@@ -21,8 +21,6 @@ class PortableChestSkill : Skill(
     )
 ), TickTrigger, UsingProgressTrigger {
 
-    override fun initDefaultSettings(settings: Settings) = Unit
-
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {
         user.openHandledScreen(
             SimpleNamedScreenHandlerFactory(

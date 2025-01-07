@@ -54,7 +54,7 @@ object SkillRenderer {
                 context.setShaderColor(1.0f, 1.0f, 1.0f, alpha.toFloat())
             }
         }
-        if (!skill.isEmpty()) renderIcon(skill, context, x, y)
+        if (!skill.isEmpty) renderIcon(skill, context, x, y)
         if (flashed) {
             context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
             RenderSystem.disableBlend()
@@ -81,7 +81,7 @@ object SkillRenderer {
         height: Int,
         player: PlayerEntity,
     ) {
-        if (skill.invalid || !player.hasLearned(skill)) return
+        if (skill.disabled || !player.hasLearned(skill)) return
         if (skill is ProgressTrigger && skill.shouldDisplay(player)
             && (player.isUsing(skill) || skill !is UsingProgressTrigger)
         ) {
@@ -150,7 +150,7 @@ object SkillRenderer {
         player: PlayerEntity
     ): MutableList<OrderedText> {
         val list = skill.getItemTooltips(displayName = true)
-        val tooltips = skill.getEnhancementTooltips(player)
+        val tooltips = skill.getEnhancementTooltips(player) { _, data -> data.activated }
         if (tooltips.isNotEmpty()) {
             list.add(Text.empty())
             list.add(translate("screen.inventory.enhance").formatted(Formatting.GRAY))

@@ -20,7 +20,7 @@ class LiquidShieldSkill : Skill(
     )
 ), TickTrigger, AutoStopTrigger, FluidMovementTrigger, BreatheInWaterTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_SHIELD_SOUND, DEFAULT_SHIELD_SOUND)
             .addParameter(

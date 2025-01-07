@@ -21,7 +21,7 @@ class WallJumpSkill : PassiveSkill(
     )
 ), AutoTrigger, SendPlayerDataTrigger, UsingProgressTrigger, FallTrigger, StopTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_JUMP_SOUND, DEFAULT_JUMP_SOUND)
             .addParameter(
@@ -33,7 +33,6 @@ class WallJumpSkill : PassiveSkill(
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             )
-        super.initDefaultSettings(settings)
     }
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean =

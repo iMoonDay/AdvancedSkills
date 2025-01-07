@@ -10,10 +10,10 @@ class AutomaticUphillSkill : PassiveSkill(
         id = "automatic_uphill",
         types = listOf(SkillType.MOVEMENT),
         rarity = SkillRarity.RARE
-    )
+    ), toggleable = true
 ), StepHeightTrigger, PersistentTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_STEP_HEIGHT,
             baseValue = DEFAULT_STEP_HEIGHT,
@@ -23,10 +23,7 @@ class AutomaticUphillSkill : PassiveSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.FLOAT
         )
-        super.initDefaultSettings(settings)
     }
-
-    override fun isToggleable(): Boolean = true
 
     override fun getStepHeight(player: PlayerEntity): Float? {
         if (!isAvailable(player)) return null

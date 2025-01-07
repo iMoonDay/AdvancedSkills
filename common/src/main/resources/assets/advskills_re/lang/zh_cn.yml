@@ -881,7 +881,7 @@ advskills_re:
       description: 你可以在岩浆上行走，并免疫岩浆块
     armor_shatterer:
       name: 破甲者
-      description: 发射一个以80%概率给予周围生物易伤效果的能量球，使其受到的伤害增加
+      description: 发射一个能够给予周围生物易伤效果的能量球，使其受到的伤害增加，有小概率给予更高级别的易伤效果
       count:
         name: 次数增幅
         description: '%s 发射次数'
@@ -1058,9 +1058,10 @@ advskills_re:
       progressBarColor: 进度条颜色
       displaySelectedSkillSlot: 额外显示选中技能槽
       displayQuickCastKey: 显示快捷施法键
-      selectedSlotPosition: 选中技能槽位置
-      selectedSlotOffsetX: 选中技能槽X偏移量
-      selectedSlotOffsetY: 选中技能槽Y偏移量
+      useVanillaSlot: 独立技能槽使用原版副手栏样式
+      selectedSlotPosition: 独立技能槽位置
+      selectedSlotOffsetX: 独立技能槽X偏移量
+      selectedSlotOffsetY: 独立技能槽Y偏移量
       displayProgressBarBelowCrosshair: 在准星下方显示选中技能的进度条
       progressBarOffsetY: 进度条Y偏移量
       invalidLayout: "错误输入! 只能包含1-10和分隔符','"

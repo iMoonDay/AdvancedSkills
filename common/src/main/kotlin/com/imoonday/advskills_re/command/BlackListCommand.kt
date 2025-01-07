@@ -110,7 +110,7 @@ object BlackListCommand : BaseCommand("blacklist") {
             return 0
         }
         val listText = blackList.toText(
-            formatter = { id -> Skills.fromId(id).takeUnless { it.isEmpty() }?.hoverableName },
+            formatter = { id -> Skills.fromId(id).takeUnless { it.isEmpty }?.hoverableName },
             prefix = "[".toText(),
             suffix = "]".toText()
         )

@@ -11,10 +11,10 @@ class FoodlessSkill : PassiveSkill(
         id = "foodless",
         types = listOf(SkillType.PASSIVE, SkillType.UTILITY),
         rarity = SkillRarity.RARE
-    )
+    ), customToggles = true
 ), HungerTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_MIN_HUNGER,
             baseValue = DEFAULT_MIN_HUNGER,
@@ -24,7 +24,6 @@ class FoodlessSkill : PassiveSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT
         )
-        super.initDefaultSettings(settings)
     }
 
     override fun onFoodLevelChange(player: PlayerEntity, level: Int): Int {
@@ -42,8 +41,6 @@ class FoodlessSkill : PassiveSkill(
             hungerManager.foodLevel = minHunger
         }
     }
-
-    override fun isCustomToggles(): Boolean = true
 
     companion object {
 

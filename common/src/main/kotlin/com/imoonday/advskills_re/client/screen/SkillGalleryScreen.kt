@@ -32,7 +32,7 @@ class SkillGalleryScreen(
             (width * 0.55).toInt(),
             height - 30,
             34,
-            { Skills.getValidSkills() }
+            { Skills.getEnabledSkills() }
         ) { context, index, skill, x, y, width, height, _, _, hovered, focused, _ ->
             val selected = selectedSkill == skill
             if (selected || focused || hovered) {

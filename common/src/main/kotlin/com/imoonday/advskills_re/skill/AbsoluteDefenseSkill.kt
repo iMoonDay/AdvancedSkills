@@ -21,7 +21,7 @@ class AbsoluteDefenseSkill : Skill(
     )
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_BLOCK_SOUND, DEFAULT_BLOCK_SOUND)
             .addParameter(PARAM_BREAK_SOUND, DEFAULT_BREAK_SOUND)

@@ -18,7 +18,7 @@ class GlidingSkill : PassiveSkill(
     )
 ), TickTrigger, JumpStateTrigger, ProgressTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_GLIDE_DURATION,
             baseValue = DEFAULT_GLIDE_DURATION,
@@ -28,7 +28,6 @@ class GlidingSkill : PassiveSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
-        super.initDefaultSettings(settings)
     }
 
     override fun tick(player: PlayerEntity, usedTime: Int) {

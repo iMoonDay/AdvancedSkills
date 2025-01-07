@@ -23,7 +23,7 @@ class MultipleLaserSkill : LongPressSkill(
     )
 ), DangerTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_DAMAGE_INTERVAL, DEFAULT_DAMAGE_INTERVAL)
             .addParameter(PARAM_LASER_SOUND, DEFAULT_LASER_SOUND)

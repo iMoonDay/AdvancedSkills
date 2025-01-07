@@ -9,7 +9,7 @@ class SkillChoice(skill: Skill) : Choosable(skill) {
 
     override val type: Type = Type.SKILL
 
-    override fun isEmpty(): Boolean = skill.invalid
+    override fun isEmpty(): Boolean = skill.disabled
 
     override fun compatibleWith(other: Choosable): Boolean = other.type != this.type || other.skill != skill
 

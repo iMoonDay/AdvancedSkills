@@ -141,7 +141,7 @@ class SkillChoiceScreen(
         private fun renderSkillBox(context: DrawContext, choice: SkillChoice) {
             val skill = choice.skill
 
-            if (skill.invalid) return
+            if (skill.disabled) return
             val gap = 5
             val x = x + 8
             var y = y + gap

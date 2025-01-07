@@ -15,12 +15,15 @@ import net.minecraft.client.gui.*
 import net.minecraft.client.network.*
 import net.minecraft.entity.player.*
 import net.minecraft.text.*
+import net.minecraft.util.*
 import net.minecraft.util.math.*
+import kotlin.Pair
 
 private const val SLOT_SIZE_WITH_GAP = 22
 
 object SkillSlotRenderer {
 
+    private val widgetsTexture = Identifier("textures/gui/widgets.png")
     private val slotsTexture = id("slots.png")
     private val config = ClientConfig.get()
 
@@ -127,7 +130,7 @@ object SkillSlotRenderer {
         if (player.isCooling(it)) {
             true
         } else if (it is PassiveSkill) {
-            !it.isToggleable() && player.isUsing(it)
+            !it.isToggleable(player) && player.isUsing(it)
         } else {
             player.isUsing(it)
         }
@@ -231,7 +234,12 @@ object SkillSlotRenderer {
         if (config.displayQuickCastKey) {
             val text = "[".toText().append(ModKeyBindings.QUICK_CAST.boundKeyLocalizedText).append("]")
             val textRenderer = client!!.textRenderer
-            context.drawCenteredTextWithShadow(textRenderer, text, x + 11, y - textRenderer.fontHeight, 0xFFFFFF)
+            val left = x + 11 < context.scaledWindowWidth / 2
+            val centerX = if (left) x + 11 else x + 7 + 11
+            context.drawCenteredTextWithShadow(
+                textRenderer, text,
+                centerX, y - textRenderer.fontHeight, 0xFFFFFF
+            )
         }
 
         if (belowCrosshair) {
@@ -250,9 +258,22 @@ object SkillSlotRenderer {
         renderBelowOutline: (iconX: Int, iconY: Int) -> Unit = { _, _ -> }
     ) {
         RenderSystem.enableBlend()
-        context.drawTexture(slotsTexture, x, y, 22, 144, 22, 22)
-        renderBelowOutline(x + 3, y + 3)
-        context.drawTexture(slotsTexture, x, y, 0, 144, 22, 22)
+        val i = context.scaledWindowWidth / 2
+        val left = x + 11 < i
+        if (config.useVanillaSlot) {
+            if (left) {
+                context.drawTexture(widgetsTexture, x, context.scaledWindowHeight - 23, 24, 22, 29, 24)
+                renderBelowOutline(x + 3, y + 3)
+            } else {
+                context.drawTexture(widgetsTexture, x, context.scaledWindowHeight - 23, 53, 22, 29, 24)
+                renderBelowOutline(x + 10, y + 3)
+            }
+        } else {
+            val x1 = if (left) x else x + 7
+            context.drawTexture(slotsTexture, x1, y, 22, 144, 22, 22)
+            renderBelowOutline(x1 + 3, y + 3)
+            context.drawTexture(slotsTexture, x1, y, 0, 144, 22, 22)
+        }
         RenderSystem.disableBlend()
     }
 
@@ -320,7 +341,7 @@ object SkillSlotRenderer {
                 slotWidth: Int,
                 slotHeight: Int
             ): Pair<Int, Int> =
-                windowWidth / 2 - 91 - 29 - (if (player.offHandStack.isEmpty) 0 else slotWidth + 7) + config.selectedSlotOffsetX to windowHeight - slotHeight + config.selectedSlotOffsetY
+                windowWidth / 2 - 91 - 29 - (if (player.mainArm == Arm.LEFT || player.offHandStack.isEmpty) 0 else slotWidth + 7) + config.selectedSlotOffsetX to windowHeight - slotHeight + config.selectedSlotOffsetY
         },
 
         @SerialName("right_of_hotbar")
@@ -333,7 +354,7 @@ object SkillSlotRenderer {
                 slotWidth: Int,
                 slotHeight: Int
             ): Pair<Int, Int> =
-                windowWidth / 2 + 91 + 29 - slotWidth + config.selectedSlotOffsetX to windowHeight - slotHeight + config.selectedSlotOffsetY
+                windowWidth / 2 + 91 + (if (player.mainArm == Arm.RIGHT || player.offHandStack.isEmpty) 0 else slotWidth + 7) + config.selectedSlotOffsetX to windowHeight - slotHeight + config.selectedSlotOffsetY
         },
 
         @SerialName("right_bottom")

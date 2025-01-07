@@ -67,7 +67,7 @@ object ModKeyBindings {
         { ClientConfig.get().quickCastWheelHoldTime },
         firstTriggerCallback = { client, _ ->
             val slot = quickCastSlot
-            slot != null && client.player?.getSkill(slot)?.isEmpty() != true
+            slot != null && client.player?.getSkill(slot)?.isEmpty != true
         },
         secondTriggerCallback = { client, _ ->
             if (!isUsingQuickCast && client.currentScreen == null) {

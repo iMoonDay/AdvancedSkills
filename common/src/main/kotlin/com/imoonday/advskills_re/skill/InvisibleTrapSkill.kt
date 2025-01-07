@@ -19,7 +19,7 @@ class InvisibleTrapSkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_TRAP_RANGE,
             baseValue = DEFAULT_TRAP_RANGE,
@@ -82,7 +82,7 @@ class InvisibleTrapSkill : Skill(
             }
         }
 
-        return UseResult.of(success, failMessage = failedMessage())
+        return UseResult.of(success, failMessage = failedMessage)
     }
 
     companion object {

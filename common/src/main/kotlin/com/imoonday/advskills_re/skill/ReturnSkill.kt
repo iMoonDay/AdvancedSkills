@@ -21,7 +21,7 @@ class ReturnSkill : LongPressSkill(
     )
 ), UsingRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_RETURN_SOUND, DEFAULT_RETURN_SOUND)
             .addParameter(
@@ -49,7 +49,7 @@ class ReturnSkill : LongPressSkill(
             val startPos = NbtUtils.readEntityPositionFromTag(player.getActiveData())
             if (startPos != player.pos) {
                 player.stopUsing()
-                player.sendMessage(failedMessage(), true)
+                player.sendMessage(failedMessage, true)
             } else {
                 var (_, world, targetPos) = getTeleportInfo(player)
                 val dimensions = player.getDimensions(player.pose)
@@ -104,7 +104,7 @@ class ReturnSkill : LongPressSkill(
     override fun onRelease(player: ServerPlayerEntity, pressedTime: Int): UseResult {
         player.stopUsing()
         if (pressedTime < getMaxUseTime(player)) {
-            return UseResult.fail(failedMessage())
+            return UseResult.fail(failedMessage)
         }
         val (spawnAngle, world, targetPos) = getTeleportInfo(player)
         player.playSoundFromParam(PARAM_RETURN_SOUND, DEFAULT_RETURN_SOUND.get())

@@ -16,7 +16,7 @@ class UnhinderedStrideSkill : Skill(
     )
 ), StepHeightTrigger, AutoStopTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_STRIDE_DURATION,
             baseValue = DEFAULT_STRIDE_DURATION,

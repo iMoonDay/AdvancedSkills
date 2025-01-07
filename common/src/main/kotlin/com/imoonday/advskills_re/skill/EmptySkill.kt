@@ -11,7 +11,7 @@ object EmptySkill : Skill(
         name = translateSkill("empty", "name"),
         description = Text.empty(),
         rarity = SkillRarity.UNKNOWN,
-        invalid = true,
+        disabled = true,
     )
 ) {
 
@@ -20,6 +20,4 @@ object EmptySkill : Skill(
     override fun getItemTooltips(displayName: Boolean, displayId: Boolean): MutableList<Text> = mutableListOf()
 
     override fun updateSettings(settings: Settings) = Unit
-
-    override fun initDefaultSettings(settings: Settings) = Unit
 }

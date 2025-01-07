@@ -19,7 +19,7 @@ class ArmorShattererSkill : Skill(
     )
 ), SpecialStateRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addEnhancement(ENHANCEMENT_SELF_IMMUNE)
             .addParameter(PARAM_LAUNCH_SOUND, DEFAULT_LAUNCH_SOUND)

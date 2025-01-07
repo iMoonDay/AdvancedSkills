@@ -8,10 +8,10 @@ class AgilitySkill : PassiveSkill(
     Settings(
         id = "agility",
         rarity = SkillRarity.RARE
-    )
+    ), customToggles = true
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_SPEED_BOOST,
             baseValue = DEFAULT_SPEED_BOOST,
@@ -21,10 +21,7 @@ class AgilitySkill : PassiveSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
-        super.initDefaultSettings(settings)
     }
-
-    override fun isCustomToggles(): Boolean = true
 
     override fun getAttributes(player: PlayerEntity): Map<EntityAttribute, EntityAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(

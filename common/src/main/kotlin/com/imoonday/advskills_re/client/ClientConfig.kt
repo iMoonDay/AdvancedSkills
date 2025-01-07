@@ -77,6 +77,11 @@ class ClientConfig {
             field = value
             save()
         }
+    var useVanillaSlot: Boolean = false
+        set(value) {
+            field = value
+            save()
+        }
     var selectedSlotPosition: SkillSlotRenderer.SlotPosition = SkillSlotRenderer.SlotPosition.LEFT_OF_HOTBAR
         set(value) {
             field = value

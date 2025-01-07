@@ -28,7 +28,7 @@ class DangerPerceptionSkill : Skill(
     )
 ), AutoStopTrigger, AttributeTrigger, DamageTrigger, UsingRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_SPEED_SOUND, DEFAULT_SPEED_SOUND)
             .addParameter(

@@ -15,7 +15,7 @@ class EnhancementChoice(
     val enhancement: Enhancement?
         get() = skill.getEnhancement(enhancementId)
 
-    override fun isEmpty(): Boolean = skill.invalid || enhancement == null
+    override fun isEmpty(): Boolean = skill.disabled || enhancement == null
 
     override fun compatibleWith(other: Choosable): Boolean {
         if (other.type != this.type) return true

@@ -20,7 +20,7 @@ class AdvancedPurificationSkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_SUCCESS_SOUND, DEFAULT_SUCCESS_SOUND)
             .addParameter(
@@ -66,7 +66,7 @@ class AdvancedPurificationSkill : Skill(
                 )
             ).withSound(getSuccessSound())
         }
-    ?: UseResult.fail(failedMessage())
+    ?: UseResult.fail(failedMessage)
 
     private fun getSuccessSound() = getSoundEventParam(PARAM_SUCCESS_SOUND, DEFAULT_SUCCESS_SOUND.get())
 

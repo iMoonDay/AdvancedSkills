@@ -10,10 +10,10 @@ class FasterEatingSkill : PassiveSkill(
     Settings(
         id = "faster_eating",
         rarity = SkillRarity.SUPERB
-    )
+    ), customToggles = true
 ), ItemMaxUseTimeTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_SPEED_BOOST,
             baseValue = DEFAULT_SPEED_BOOST,
@@ -23,10 +23,7 @@ class FasterEatingSkill : PassiveSkill(
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT
         )
-        super.initDefaultSettings(settings)
     }
-
-    override fun isCustomToggles(): Boolean = true
 
     override fun getItemMaxUseTimeMultiplier(player: PlayerEntity, stack: ItemStack): Float {
         if (!isAvailable(player)) return 0f

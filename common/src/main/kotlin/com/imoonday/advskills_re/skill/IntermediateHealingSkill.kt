@@ -9,8 +9,5 @@ class IntermediateHealingSkill : HealingSkill(
         types = listOf(SkillType.RESTORATION),
         cooldown = 30,
         rarity = SkillRarity.SUPERB
-    )
-) {
-
-    override fun getDefaultHealingAmount(): Float = 8.0f
-}
+    ), 8.0f
+)

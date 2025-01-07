@@ -18,7 +18,7 @@ class WeedCleanerSkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_WEED_BLOCKS, WEED_BLOCKS)
             .addParameter(

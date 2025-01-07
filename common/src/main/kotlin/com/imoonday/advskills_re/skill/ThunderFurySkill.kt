@@ -18,7 +18,7 @@ class ThunderFurySkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addEnhancement(ENHANCEMENT_LIGHTNING_IMMUNE)
             .addParameter(PARAM_TARGET_DISTANCE, DEFAULT_TARGET_DISTANCE)
@@ -36,7 +36,7 @@ class ThunderFurySkill : Skill(
     override fun use(user: ServerPlayerEntity): UseResult {
         val maxDistance = getDoubleParam(PARAM_TARGET_DISTANCE, user, DEFAULT_TARGET_DISTANCE)
         val result = user.raycastBlock(maxDistance)
-        if (result.type != HitResult.Type.BLOCK) return UseResult.fail(failedMessage())
+        if (result.type != HitResult.Type.BLOCK) return UseResult.fail(failedMessage)
     
         val lightningCount = getIntParam(PARAM_LIGHTNING_COUNT, user, DEFAULT_LIGHTNING_COUNT)
         val immuneToLightning = user.hasEnhancement(ENHANCEMENT_LIGHTNING_IMMUNE)

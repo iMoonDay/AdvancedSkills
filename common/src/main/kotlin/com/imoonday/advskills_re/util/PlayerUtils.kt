@@ -158,7 +158,7 @@ fun PlayerEntity.learn(skill: Skill, toast: Boolean = true, message: Boolean = t
     }
 
 fun PlayerEntity.learnAll() {
-    if (skillContainer.getAllSkills().size != Skills.getValidSkills().size) {
+    if (skillContainer.getAllSkills().size != Skills.getEnabledSkills().size) {
         skillContainer.learnAll {
             skillContainer.getEmptySlot(it)?.equip(it)
         }
@@ -167,7 +167,7 @@ fun PlayerEntity.learnAll() {
     sendMessage(translate("learnSkill.all"))
 }
 
-fun PlayerEntity.hasLearnedAll(): Boolean = learnedSkills.size >= Skills.getValidSkills().size
+fun PlayerEntity.hasLearnedAll(): Boolean = learnedSkills.size >= Skills.getEnabledSkills().size
 
 fun PlayerEntity.forget(skill: Skill, message: Boolean = true): Boolean =
     skillContainer.forget(skill, { result ->
@@ -204,12 +204,12 @@ fun PlayerEntity.forgetAll() {
 
 fun PlayerEntity.learnRandomly(filter: (Skill) -> Boolean = { true }): Boolean =
     Skills.random { !hasLearned(it) && filter(it) }
-        .takeUnless { it.isEmpty() }
+        .takeUnless { it.isEmpty }
         ?.let { learn(it) } ?: false
 
 fun PlayerEntity.enhanceRandomly(filter: (Skill, Enhancement) -> Boolean = { _, _ -> true }): Boolean =
     learnedSkills.flatMap { skill ->
-        skill.getAvailableEnhancements()
+        skill.availableEnhancements
             .filter { getEnhancementLvl(skill, it.id) < it.maxLevel }
             .map { skill to it }
             .filter { filter(it.first, it.second) }
@@ -299,7 +299,7 @@ fun PlayerEntity.enhance(skill: Skill, id: String, level: Int? = null): Boolean 
 }
 
 fun PlayerEntity.enhanceAll(skill: Skill, sendPacket: Boolean = true): Boolean = getData(skill)?.run {
-    skill.getAvailableEnhancements().forEach {
+    skill.availableEnhancements.forEach {
         getOrCreateEnhancementData(it.id, it.maxLevel).maxLevel = it.maxLevel
     }
 
@@ -353,15 +353,15 @@ fun PlayerEntity.equip(skill: Skill, index: Int): Boolean {
         Channels.EQUIP_SKILL_C2S.sendToServer(EquipSkillC2SRequest(index, skill))
         return true
     } else if (this is ServerPlayerEntity) {
-        if (skill.invalid && !skill.isEmpty()) return false
-        if (!skill.invalid && !hasLearned(skill)) return false
+        if (skill.disabled && !skill.isEmpty) return false
+        if (!skill.disabled && !hasLearned(skill)) return false
         val slot = skillContainer.getSlot(index) ?: return false
         if (slot.skill == skill || !slot.canEquip(skill)) return false
         val original = slot.skill
         var move = false
-        if (!skill.invalid) skillContainer.getSlot(skill)?.let { it.unequip { move = true } }
+        if (!skill.disabled) skillContainer.getSlot(skill)?.let { it.unequip { move = true } }
         if (!move) {
-            if (skill.invalid) {
+            if (skill.disabled) {
                 if (SkillChangeEvents.UNEQUIPPED.invoker().onUnequipped(this, slot, original).isFalse) {
                     syncData()
                     return false
@@ -375,11 +375,11 @@ fun PlayerEntity.equip(skill: Skill, index: Int): Boolean {
         }
         slot.equip(skill) { syncData() }
         if (!move) {
-            if (skill.invalid) {
+            if (skill.disabled) {
                 SkillChangeEvents.POST_UNEQUIPPED.invoker().postUnequipped(this, slot, original)
             } else {
                 SkillChangeEvents.POST_EQUIPPED.invoker().postEquipped(this, slot, skill)
-                if (!original.invalid) SkillChangeEvents.POST_UNEQUIPPED.invoker()
+                if (!original.disabled) SkillChangeEvents.POST_UNEQUIPPED.invoker()
                     .postUnequipped(this, slot, original)
             }
         }
@@ -459,7 +459,7 @@ val PlayerEntity.usingSkills: Set<Skill>
 
 fun PlayerEntity.startUsing(skill: Skill, data: NbtCompound? = null): Boolean {
     if (skill in usingSkills) return false
-    if (skill.invalid) return false
+    if (skill.disabled) return false
     getData(skill)?.apply {
         using = true
         usedTime = 0
@@ -532,7 +532,7 @@ fun PlayerEntity.isCharging(skill: Skill): Boolean = skill is LongPressTrigger &
 
 fun PlayerEntity.getEnhancements(skill: Skill): Map<Enhancement, EnhancementData> =
     getData(skill)?.run {
-        skill.getAvailableEnhancements().mapNotNull {
+        skill.availableEnhancements.mapNotNull {
             enhancements[it.id]?.run { it to this }
         }.toMap()
     } ?: emptyMap()

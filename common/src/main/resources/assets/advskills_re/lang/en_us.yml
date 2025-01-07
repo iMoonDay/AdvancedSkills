@@ -881,7 +881,7 @@ advskills_re:
       description: You can walk on lava and are immune to magma blocks
     armor_shatterer:
       name: Armor Shatterer
-      description: Fires an energy ball with an 80% chance to weaken nearby entities, increasing the damage they take
+      description: Fires an energy ball that applies Vulnerable effect to nearby creatures, increasing damage taken. Has a small chance to apply a higher level of vulnerability
       count:
         name: Count Enhancement
         description: '%s Launch Count'
@@ -1058,6 +1058,7 @@ advskills_re:
       progressBarColor: Progress Bar Color
       displaySelectedSkillSlot: Display the selected skill slots additionally
       displayQuickCastKey: Display the Quick Cast Key
+      useVanillaSlot: Use Vanilla Off-hand Slot Style
       selectedSlotPosition: Selected Slot Position
       selectedSlotOffsetX: Selected Slot X Offset
       selectedSlotOffsetY: Selected Slot Y Offset

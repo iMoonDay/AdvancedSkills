@@ -23,7 +23,7 @@ class BloodSealSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger, DangerTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(
                 name = PARAM_CHARGE_TIME,
@@ -109,7 +109,7 @@ class BloodSealSkill : LongPressSkill(
                 )
                 return UseResult.success()
             }
-        return UseResult.fail(failedMessage())
+        return UseResult.fail(failedMessage)
     }
 
     private fun PlayerEntity.getRaycastDistance() =

@@ -15,7 +15,7 @@ class JumpSkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_JUMP_FORCE,
             baseValue = DEFAULT_JUMP_FORCE,

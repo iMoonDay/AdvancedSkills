@@ -16,11 +16,11 @@ object SettingsManager {
     private const val VERSION = 1
     private const val BACKUP_SUFFIX = ".bak"
     private val settingsDir = Platform.getConfigFolder().resolve("advskills_re/skills")
-    private val versionFile = settingsDir.resolve("version")
     private val settings: MutableMap<Identifier, Skill.Settings> = mutableMapOf()
 
     @JvmStatic
-    fun tryLoad(file: File): Skill.Settings? = if (!file.exists()) null else Skill.Settings.fromJson(file.readText())
+    fun tryLoad(file: File): Skill.Settings? =
+        if (!file.exists()) null else Skill.Settings.fromJsonWithVersion(file.readText(), VERSION)
 
     @JvmStatic
     fun loadFiles() {
@@ -31,7 +31,7 @@ object SettingsManager {
         val loadedCount = settingsDir.listAllFiles(".*\\.json").map { it.toFile() }.count { file ->
             tryLoad(file)?.let {
                 if (settings.containsKey(it.id)) {
-                    LOGGER.warn("Duplicate Skill Settings found for ${it.id}, skipping")
+                    LOGGER.warn("Duplicate skill settings found for ${it.id}, skipping")
                     false
                 } else {
                     settings[it.id] = it
@@ -40,7 +40,7 @@ object SettingsManager {
             } ?: false
         }
 
-        LOGGER.info("Loaded $loadedCount Skill Settings")
+        LOGGER.info("Loaded $loadedCount skill settings")
     }
 
     @JvmStatic
@@ -54,19 +54,20 @@ object SettingsManager {
 
         val file = namespaceDir.resolve("${id.path}.json")
         try {
+            val json = try {
+                settings.toJsonWithVersion(VERSION)
+            } catch (e: Exception) {
+                LOGGER.error("Failed to encode skill settings: $settings", e)
+                return
+            }
+
             if (file.exists()) {
                 tryBackupFile(file)
             }
 
-            val json = try {
-                settings.toJson()
-            } catch (e: Exception) {
-                LOGGER.error("Failed to encode Skill Settings: $settings", e)
-                return
-            }
             file.writeText(json)
         } catch (e: Exception) {
-            LOGGER.error("Failed to save Skill Settings for $id", e)
+            LOGGER.error("Failed to save skill settings for $id", e)
         }
     }
 
@@ -87,24 +88,24 @@ object SettingsManager {
 
             val file = namespaceDir.resolve("${id.path}.json")
             try {
+                val json = try {
+                    settings.toJsonWithVersion(VERSION)
+                } catch (e: Exception) {
+                    LOGGER.error("Failed to encode skill settings: $settings", e)
+                    continue
+                }
+
                 if (file.exists()) {
                     tryBackupFile(file)
                 }
 
-                val json = try {
-                    settings.toJson()
-                } catch (e: Exception) {
-                    LOGGER.error("Failed to encode Skill Settings: $settings", e)
-                    continue
-                }
                 file.writeText(json)
                 successCount++
             } catch (ignore: Exception) {
             }
         }
 
-        LOGGER.info("Skill Settings saved: $successCount succeeded, ${skills.size - successCount} failed")
-        saveVersion()
+        LOGGER.info("Skill settings saved: $successCount succeeded, ${skills.size - successCount} failed")
     }
 
     private fun getNamespaceDir(id: Identifier): Path =
@@ -112,13 +113,7 @@ object SettingsManager {
 
     @JvmStatic
     fun loadOrSaveFiles(skills: Collection<Skill>) {
-        val version = loadVersion()
-        when {
-            version == null -> LOGGER.warn("Missing version file, stopping Skill Settings loading")
-            version < 0 -> LOGGER.warn("Invalid version: $version, stopping Skill Settings loading")
-            version < VERSION -> LOGGER.warn("Outdated version: $version, stopping Skill Settings loading")
-            else -> loadFiles()
-        }
+        loadFiles()
         saveMissing(skills)
     }
 
@@ -137,7 +132,9 @@ object SettingsManager {
                 skillsDir.listAllFiles(".*\\.json").map { it.toFile() }.count { file ->
                     tryLoad(file)?.also { put(it.id, it) } != null
                 }.also {
-                    LOGGER.info("Loaded $it Skill Settings from server config")
+                    if (it > 0) {
+                        LOGGER.info("Loaded $it skill settings from server config")
+                    }
                 }
             }
         }
@@ -146,36 +143,13 @@ object SettingsManager {
     @JvmStatic
     fun saveMissing(skills: Collection<Skill>) = saveAll(skills.filter { it.id !in settings })
 
-    private fun saveVersion() {
-        if (!checkOrCreateDirectory(settingsDir)) return
-        try {
-            if (!versionFile.exists()) {
-                versionFile.createFile()
-            }
-            versionFile.writeText(VERSION.toString())
-        } catch (e: Exception) {
-            LOGGER.error("Failed to save version file", e)
-        }
-    }
-
-    private fun loadVersion(): Int? = if (versionFile.exists()) {
-        try {
-            versionFile.readText().toInt()
-        } catch (e: NumberFormatException) {
-            LOGGER.warn("Invalid version format in version file")
-            null
-        }
-    } else {
-        null
-    }
-
     private fun checkOrCreateDirectory(path: Path, error: Boolean = true): Boolean {
         if (!path.isDirectory()) {
             try {
                 path.createDirectories()
             } catch (e: Exception) {
                 if (error) {
-                    LOGGER.error("Failed to create Skill Settings directory", e)
+                    LOGGER.error("Failed to create skill settings directory", e)
                 }
                 return false
             }
@@ -191,12 +165,9 @@ object SettingsManager {
 
     private fun tryBackupFile(file: Path) {
         try {
-            val currentVersion = loadVersion()
-            if (currentVersion == null || currentVersion < VERSION) {
-                val backupFile = file.resolveSibling(file.name + BACKUP_SUFFIX)
-                Files.copy(file, backupFile, StandardCopyOption.REPLACE_EXISTING)
-                LOGGER.info("Created backup of outdated settings file: ${backupFile.fileName}")
-            }
+            val backupFile = file.resolveSibling(file.name + BACKUP_SUFFIX)
+            Files.copy(file, backupFile, StandardCopyOption.REPLACE_EXISTING)
+            LOGGER.info("Created backup of settings file: ${backupFile.fileName}")
         } catch (e: Exception) {
             LOGGER.error("Failed to create backup for file: ${file.fileName}", e)
         }

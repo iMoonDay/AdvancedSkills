@@ -402,6 +402,15 @@ object ConfigScreenHandler {
             )
 
             addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.useVanillaSlot"),
+                    config.useVanillaSlot
+                ).setDefaultValue(false)
+                    .setSaveConsumer { config.useVanillaSlot = it }
+                    .build()
+            )
+
+            addEntry(
                 entryBuilder.startEnumSelector(
                     translate("screen.config.selectedSlotPosition"),
                     SkillSlotRenderer.SlotPosition::class.java,

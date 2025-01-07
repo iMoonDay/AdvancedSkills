@@ -22,7 +22,7 @@ class PrimaryConfinementSkill : LongPressSkill(
     )
 ), UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_CONFINE_SOUND, DEFAULT_CONFINE_SOUND)
             .addParameter(
@@ -76,7 +76,7 @@ class PrimaryConfinementSkill : LongPressSkill(
                     getSoundEventParam(PARAM_CONFINE_SOUND, DEFAULT_CONFINE_SOUND)
                 )
             }
-            return UseResult.pass(failedMessage())
+            return UseResult.pass(failedMessage)
         }
         return UseResult.pass(message("empty"))
     }

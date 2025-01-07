@@ -20,7 +20,7 @@ class MeteorShowerSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_MIN_METEOR_COUNT, DEFAULT_MIN_METEOR_COUNT)
             .addParameter(PARAM_MAX_METEOR_COUNT, DEFAULT_MAX_METEOR_COUNT)
@@ -95,7 +95,7 @@ class MeteorShowerSkill : LongPressSkill(
         player.stopUsing()
         if (pressedTime < getMaxUseTime(player)) {
             player.startCooling(10)
-            return UseResult.fail(failedMessage())
+            return UseResult.fail(failedMessage)
         }
         val targetPos = player.raycast(512.0, 0f, false).pos
         val random = player.random

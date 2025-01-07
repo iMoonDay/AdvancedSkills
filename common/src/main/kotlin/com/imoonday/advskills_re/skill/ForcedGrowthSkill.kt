@@ -19,7 +19,7 @@ class ForcedGrowthSkill : Skill(
     )
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_GROWTH_RANGE,
             baseValue = DEFAULT_GROWTH_RANGE,
@@ -75,7 +75,7 @@ class ForcedGrowthSkill : Skill(
                     }
                 }
             }
-        return UseResult.success(if (result > 0) message("success", result) else failedMessage())
+        return UseResult.success(if (result > 0) message("success", result) else failedMessage)
     }
 
     private fun tryGrow(

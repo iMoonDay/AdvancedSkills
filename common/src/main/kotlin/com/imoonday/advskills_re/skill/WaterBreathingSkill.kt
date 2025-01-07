@@ -18,7 +18,7 @@ class WaterBreathingSkill : Skill(
     )
 ), AutoStopTrigger, BreatheInWaterTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_BREATH_DURATION,
             baseValue = DEFAULT_BREATH_DURATION,

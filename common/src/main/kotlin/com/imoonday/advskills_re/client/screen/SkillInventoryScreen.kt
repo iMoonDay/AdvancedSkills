@@ -238,7 +238,7 @@ class SkillInventoryScreen(
         val title = if (selectedTab == null) translate(
             "screen.inventory.title",
             player.learnedSkills.size,
-            Skills.getValidSkills().size
+            Skills.getEnabledSkills().size
         ) else selectedTab!!.type.displayName.copy().formatted(Formatting.BLACK)
         context.drawText(
             textRenderer,
@@ -263,7 +263,7 @@ class SkillInventoryScreen(
             close()
             return true
         }
-        return if (selectingSlot != null && !selectingSlot!!.skill.invalid && selectingSlot != selectedSlot) {
+        return if (selectingSlot != null && !selectingSlot!!.skill.disabled && selectingSlot != selectedSlot) {
             val slot = selectingSlot!!
             when (keyCode) {
                 GLFW.GLFW_KEY_1 -> swap(slot, 1)
@@ -284,7 +284,7 @@ class SkillInventoryScreen(
     private fun swap(slot: Slot, index: Int): Boolean {
         val original = player.getSkill(index)
         val result = player.equip(slot.skill, index)
-        if (slot.slot != null && !original.invalid) {
+        if (slot.slot != null && !original.disabled) {
             player.equip(original, slot.slot)
         }
         return result
@@ -327,13 +327,13 @@ class SkillInventoryScreen(
 
             RenderSystem.enableBlend()
             context.fill(x, y, x + width, y + height, 0x806A6869.toInt())
-            if (!skill.invalid && selectedSlot?.skill != skill) {
+            if (!skill.disabled && selectedSlot?.skill != skill) {
                 SkillRenderer.renderIcon(skill, context, x + (width - 16) / 2, y + (height - 16) / 2)
             }
             if (hovered) {
                 val edge = 2
                 context.overlayHighlight(x + edge, y + edge, x + width - edge, y + height - edge, true)
-                selectingSlot = if (!skill.invalid) {
+                selectingSlot = if (!skill.disabled) {
                     if (selectedSlot == null) {
                         if (!ClientConfig.get().hideSkillInfo || hasShiftDown()) {
                             setTooltip(SkillRenderer.getTooltip(client!!, skill, player))
@@ -369,18 +369,18 @@ class SkillInventoryScreen(
                         player.equip(Skills.EMPTY, selectedSlot!!.slot!!)
                         selectedSlot = null
                     } else {
-                        selectedSlot = if (selectedSlot == null && !skill.invalid) this else null
+                        selectedSlot = if (selectedSlot == null && !skill.disabled) this else null
                     }
                 }
             } else if (selectedSlot != null && selectedSlot != this) {
                 if (!slot.canEquip(selectedSlot!!.skill)) return false
                 player.equip(selectedSlot!!.skill, slot)
-                if (selectedSlot!!.slot != null && !selectedSlot!!.skill.invalid) player.equip(
+                if (selectedSlot!!.slot != null && !selectedSlot!!.skill.disabled) player.equip(
                     skill,
                     selectedSlot!!.slot!!
                 )
                 selectedSlot = null
-            } else if (!skill.invalid) {
+            } else if (!skill.disabled) {
                 if (hasShiftDown()) {
                     player.equip(Skills.EMPTY, slot)
                 } else {

@@ -27,7 +27,7 @@ class LavaWalkerSkill : Skill(
     DamageTrigger,
     LavaTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_WALK_SOUND, DEFAULT_WALK_SOUND)
             .addParameter(

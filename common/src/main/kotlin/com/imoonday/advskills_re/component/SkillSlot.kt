@@ -21,7 +21,7 @@ sealed class SkillSlot(
     val tooltip: Text
         get() = translate("skillSlot.$type", index)
 
-    fun isEmpty() = skill.isEmpty()
+    fun isEmpty() = skill.isEmpty
     fun toNbt(): NbtCompound = NbtCompound().apply {
         putInt("index", index)
         putString("type", this@SkillSlot.type)
@@ -43,7 +43,7 @@ sealed class SkillSlot(
         }
 
     fun unequip(callback: (Boolean) -> Unit = {}): Boolean =
-        if (skill.isEmpty()) {
+        if (skill.isEmpty) {
             callback(false)
             false
         } else {
@@ -72,7 +72,7 @@ sealed class SkillSlot(
         override val type: String = "active"
         override val v: Int = 9
         override fun canEquip(skill: Skill): Boolean =
-            SkillType.PASSIVE !in skill.types || skill.isEmpty()
+            SkillType.PASSIVE !in skill.types || skill.isEmpty
 
         override fun copyWithIndex(index: Int): Active = Active(index, skill)
     }
@@ -83,7 +83,7 @@ sealed class SkillSlot(
         override val v: Int = 9 * 2
 
         override fun canEquip(skill: Skill): Boolean =
-            SkillType.PASSIVE in skill.types || skill.isEmpty()
+            SkillType.PASSIVE in skill.types || skill.isEmpty
 
         override fun copyWithIndex(index: Int): Passive = Passive(index, skill)
     }

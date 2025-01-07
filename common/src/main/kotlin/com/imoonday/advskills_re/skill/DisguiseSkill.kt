@@ -19,7 +19,7 @@ class DisguiseSkill : Skill(
     )
 ), DisguiseTrigger, UseInterruptTrigger, AutoStopTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_DISGUISE_DURATION,
             baseValue = DEFAULT_DISGUISE_DURATION,

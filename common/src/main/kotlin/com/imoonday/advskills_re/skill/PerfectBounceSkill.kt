@@ -12,10 +12,12 @@ class PerfectBounceSkill : BounceSkill(
         id = "perfect_bounce",
         cooldown = 5,
         rarity = SkillRarity.EPIC
-    )
+    ),
+    duration = 2,
+    damageBoost = 1.5f
 ) {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(
                 name = PARAM_HEAL_RATIO,
@@ -34,14 +36,7 @@ class PerfectBounceSkill : BounceSkill(
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
             )
-        super.initDefaultSettings(settings)
     }
-
-    override fun getDuration(): Int = 2
-
-    override fun getDamageMultiplier(): Float = 1.5f
-
-    override fun getBaseChance(): Float? = null
 
     override fun ignoreDamage(
         amount: Float,

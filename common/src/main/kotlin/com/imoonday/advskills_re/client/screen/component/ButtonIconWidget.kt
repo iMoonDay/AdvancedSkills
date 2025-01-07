@@ -137,15 +137,7 @@ open class ButtonIconWidget : IconWidget {
         val hoveredTexture = this.hoveredTexture
         if (hoveredTexture != null && this.isMouseOver(mouseX.toDouble(), mouseY.toDouble())) {
             context.drawTexture(
-                hoveredTexture,
-                x,
-                y,
-                hoveredTextureU,
-                hoveredTextureV,
-                i,
-                j,
-                textureWidth,
-                textureHeight
+                hoveredTexture, x, y, hoveredTextureU, hoveredTextureV, i, j, textureWidth, textureHeight
             )
         } else {
             context.drawTexture(this.texture, x, y, textureU, textureV, i, j, textureWidth, textureHeight)

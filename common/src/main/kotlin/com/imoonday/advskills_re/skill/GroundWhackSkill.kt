@@ -20,7 +20,7 @@ class GroundWhackSkill : Skill(
     )
 ), LandingTrigger, PersistentTrigger, FallTrigger, DangerTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(PARAM_WHACK_SOUND, DEFAULT_WHACK_SOUND)
             .addParameter(
@@ -83,7 +83,7 @@ class GroundWhackSkill : Skill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
-        if (user.isOnGround) return UseResult.fail(failedMessage())
+        if (user.isOnGround) return UseResult.fail(failedMessage)
         user.run {
             if (abilities.flying) abilities.flying = false
             val velocityMultiplier = getDoubleParam(PARAM_FALL_SPEED, this, DEFAULT_FALL_SPEED)

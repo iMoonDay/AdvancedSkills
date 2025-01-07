@@ -21,7 +21,7 @@ class NegativeResistanceSkill : Skill(
     )
 ), AutoStopTrigger, StatusEffectTrigger, UsingRenderTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(
                 name = PARAM_RESIST_DURATION,

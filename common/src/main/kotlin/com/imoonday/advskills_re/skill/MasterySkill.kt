@@ -16,7 +16,7 @@ class MasterySkill : Skill(
     )
 ), CooldownTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings.addParameter(
             name = PARAM_COOLDOWN_REDUCTION,
             baseValue = DEFAULT_COOLDOWN_REDUCTION,

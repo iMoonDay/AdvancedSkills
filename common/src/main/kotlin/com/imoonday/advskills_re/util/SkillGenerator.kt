@@ -47,7 +47,7 @@ object SkillGenerator {
     }
 
     private fun generateEnhancements(skills: Collection<Skill>): List<Pair<Skill, Enhancement>> =
-        skills.flatMap { skill -> skill.getAvailableEnhancements().map { enhancement -> skill to enhancement } }
+        skills.flatMap { skill -> skill.availableEnhancements.map { enhancement -> skill to enhancement } }
 
     private fun getEnhancementWeight(pair: Pair<Skill, Enhancement>, player: PlayerEntity): Int {
         val (skill, enhancement) = pair

@@ -9,8 +9,5 @@ class TopHealingSkill : HealingSkill(
         types = listOf(SkillType.RESTORATION),
         cooldown = 60,
         rarity = SkillRarity.LEGENDARY
-    )
-) {
-
-    override fun getDefaultHealingAmount(): Float = 16.0f
-}
+    ), 16.0f
+)

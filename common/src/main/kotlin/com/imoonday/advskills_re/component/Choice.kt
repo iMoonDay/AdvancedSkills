@@ -107,7 +107,7 @@ data class Choice(
                 return true
             }
             return player.learnedSkills
-                .map { it to it.getAvailableEnhancements() }
+                .map { it to it.availableEnhancements }
                 .any { pair ->
                     pair.second.any {
                         player.getEnhancementLvl(pair.first, it.id) < it.maxLevel

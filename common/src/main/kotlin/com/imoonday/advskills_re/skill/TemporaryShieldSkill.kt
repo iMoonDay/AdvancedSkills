@@ -17,7 +17,7 @@ class TemporaryShieldSkill : Skill(
     )
 ), AutoStopTrigger {
 
-    override fun initDefaultSettings(settings: Settings) {
+    init {
         settings
             .addParameter(
                 name = PARAM_SHIELD_DURATION,
