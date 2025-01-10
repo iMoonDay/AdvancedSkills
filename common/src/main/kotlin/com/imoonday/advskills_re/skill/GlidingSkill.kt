@@ -99,6 +99,7 @@ class GlidingSkill : PassiveSkill(
     override fun canBeEmpty(player: PlayerEntity): Boolean = true
 
     companion object {
+
         // NBT Keys
         private const val NBT_REMAINING_TIME = "RemainingTime"  // 剩余时间
 

@@ -81,6 +81,7 @@ class FireballSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_FIREBALL_POWER = 1
         private const val DEFAULT_FIREBALL_COUNT = 1

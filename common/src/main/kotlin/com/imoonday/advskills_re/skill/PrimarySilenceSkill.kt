@@ -74,6 +74,7 @@ class PrimarySilenceSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_SILENCE_RANGE = 0
         private const val DEFAULT_BALL_COUNT = 1

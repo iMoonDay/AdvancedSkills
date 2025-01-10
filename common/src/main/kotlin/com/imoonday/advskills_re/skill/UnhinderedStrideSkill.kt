@@ -34,7 +34,7 @@ class UnhinderedStrideSkill : Skill(
     override fun getStepHeight(player: PlayerEntity): Float? =
         if (player.isUsing()) player.world.height.toFloat() else null
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_STRIDE_DURATION, player, DEFAULT_STRIDE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -43,6 +43,7 @@ class UnhinderedStrideSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_STRIDE_DURATION = 10 * 20
 

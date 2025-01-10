@@ -65,7 +65,7 @@ class TimeRewindSkill : LongPressSkill(
         return UseResult.success()
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_REWIND_DURATION, player, DEFAULT_REWIND_DURATION, 0)
 
     override fun allowDeath(player: ServerPlayerEntity, source: DamageSource, amount: Float): Boolean =
@@ -75,6 +75,7 @@ class TimeRewindSkill : LongPressSkill(
         } else true
 
     companion object {
+
         // Default Values
         private const val DEFAULT_REWIND_DURATION = 5 * 20
         private val DEFAULT_REWIND_SOUND = SoundEvents.ENTITY_FOX_TELEPORT

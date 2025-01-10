@@ -61,10 +61,11 @@ class ResuscitationSkill : Skill(
         attacker: Entity?,
     ): Boolean = player.isUsing()
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_IMMUNE_DURATION, player, DEFAULT_IMMUNE_DURATION, 0)
 
     companion object {
+
         // Default Values
         private const val DEFAULT_REVIVE_HEALTH = 1.0f
         private const val DEFAULT_IMMUNE_DURATION = 2 * 20

@@ -37,7 +37,7 @@ class ThunderFurySkill : Skill(
         val maxDistance = getDoubleParam(PARAM_TARGET_DISTANCE, user, DEFAULT_TARGET_DISTANCE)
         val result = user.raycastBlock(maxDistance)
         if (result.type != HitResult.Type.BLOCK) return UseResult.fail(failedMessage)
-    
+
         val lightningCount = getIntParam(PARAM_LIGHTNING_COUNT, user, DEFAULT_LIGHTNING_COUNT)
         val immuneToLightning = user.hasEnhancement(ENHANCEMENT_LIGHTNING_IMMUNE)
         user.executeAndAddTask(5, lightningCount) { summonLightning(user, result.pos, immuneToLightning) }
@@ -54,6 +54,7 @@ class ThunderFurySkill : Skill(
         } ?: false
 
     companion object {
+
         // Default Values
         private const val DEFAULT_TARGET_DISTANCE = 512.0
         private const val DEFAULT_LIGHTNING_COUNT = 1

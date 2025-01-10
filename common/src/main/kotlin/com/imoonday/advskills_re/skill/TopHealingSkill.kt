@@ -9,5 +9,5 @@ class TopHealingSkill : HealingSkill(
         types = listOf(SkillType.RESTORATION),
         cooldown = 60,
         rarity = SkillRarity.LEGENDARY
-    ), 16.0f
+    ).withDisabled(true), 16.0f
 )

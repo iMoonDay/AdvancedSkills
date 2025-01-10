@@ -29,10 +29,4 @@ interface AutoStopTrigger : TickTrigger, UsingProgressTrigger, UnequipTrigger {
         super.postUnequipped(player, slot)
         onStop(player)
     }
-
-    companion object {
-
-        const val PERSIST_TIME = "persist_time"
-        const val CHARGE_TIME = "charge_time"
-    }
 }

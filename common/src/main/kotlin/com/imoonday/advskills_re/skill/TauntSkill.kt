@@ -54,7 +54,7 @@ class TauntSkill : Skill(
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean = !player.isUsing()
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_TAUNT_DURATION, player, DEFAULT_TAUNT_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -63,6 +63,7 @@ class TauntSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_TAUNT_DURATION = 15 * 20
         private const val DEFAULT_DAMAGE_REDUCTION = 0.25f

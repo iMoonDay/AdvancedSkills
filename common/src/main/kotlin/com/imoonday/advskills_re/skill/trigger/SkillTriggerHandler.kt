@@ -220,4 +220,8 @@ object SkillTriggerHandler {
         player.forEachTrigger<HungerTrigger> { newLevel = it.onFoodLevelChange(player, newLevel) }
         return newLevel
     }
+
+    @JvmStatic
+    fun isSaveMoving(player: PlayerEntity): Boolean =
+        player.anyTrigger<SaveMovingTrigger> { it.isSaveMoving(player) }
 }

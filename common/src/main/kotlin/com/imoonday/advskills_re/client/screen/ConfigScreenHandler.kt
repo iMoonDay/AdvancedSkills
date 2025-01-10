@@ -2,7 +2,7 @@ package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.ClientConfig.Companion.DEFAULT_LAYOUT_STRING_LIST
-import com.imoonday.advskills_re.client.render.skill.*
+import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.skill.enums.*
@@ -336,10 +336,10 @@ object ConfigScreenHandler {
             addEntry(
                 entryBuilder.startEnumSelector(
                     translate("screen.config.hideSkillSlots"),
-                    SkillSlotRenderer.HideMode::class.java,
+                    HideMode::class.java,
                     config.hideSkillSlots
-                ).setDefaultValue(SkillSlotRenderer.HideMode.DYNAMICALLY_HIDE)
-                    .setEnumNameProvider { (it as SkillSlotRenderer.HideMode).displayName }
+                ).setDefaultValue(HideMode.DYNAMICALLY_HIDE)
+                    .setEnumNameProvider { (it as HideMode).displayName }
                     .setSaveConsumer { config.hideSkillSlots = it }
                     .build()
             )
@@ -347,10 +347,10 @@ object ConfigScreenHandler {
             addEntry(
                 entryBuilder.startEnumSelector(
                     translate("screen.config.dynamicallyHideDirection"),
-                    SkillSlotRenderer.AnimationDirection::class.java,
+                    AnimationDirection::class.java,
                     config.dynamicallyHideDirection
-                ).setDefaultValue(SkillSlotRenderer.AnimationDirection.RIGHT)
-                    .setEnumNameProvider { (it as SkillSlotRenderer.AnimationDirection).displayName }
+                ).setDefaultValue(AnimationDirection.RIGHT)
+                    .setEnumNameProvider { (it as AnimationDirection).displayName }
                     .setSaveConsumer { config.dynamicallyHideDirection = it }
                     .build()
             )
@@ -413,10 +413,10 @@ object ConfigScreenHandler {
             addEntry(
                 entryBuilder.startEnumSelector(
                     translate("screen.config.selectedSlotPosition"),
-                    SkillSlotRenderer.SlotPosition::class.java,
+                    SlotPosition::class.java,
                     config.selectedSlotPosition
-                ).setDefaultValue(SkillSlotRenderer.SlotPosition.LEFT_OF_HOTBAR)
-                    .setEnumNameProvider { (it as SkillSlotRenderer.SlotPosition).displayName }
+                ).setDefaultValue(SlotPosition.LEFT_OF_HOTBAR)
+                    .setEnumNameProvider { (it as SlotPosition).displayName }
                     .setSaveConsumer { config.selectedSlotPosition = it }
                     .build()
             )
@@ -436,6 +436,15 @@ object ConfigScreenHandler {
                     config.selectedSlotOffsetY
                 ).setDefaultValue(0)
                     .setSaveConsumer { config.selectedSlotOffsetY = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.useRingCastingWheel"),
+                    config.useRingCastingWheel
+                ).setDefaultValue(true)
+                    .setSaveConsumer { config.useRingCastingWheel = it }
                     .build()
             )
         }

@@ -40,6 +40,7 @@ class StaticInvisibilitySkill : PassiveSkill(
     }
 
     companion object {
+
         // NBT Keys
         private const val NBT_LAST_POSITION = "LastPosition"  // 上一次位置
     }

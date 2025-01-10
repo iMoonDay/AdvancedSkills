@@ -65,7 +65,7 @@ class LiquidShieldSkill : Skill(
 
     override fun canBreatheInWater(player: PlayerEntity): Boolean = player.isUsing()
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_SHIELD_DURATION, player, DEFAULT_SHIELD_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -74,6 +74,7 @@ class LiquidShieldSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_SHIELD_DURATION = 15 * 20
         private val DEFAULT_SHIELD_SOUND = SoundEvents.BLOCK_WATER_AMBIENT

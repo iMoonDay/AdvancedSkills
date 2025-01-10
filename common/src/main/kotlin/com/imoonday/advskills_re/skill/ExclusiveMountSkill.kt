@@ -43,6 +43,7 @@ class ExclusiveMountSkill : Skill(
     }
 
     companion object {
+
         // NBT Keys
         const val NBT_HORSE_UUID = "HorseUuid"  // 坐骑UUID
 

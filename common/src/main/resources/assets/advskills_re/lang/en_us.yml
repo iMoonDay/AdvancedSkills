@@ -1064,6 +1064,7 @@ advskills_re:
       selectedSlotOffsetY: Selected Slot Y Offset
       displayProgressBarBelowCrosshair: Display progress bar below crosshair
       progressBarOffsetY: Progress Bar Y Offset
+      useRingCastingWheel: Use Ring Casting Wheel style
       invalidLayout: "Wrong input! Can only contain 1-10 and the delimiter ','"
       incompleteLayout: "Wrong input! Missing slots: %s"
       redundantNumbers: "Wrong input! Redundant numbers: %s"
@@ -1086,6 +1087,11 @@ advskills_re:
       skillCooldownMultiplier: Skill Cooldown Multiplier
       skillXpMultiplier: Skill Xp Multiplier
       skillBlackList: Skill Black List
+  widget:
+    enhancement_list:
+      empty: Empty
+      level: 'Level: %d / %d'
+      deactivated: Disabled
   skillSlot:
     generic: 'Generic Skill Slot %d'
     active: 'Active Skill Slot %d'

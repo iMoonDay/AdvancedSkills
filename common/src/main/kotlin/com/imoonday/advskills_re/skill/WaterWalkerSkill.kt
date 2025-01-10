@@ -42,7 +42,7 @@ class WaterWalkerSkill : Skill(
     override fun canWalkOnFluid(player: PlayerEntity, state: FluidState): Boolean =
         player.isUsing() && state.isOf(Fluids.WATER) && player.getFluidHeight(FluidTags.WATER) < FLUID_HEIGHT_THRESHOLD
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_WALK_DURATION, player, DEFAULT_WALK_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -61,6 +61,7 @@ class WaterWalkerSkill : Skill(
         if (!player.isUsing() || tag != FluidTags.WATER) speed else 0.0
 
     companion object {
+
         // Default Values
         private const val DEFAULT_WALK_DURATION = 15 * 20
         private val DEFAULT_WALK_SOUND = SoundEvents.BLOCK_WATER_AMBIENT

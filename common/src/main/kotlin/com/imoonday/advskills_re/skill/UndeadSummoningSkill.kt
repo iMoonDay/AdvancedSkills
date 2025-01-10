@@ -35,18 +35,19 @@ class UndeadSummoningSkill : Skill(
         val totalCount = getIntParam(PARAM_TOTAL_COUNT, user, DEFAULT_TOTAL_COUNT)
         val maxSkeletonCount = floor(totalCount / 2.0).toInt()
         val skeletonCount = (1..maxSkeletonCount).random()
-        
+
         repeat(skeletonCount) {
             user.world.spawnEntity(ServantSkeletonEntity(user.world, user))
         }
         repeat((1..min(totalCount - skeletonCount, maxSkeletonCount)).random()) {
             user.world.spawnEntity(ServantWitherSkeletonEntity(user.world, user))
         }
-        
+
         return UseResult.success(sound = getSoundEventParam(PARAM_SUMMON_SOUND, DEFAULT_SUMMON_SOUND))
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_TOTAL_COUNT = 5
         private val DEFAULT_SUMMON_SOUND = SoundEvents.ENTITY_WITHER_SPAWN

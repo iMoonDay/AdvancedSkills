@@ -80,7 +80,8 @@ class SkillListScreen(
 
     private fun initEnhancementList() {
         enhancementList = EnhancementListWidget(
-            width / 2 - width / 4, height / 2 - height / 4, width / 2, height / 2, textRenderer, player, Skills.EMPTY
+            client!!, width / 2 - width / 4, height / 2 - height / 4, width / 2,
+            height / 2, player, Skills.EMPTY
         ).apply {
             visible = false
             fixOverflow(this@SkillListScreen.width, this@SkillListScreen.height)
@@ -114,7 +115,7 @@ class SkillListScreen(
         val skill = line.skill
         if (button == 1) {
             openEnhancementList(skill, mouseX, mouseY)
-            return true
+            return false
         }
 
         if (button != 0) return false
@@ -378,8 +379,15 @@ class SkillListScreen(
     private fun hasOverlay() = enhancementList.visible
 
     private fun openEnhancementList(skill: Skill, mouseX: Double, mouseY: Double) {
+        if (skill.isEmpty) return
+
         enhancementList.apply {
-            setPosition(mouseX.toInt() + 12, mouseY.toInt() - 12)
+            var x = mouseX.toInt() + 12
+            val y = mouseY.toInt() - 12
+            if (x + width > this@SkillListScreen.width) {
+                x = mouseX.toInt() - width - 12
+            }
+            setPosition(x, y)
             fixOverflow(this@SkillListScreen.width, this@SkillListScreen.height)
             updateSkill(skill)
             visible = true
@@ -389,7 +397,7 @@ class SkillListScreen(
     override fun resize(client: MinecraftClient, width: Int, height: Int) {
         val old = enhancementList
         super.resize(client, width, height)
-        enhancementList.restoreFrom(old)
+        enhancementList.restoreFrom(old, width to height)
     }
 
     inner class EquippedSkillSlot(

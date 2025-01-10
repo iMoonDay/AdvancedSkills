@@ -72,7 +72,11 @@ class SuperShadowCloneSkill : Skill(
         }
     }
 
-    private fun createCloneEntity(player: ServerPlayerEntity, horizontalRotation: Vec3d, moveTime: Int): ClonePlayerEntity {
+    private fun createCloneEntity(
+        player: ServerPlayerEntity,
+        horizontalRotation: Vec3d,
+        moveTime: Int
+    ): ClonePlayerEntity {
         return ClonePlayerEntity(player.world, player).apply {
             moveVelocity = horizontalRotation * (player.velocity.length() * 2.0).coerceAtMost(1.0)
             this.moveTime = moveTime
@@ -84,6 +88,7 @@ class SuperShadowCloneSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_CLONE_MOVE_TIME = 5 * 20
         private const val DEFAULT_CLONE_COUNT = 8

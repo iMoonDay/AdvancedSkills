@@ -41,6 +41,7 @@ class JumpSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_JUMP_FORCE = 1.0
 

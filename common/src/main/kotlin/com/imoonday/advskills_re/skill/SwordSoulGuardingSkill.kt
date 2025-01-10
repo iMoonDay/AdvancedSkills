@@ -96,7 +96,7 @@ class SwordSoulGuardingSkill : Skill(
         }
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_GUARD_DURATION, player, DEFAULT_GUARD_DURATION, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
@@ -109,6 +109,7 @@ class SwordSoulGuardingSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_GUARD_DURATION = 20 * 20
         private const val DEFAULT_TRIGGER_CHANCE = 0.3f

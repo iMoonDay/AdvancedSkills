@@ -17,7 +17,7 @@ class GrapplingHookSkill : LongPressSkill(
         cooldown = 15,
         rarity = SkillRarity.EPIC
     )
-), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger {
+), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger, SaveMovingTrigger {
 
     init {
         settings.addParameter(

@@ -88,7 +88,9 @@ class ChargedSweepSkill : LongPressSkill(
         val range = getDoubleParam(PARAM_SWEEP_RANGE, player, DEFAULT_SWEEP_RANGE)
         val baseDamage = player.attributes.getValue(EntityAttributes.GENERIC_ATTACK_DAMAGE).toFloat()
         val multiplier =
-            pressedTime.toFloat() / getMaxUseTime(player) * 2f * getFloatParam(PARAM_DAMAGE_BOOST, player, DEFAULT_DAMAGE_BOOST)
+            pressedTime.toFloat() / getMaxUseTime(player) * 2f * getFloatParam(
+                PARAM_DAMAGE_BOOST, player, DEFAULT_DAMAGE_BOOST
+            )
         val stack = player.mainHandStack
         player.world.getOtherEntities(player, player.boundingBox.expand(range)) {
             it is LivingEntity &&
@@ -121,6 +123,7 @@ class ChargedSweepSkill : LongPressSkill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_CHARGE_TIME = 3 * 20
         private const val DEFAULT_MOVEMENT_PENALTY = 0.8

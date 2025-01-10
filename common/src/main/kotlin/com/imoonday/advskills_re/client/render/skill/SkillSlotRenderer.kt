@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.client.render.skill
 
 import com.imoonday.advskills_re.client.*
+import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.render.skill.SkillRenderer.renderCooldownOverlay
 import com.imoonday.advskills_re.client.render.skill.SkillRenderer.renderIcon
 import com.imoonday.advskills_re.client.render.skill.SkillRenderer.renderProgressBar
@@ -10,11 +11,8 @@ import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.blaze3d.systems.*
-import kotlinx.serialization.*
 import net.minecraft.client.gui.*
-import net.minecraft.client.network.*
 import net.minecraft.entity.player.*
-import net.minecraft.text.*
 import net.minecraft.util.*
 import net.minecraft.util.math.*
 import kotlin.Pair
@@ -40,25 +38,24 @@ object SkillSlotRenderer {
         val player = clientPlayer ?: return
         if (player.isSpectator) return
 
-        val layout =
-            getValidLayout(player.skillContainer.slotSize)
+        val layout = getValidLayout(player.skillContainer.slotSize)
         if (layout.isEmpty()) return
 
         handleDynamicHide(player, layout)
 
-        val startX = getStartX(context, layout, config)
-        val startY = getStartY(context, layout, config)
+        val startX = getStartX(context, layout)
+        val startY = getStartY(context, layout)
         val width = getTotalWidth(layout)
         val height = getTotalHeight(layout)
         context.enableScissor(startX, startY, startX + width, startY + height)
 
         val direction = config.dynamicallyHideDirection
         player.skillContainer.getAllSlots().forEach { slot ->
-            val (x, y) = calculateXY(
-                context,
-                layout,
-                slot.index
-            )?.let { direction.handleOffset(it.first, it.second, offset) } ?: return@forEach
+            val (x, y) = calculateXY(context, layout, slot.index)?.let {
+                direction.handleOffset(
+                    it.first, it.second, offset
+                )
+            } ?: return@forEach
             renderSlot(context, x - 2, y - 2, slot.index == quickCastSlot)
             SkillRenderer.render(slot.skill, context, x, y, player, 0)
         }
@@ -157,14 +154,12 @@ object SkillSlotRenderer {
 
     private fun getStartY(
         context: DrawContext,
-        layout: Array<IntArray>,
-        config: ClientConfig
+        layout: Array<IntArray>
     ) = context.scaledWindowHeight / 2 - ((layout.size / 2.0) * SLOT_SIZE_WITH_GAP).toInt() + 1 + config.uiOffsetY
 
     private fun getStartX(
         context: DrawContext,
-        layout: Array<IntArray>,
-        config: ClientConfig
+        layout: Array<IntArray>
     ) = context.scaledWindowWidth - SLOT_SIZE_WITH_GAP * layout.maxOf { it.size } + 1 - config.uiOffsetX
 
     private fun calculateXY(
@@ -282,218 +277,5 @@ object SkillSlotRenderer {
         RenderSystem.enableBlend()
         context.drawTexture(slotsTexture, x, y, if (selected) 68 else 48, 64, 20, 20)
         RenderSystem.disableBlend()
-    }
-
-    @Serializable
-    enum class AnimationDirection {
-
-        @SerialName("up")
-        UP {
-
-            override fun handleOffset(x: Int, y: Int, offset: Int): Pair<Int, Int> = x to y - offset
-        },
-
-        @SerialName("down")
-        DOWN {
-
-            override fun handleOffset(x: Int, y: Int, offset: Int): Pair<Int, Int> = x to y + offset
-        },
-
-        @SerialName("left")
-        LEFT {
-
-            override fun handleOffset(x: Int, y: Int, offset: Int): Pair<Int, Int> = x - offset to y
-        },
-
-        @SerialName("right")
-        RIGHT {
-
-            override fun handleOffset(x: Int, y: Int, offset: Int): Pair<Int, Int> = x + offset to y
-        };
-
-        val displayName: Text = translate("animationDirection.${name.lowercase()}")
-
-        abstract fun handleOffset(x: Int, y: Int, offset: Int): Pair<Int, Int>
-    }
-
-    @Serializable
-    enum class SlotPosition {
-
-        @SerialName("left_bottom")
-        LEFT_BOTTOM {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> = config.selectedSlotOffsetX to windowHeight - slotHeight + config.selectedSlotOffsetY
-        },
-
-        @SerialName("left_of_hotbar")
-        LEFT_OF_HOTBAR {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> =
-                windowWidth / 2 - 91 - 29 - (if (player.mainArm == Arm.LEFT || player.offHandStack.isEmpty) 0 else slotWidth + 7) + config.selectedSlotOffsetX to windowHeight - slotHeight + config.selectedSlotOffsetY
-        },
-
-        @SerialName("right_of_hotbar")
-        RIGHT_OF_HOTBAR {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> =
-                windowWidth / 2 + 91 + (if (player.mainArm == Arm.RIGHT || player.offHandStack.isEmpty) 0 else slotWidth + 7) + config.selectedSlotOffsetX to windowHeight - slotHeight + config.selectedSlotOffsetY
-        },
-
-        @SerialName("right_bottom")
-        RIGHT_BOTTOM {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> =
-                windowWidth - slotWidth + config.selectedSlotOffsetX to windowHeight - slotHeight + config.selectedSlotOffsetY
-        },
-
-        @SerialName("center")
-        CENTER {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> =
-                (windowWidth - slotWidth) / 2 + config.selectedSlotOffsetX to (windowHeight - slotHeight) / 2 + config.selectedSlotOffsetY
-        },
-
-        @SerialName("left_center")
-        LEFT_CENTER {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> =
-                config.selectedSlotOffsetX to (windowHeight - slotHeight) / 2 + config.selectedSlotOffsetY
-        },
-
-        @SerialName("right_center")
-        RIGHT_CENTER {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> =
-                windowWidth - slotWidth + config.selectedSlotOffsetX to (windowHeight - slotHeight) / 2 + config.selectedSlotOffsetY
-        },
-
-        @SerialName("top_center")
-        TOP_CENTER {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> =
-                (windowWidth - slotWidth) / 2 + config.selectedSlotOffsetX to config.selectedSlotOffsetY
-        },
-
-        @SerialName("left_top")
-        LEFT_TOP {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> = config.selectedSlotOffsetX to config.selectedSlotOffsetY
-        },
-
-        @SerialName("right_top")
-        RIGHT_TOP {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> = windowWidth - slotWidth + config.selectedSlotOffsetX to config.selectedSlotOffsetY
-        },
-
-        @SerialName("custom")
-        CUSTOM {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> = config.selectedSlotOffsetX to config.selectedSlotOffsetY
-        },
-
-        @SerialName("custom_percent")
-        CUSTOM_PERCENT {
-
-            override fun getPosition(
-                player: ClientPlayerEntity,
-                windowWidth: Int,
-                windowHeight: Int,
-                slotWidth: Int,
-                slotHeight: Int
-            ): Pair<Int, Int> =
-                ((windowWidth - slotWidth) * (config.selectedSlotOffsetX / 100.0)).toInt() to ((windowHeight - slotHeight) * (config.selectedSlotOffsetY / 100.0)).toInt()
-        };
-
-        val displayName: Text = translate("slotPosition.${name.lowercase()}")
-
-        abstract fun getPosition(
-            player: ClientPlayerEntity,
-            windowWidth: Int,
-            windowHeight: Int,
-            slotWidth: Int,
-            slotHeight: Int
-        ): Pair<Int, Int>
-    }
-
-    @Serializable
-    enum class HideMode {
-
-        @SerialName("show")
-        SHOW,
-
-        @SerialName("dynamically_hide")
-        DYNAMICALLY_HIDE,
-
-        @SerialName("hide")
-        HIDE;
-
-        val displayName: Text = translate("hideMode.${name.lowercase()}")
     }
 }

@@ -45,6 +45,7 @@ class MagneticTrapSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_ATTRACT_RANGE = 1.0f
         private const val DEFAULT_TRAP_DURATION = 0

@@ -43,6 +43,7 @@ class DashSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_DASH_FORCE = 1.5
         private val DEFAULT_DASH_SOUND = ModSounds.DASH

@@ -93,6 +93,7 @@ class DisarmSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_SUCCESS_CHANCE = 0.45f
         private const val DEFAULT_DISARM_DURATION = 5 * 20

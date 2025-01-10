@@ -44,7 +44,7 @@ class SelfRepairSkill : Skill(
     override fun shouldStart(player: ServerPlayerEntity): Boolean =
         player.armorItems.filter { it.isDamaged }.any { it.damage > getMaxRepairLimit(player, it) }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -74,6 +74,7 @@ class SelfRepairSkill : Skill(
     override fun getProgress(player: PlayerEntity): Double = 1.0 - super.getProgress(player)
 
     companion object {
+
         // Default Values
         private const val DEFAULT_CHARGE_DURATION = 10 * 20
         private const val DEFAULT_REPAIR_THRESHOLD = 0.5f

@@ -33,7 +33,7 @@ class DisguiseSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_DISGUISE_DURATION, player, DEFAULT_DISGUISE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -45,7 +45,7 @@ class DisguiseSkill : Skill(
         player.stopAndCooldown()
     }
 
-    override fun isDisguising(player: PlayerEntity): Boolean = 
+    override fun isDisguising(player: PlayerEntity): Boolean =
         player.isUsing() && getDisguisePos(player) != null
 
     fun getDisguisePos(player: PlayerEntity): BlockPos? {
@@ -62,6 +62,7 @@ class DisguiseSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_DISGUISE_DURATION = 30 * 20
 

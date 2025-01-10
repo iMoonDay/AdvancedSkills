@@ -75,7 +75,7 @@ class DamageAbsorptionSkill : Skill(
         return true
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_DURATION, player, DEFAULT_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -84,6 +84,7 @@ class DamageAbsorptionSkill : Skill(
     }
 
     companion object {
+
         // NBT Keys
         private const val NBT_REMAINING_COUNT = "RemainingCount"
 

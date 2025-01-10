@@ -68,6 +68,7 @@ class TeleportSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_TELEPORT_RANGE = 2.0
         private val DEFAULT_TELEPORT_SOUND = SoundEvents.ENTITY_ENDERMAN_TELEPORT

@@ -42,7 +42,7 @@ class PrimaryPurificationSkill : Skill(
             val maxDuration = getIntParam(PARAM_PURIFY_DURATION, user, DEFAULT_PURIFY_DURATION).toDouble()
             effect.setDuration(effect.mapDuration { (it - min(it * 0.2, maxDuration)).toInt() })
             user.sendPacket(EntityStatusEffectS2CPacket(user.id, effect))
-            
+
             val reducedSeconds = (originalDuration - effect.duration) / 20.0
             user.spawnParticles(
                 ParticleTypes.GLOW,
@@ -60,6 +60,7 @@ class PrimaryPurificationSkill : Skill(
         } ?: UseResult.fail(failedMessage)
 
     companion object {
+
         // Default Values
         private const val DEFAULT_PURIFY_DURATION = 15 * 20
         private val DEFAULT_PURIFY_SOUND = ModSounds.PURIFY

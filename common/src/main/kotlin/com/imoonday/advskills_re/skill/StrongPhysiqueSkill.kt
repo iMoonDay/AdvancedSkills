@@ -50,6 +50,7 @@ class StrongPhysiqueSkill : PassiveSkill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_HEALTH_BOOST = 4.0
 

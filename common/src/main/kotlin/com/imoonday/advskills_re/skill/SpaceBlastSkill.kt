@@ -117,7 +117,7 @@ class SpaceBlastSkill : LongPressSkill(
 
     override fun alwaysKeepCharging(player: PlayerEntity): Boolean = true
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun isGlowing(entity: Entity, clientPlayer: PlayerEntity): Boolean =
@@ -177,6 +177,7 @@ class SpaceBlastSkill : LongPressSkill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_CHARGE_DURATION = 5 * 20
         private const val DEFAULT_BLAST_RANGE = 4

@@ -120,12 +120,6 @@ interface SkillTrigger {
     fun getListParam(name: String): Parameter.ListParameter =
         getAsSkill().getParam(name)?.asList() ?: Parameter.ListParameter(listOf(), listOf())
 
-    fun getParamBaseValue(name: String, default: Any? = null): Any? {
-        val skill = getAsSkill()
-        val parameter = skill.getParam(name) ?: return default
-        return parameter.baseValue
-    }
-
     fun PlayerEntity.hasEnhancement(id: String): Boolean =
         getEnhancement(getAsSkill(), id) != null
 
@@ -133,4 +127,11 @@ interface SkillTrigger {
 
         private val NO_DATA_EXCEPTION = { IllegalStateException("Error! Trying to access data for an unlearned skill") }
     }
+}
+
+inline fun <reified T : Any> SkillTrigger.getParamBaseValue(name: String, default: T? = null): T? {
+    val skill = getAsSkill()
+    val parameter = skill.getParam(name) ?: return default
+    val baseValue = parameter.baseValue
+    return baseValue as? T ?: default
 }

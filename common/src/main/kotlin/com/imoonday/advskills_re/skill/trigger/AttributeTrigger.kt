@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill.trigger
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.init.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.player.*
 import net.minecraft.server.network.*

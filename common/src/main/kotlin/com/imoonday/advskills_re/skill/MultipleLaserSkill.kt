@@ -108,7 +108,7 @@ class MultipleLaserSkill : LongPressSkill(
         }
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_LASER_DURATION, player, DEFAULT_LASER_DURATION, 0)
 
     private fun getMaxDistance(player: PlayerEntity): Double =
@@ -128,6 +128,7 @@ class MultipleLaserSkill : LongPressSkill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_DAMAGE_INTERVAL = 2
         private const val DEFAULT_LASER_DURATION = 10 * 20

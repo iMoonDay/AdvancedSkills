@@ -31,6 +31,7 @@ class AutomaticUphillSkill : PassiveSkill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_STEP_HEIGHT = 1.0f
 

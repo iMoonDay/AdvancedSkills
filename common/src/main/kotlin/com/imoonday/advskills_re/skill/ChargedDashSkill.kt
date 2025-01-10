@@ -18,7 +18,8 @@ class ChargedDashSkill : LongPressSkill(
     )
 ), AttributeTrigger {
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam(PARAM_CHARGE_TIME, player, DEFAULT_CHARGE_TIME, 0)
+    override fun getMaxUseTime(player: PlayerEntity): Int =
+        getIntParam(PARAM_CHARGE_TIME, player, DEFAULT_CHARGE_TIME, 0)
 
     init {
         settings.addParameter(
@@ -80,6 +81,7 @@ class ChargedDashSkill : LongPressSkill(
         super<AttributeTrigger>.postUnequipped(player, slot)
 
     companion object {
+
         // Default Values
         private const val DEFAULT_CHARGE_TIME = 3 * 20
         private const val DEFAULT_MOVEMENT_PENALTY = 0.2

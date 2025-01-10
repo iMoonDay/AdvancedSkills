@@ -9,7 +9,12 @@ class InstantHealingSkill : HealingSkill(
         types = listOf(SkillType.RESTORATION),
         cooldown = 25,
         rarity = SkillRarity.EPIC
-    ), 6.0f
+    ),
+    healingAmount = 6.0f,
+    enhancementValue = 2,
+    enhancementOperation = Enhancement.Operation.ADDITION,
+    enhancementLevel = 7,
+    enhancementDescArg = Enhancement.ArgFormatter.INT
 ) {
 
     override fun cooldownWithOthers(skill: Skill): Boolean = false

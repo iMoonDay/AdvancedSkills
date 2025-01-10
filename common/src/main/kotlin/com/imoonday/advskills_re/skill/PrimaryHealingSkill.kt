@@ -9,5 +9,5 @@ class PrimaryHealingSkill : HealingSkill(
         types = listOf(SkillType.RESTORATION),
         cooldown = 15,
         rarity = SkillRarity.RARE
-    ), 4.0f
+    ).withDisabled(true), 4.0f
 )

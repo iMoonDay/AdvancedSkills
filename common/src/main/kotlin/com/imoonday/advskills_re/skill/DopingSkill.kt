@@ -72,7 +72,7 @@ class DopingSkill : Skill(
         }
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_DOPING_DURATION, player, DEFAULT_DOPING_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -87,6 +87,7 @@ class DopingSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_DOPING_DURATION = 10 * 20
         private const val DEFAULT_SPEED_BOOST = 0.5

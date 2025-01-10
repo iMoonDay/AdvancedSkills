@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.client.render
 
-import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.render.Renderer2d.SLIDER_HEIGHT
 import com.imoonday.advskills_re.client.render.Renderer2d.SLIDER_WIDTH
 import com.imoonday.advskills_re.client.render.Renderer2d.sliderTexture
@@ -285,24 +284,27 @@ fun DrawContext.renderScrollbar(x: Int, y: Int, height: Int) {
 }
 
 fun DrawContext.drawTextWithBackground(
+    textRenderer: TextRenderer,
     text: String,
     centerX: Int,
     y: Int,
     color: Int,
     backgroundColor: Int,
     shadow: Boolean = true,
-) = drawTextWithBackground(text.toText(), centerX, y, color, backgroundColor, shadow)
+) = drawTextWithBackground(textRenderer, text.toText(), centerX, y, color, backgroundColor, shadow)
 
 fun DrawContext.drawTextWithBackground(
+    textRenderer: TextRenderer,
     text: Text,
     centerX: Int,
     y: Int,
     color: Int,
     backgroundColor: Int,
     shadow: Boolean = true,
-) = drawTextWithBackground(text.asOrderedText(), centerX, y, color, backgroundColor, shadow)
+) = drawTextWithBackground(textRenderer, text.asOrderedText(), centerX, y, color, backgroundColor, shadow)
 
 fun DrawContext.drawTextWithBackground(
+    textRenderer: TextRenderer,
     text: OrderedText,
     centerX: Int,
     y: Int,
@@ -310,12 +312,10 @@ fun DrawContext.drawTextWithBackground(
     backgroundColor: Int,
     shadow: Boolean = true,
 ) {
-    client?.textRenderer?.run {
-        val width = getWidth(text)
-        val x = centerX - width / 2
-        fill(x - 1, y - 1, x + width + 1, y + fontHeight + 1, backgroundColor)
-        drawText(this, text, x, y, color, shadow)
-    }
+    val width = textRenderer.getWidth(text)
+    val x = centerX - width / 2
+    fill(x - 1, y - 1, x + width + 1, y + textRenderer.fontHeight + 1, backgroundColor)
+    drawText(textRenderer, text, x, y, color, shadow)
 }
 
 fun DrawContext.drawBox(x: Int, y: Int, width: Int, height: Int, focused: Boolean) {
@@ -323,3 +323,38 @@ fun DrawContext.drawBox(x: Int, y: Int, width: Int, height: Int, focused: Boolea
     fill(x, y, x + width, y + height, i)
     fill(x + 1, y + 1, x + width - 1, y + height - 1, -16777216)
 }
+
+fun DrawContext.drawScaledText(
+    textRenderer: TextRenderer,
+    text: Text,
+    maxWidth: Int,
+    centerX: Int,
+    y: Int,
+    color: Int,
+    shadow: Boolean = true
+) {
+
+    val textWidth = textRenderer.getWidth(text)
+    if (textWidth > maxWidth) {
+        val matrices = matrices
+        val scale = maxWidth.toFloat() / textWidth
+
+        matrices.push()
+        matrices.translate(centerX.toFloat(), y.toFloat(), 0f)
+        matrices.scale(scale, scale, 1f)
+        drawText(textRenderer, text, -textWidth / 2, 0, color, shadow)
+        matrices.pop()
+    } else {
+        drawText(textRenderer, text, centerX - textWidth / 2, y, color, shadow)
+    }
+}
+
+fun DrawContext.drawScaledText(
+    textRenderer: TextRenderer,
+    text: String,
+    maxWidth: Int,
+    centerX: Int,
+    y: Int,
+    color: Int,
+    shadow: Boolean = true
+) = drawScaledText(textRenderer, text.toText(), maxWidth, centerX, y, color, shadow)

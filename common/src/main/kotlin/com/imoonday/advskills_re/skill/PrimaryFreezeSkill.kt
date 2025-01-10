@@ -78,6 +78,7 @@ class PrimaryFreezeSkill : Skill(
     override fun isInSpecialState(player: PlayerEntity): Boolean = player.isForceFrozen
 
     companion object {
+
         // Default Values
         private const val DEFAULT_FREEZE_RANGE = 0
         private const val DEFAULT_BALL_COUNT = 1

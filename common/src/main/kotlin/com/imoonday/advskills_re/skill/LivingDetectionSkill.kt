@@ -53,7 +53,7 @@ class LivingDetectionSkill : Skill(
             || entity.z != entity.prevZ)
     }
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_DETECT_DURATION, player, DEFAULT_DETECT_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -62,6 +62,7 @@ class LivingDetectionSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_DETECT_DURATION = 5 * 20
         private const val DEFAULT_DETECT_RANGE = 50.0

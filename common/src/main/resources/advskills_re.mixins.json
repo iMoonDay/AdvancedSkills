@@ -36,6 +36,7 @@
     "FluidBlockMixin",
     "GhastEntity$ShootFireballGoalMixin",
     "GuardianEntity$FireBeamGoalMixin",
+    "HungerManagerMixin",
     "ItemStackMixin",
     "LightningEntityMixin",
     "LivingEntityAccessor",
@@ -46,12 +47,12 @@
     "ReloadCommandAccessor",
     "ScreenHandlerAccessor",
     "ServerPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
     "ServerWorldMixin",
     "ShulkerEntity$ShootBulletGoalMixin",
     "StatusEffectInstanceAccessor",
     "ThreadedAnvilChunkStorageAccessor",
-    "WardenEntityMixin",
-    "HungerManagerMixin"
+    "WardenEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

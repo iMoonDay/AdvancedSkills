@@ -84,18 +84,19 @@ class AbsoluteDefenseSkill : Skill(
 
     companion object {
 
+        // Default Values
         private const val DEFAULT_DURATION = 30 * 20
         private const val DEFAULT_DEFENSE_COUNT = 1
         private val DEFAULT_BLOCK_SOUND = SoundEvents.ITEM_SHIELD_BLOCK
         private val DEFAULT_BREAK_SOUND = SoundEvents.ITEM_SHIELD_BREAK
 
         // NBT Keys
-        private const val NBT_REMAINING_COUNT = "RemainingEffects"
+        private const val NBT_REMAINING_COUNT = "RemainingCount"
 
         // Parameter Names
         private const val PARAM_BLOCK_SOUND = "block_sound"
         private const val PARAM_BREAK_SOUND = "break_sound"
-        private const val PARAM_DURATION = "persist_time"
+        private const val PARAM_DURATION = "duration"
         private const val PARAM_DEFENSE_COUNT = "defense_count"
 
         // Enhancement IDs

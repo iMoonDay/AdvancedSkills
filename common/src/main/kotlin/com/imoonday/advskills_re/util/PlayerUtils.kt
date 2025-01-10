@@ -694,26 +694,13 @@ fun ServerPlayerEntity.spawnParticles(
 ) {
     if (force) {
         val particleS2CPacket = ParticleS2CPacket(
-            type,
-            true,
-            pos.x,
-            pos.y,
-            pos.z,
-            deltaX.toFloat(),
-            deltaY.toFloat(),
-            deltaZ.toFloat(),
-            speed.toFloat(),
-            count
+            type, true,
+            pos.x, pos.y, pos.z,
+            deltaX.toFloat(), deltaY.toFloat(), deltaZ.toFloat(),
+            speed.toFloat(), count
         )
         serverWorld.players.forEach {
-            serverWorld.sendToPlayerIfNearby(
-                it,
-                true,
-                pos.x,
-                pos.y,
-                pos.z,
-                particleS2CPacket
-            )
+            serverWorld.sendToPlayerIfNearby(it, true, pos.x, pos.y, pos.z, particleS2CPacket)
         }
     } else {
         serverWorld.spawnParticles(type, pos.x, pos.y, pos.z, count, deltaX, deltaY, deltaZ, speed)

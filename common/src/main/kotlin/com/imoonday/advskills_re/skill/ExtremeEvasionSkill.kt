@@ -66,7 +66,7 @@ class ExtremeEvasionSkill : Skill(
         attacker: Entity?,
     ): Boolean = player.isUsing()
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_EVASION_DURATION, player, DEFAULT_EVASION_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -75,6 +75,7 @@ class ExtremeEvasionSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_EVASION_DURATION = 10
         private const val DEFAULT_EVASION_FORCE = 2.0

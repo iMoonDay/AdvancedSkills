@@ -168,19 +168,15 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
         }
         if (player.isCooling() && (this !is LongPressTrigger || !player.isUsing())) {
             player.sendMessage(
-                translate(
-                    "useSkill.cooling",
-                    name,
-                    translate("cooldown.seconds", player.getCooldown(this) / 20.0)
-                ), true
+                translate("useSkill.cooling", name, translate("cooldown.seconds", player.getCooldown(this) / 20.0)),
+                true
             )
         } else {
             player.forEachTrigger<UseInterruptTrigger>({ it != this && it.shouldInterrupt(player) }) {
-                it.interrupt(
-                    player
-                )
+                it.interrupt(player)
             }
-            val result = (this as? LongPressTrigger)?.use(player, keyState) ?: use(player)
+
+            val result = if (this is LongPressTrigger) use(player, keyState) else use(player)
             handleResult(player, result)
         }
     }
@@ -204,30 +200,35 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
     }
 
     override fun getAsSkill(): Skill = this
+
     fun message(key: String, vararg args: Any) = translateSkill(id.path, key, *args)
+
     fun messageKey(key: String) = translateSkillKey(id.path, key)
+
     open fun applyCooldownEnhancements(player: PlayerEntity, cooldown: Int): Int {
         val (enhancement, data) = player.getEnhancement("cooldown") ?: return cooldown
+        if (!data.activated) return cooldown
         return enhancement.getEnhancedValue(data.currentLevel, cooldown).coerceAtLeast(0)
     }
 
-    open fun getEnhancementTooltip(id: String, level: Int): Text? =
+    open fun getEnhancementTooltip(id: String, level: Int): MutableText? =
         getEnhancement(id)?.let {
             val arg = (it.descArg ?: enhancementDescArgs[it.id])?.invoke(it.getValue(level))
             if (arg != null) Text.translatable(it.description, arg)
             else Text.translatable(it.description)
         }
 
-    open fun getEnhancementTooltips(
-        player: PlayerEntity,
-        filter: (Enhancement, EnhancementData) -> Boolean = { _, _ -> true }
-    ): List<Text> =
-        player.getEnhancements().filter { filter(it.key, it.value) }.map {
+    open fun getEnhancementTooltips(player: PlayerEntity): List<MutableText> =
+        player.getEnhancements().map {
             val enhancement = it.key
             val level = it.value.currentLevel
             val arg = (enhancement.descArg ?: enhancementDescArgs[enhancement.id])?.invoke(enhancement.getValue(level))
             (if (arg != null) Text.translatable(enhancement.description, arg)
-            else Text.translatable(enhancement.description)).formatted(Formatting.BLUE)
+            else Text.translatable(enhancement.description)).formatted(Formatting.BLUE).run {
+                if (!it.value.activated) {
+                    formatted(Formatting.STRIKETHROUGH)
+                } else this
+            }
         }
 
     private fun getCooldownText(cooldown: Int) = if (cooldown <= 0) {
@@ -248,6 +249,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
     }
 
     override fun hashCode(): Int = id.hashCode()
+
     override fun toString(): String =
         "Skill(id=$id, cooldown=$cooldown, icon=$icon, disabled=$disabled, parameters=$parameters, rarity=$rarity, types=$types, weight=$weight, enhancements=$enhancements)"
 
@@ -386,7 +388,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             genericText: Boolean = false
         ): Settings {
             parameters[name] = Parameter.create(baseValue, listOf(enhancementId))
-            return addEnhancement(enhancementId, value.toDouble(), operation, maxLevel, descArg, genericText)
+            return addEnhancement(enhancementId, value, operation, maxLevel, descArg, genericText)
         }
 
         fun addParameter(
@@ -589,7 +591,6 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
                             null
                         }
                     }
-
 
                     return fromJson(GSON.toJson(obj.get("settings")))
                 } catch (e: Exception) {

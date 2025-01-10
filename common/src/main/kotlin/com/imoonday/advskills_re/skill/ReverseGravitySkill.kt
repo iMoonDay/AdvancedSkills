@@ -24,7 +24,8 @@ class ReverseGravitySkill : Skill(
     StopTrigger,
     ClientUseTrigger,
     InvertInputTrigger,
-    CameraUpdateMovementTrigger {
+    CameraUpdateMovementTrigger,
+    SaveMovingTrigger {
 
     init {
         settings.addParameter(
@@ -41,7 +42,7 @@ class ReverseGravitySkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this)
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_REVERSE_DURATION, player, DEFAULT_REVERSE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -101,6 +102,7 @@ class ReverseGravitySkill : Skill(
     override fun getDelta(original: Float, clientPlayer: PlayerEntity): Float = 1f
 
     companion object {
+
         // NBT Keys
         private const val NBT_FIRST_TICK = "First"  // 首次触发标记
 

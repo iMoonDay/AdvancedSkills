@@ -1,7 +1,7 @@
 package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.*
-import com.imoonday.advskills_re.client.render.skill.*
+import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
@@ -52,12 +52,12 @@ class ClientConfig {
             field = value
             save()
         }
-    var hideSkillSlots: SkillSlotRenderer.HideMode = SkillSlotRenderer.HideMode.DYNAMICALLY_HIDE
+    var hideSkillSlots: HideMode = HideMode.DYNAMICALLY_HIDE
         set(value) {
             field = value
             save()
         }
-    var dynamicallyHideDirection: SkillSlotRenderer.AnimationDirection = SkillSlotRenderer.AnimationDirection.RIGHT
+    var dynamicallyHideDirection: AnimationDirection = AnimationDirection.RIGHT
         set(value) {
             field = value
             save()
@@ -82,7 +82,7 @@ class ClientConfig {
             field = value
             save()
         }
-    var selectedSlotPosition: SkillSlotRenderer.SlotPosition = SkillSlotRenderer.SlotPosition.LEFT_OF_HOTBAR
+    var selectedSlotPosition: SlotPosition = SlotPosition.LEFT_OF_HOTBAR
         set(value) {
             field = value
             save()
@@ -112,6 +112,12 @@ class ClientConfig {
             field = value
             save()
         }
+    var useRingCastingWheel: Boolean = true
+        set(value) {
+            field = value
+            save()
+        }
+
     var displayedSkills: MutableSet<String> = mutableSetOf()
         set(value) {
             field = value

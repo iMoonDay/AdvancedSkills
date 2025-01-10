@@ -23,7 +23,7 @@ class AbsoluteDomainSkill : Skill(
         settings
             .addParameter(PARAM_MIN_HARDNESS, DEFAULT_MIN_HARDNESS)
             .addParameter(PARAM_MAX_HARDNESS, DEFAULT_MAX_HARDNESS)
-            .addParameter(PARAM_ABOVE_PLAYER_Y, DEFAULT_ABOVE_PLAYER_Y)
+            .addParameter(PARAM_ABOVE_PLAYER, DEFAULT_ABOVE_PLAYER_Y)
             .addParameter(
                 name = PARAM_DURATION,
                 baseValue = DEFAULT_DURATION,
@@ -47,7 +47,7 @@ class AbsoluteDomainSkill : Skill(
         putDouble(NBT_RANGE, getDoubleParam(PARAM_RANGE, user, DEFAULT_RANGE))
         putFloat(NBT_MIN_HARDNESS, getFloatParam(PARAM_MIN_HARDNESS, user, DEFAULT_MIN_HARDNESS))
         putFloat(NBT_MAX_HARDNESS, getFloatParam(PARAM_MAX_HARDNESS, user, DEFAULT_MAX_HARDNESS))
-        putBoolean(NBT_ABOVE_PLAYER_Y, getBooleanParam(PARAM_ABOVE_PLAYER_Y, user, DEFAULT_ABOVE_PLAYER_Y))
+        putBoolean(NBT_ABOVE_PLAYER_Y, getBooleanParam(PARAM_ABOVE_PLAYER, user, DEFAULT_ABOVE_PLAYER_Y))
     })
 
     override fun getMaxUseTime(player: PlayerEntity): Int =
@@ -98,7 +98,7 @@ class AbsoluteDomainSkill : Skill(
         // Parameter Names
         private const val PARAM_MIN_HARDNESS = "minimum_hardness"  // 最小硬度
         private const val PARAM_MAX_HARDNESS = "maximum_hardness"  // 最大硬度
-        private const val PARAM_ABOVE_PLAYER_Y = "only_above_player"  // 仅破坏玩家上方方块
+        private const val PARAM_ABOVE_PLAYER = "only_above_player"  // 仅破坏玩家上方方块
         private const val PARAM_DURATION = "duration"  // 持续时间
         private const val PARAM_RANGE = "break_range"  // 破坏范围
 

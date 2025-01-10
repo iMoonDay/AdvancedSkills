@@ -1064,6 +1064,7 @@ advskills_re:
       selectedSlotOffsetY: 独立技能槽Y偏移量
       displayProgressBarBelowCrosshair: 在准星下方显示选中技能的进度条
       progressBarOffsetY: 进度条Y偏移量
+      useRingCastingWheel: 使用环形施法轮盘样式
       invalidLayout: "错误输入! 只能包含1-10和分隔符','"
       incompleteLayout: "错误输入! 缺少栏位：%s"
       redundantNumbers: "错误输入! 栏位不能重复：%s"
@@ -1086,6 +1087,11 @@ advskills_re:
       skillCooldownMultiplier: 技能冷却倍率
       skillXpMultiplier: 技能经验倍率
       skillBlackList: 技能黑名单
+  widget:
+    enhancement_list:
+      empty: 尚未获得增幅
+      level: '等级：%d / %d'
+      deactivated: 已禁用
   skillSlot:
     generic: '通用技能槽 %d'
     active: '主动技能槽 %d'

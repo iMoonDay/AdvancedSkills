@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.api.*
+import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.render.entity.*
 import com.imoonday.advskills_re.client.render.entity.feature.*
 import com.imoonday.advskills_re.client.render.entity.model.*
@@ -83,7 +84,7 @@ object ClientRegistry {
             if (client?.options?.hudHidden == true) return@register
 
             SkillRendererHandler.renderOverlay(context)
-            if (ClientConfig.get().hideSkillSlots != SkillSlotRenderer.HideMode.HIDE) {
+            if (ClientConfig.get().hideSkillSlots != HideMode.HIDE) {
                 SkillSlotRenderer.render(context)
             }
             SkillSlotRenderer.renderSelectedSkill(context)

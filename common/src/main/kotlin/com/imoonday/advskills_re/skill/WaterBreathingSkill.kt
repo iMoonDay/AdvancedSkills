@@ -33,7 +33,7 @@ class WaterBreathingSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this)
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_BREATH_DURATION, player, DEFAULT_BREATH_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -59,6 +59,7 @@ class WaterBreathingSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_BREATH_DURATION = 30 * 20
         private const val BUBBLE_INTERVAL = 4  // 气泡生成间隔

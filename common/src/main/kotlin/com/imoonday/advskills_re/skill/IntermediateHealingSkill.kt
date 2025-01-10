@@ -9,5 +9,5 @@ class IntermediateHealingSkill : HealingSkill(
         types = listOf(SkillType.RESTORATION),
         cooldown = 30,
         rarity = SkillRarity.SUPERB
-    ), 8.0f
+    ).withDisabled(true), 8.0f
 )

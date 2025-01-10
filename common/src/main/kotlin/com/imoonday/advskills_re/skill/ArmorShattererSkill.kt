@@ -69,6 +69,7 @@ class ArmorShattererSkill : Skill(
     override fun isInSpecialState(player: PlayerEntity): Boolean = player.isVulnerable
 
     companion object {
+
         // Default Values
         private const val DEFAULT_PROJECTILE_COUNT = 1
         private val DEFAULT_LAUNCH_SOUND = ModSounds.FIRE

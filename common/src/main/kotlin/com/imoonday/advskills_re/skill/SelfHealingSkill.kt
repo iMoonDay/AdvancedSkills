@@ -44,7 +44,7 @@ class SelfHealingSkill : Skill(
 
     override fun shouldStart(player: ServerPlayerEntity): Boolean = !player.isDead && player.health < player.maxHealth
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_CHARGE_DURATION, player, DEFAULT_CHARGE_DURATION, 0)
 
     override fun onStop(player: ServerPlayerEntity) {
@@ -72,6 +72,7 @@ class SelfHealingSkill : Skill(
     override fun getProgress(player: PlayerEntity): Double = 1.0 - super.getProgress(player)
 
     companion object {
+
         // Default Values
         private const val DEFAULT_CHARGE_DURATION = 10 * 20
         private const val DEFAULT_HEAL_AMOUNT = 2.0f

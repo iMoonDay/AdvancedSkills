@@ -57,7 +57,7 @@ class RisingShockSkill : Skill(
         user.updateVelocity()
     }.withSound(getSoundEventParam(PARAM_RISE_SOUND, DEFAULT_RISE_SOUND.get()))
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_RISE_DURATION, player, DEFAULT_RISE_DURATION, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
@@ -83,6 +83,7 @@ class RisingShockSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_RISE_DURATION = 8
         private const val DEFAULT_AFFECT_RANGE = 1.0

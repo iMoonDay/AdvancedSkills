@@ -102,6 +102,7 @@ class ForcedGrowthSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_GROWTH_RANGE = 5.0
         private const val DEFAULT_GROWTH_TIMES = 1

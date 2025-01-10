@@ -1,6 +1,5 @@
 package com.imoonday.advskills_re.client.screen.component
 
-import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.render.skill.*
 import com.imoonday.advskills_re.component.*
@@ -8,7 +7,7 @@ import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.util.*
-import net.minecraft.client.font.*
+import net.minecraft.client.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.gui.screen.*
 import net.minecraft.client.gui.screen.narration.*
@@ -19,19 +18,22 @@ import org.lwjgl.glfw.*
 import java.util.function.*
 
 class EnhancementListWidget(
+    val client: MinecraftClient,
     private var x: Int,
     private var y: Int,
     private val width: Int,
     private val height: Int,
-    private val textRenderer: TextRenderer,
     private val player: PlayerEntity,
-    var skill: Skill,
+    skill: Skill,
     private val onClose: (EnhancementListWidget) -> Unit = { it.visible = false }
 ) : Widget, Drawable, Element {
 
+    private val textRenderer = client.textRenderer
+    var skill = skill
+        private set
     var visible: Boolean = true
     private var focused: Boolean = false
-    val enhancements: Map<Enhancement, EnhancementData> get() = player.getEnhancements(skill)
+    private var enhancements: Map<Enhancement, EnhancementData> = player.getEnhancements(skill)
     private var selected: Enhancement? = null
     private val selectedData: EnhancementData? get() = selected?.let { enhancements[it] }
 
@@ -96,7 +98,6 @@ class EnhancementListWidget(
     fun updateSkill(skill: Skill) {
         this.skill = skill
         this.scrollBar.resetOffset()
-        selected = enhancements.keys.firstOrNull()
         update()
     }
 
@@ -132,14 +133,15 @@ class EnhancementListWidget(
         onClose(this)
     }
 
-    fun restoreFrom(widget: EnhancementListWidget) {
+    fun restoreFrom(widget: EnhancementListWidget, windowSize: Pair<Int, Int>? = null) {
         this.visible = widget.visible
         this.focused = widget.focused
         this.skill = widget.skill
+        this.enhancements = widget.enhancements
         this.selected = widget.selected
         this.scrollBar.offset = widget.scrollBar.offset
-        this.setX(this.x)
-        this.setY(this.y)
+        this.setPosition(widget.x, widget.y)
+        windowSize?.let { this.fixOverflow(it.first, it.second) }
         updateButtons()
     }
 
@@ -179,6 +181,11 @@ class EnhancementListWidget(
     override fun forEachChild(consumer: Consumer<ClickableWidget>) = widgets.forEach(consumer)
 
     fun update() {
+        this.enhancements = player.getEnhancements(skill)
+        if (this.selected !in enhancements) {
+            this.selected = enhancements.keys.firstOrNull()
+        }
+
         updateButtons()
     }
 
@@ -195,8 +202,10 @@ class EnhancementListWidget(
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         if (!visible) return
 
-        context.matrices.push()
-        context.matrices.translate(0f, 0f, 100f)
+        val matrices = context.matrices
+
+        matrices.push()
+        matrices.translate(0f, 0f, 100f)
         renderBackground(context, mouseX, mouseY)
         widgets.forEach { it.render(context, mouseX, mouseY, delta) }
 
@@ -205,85 +214,52 @@ class EnhancementListWidget(
         val maxWidth = width / 2 - 20
 
         val name = skill.name
-        val nameWidth = textRenderer.getWidth(name)
-        if (nameWidth > maxWidth) {
-            val scale = maxWidth.toFloat() / nameWidth
-            context.matrices.push()
-            context.matrices.translate(centerX.toFloat(), (y + 10).toFloat(), 0f)
-            context.matrices.scale(scale, scale, 1f)
-            context.drawCenteredTextWithShadow(textRenderer, name, 0, 0, 0xFFFFFF)
-            context.matrices.pop()
-        } else {
-            context.drawCenteredTextWithShadow(textRenderer, name, centerX, y + 10, 0xFFFFFF)
-        }
+        context.drawScaledText(textRenderer, name, maxWidth, centerX, y + 10, 0xFFFFFF)
 
         val iconX = x + width - 5 - 16
         val iconY = y + 5
         SkillRenderer.renderIcon(skill, context, iconX, iconY)
         if (mouseX in iconX..(iconX + 16) && mouseY in iconY..(iconY + 16)) {
-            SkillRenderer.renderTooltip(client!!, skill, context, mouseX, mouseY, player)
+            SkillRenderer.renderTooltip(client, skill, context, mouseX, mouseY, player)
         }
 
         if (enhancements.isEmpty()) {
-            context.drawCenteredTextWithShadow(
+            val text = translate("widget.enhancement_list.empty")
+            context.drawText(
                 textRenderer,
-                "No Enhancements Available",
-                x + width / 2,
-                y + height / 2,
-                0xFFFFFF
+                text,
+                x + width / 4 - textRenderer.getWidth(text) / 2,
+                y + height / 2 - textRenderer.fontHeight / 2,
+                0xFFFFFF,
+                false
             )
         } else {
-            selected?.let { enhancement ->
-                selectedData?.let {
-                    val text = enhancement.name
-                    val level = it.currentLevel
-                    val maxLevel = it.maxLevel
-                    val description = skill.getEnhancementTooltip(enhancement.id, level)
+            do {
+                val enhancement = selected ?: break
+                val data = selectedData ?: break
 
-                    val textWidth = textRenderer.getWidth(text)
-                    if (textWidth > maxWidth) {
-                        val scale = maxWidth.toFloat() / textWidth
-                        context.matrices.push()
-                        context.matrices.translate(centerX.toFloat(), (centerY - 20).toFloat(), 0f)
-                        context.matrices.scale(scale, scale, 1f)
-                        context.drawCenteredTextWithShadow(textRenderer, text, 0, 0, 0xFFFFFF)
-                        context.matrices.pop()
-                    } else {
-                        context.drawCenteredTextWithShadow(textRenderer, text, centerX, centerY - 20, 0xFFFFFF)
-                    }
+                context.drawScaledText(textRenderer, enhancement.name, maxWidth, centerX, centerY - 20, 0xFFFFFF)
 
-                    context.drawCenteredTextWithShadow(
-                        textRenderer, "Level: $level/$maxLevel", centerX, centerY - 10, 0xFFFFFF
-                    )
+                val level = data.currentLevel
+                context.drawScaledText(
+                    textRenderer, translate("widget.enhancement_list.level", level, data.maxLevel),
+                    maxWidth, centerX, centerY - 10, 0xFFFFFF
+                )
 
-                    var lines: List<OrderedText> = emptyList()
-                    description?.let { descText ->
-                        lines = textRenderer.wrapLines(descText, maxWidth)
-                        lines.forEachIndexed { index, line ->
-                            context.drawCenteredTextWithShadow(
-                                textRenderer,
-                                line,
-                                centerX,
-                                centerY + index * 10,
-                                0xFFFFFF
-                            )
-                        }
-                    }
-
-                    if (!it.activated) {
-                        context.drawCenteredTextWithShadow(
-                            textRenderer,
-                            "Deactivated",
-                            centerX,
-                            centerY + lines.size * 10 + 10,
-                            0xFF0000
-                        )
-                    }
+                skill.getEnhancementTooltip(enhancement.id, level)?.let { descText ->
+                    context.drawScaledText(textRenderer, descText, maxWidth, centerX, centerY, 0xFFFFFF)
                 }
-            }
+
+                if (!data.activated) {
+                    context.drawCenteredTextWithShadow(
+                        textRenderer, translate("widget.enhancement_list.deactivated"),
+                        centerX, centerY + 20, 0xFF0000
+                    )
+                }
+            } while (false)
         }
 
-        context.matrices.pop()
+        matrices.pop()
     }
 
     private fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int) {

@@ -92,6 +92,7 @@ class DyingCounterattackSkill : Skill(
         player.isUsing() && effect == StatusEffects.WITHER || super.shouldHaveStatusEffect(player, effect)
 
     companion object {
+
         // Default Values
         private const val DEFAULT_HEAL_RATIO = 0.1f
         private const val DEFAULT_DAMAGE_PENALTY = 1.0f

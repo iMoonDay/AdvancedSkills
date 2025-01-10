@@ -39,6 +39,7 @@ class BiologicalHookSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_DURATION = 5 * 20
 

@@ -85,6 +85,7 @@ class FrostTrapSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_TRAP_RANGE = 0
         private const val DEFAULT_TRAP_COUNT = 1

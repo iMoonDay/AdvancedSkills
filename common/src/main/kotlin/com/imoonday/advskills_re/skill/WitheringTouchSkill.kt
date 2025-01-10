@@ -79,7 +79,9 @@ class WitheringTouchSkill : Skill(
     }
 
     override fun getProgress(player: PlayerEntity): Double =
-        1 - player.getActiveData().getInt(NBT_TOUCH_COUNT) / getDoubleParam(PARAM_MAX_TOUCH_COUNT, player, DEFAULT_MAX_TOUCH_COUNT.toDouble())
+        1 - player.getActiveData().getInt(NBT_TOUCH_COUNT) / getDoubleParam(
+            PARAM_MAX_TOUCH_COUNT, player, DEFAULT_MAX_TOUCH_COUNT.toDouble()
+        )
 
     override fun postUnequipped(player: ServerPlayerEntity, slot: SkillSlot) {
         super.postUnequipped(player, slot)
@@ -89,6 +91,7 @@ class WitheringTouchSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_MAX_EFFECT_DURATION = 20 * 9
         private const val DEFAULT_MAX_TOUCH_COUNT = 3

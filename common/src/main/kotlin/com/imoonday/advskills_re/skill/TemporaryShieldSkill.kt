@@ -48,7 +48,7 @@ class TemporaryShieldSkill : Skill(
 
     override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).withCooling(true)
 
-    override fun getMaxUseTime(player: PlayerEntity): Int = 
+    override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_SHIELD_DURATION, player, DEFAULT_SHIELD_DURATION, 0)
 
     override fun serverTick(player: ServerPlayerEntity, usedTime: Int) {
@@ -62,6 +62,7 @@ class TemporaryShieldSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_SHIELD_DURATION = 10 * 20
         private const val DEFAULT_CHARGE_INTERVAL = 20

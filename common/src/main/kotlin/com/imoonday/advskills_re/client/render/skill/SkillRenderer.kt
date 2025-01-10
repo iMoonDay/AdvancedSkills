@@ -150,7 +150,7 @@ object SkillRenderer {
         player: PlayerEntity
     ): MutableList<OrderedText> {
         val list = skill.getItemTooltips(displayName = true)
-        val tooltips = skill.getEnhancementTooltips(player) { _, data -> data.activated }
+        val tooltips = skill.getEnhancementTooltips(player)
         if (tooltips.isNotEmpty()) {
             list.add(Text.empty())
             list.add(translate("screen.inventory.enhance").formatted(Formatting.GRAY))
@@ -180,6 +180,8 @@ object SkillRenderer {
         }
 
         val orderedList = list.map(Text::asOrderedText).toMutableList()
+
+        if (list.size < 2) return orderedList
         val lines = Tooltip.wrapLines(client, list[1])
         if (lines.size > 1) {
             orderedList.removeAt(1)

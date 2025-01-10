@@ -62,6 +62,7 @@ class DuplicationSkill : Skill(
     }
 
     companion object {
+
         // Default Values
         private const val DEFAULT_CLONE_INTERVAL = 10
         private const val DEFAULT_CLONE_MOVE_TIME = 3 * 20
