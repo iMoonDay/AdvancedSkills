@@ -4,7 +4,7 @@ import net.minecraft.entity.player.*
 
 interface ProgressTrigger : SkillTrigger {
 
-    fun shouldDisplay(player: PlayerEntity): Boolean = false
+    fun shouldDisplay(player: PlayerEntity): Boolean
 
     fun getProgress(player: PlayerEntity): Double
 

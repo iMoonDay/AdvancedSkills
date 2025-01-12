@@ -24,14 +24,22 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     public Input input;
     @Unique
     private boolean advskills_re$wasJumping;
+    @Unique
+    private boolean advskills_re$onGround;
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);
         throw new UnsupportedOperationException("Mixin Constructor");
     }
 
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void advskills_re$onTick(CallbackInfo ci) {
+        ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
+        this.advskills_re$onGround = player.isOnGround();
+    }
+
     @Inject(method = "tick", at = @At("TAIL"))
-    private void advskills_re$tick(CallbackInfo ci) {
+    private void advskills_re$postTick(CallbackInfo ci) {
         ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
         ClientTriggerHandler.sendPlayerData(player);
     }
@@ -51,6 +59,9 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         boolean jumping = this.input.jumping;
         if (ClientTriggerHandler.shouldSyncJumpState(player)) {
             if (jumping != this.advskills_re$wasJumping) {
+                if (jumping) {
+                    SkillTriggerHandler.onJumped(player, this.advskills_re$onGround);
+                }
                 Channels.getUPDATE_JUMPING_C2S().sendToServer(new UpdateJumpingC2SPacket(jumping));
             }
         }

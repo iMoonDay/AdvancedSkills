@@ -164,11 +164,14 @@ advskills_re:
         name: 距离增幅
         description: '%s 传送距离'
     jump:
-      name: 跳跃
-      description: 无需地面的跳跃
+      name: 多段跳
+      description: 获得额外的跳跃
       force:
         name: 力量增幅
         description: '%s 跳跃力度'
+      count:
+        name: 次数增幅
+        description: '%s 跳跃次数'
     double_jump:
       name: 二级跳跃
       description: 无需地面的双倍高度跳跃
@@ -500,13 +503,13 @@ advskills_re:
         description: '%s 奴仆数量'
     taunt:
       name: 嘲讽
-      description: 嘲讽其他玩家的奴仆，并获得奴仆伤害减伤，持续15s，使用期间无法解除
+      description: 大部分敌对生物会尝试优先攻击嘲讽者，并获得伤害减免，持续15s，使用期间无法解除
       duration:
         name: 时间增幅
         description: '%s 嘲讽时长'
       reduction:
         name: 减伤增幅
-        description: '%s 奴仆伤害减免'
+        description: '%s 伤害减免'
     liquid_shield:
       name: 液体护罩
       description: 你将隔离周围液体
@@ -797,6 +800,9 @@ advskills_re:
       duration:
         name: 时间增幅
         description: '%s 隐身时长'
+      attack:
+        name: 攻击增幅
+        description: 分身可攻击
     magnetic_trap:
       name: 磁力陷阱
       description: 生成一个减速陷阱
@@ -824,6 +830,9 @@ advskills_re:
       duration:
         name: 时间增幅
         description: '%s 隐身时长'
+      attack:
+        name: 攻击增幅
+        description: 分身可攻击
     arrow_rain:
       name: 箭雨
       description: 在目标上方随机召唤数根箭
@@ -859,7 +868,7 @@ advskills_re:
         description: '%s 吸收次数'
     disguise:
       name: 伪装术
-      description: 伪装成脚下的方块，释放任意技能时失效
+      description: 伪装成脚下的方块，可以避免被大部分敌对生物发现，释放任意技能时失效
       duration:
         name: 时间增幅
         description: '%s 伪装时长'
@@ -1056,7 +1065,7 @@ advskills_re:
       hideSkillSlots: 隐藏技能栏
       dynamicallyHideDirection: 动态隐藏方向
       progressBarColor: 进度条颜色
-      displaySelectedSkillSlot: 额外显示选中技能槽
+      displaySelectedSkillSlot: 额外显示选中技能槽F
       displayQuickCastKey: 显示快捷施法键
       useVanillaSlot: 独立技能槽使用原版副手栏样式
       selectedSlotPosition: 独立技能槽位置

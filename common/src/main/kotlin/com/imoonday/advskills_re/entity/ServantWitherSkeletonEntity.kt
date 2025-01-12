@@ -3,7 +3,6 @@ package com.imoonday.advskills_re.entity
 import com.imoonday.advskills_re.entity.goal.AttackWithOwnerGoal
 import com.imoonday.advskills_re.entity.goal.TrackOwnerAttackerGoal
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.skill.trigger.*
 import net.minecraft.entity.*
 import net.minecraft.entity.ai.goal.*
 import net.minecraft.entity.ai.pathing.*
@@ -39,11 +38,6 @@ class ServantWitherSkeletonEntity(
         goalSelector.add(2, WanderAroundFarGoal(this, 1.0))
         goalSelector.add(3, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
         goalSelector.add(3, LookAroundGoal(this))
-        targetSelector.add(
-            0,
-            ActiveTargetGoal(this, PlayerEntity::class.java, true)
-            { it.uuid != ownerUuid && (it as? PlayerEntity)?.run { SkillTriggerHandler.isTaunter(this) } == true }
-        )
         targetSelector.add(
             1,
             ActiveTargetGoal(this, LivingEntity::class.java, true) { it is Servant && it.ownerUuid != this.ownerUuid })
@@ -95,7 +89,9 @@ class ServantWitherSkeletonEntity(
         val attacker = damageSource.attacker
         val source = damageSource.source
         if (attacker == null && source == null) return false
-        return super.isInvulnerableTo(damageSource) || attacker?.uuid == ownerUuid || source?.uuid == ownerUuid || attacker is Servant && attacker.ownerUuid == ownerUuid || source is Servant && source.ownerUuid == ownerUuid
+        return super.isInvulnerableTo(
+            damageSource
+        ) || attacker?.uuid == ownerUuid || source?.uuid == ownerUuid || attacker is Servant && attacker.ownerUuid == ownerUuid || source is Servant && source.ownerUuid == ownerUuid
     }
 
     companion object {

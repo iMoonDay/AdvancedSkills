@@ -30,7 +30,7 @@ interface SkillTrigger {
         startUsing(getAsSkill(), data?.let { NbtCompound().apply(it) })
 
     fun PlayerEntity.stopUsing(): Boolean = stopUsing(getAsSkill())
-    fun PlayerEntity.toggleUsing(): Boolean = toggleUsing(getAsSkill())
+    fun PlayerEntity.toggleUsing(data: NbtCompound? = null): Boolean = toggleUsing(getAsSkill(), data)
     fun PlayerEntity.isReady(): Boolean = hasEquipped() && !isCooling() && !isUsing()
     fun PlayerEntity.stopAndCooldown(cooldown: Int? = null) = stopAndCooldown(getAsSkill(), cooldown)
     fun PlayerEntity.getEnhancements(): Map<Enhancement, EnhancementData> = getEnhancements(getAsSkill())

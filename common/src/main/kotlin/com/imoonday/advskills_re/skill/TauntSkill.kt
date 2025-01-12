@@ -1,7 +1,6 @@
 package com.imoonday.advskills_re.skill
 
 import com.imoonday.advskills_re.component.*
-import com.imoonday.advskills_re.entity.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.skill.trigger.client.render.*
@@ -34,7 +33,7 @@ class TauntSkill : Skill(
                 name = PARAM_DAMAGE_REDUCTION,
                 baseValue = DEFAULT_DAMAGE_REDUCTION,
                 enhancementId = ENHANCEMENT_REDUCTION,
-                value = 0.1f,
+                value = 0.05f,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
@@ -48,9 +47,8 @@ class TauntSkill : Skill(
         source: DamageSource,
         player: ServerPlayerEntity,
         attacker: LivingEntity?,
-    ): Float =
-        if (!player.isUsing() || attacker !is Servant) amount
-        else amount * (1f - getFloatParam(PARAM_DAMAGE_REDUCTION, player, DEFAULT_DAMAGE_REDUCTION, max = 1.0f))
+    ): Float = if (!player.isUsing()) amount
+    else amount * (1f - getFloatParam(PARAM_DAMAGE_REDUCTION, player, DEFAULT_DAMAGE_REDUCTION, max = 1.0f))
 
     override fun onUnequipped(player: ServerPlayerEntity, slot: SkillSlot): Boolean = !player.isUsing()
 

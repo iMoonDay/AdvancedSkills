@@ -4,6 +4,7 @@ import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.*
 import net.minecraft.entity.ai.goal.*
+import net.minecraft.entity.attribute.*
 import net.minecraft.entity.damage.*
 import net.minecraft.entity.data.*
 import net.minecraft.entity.mob.*
@@ -18,20 +19,26 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
     PathAwareEntity(entityType, world) {
 
     var playerUUID: UUID
-        get() = dataTracker.get(Companion.uuid).orElse(Uuids.getOfflinePlayerUuid(customName?.string ?: "Steve"))
-        set(value) = dataTracker.set(Companion.uuid, Optional.of(value))
+        get() = dataTracker.get(UUID_DATA).orElse(Uuids.getOfflinePlayerUuid(customName?.string ?: "Steve"))
+        set(value) = dataTracker.set(UUID_DATA, Optional.of(value))
     var moveVelocity: Vec3d
-        get() = NbtUtils.readVec3d(dataTracker.get(data)) ?: Vec3d.ZERO
-        set(value) = dataTracker.set(data, dataTracker.get(data).apply {
+        get() = NbtUtils.readVec3d(dataTracker.get(NBT_DATA)) ?: Vec3d.ZERO
+        set(value) = dataTracker.set(NBT_DATA, dataTracker.get(NBT_DATA).apply {
             NbtUtils.writeVec3dToTag(value, this)
         })
     var moveTime: Int
-        get() = dataTracker.get(data).getInt("time")
-        set(value) = dataTracker.set(data, dataTracker.get(data).apply {
+        get() = dataTracker.get(NBT_DATA).getInt("time")
+        set(value) = dataTracker.set(NBT_DATA, dataTracker.get(NBT_DATA).apply {
             putInt("time", value)
         })
+    var aggressive: Boolean
+        get() = dataTracker.get(AGGRESSIVE_DATA)
+        set(value) = dataTracker.set(AGGRESSIVE_DATA, value)
 
-    constructor(world: World, player: PlayerEntity) : this(ModEntities.CLONE_PLAYER.get(), world) {
+    constructor(world: World, player: PlayerEntity, aggressive: Boolean = false) : this(
+        ModEntities.CLONE_PLAYER.get(), world
+    ) {
+        this.aggressive = aggressive
         playerUUID = player.uuid
         refreshPositionAndAngles(player.x, player.y, player.z, player.yaw, player.pitch)
         headYaw = player.headYaw
@@ -51,7 +58,8 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
             discard()
             return
         }
-        if (moveTime-- > 0) {
+        if (moveTime > 0) {
+            moveTime--
             velocity = moveVelocity.withAxis(Direction.Axis.Y, velocity.y)
             if (horizontalCollision) moveTime = 0
             if (jumping) {
@@ -61,22 +69,39 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
                     jumpControl.setActive()
                 }
             }
-            if (moveTime <= 0) {
+        }
+        addCustomGoals()
+
+        super.tick()
+    }
+
+    override fun tickMovement() {
+        this.tickHandSwing()
+        super.tickMovement()
+    }
+
+    private fun addCustomGoals() {
+        if (moveTime <= 0) {
+            if (goalSelector.goals.isEmpty()) {
                 goalSelector.add(0, SwimGoal(this))
                 goalSelector.add(1, EscapeDangerGoal(this, 3.2))
-                goalSelector.add(2, WanderAroundFarGoal(this, 2.5))
-                goalSelector.add(3, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
-                goalSelector.add(4, LookAroundGoal(this))
-                goalSelector.add(5, WanderAroundGoal(this, 3.2))
+                goalSelector.add(2, MeleeAttackGoal(this, 2.5, false))
+                goalSelector.add(3, WanderAroundFarGoal(this, 2.5))
+                goalSelector.add(4, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
+                goalSelector.add(5, LookAroundGoal(this))
+                goalSelector.add(6, WanderAroundGoal(this, 3.2))
+            }
+            if (targetSelector.goals.isEmpty()) {
+                targetSelector.add(0, ActiveTargetGoal(this, HostileEntity::class.java, true) { aggressive })
             }
         }
-        super.tick()
     }
 
     override fun initDataTracker() {
         super.initDataTracker()
-        dataTracker.startTracking(Companion.uuid, Optional.of(Uuids.getOfflinePlayerUuid("Steve")))
-        dataTracker.startTracking(data, NbtCompound())
+        dataTracker.startTracking(UUID_DATA, Optional.of(Uuids.getOfflinePlayerUuid("Steve")))
+        dataTracker.startTracking(NBT_DATA, NbtCompound())
+        dataTracker.startTracking(AGGRESSIVE_DATA, false)
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
@@ -85,14 +110,18 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
             playerUUID = nbt.getUuid("PlayerUuid")
         }
         if (nbt.contains("Data")) {
-            dataTracker.set(data, nbt.getCompound("Data"))
+            dataTracker.set(NBT_DATA, nbt.getCompound("Data"))
+        }
+        if (nbt.contains("Aggressive")) {
+            aggressive = nbt.getBoolean("Aggressive")
         }
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
         nbt.putUuid("PlayerUuid", playerUUID)
-        nbt.put("Data", dataTracker.get(data))
+        nbt.put("Data", dataTracker.get(NBT_DATA))
+        nbt.putBoolean("Aggressive", aggressive)
     }
 
     override fun isPlayer(): Boolean = true
@@ -103,9 +132,19 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
 
     companion object {
 
-        val uuid: TrackedData<Optional<UUID>> =
+        @JvmStatic
+        val UUID_DATA: TrackedData<Optional<UUID>> =
             DataTracker.registerData(ClonePlayerEntity::class.java, TrackedDataHandlerRegistry.OPTIONAL_UUID)
-        val data: TrackedData<NbtCompound> =
+
+        @JvmStatic
+        val NBT_DATA: TrackedData<NbtCompound> =
             DataTracker.registerData(ClonePlayerEntity::class.java, TrackedDataHandlerRegistry.NBT_COMPOUND)
+
+        @JvmStatic
+        val AGGRESSIVE_DATA: TrackedData<Boolean> =
+            DataTracker.registerData(ClonePlayerEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
+
+        @JvmStatic
+        fun createAttributes(): DefaultAttributeContainer.Builder = HostileEntity.createHostileAttributes()
     }
 }

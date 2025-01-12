@@ -164,8 +164,8 @@ advskills_re:
         name: Range Enhancement
         description: '%s Teleport Distance'
     jump:
-      name: Jump
-      description: Jump without the help of the ground
+      name: Multi-jump
+      description: Gain extra jumps
       force:
         name: Force Enhancement
         description: '%s Jump Force'
@@ -175,6 +175,9 @@ advskills_re:
       force:
         name: Force Enhancement
         description: '%s Jump Force'
+      count:
+        name: Count Enhancement
+        description: '%s Jump Count'
     triple_jump:
       name: Triple Jump
       description: Triple height jump without the help of the ground
@@ -500,13 +503,13 @@ advskills_re:
         description: '%s Servant Count'
     taunt:
       name: Taunt
-      description: Taunt other players' minions and gain minion damage reduction for 15 s, but cannot be canceled during use
+      description: Most hostile mobs will attempt to prioritize the taunt and gain damage reduction for 15s, which cannot be removed while used
       duration:
         name: Duration Enhancement
         description: '%s Taunt Duration'
       reduction:
-        name: Reduction Enhancement
-        description: '%s Minion Damage Reduction'
+        name: Defence Enhancement
+        description: '%s Damage Reduction'
     liquid_shield:
       name: Liquid Shield
       description: You will isolate the liquid
@@ -797,6 +800,9 @@ advskills_re:
       duration:
         name: Duration Enhancement
         description: '%s Invisibility Duration'
+      attack:
+        name: Attack Enhancement
+        description: Clones Can Attack
     magnetic_trap:
       name: Magnetic Trap
       description: Generate a slowdown trap
@@ -824,6 +830,9 @@ advskills_re:
       duration:
         name: Duration Enhancement
         description: '%s Invisibility Duration'
+      attack:
+        name: Attack Enhancement
+        description: Clones Can Attack
     arrow_rain:
       name: Arrow Rain
       description: Summons several arrows randomly above the target
@@ -859,7 +868,7 @@ advskills_re:
         description: '%s Absorption Count'
     disguise:
       name: Disguise
-      description: Disguises as a block beneath your feet, ending when any skill is used
+      description: Disguised as a block underneath your feet, it can avoid being detected by most hostile mobs, and it will not work when any skill is cast
       duration:
         name: Duration Enhancement
         description: '%s Disguise Duration'

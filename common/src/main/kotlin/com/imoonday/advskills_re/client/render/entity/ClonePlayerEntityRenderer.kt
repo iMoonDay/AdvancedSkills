@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.client.render.entity
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.entity.*
+import net.minecraft.client.render.*
 import net.minecraft.client.render.entity.*
 import net.minecraft.client.render.entity.feature.*
 import net.minecraft.client.render.entity.model.*
@@ -41,8 +42,8 @@ class ClonePlayerEntityRenderer(
         this.addFeature(StuckStingersFeatureRenderer(this))
     }
 
-    override fun getTexture(entity: ClonePlayerEntity): Identifier {
-        return client?.networkHandler?.getPlayerListEntry(entity.playerUUID)?.run {
+    override fun getTexture(entity: ClonePlayerEntity): Identifier =
+        client?.networkHandler?.getPlayerListEntry(entity.playerUUID)?.run {
             val slim = this.model == "slim"
             super.model = if (slim) slimModel else defaultModel
             armorFeatureRenderer.innerModel = if (slim) slimInnerArmor else defaultInnerArmor
@@ -56,7 +57,6 @@ class ClonePlayerEntityRenderer(
             armorFeatureRenderer.outerModel = if (slim) slimOuterArmor else defaultOuterArmor
             DefaultSkinHelper.getTexture(entity.playerUUID)
         }
-    }
 
     override fun getPositionOffset(entity: ClonePlayerEntity, f: Float): Vec3d =
         if (entity.isInSneakingPose) Vec3d(0.0, -0.125, 0.0) else super.getPositionOffset(entity, f)
@@ -64,5 +64,9 @@ class ClonePlayerEntityRenderer(
     override fun scale(entity: ClonePlayerEntity, matrices: MatrixStack, amount: Float) {
         val g = 0.9375f
         matrices.scale(g, g, g)
+    }
+
+    override fun getHandSwingProgress(entity: ClonePlayerEntity, tickDelta: Float): Float {
+        return super.getHandSwingProgress(entity, tickDelta)
     }
 }

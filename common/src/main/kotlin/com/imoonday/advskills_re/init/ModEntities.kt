@@ -6,7 +6,6 @@ import dev.architectury.registry.level.entity.*
 import dev.architectury.registry.registries.*
 import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
-import net.minecraft.entity.mob.*
 import net.minecraft.entity.passive.*
 import net.minecraft.registry.*
 import java.util.function.*
@@ -109,7 +108,7 @@ object ModEntities {
             .setDimensions(0.6f, 1.8f)
             .maxTrackingRange(32)
             .trackingTickInterval(2)
-            .register("clone_player") { MobEntity.createMobAttributes() }
+            .register("clone_player") { ClonePlayerEntity.createAttributes() }
 
     @JvmField
     val MAGNET: RegistrySupplier<EntityType<MagnetEntity>> =

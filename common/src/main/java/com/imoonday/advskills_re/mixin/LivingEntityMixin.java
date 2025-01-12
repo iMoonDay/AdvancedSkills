@@ -3,6 +3,7 @@ package com.imoonday.advskills_re.mixin;
 import com.imoonday.advskills_re.effect.SeriousInjuryEffect;
 import com.imoonday.advskills_re.init.ModEffectsKt;
 import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
@@ -101,14 +102,6 @@ public abstract class LivingEntityMixin extends EntityMixin {
         }
     }
 
-//    @Inject(method = "tickMovement", at = @At("HEAD"), cancellable = true)
-//    private void advskills_re$tickMovement(CallbackInfo ci) {
-//        LivingEntity entity = (LivingEntity) (Object) this;
-//        if (ModEffectsKt.isForceFrozen(entity) || ModEffectsKt.isConfined(entity)) {
-//            ci.cancel();
-//        }
-//    }
-
     @Inject(method = "setHeadYaw", at = @At("HEAD"), cancellable = true)
     public void advskills_re$setHeadYaw(float headYaw, CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;
@@ -189,5 +182,19 @@ public abstract class LivingEntityMixin extends EntityMixin {
     @Inject(method = "tickStatusEffects", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;updateGlowing()V", shift = At.Shift.AFTER))
     public void advskills_re$tickStatusEffects(CallbackInfo ci) {
         getPropertyComponent().onEffectsChanged();
+    }
+
+//    @Inject(method = "canSee", at = @At("HEAD"), cancellable = true)
+//    public void advskills_re$canSee(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+//        if (entity instanceof PlayerEntity player && SkillTriggerHandler.isDisguising(player)) {
+//            cir.setReturnValue(false);
+//        }
+//    }
+
+    @Inject(method = "canTarget(Lnet/minecraft/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
+    public void advskills_re$canTarget(LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
+        if (target instanceof PlayerEntity player && SkillTriggerHandler.isDisguising(player)) {
+            cir.setReturnValue(false);
+        }
     }
 }

@@ -37,19 +37,24 @@ class SuperShadowCloneSkill : Skill(
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
+            ).addParameter(
+                name = PARAM_ATTACK_HOSTILES,
+                baseValue = DEFAULT_ATTACK_HOSTILES,
+                enhancementId = ENHANCEMENT_ATTACK_HOSTILES
             )
     }
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val cloneCount = getIntParam(PARAM_CLONE_COUNT, user, DEFAULT_CLONE_COUNT)
         val moveTime = getIntParam(PARAM_CLONE_MOVE_TIME, user, DEFAULT_CLONE_MOVE_TIME)
-        spawnClones(user, cloneCount, moveTime)
+        val attackHostiles = getBooleanParam(PARAM_ATTACK_HOSTILES, user, DEFAULT_ATTACK_HOSTILES)
+        spawnClones(user, cloneCount, moveTime, attackHostiles)
         val stealthDuration = getIntParam(PARAM_STEALTH_DURATION, user, DEFAULT_STEALTH_DURATION)
         user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, stealthDuration, 0, true, false, true))
         return UseResult.success()
     }
 
-    private fun spawnClones(player: ServerPlayerEntity, amount: Int, moveTime: Int) {
+    private fun spawnClones(player: ServerPlayerEntity, amount: Int, moveTime: Int, attackHostiles: Boolean) {
         val fullCircle = 360f
         val angleStep = fullCircle / amount
         val yaw = player.yaw
@@ -64,7 +69,8 @@ class SuperShadowCloneSkill : Skill(
                 createCloneEntity(
                     player,
                     player.getRotationVector(0f, adjustedAngle),
-                    moveTime
+                    moveTime,
+                    attackHostiles
                 ).apply {
                     this.yaw = adjustedAngle
                     headYaw = adjustedAngle
@@ -75,15 +81,14 @@ class SuperShadowCloneSkill : Skill(
     private fun createCloneEntity(
         player: ServerPlayerEntity,
         horizontalRotation: Vec3d,
-        moveTime: Int
-    ): ClonePlayerEntity {
-        return ClonePlayerEntity(player.world, player).apply {
-            moveVelocity = horizontalRotation * (player.velocity.length() * 2.0).coerceAtMost(1.0)
-            this.moveTime = moveTime
-            if (player.velocity.y > 0) {
-                jumpControl.setActive()
-                setJumping(true)
-            }
+        moveTime: Int,
+        attackHostiles: Boolean
+    ): ClonePlayerEntity = ClonePlayerEntity(player.world, player, attackHostiles).apply {
+        moveVelocity = horizontalRotation * (player.velocity.length() * 2.0).coerceAtMost(1.0)
+        this.moveTime = moveTime
+        if (player.velocity.y > 0) {
+            jumpControl.setActive()
+            setJumping(true)
         }
     }
 
@@ -93,14 +98,17 @@ class SuperShadowCloneSkill : Skill(
         private const val DEFAULT_CLONE_MOVE_TIME = 5 * 20
         private const val DEFAULT_CLONE_COUNT = 8
         private const val DEFAULT_STEALTH_DURATION = 5 * 20
+        private const val DEFAULT_ATTACK_HOSTILES = false
 
         // Parameter Names
         private const val PARAM_CLONE_MOVE_TIME = "clone_move_time"  // 分身移动时间
         private const val PARAM_CLONE_COUNT = "clone_count"  // 分身数量
         private const val PARAM_STEALTH_DURATION = "stealth_duration"  // 隐身持续时间
+        private const val PARAM_ATTACK_HOSTILES = "attack_hostiles"  // 攻击敌人
 
         // Enhancement IDs
         private const val ENHANCEMENT_COUNT = "count"  // 对应数量
         private const val ENHANCEMENT_DURATION = "duration"  // 对应持续时间
+        private const val ENHANCEMENT_ATTACK_HOSTILES = "attack"  // 对应攻击敌人
     }
 }

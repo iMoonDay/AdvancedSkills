@@ -88,7 +88,8 @@ class HookEntity(type: EntityType<out HookEntity>, world: World) : Entity(type, 
 
     override fun tick() {
         super.tick()
-        if (owner == null || owner!!.isRemoved || age >= life) {
+        val owner = owner
+        if (owner == null || owner.isRemoved || age >= life) {
             if (!world.isClient) discard()
             return
         }
@@ -107,14 +108,17 @@ class HookEntity(type: EntityType<out HookEntity>, world: World) : Entity(type, 
             }
         }
         target?.let {
-            it.addVelocity((owner!!.pos - it.pos).normalize() * 0.15)
+            it.addVelocity((owner.pos - it.pos).normalize() * 0.15)
             setPos(it.x, it.y + it.height / 2, it.z)
-            if (!world.isClient && ((age % 20 == 0 || it.isPlayer && it.isSneaking) && random.nextFloat() < age / life * 0.75 || it.distanceTo(
-                    owner!!
-                ) <= 2)
-            ) discard()
+            if (!world.isClient
+                && ((age % 20 == 0 || it.isPlayer && it.isSneaking)
+                    && random.nextFloat() < age.toFloat() / (life * 0.75f)
+                    || it.distanceTo(owner) <= 2)
+            ) {
+                discard()
+            }
         }
-        if (target == null) velocity = velocity.multiply(0.98).subtract(0.0, 0.01, 0.0) else Vec3d.ZERO
+        velocity = if (target == null) velocity.multiply(0.98).subtract(0.0, 0.01, 0.0) else Vec3d.ZERO
     }
 
     override fun createSpawnPacket(): Packet<ClientPlayPacketListener> = EntitySpawnS2CPacket(this, owner?.id ?: 0)

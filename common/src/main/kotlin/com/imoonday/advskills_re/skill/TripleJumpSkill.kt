@@ -12,7 +12,7 @@ class TripleJumpSkill : Skill(
         types = listOf(SkillType.MOVEMENT),
         cooldown = 5,
         rarity = SkillRarity.RARE
-    )
+    ).withDisabled(true)
 ) {
 
     init {

@@ -36,11 +36,6 @@ class ServantSkeletonEntity(
         goalSelector.add(3, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
         goalSelector.add(3, LookAroundGoal(this))
         targetSelector.add(
-            0,
-            ActiveTargetGoal(this, PlayerEntity::class.java, true)
-            { it.uuid != ownerUuid && (it as? PlayerEntity)?.run { SkillTriggerHandler.isTaunter(this) } == true }
-        )
-        targetSelector.add(
             1,
             ActiveTargetGoal(this, LivingEntity::class.java, true) { it is Servant && it.ownerUuid != this.ownerUuid }
         )

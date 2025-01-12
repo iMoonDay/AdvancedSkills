@@ -132,6 +132,14 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
         }
     }
 
+    @Inject(method = "checkFallFlying", at = @At("HEAD"), cancellable = true)
+    private void advskills_re$checkFallFlying(CallbackInfoReturnable<Boolean> cir) {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (!SkillTriggerHandler.canStartFallFlying(player)) {
+            cir.setReturnValue(false);
+        }
+    }
+
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     private void advskills_re$writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
         nbt.put("playerDataComponent", getDataComponent().toNbt());

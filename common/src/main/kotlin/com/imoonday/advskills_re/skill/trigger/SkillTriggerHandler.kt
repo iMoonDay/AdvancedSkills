@@ -224,4 +224,12 @@ object SkillTriggerHandler {
     @JvmStatic
     fun isSaveMoving(player: PlayerEntity): Boolean =
         player.anyTrigger<SaveMovingTrigger> { it.isSaveMoving(player) }
+
+    @JvmStatic
+    fun onJumped(player: PlayerEntity, onGround: Boolean) =
+        player.forEachTrigger<JumpStateTrigger> { it.onJumped(player, onGround) }
+
+    @JvmStatic
+    fun canStartFallFlying(player: PlayerEntity): Boolean =
+        player.allTriggers<FallFlyingTrigger> { it.canStartFallFlying(player) }
 }

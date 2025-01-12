@@ -25,7 +25,7 @@ class FrostTrapSkill : Skill(
             enhancementId = ENHANCEMENT_RANGE,
             value = 1,
             operation = Enhancement.Operation.ADDITION,
-            maxLevel = 5,
+            maxLevel = 3,
             descArg = Enhancement.ArgFormatter.INT
         ).addParameter(
             name = PARAM_TRAP_COUNT,

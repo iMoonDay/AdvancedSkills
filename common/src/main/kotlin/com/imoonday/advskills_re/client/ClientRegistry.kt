@@ -24,6 +24,7 @@ import com.imoonday.advskills_re.init.ModEntities.UNSTABLE_TNT
 import com.imoonday.advskills_re.init.ModEntities.VULNERABLE_ENERGY_BALL
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import dev.architectury.event.events.client.*
 import dev.architectury.registry.client.level.entity.*

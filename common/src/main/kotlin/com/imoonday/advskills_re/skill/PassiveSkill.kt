@@ -5,6 +5,7 @@ import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
+import net.minecraft.nbt.*
 import net.minecraft.server.network.*
 
 abstract class PassiveSkill(
@@ -22,7 +23,7 @@ abstract class PassiveSkill(
     }
 
     override fun use(user: ServerPlayerEntity): UseResult = if (isToggleable(user)) {
-        val active = user.toggleUsing()
+        val active = user.toggleUsing(writeStartUsingData(user))
         if (active) onActivated(user) else onDeactivated(user)
         UseResult.consume(translateActive(this, active))
     } else {
@@ -32,6 +33,8 @@ abstract class PassiveSkill(
     open fun onActivated(user: ServerPlayerEntity) {
         user.addAttributes()
     }
+
+    open fun writeStartUsingData(user: ServerPlayerEntity): NbtCompound? = null
 
     open fun onDeactivated(user: ServerPlayerEntity) {
         user.removeAttributes()

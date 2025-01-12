@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.network.c2s
 
 import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.network.*
+import com.imoonday.advskills_re.skill.trigger.*
 import dev.architectury.networking.*
 import net.minecraft.network.*
 import net.minecraft.server.network.*
@@ -18,6 +19,10 @@ data class UpdateJumpingC2SPacket(
 
     override fun apply(context: NetworkManager.PacketContext) {
         val player = context.player as? ServerPlayerEntity ?: return
+        val wasJumping = (player as LivingEntityAccessor).isJumping
         (player as LivingEntityAccessor).isJumping = jumping
+        if (jumping && !wasJumping) {
+            SkillTriggerHandler.onJumped(player, player.isOnGround)
+        }
     }
 }

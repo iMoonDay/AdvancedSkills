@@ -5,4 +5,6 @@ import net.minecraft.entity.player.*
 interface UsingProgressTrigger : ProgressTrigger {
 
     override fun shouldDisplay(player: PlayerEntity): Boolean = true
+
+    fun isInUsingState(player: PlayerEntity): Boolean = player.isUsing()
 }

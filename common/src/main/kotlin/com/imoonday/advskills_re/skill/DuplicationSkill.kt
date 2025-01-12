@@ -37,6 +37,10 @@ class DuplicationSkill : Skill(
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
+            ).addParameter(
+                name = PARAM_ATTACK_HOSTILES,
+                baseValue = DEFAULT_ATTACK_HOSTILES,
+                enhancementId = ENHANCEMENT_ATTACK_HOSTILES
             )
     }
 
@@ -44,14 +48,15 @@ class DuplicationSkill : Skill(
         val interval = getIntParam(PARAM_CLONE_INTERVAL, user, DEFAULT_CLONE_INTERVAL, 0)
         val amount = getIntParam(PARAM_CLONE_COUNT, user, DEFAULT_CLONE_COUNT)
         val time = getIntParam(PARAM_CLONE_MOVE_TIME, user, DEFAULT_CLONE_MOVE_TIME)
-        user.executeAndAddTask(interval, amount) { summonClones(user, time) }
+        val attackHostiles = getBooleanParam(PARAM_ATTACK_HOSTILES, user, DEFAULT_ATTACK_HOSTILES)
+        user.executeAndAddTask(interval, amount) { summonClones(user, time, attackHostiles) }
         val duration = getIntParam(PARAM_INVISIBLE_DURATION, user, DEFAULT_INVISIBLE_DURATION)
         user.addStatusEffect(StatusEffectInstance(StatusEffects.INVISIBILITY, duration, 0, true, false, true))
         return UseResult.success()
     }
 
-    private fun summonClones(user: ServerPlayerEntity, moveTime: Int): Boolean {
-        return user.world.spawnEntity(ClonePlayerEntity(user.world, user).apply {
+    private fun summonClones(user: ServerPlayerEntity, moveTime: Int, attackHostiles: Boolean): Boolean =
+        user.world.spawnEntity(ClonePlayerEntity(user.world, user, attackHostiles).apply {
             moveVelocity = user.horizontalRotationVector * (user.velocity.length() * 2.0).coerceAtMost(1.0)
             this.moveTime = moveTime
             if (user.velocity.y > 0) {
@@ -59,7 +64,6 @@ class DuplicationSkill : Skill(
                 setJumping(true)
             }
         })
-    }
 
     companion object {
 
@@ -68,15 +72,18 @@ class DuplicationSkill : Skill(
         private const val DEFAULT_CLONE_MOVE_TIME = 3 * 20
         private const val DEFAULT_INVISIBLE_DURATION = 3 * 20
         private const val DEFAULT_CLONE_COUNT = 1
+        private const val DEFAULT_ATTACK_HOSTILES = false
 
         // Parameter Names
         private const val PARAM_CLONE_INTERVAL = "clone_interval"  // 分身间隔
         private const val PARAM_CLONE_MOVE_TIME = "clone_move_time"  // 分身移动时间
         private const val PARAM_INVISIBLE_DURATION = "invisible_duration"  // 隐身时长
         private const val PARAM_CLONE_COUNT = "clone_count"  // 分身数量
+        private const val PARAM_ATTACK_HOSTILES = "attack_hostiles"  // 攻击敌人
 
         // Enhancement IDs
         private const val ENHANCEMENT_DURATION = "duration"  // 对应隐身时长
         private const val ENHANCEMENT_COUNT = "count"  // 对应分身数量
+        private const val ENHANCEMENT_ATTACK_HOSTILES = "attack"  // 对应攻击敌人
     }
 }

@@ -9,6 +9,7 @@ import com.imoonday.advskills_re.client.screen.*
 import com.imoonday.advskills_re.client.screen.SkillWheelScreen.Companion.quickCastSlot
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
+import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.blaze3d.systems.*
 import net.minecraft.client.gui.*
@@ -126,6 +127,8 @@ object SkillSlotRenderer {
     private fun shouldDisplayDynamically(player: PlayerEntity) = ((player.equippedSkills.any {
         if (player.isCooling(it)) {
             true
+        } else if (it is UsingProgressTrigger) {
+            it.isInUsingState(player)
         } else if (it is PassiveSkill) {
             !it.isToggleable(player) && player.isUsing(it)
         } else {
