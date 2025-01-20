@@ -47,7 +47,10 @@ class SkillInventoryScreen(
             .filterNot(player::hasEquipped)
             .filter { (selectedTab?.type ?: return@filter true) in it.types }
             .filter { skillFilter(player, it) && rarityFilter(it) }
-            .sortedWith(ClientConfig.get().skillSorter)
+            .partition { ClientConfig.get().isTopSkill(it) }
+            .let { (top, skills) ->
+                top + skills.sortedWith(ClientConfig.get().skillSorter)
+            }
             .toList()
     var bgWidth: Int = width
     var bgHeight: Int = height
@@ -248,6 +251,10 @@ class SkillInventoryScreen(
             0x000000,
             false
         )
+        context.drawText(
+            textRenderer, translate("screen.inventory.tip"), 5, height - textRenderer.fontHeight + 1 - 5, 11184810,
+            false
+        )
         selectedSlot?.run {
             context.drawTexture(skill.icon, mouseX - 8, mouseY - 8, 90, 0f, 0f, 16, 16, 16, 16)
         }
@@ -321,6 +328,7 @@ class SkillInventoryScreen(
         var height: Int = SLOT_SIZE
         var visible: Boolean = true
         var hovered: Boolean = false
+        var top: Boolean = slot == null && ClientConfig.get().isTopSkill(skill)
 
         override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
             if (!visible) return
@@ -352,6 +360,10 @@ class SkillInventoryScreen(
             context.drawTexture(
                 slotTexture, x, y, (skill.rarity.level * width).toFloat(), 112f, width, height, 256, 256
             )
+
+            if (top) {
+                context.drawTexture(slotTexture, x + 2, y + 2, 0, 176, 5, 5)
+            }
             RenderSystem.disableBlend()
         }
 
@@ -362,7 +374,21 @@ class SkillInventoryScreen(
 
         private fun onClick(): Boolean {
             if (slot == null) {
-                if (hasShiftDown()) {
+                if (hasAltDown()) {
+                    if (!skill.isEmpty) {
+                        val config = ClientConfig.get()
+                        config.topSkills.let {
+                            val id = skill.id.toString()
+                            if (id in it) {
+                                it.remove(id)
+                            } else {
+                                it.add(id)
+                            }
+                        }
+                        config.save()
+                        update()
+                    }
+                } else if (hasShiftDown()) {
                     player.equip(skill)
                 } else {
                     if (selectedSlot != null && selectedSlot!!.slot != null) {
@@ -630,10 +656,10 @@ class SkillInventoryScreen(
     companion object {
 
         private val tabTexture = Identifier("textures/gui/container/creative_inventory/tabs.png")
-        private val slotTexture = id("slots.png")
-        private val sortTexture = id("sort.png")
-        private val filterTexture = id("filter.png")
-        private val rarityFilterTexture = id("rarity_filter.png")
+        private val slotTexture = id("textures/gui/slots.png")
+        private val sortTexture = id("textures/gui/sort.png")
+        private val filterTexture = id("textures/gui/filter.png")
+        private val rarityFilterTexture = id("textures/gui/rarity_filter.png")
         private const val SLOT_SIZE = 22
     }
 }

@@ -17,7 +17,8 @@ abstract class BounceSkill(
     private val baseChance: Float? = null
 ) : Skill(settings), DamageTrigger, BounceTrigger, UsingRenderTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addTypeToTopIfAbsent(SkillType.DEFENSE)
 
         settings

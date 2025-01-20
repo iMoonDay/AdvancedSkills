@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FFF",
+    "FFF",
+    "FFF"
+  ],
+  "key": {
+    "F": {
+      "item": "advskills_re:uncommon_skill_fruit"
+    }
+  },
+  "result": {
+    "item": "advskills_re:rare_skill_fruit",
+    "count": 1
+  }
+}

@@ -18,7 +18,8 @@ class LightLandingSkill : Skill(
     )
 ), FallTrigger, AutoStopTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_LANDING_SOUND, DEFAULT_LANDING_SOUND)
             .addParameter(PARAM_BREAK_SOUND, DEFAULT_BREAK_SOUND)

@@ -13,7 +13,8 @@ class FasterEatingSkill : PassiveSkill(
     ), customToggles = true
 ), ItemMaxUseTimeTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_SPEED_BOOST,
             baseValue = DEFAULT_SPEED_BOOST,

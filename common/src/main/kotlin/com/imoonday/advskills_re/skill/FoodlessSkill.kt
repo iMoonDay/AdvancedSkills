@@ -14,7 +14,8 @@ class FoodlessSkill : PassiveSkill(
     ), customToggles = true
 ), HungerTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_MIN_HUNGER,
             baseValue = DEFAULT_MIN_HUNGER,

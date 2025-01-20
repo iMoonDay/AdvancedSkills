@@ -26,7 +26,8 @@ class OrePerceptionSkill : Skill(
     )
 ), AutoStopTrigger, WorldRendererTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_ORE_BLOCKS, emptyList<String>())
             .addParameter(PARAM_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
@@ -49,7 +50,9 @@ class OrePerceptionSkill : Skill(
             )
     }
 
-    override fun use(user: ServerPlayerEntity): UseResult = UseResult.startUsing(user, this).also { updateOres(user) }
+    override fun use(user: ServerPlayerEntity): UseResult = UseResult.toggleUsing(user, this) {
+        updateOres(user)
+    }
 
     override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_DETECT_DURATION, player, DEFAULT_DETECT_DURATION, 0)

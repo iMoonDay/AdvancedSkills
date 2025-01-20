@@ -21,7 +21,8 @@ class WallJumpSkill : PassiveSkill(
     )
 ), AutoTrigger, SendPlayerDataTrigger, UsingProgressTrigger, FallTrigger, StopTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_JUMP_SOUND, DEFAULT_JUMP_SOUND)
             .addParameter(

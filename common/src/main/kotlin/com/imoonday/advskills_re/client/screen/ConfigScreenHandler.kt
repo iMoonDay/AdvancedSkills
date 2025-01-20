@@ -5,6 +5,8 @@ import com.imoonday.advskills_re.client.ClientConfig.Companion.DEFAULT_LAYOUT_ST
 import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.config.*
+import com.imoonday.advskills_re.network.*
+import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
@@ -20,21 +22,19 @@ object ConfigScreenHandler {
     fun createScreen(parent: Screen?): Screen? {
         if (!AdvancedSkillsClient.clothConfigLoaded) return parent
         try {
+            val config = ClientConfig.get()
+            val globalConfig = GlobalConfig.get()
+
             val builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(translate("screen.config.title"))
-                .setSavingRunnable { ClientConfig.get().save() }
-
-            val inGame = client?.world != null
-
-            val config = ClientConfig.get()
-            val globalConfig = GlobalConfig.get()
+                .setSavingRunnable(::save)
 
             val entryBuilder = builder.entryBuilder()
 
             addRenderCategory(builder, entryBuilder, config)
             addGeneralCategory(builder, entryBuilder, config)
-            addGlobalCategory(builder, entryBuilder, globalConfig, inGame)
+            addGlobalCategory(builder, entryBuilder, globalConfig)
 
             return builder.build()
         } catch (e: Exception) {
@@ -43,13 +43,38 @@ object ConfigScreenHandler {
         }
     }
 
+    private fun save() {
+        ClientConfig.get().save()
+        val globalConfig = GlobalConfig.get()
+        globalConfig.save()
+
+        val client = client
+        if (client?.isIntegratedServerRunning == true) {
+            client.server?.let {
+                Channels.SYNC_CONFIG_S2C.sendToPlayers(
+                    it.playerManager.playerList,
+                    SyncConfigS2CPacket(globalConfig.toNbt(), SyncConfigS2CPacket.ConfigType.GLOBAL)
+                )
+            }
+        }
+    }
+
     private fun addGlobalCategory(
         builder: ConfigBuilder,
         entryBuilder: ConfigEntryBuilder,
-        globalConfig: GlobalConfig,
-        inGame: Boolean
+        globalConfig: GlobalConfig
     ) {
         builder.getOrCreateCategory(translate("screen.config.category.global")).run {
+
+            addEntry(
+                entryBuilder.startIntField(
+                    translate("screen.config.initialDrawTimes"),
+                    globalConfig.initialDrawTimes
+                ).setDefaultValue(5)
+                    .setMin(0)
+                    .setSaveConsumer { globalConfig.initialDrawTimes = it }
+                    .build()
+            )
 
             val defaultSlots =
                 entryBuilder.startSubCategory(translate("screen.config.defaultSkillSlots.subCategory"))
@@ -83,10 +108,6 @@ object ConfigScreenHandler {
                     .setSaveConsumer { globalConfig.setDefaultSkillSlot("passive", it) }
                     .build()
             )
-
-            if (inGame) {
-                defaultSlots.forEach { it.isRequiresRestart = true }
-            }
 
             addEntry(defaultSlots.build())
 
@@ -173,7 +194,7 @@ object ConfigScreenHandler {
                     .build()
             )
 
-            if (inGame) {
+            if (client?.world != null) {
                 skillFruitGeneration.forEach { it.isRequiresRestart = true }
             }
 
@@ -192,7 +213,6 @@ object ConfigScreenHandler {
                     .setMin(0.0)
                     .setSaveConsumer {
                         skillConfig.skillCooldownMultiplier = it
-                        globalConfig.save()
                     }
                     .build()
             )
@@ -205,7 +225,6 @@ object ConfigScreenHandler {
                     .setMin(0.0)
                     .setSaveConsumer {
                         skillConfig.skillXpMultiplier = it
-                        globalConfig.save()
                     }
                     .build()
             )
@@ -218,14 +237,9 @@ object ConfigScreenHandler {
                     .setSaveConsumer {
                         skillConfig.skillBlackList.clear()
                         skillConfig.skillBlackList.addAll(it)
-                        globalConfig.save()
                     }
                     .build()
             )
-
-            if (inGame) {
-                skillConfigEntry.forEach { it.isRequiresRestart = true }
-            }
 
             addEntry(skillConfigEntry.build())
         }
@@ -445,6 +459,15 @@ object ConfigScreenHandler {
                     config.useRingCastingWheel
                 ).setDefaultValue(true)
                     .setSaveConsumer { config.useRingCastingWheel = it }
+                    .build()
+            )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.disableLearningNotifications"),
+                    config.disableLearningNotifications
+                ).setDefaultValue(false)
+                    .setSaveConsumer { config.disableLearningNotifications = it }
                     .build()
             )
         }

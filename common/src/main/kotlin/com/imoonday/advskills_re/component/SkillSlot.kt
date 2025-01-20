@@ -90,7 +90,7 @@ sealed class SkillSlot(
 
     companion object {
 
-        val indexTexture = id("index.png")
+        val indexTexture = id("textures/gui/index.png")
 
         fun fromNbt(tag: NbtCompound): SkillSlot {
             val index = tag.getInt("index")

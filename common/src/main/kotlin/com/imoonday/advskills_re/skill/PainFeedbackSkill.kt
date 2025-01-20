@@ -14,7 +14,8 @@ class PainFeedbackSkill : PassiveSkill(
     ), customToggles = true
 ), PostDamagedTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_FEEDBACK_RATIO,
             baseValue = DEFAULT_FEEDBACK_RATIO,

@@ -17,7 +17,8 @@ class BiologicalHookSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_DURATION,
             baseValue = DEFAULT_DURATION,

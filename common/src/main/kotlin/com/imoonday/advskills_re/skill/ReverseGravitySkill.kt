@@ -27,7 +27,8 @@ class ReverseGravitySkill : Skill(
     CameraUpdateMovementTrigger,
     SaveMovingTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_REVERSE_DURATION,
             baseValue = DEFAULT_REVERSE_DURATION,

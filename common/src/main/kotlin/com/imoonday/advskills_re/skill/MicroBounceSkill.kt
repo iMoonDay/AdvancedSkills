@@ -15,7 +15,8 @@ class MicroBounceSkill : BounceSkill(
     baseChance = 0.25f
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_DAMAGE_REDUCTION,
             baseValue = DEFAULT_DAMAGE_REDUCTION,

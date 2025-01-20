@@ -9,7 +9,7 @@ import net.minecraft.nbt.*
 data class ChoiceData(
     private var choice: Choice = Choice.EMPTY,
     var refreshableCount: Int = 0,
-    var count: Int = 5,
+    var count: Int = 0
 ) {
 
     fun next(player: PlayerEntity) {

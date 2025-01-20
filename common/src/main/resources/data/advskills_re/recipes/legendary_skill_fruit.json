@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FFF",
+    "FFF",
+    "FFF"
+  ],
+  "key": {
+    "F": {
+      "item": "advskills_re:epic_skill_fruit"
+    }
+  },
+  "result": {
+    "item": "advskills_re:legendary_skill_fruit",
+    "count": 1
+  }
+}

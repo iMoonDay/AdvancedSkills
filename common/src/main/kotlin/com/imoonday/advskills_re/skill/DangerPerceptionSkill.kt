@@ -28,7 +28,8 @@ class DangerPerceptionSkill : Skill(
     )
 ), AutoStopTrigger, AttributeTrigger, DamageTrigger, UsingRenderTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_SPEED_SOUND, DEFAULT_SPEED_SOUND)
             .addParameter(
@@ -173,7 +174,9 @@ class DangerPerceptionSkill : Skill(
                         it is HostileEntity && it.isAlive && it.target == player -> true
                         it is PotionEntity &&
                             (PotionUtil.getPotion(it.stack).effects
-                                .any { effect -> !effect.effectType.isBeneficial }
+                                .any { effect ->
+                                    !effect.effectType.isBeneficial
+                                }
                                 || PotionUtil.getPotionEffects(it.stack)
                                 .any { effect -> !effect.effectType.isBeneficial })
                         -> true

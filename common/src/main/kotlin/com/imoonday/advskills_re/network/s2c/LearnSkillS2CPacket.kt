@@ -28,11 +28,13 @@ data class LearnSkillS2CPacket(
     override fun apply(context: NetworkManager.PacketContext) {
         if (context.environment != Env.CLIENT) return
         client?.let {
-            val skills = ClientConfig.get().displayedSkills
+            val config = ClientConfig.get()
+            if (config.disableLearningNotifications) return
+            val skills = config.displayedSkills
             if (skill.id.toString() !in skills && toast) {
                 skills.add(skill.id.toString())
                 it.toastManager.add(SkillToast(skill))
-                ClientConfig.get().save()
+                config.save()
             }
             if (System.currentTimeMillis() - lastPlaySoundTime > 500) {
                 it.soundManager.play(PositionedSoundInstance.master(ModSounds.NOTICE.get(), 1.0f, 1.0f))

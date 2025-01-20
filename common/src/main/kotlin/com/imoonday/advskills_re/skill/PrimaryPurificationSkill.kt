@@ -20,7 +20,8 @@ class PrimaryPurificationSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_PURIFY_SOUND, DEFAULT_PURIFY_SOUND)
             .addParameter(

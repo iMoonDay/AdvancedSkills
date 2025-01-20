@@ -10,7 +10,7 @@ import com.imoonday.advskills_re.network.s2c.*
 import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.trigger.*
 import com.imoonday.advskills_re.util.PlayerUtils.getNextLevelExp
-import com.imoonday.advskills_re.util.PlayerUtils.shouldLearnSkill
+import com.imoonday.advskills_re.util.PlayerUtils.shouldDraw
 import net.minecraft.entity.*
 import net.minecraft.entity.player.*
 import net.minecraft.entity.projectile.*
@@ -38,7 +38,7 @@ object PlayerUtils {
         else -> 7 + level * 2
     }
 
-    fun shouldLearnSkill(level: Int): Boolean = when {
+    fun shouldDraw(level: Int): Boolean = when {
         level <= 0 -> false
         level in 1..14 -> level % 5 == 0
         level in 15..29 -> level % 3 == 0
@@ -46,13 +46,13 @@ object PlayerUtils {
         else -> true
     }
 
-    fun getLevelRequiredForLearningSkill(currentLevel: Int): Int {
+    fun calculateLevelRequiredForDrawing(currentLevel: Int): Int {
         var level = currentLevel + 1
         while (true) {
             if (level > 100) {
                 level -= 100
             }
-            if (shouldLearnSkill(level)) {
+            if (shouldDraw(level)) {
                 return level
             }
             level++
@@ -433,7 +433,7 @@ private fun PlayerEntity.updateLevel() {
         levelData.experience -= needed
         levelData.level++
         updateCycle()
-        if (shouldLearnSkill(levelData.level) && this is ServerPlayerEntity) {
+        if (shouldDraw(levelData.level) && this is ServerPlayerEntity) {
             addChoice()
             added = true
         }

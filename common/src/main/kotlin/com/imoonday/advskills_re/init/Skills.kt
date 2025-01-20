@@ -311,15 +311,22 @@ object Skills {
     fun init() = Unit
 
     @JvmStatic
+    fun initDefaultSettings() {
+        skills.values.filterNot { it.isEmpty }.forEach { it.initSettings(it.settings) }
+    }
+
+    @JvmStatic
     fun reload(server: MinecraftServer) {
         val skills = skills.values.filterNot { it.isEmpty }
         SettingsManager.loadOrSaveFiles(skills)
         val serverSkills = SettingsManager.loadFromServerConfig(server)
-        skills.forEach {
-            (serverSkills[it.id]
-                ?: SettingsManager.getSettings(it)
-                ?: createDefaultSkill(it.id)?.settings)
-                ?.run { it.updateSettings(this) }
+        skills.forEach { skill ->
+            (serverSkills[skill.id]
+                ?: SettingsManager.getSettings(skill)
+                ?: createDefaultSkill(skill.id)?.let {
+                    it.settings.apply { it.initSettings(this) }
+                })
+                ?.run { skill.updateSettings(this) }
         }
     }
 

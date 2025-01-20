@@ -20,7 +20,8 @@ class GroundWhackSkill : Skill(
     )
 ), LandingTrigger, PersistentTrigger, FallTrigger, DangerTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_WHACK_SOUND, DEFAULT_WHACK_SOUND)
             .addParameter(

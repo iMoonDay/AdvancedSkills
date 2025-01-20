@@ -60,9 +60,9 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
     val failedMessage get() = translateSkill(id.path, "failed")
     val isEmpty: Boolean get() = this === Skills.EMPTY || this == EmptySkill
 
-    init {
-        if (this.settings.cooldown > 0) {
-            this.settings.addEnhancement(
+    open fun initSettings(settings: Settings) {
+        if (settings.cooldown > 0) {
+            settings.addEnhancement(
                 id = "cooldown",
                 value = -0.16,
                 operation = MULTIPLY_TOTAL,

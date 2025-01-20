@@ -1027,9 +1027,7 @@ advskills_re:
         inventory: 背包
         learn: 学习
         enhance: 强化
-      requiredLevel:
-        learn: '下次学习所需等级：%d'
-        enhance: '下次强化所需等级：%d'
+      requiredLevel: 下次抽取所需等级：%d
       enhancedAll: 已学习并强化所有技能
     slot:
       title: 左键拖动移动，右键重置
@@ -1038,6 +1036,7 @@ advskills_re:
     inventory:
       title: '技能背包 %d/%d'
       enhance: '当装备时：'
+      tip: '提示：Alt+左击置顶技能'
     wheel:
       cancel: 取消
       tip: 松开选中，左键使用，右键取消，中键查看详情，按下 %s 打开技能背包
@@ -1065,7 +1064,7 @@ advskills_re:
       hideSkillSlots: 隐藏技能栏
       dynamicallyHideDirection: 动态隐藏方向
       progressBarColor: 进度条颜色
-      displaySelectedSkillSlot: 额外显示选中技能槽F
+      displaySelectedSkillSlot: 额外显示选中技能槽
       displayQuickCastKey: 显示快捷施法键
       useVanillaSlot: 独立技能槽使用原版副手栏样式
       selectedSlotPosition: 独立技能槽位置
@@ -1074,6 +1073,7 @@ advskills_re:
       displayProgressBarBelowCrosshair: 在准星下方显示选中技能的进度条
       progressBarOffsetY: 进度条Y偏移量
       useRingCastingWheel: 使用环形施法轮盘样式
+      disableLearningNotifications: 禁用新技能通知
       invalidLayout: "错误输入! 只能包含1-10和分隔符','"
       incompleteLayout: "错误输入! 缺少栏位：%s"
       redundantNumbers: "错误输入! 栏位不能重复：%s"
@@ -1091,6 +1091,7 @@ advskills_re:
       buriedTreasureChestGenerationChance: 埋藏的宝藏
       endCityTreasureChestGenerationChance: 末地城宝箱
       spawnBonusChestGenerationChance: 开局奖励箱
+      initialDrawTimes: 初始抽取次数
       skillRarityWeights: 稀有度权重
       skillConfig: 全局技能配置
       skillCooldownMultiplier: 技能冷却倍率

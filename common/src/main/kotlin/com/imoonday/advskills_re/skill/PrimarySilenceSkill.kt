@@ -16,7 +16,8 @@ class PrimarySilenceSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_SILENCE_SOUND, DEFAULT_SILENCE_SOUND)
             .addParameter(

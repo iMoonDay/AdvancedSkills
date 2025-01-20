@@ -21,7 +21,8 @@ class ReturnSkill : LongPressSkill(
     )
 ), UsingRenderTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_RETURN_SOUND, DEFAULT_RETURN_SOUND)
             .addParameter(

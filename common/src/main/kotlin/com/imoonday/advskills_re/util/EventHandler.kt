@@ -94,6 +94,9 @@ object EventHandler {
             SkillConfig.get().reset()
             SkillConfig.resetFile()
         }
+        LifecycleEvent.SETUP.register {
+            Skills.initDefaultSettings()
+        }
     }
 
     private fun reloadSkillConfigs(server: MinecraftServer) {

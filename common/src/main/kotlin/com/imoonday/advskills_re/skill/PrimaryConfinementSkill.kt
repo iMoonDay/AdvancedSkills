@@ -22,7 +22,8 @@ class PrimaryConfinementSkill : LongPressSkill(
     )
 ), UsingRenderTrigger, CrosshairTrigger, TargetRenderTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_CONFINE_SOUND, DEFAULT_CONFINE_SOUND)
             .addParameter(

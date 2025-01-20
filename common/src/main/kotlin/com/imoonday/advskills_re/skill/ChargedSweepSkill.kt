@@ -25,7 +25,8 @@ class ChargedSweepSkill : LongPressSkill(
 
     override fun getMaxUseTime(player: PlayerEntity): Int = getIntParam("charge_time", player, 3 * 20, 0)
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_DAMAGE_ITEM, DEFAULT_DAMAGE_ITEM, ENHANCEMENT_NO_DAMAGE)
             .addParameter(

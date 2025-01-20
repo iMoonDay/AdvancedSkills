@@ -23,7 +23,7 @@ private const val SLOT_SIZE_WITH_GAP = 22
 object SkillSlotRenderer {
 
     private val widgetsTexture = Identifier("textures/gui/widgets.png")
-    private val slotsTexture = id("slots.png")
+    private val slotsTexture = id("textures/gui/slots.png")
     private val config = ClientConfig.get()
 
     private var animationTime: Long = 250L
@@ -227,6 +227,7 @@ object SkillSlotRenderer {
                 renderProgressBar(skill, context, iconX, endY - 1, 16, 2, player)
             }
             renderCooldownOverlay(skill, context, iconX - 1, endY + 1, 18, 18, player)
+//            renderCooldownOverlay(context, client!!, skill, iconX - 1, iconY - 1, 18, player)
         }
 
         if (config.displayQuickCastKey) {

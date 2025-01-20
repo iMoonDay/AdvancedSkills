@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.client
 
 import com.imoonday.advskills_re.*
 import com.imoonday.advskills_re.client.render.*
+import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
@@ -14,20 +15,8 @@ import java.io.*
 class ClientConfig {
 
     var uiOffsetX: Int = 0
-        set(value) {
-            field = value
-            save()
-        }
     var uiOffsetY: Int = 0
-        set(value) {
-            field = value
-            save()
-        }
     var skillSorter: SkillSorter = SkillSorter.DEFAULT
-        set(value) {
-            field = value
-            save()
-        }
     var layout: Array<IntArray> = DEFAULT_LAYOUT
         get() {
             if (!isValidLayout(field)) field = DEFAULT_LAYOUT
@@ -35,94 +24,26 @@ class ClientConfig {
         }
         set(value) {
             if (isValidLayout(value)) field = value else return
-            save()
         }
     var quickCastWheelHoldTime: Int = 250
-        set(value) {
-            field = value
-            save()
-        }
     var hideSkillCrosshair: Boolean = false
-        set(value) {
-            field = value
-            save()
-        }
     var hideSkillInfo: Boolean = false
-        set(value) {
-            field = value
-            save()
-        }
     var hideSkillSlots: HideMode = HideMode.DYNAMICALLY_HIDE
-        set(value) {
-            field = value
-            save()
-        }
     var dynamicallyHideDirection: AnimationDirection = AnimationDirection.RIGHT
-        set(value) {
-            field = value
-            save()
-        }
     var progressBarColor: Int = 0xFFFFEE58.toInt()
-        set(value) {
-            field = value
-            save()
-        }
     var displaySelectedSkillSlot: Boolean = true
-        set(value) {
-            field = value
-            save()
-        }
     var displayQuickCastKey: Boolean = true
-        set(value) {
-            field = value
-            save()
-        }
     var useVanillaSlot: Boolean = false
-        set(value) {
-            field = value
-            save()
-        }
     var selectedSlotPosition: SlotPosition = SlotPosition.LEFT_OF_HOTBAR
-        set(value) {
-            field = value
-            save()
-        }
     var selectedSlotOffsetX: Int = 0
-        set(value) {
-            field = value
-            save()
-        }
     var selectedSlotOffsetY: Int = 0
-        set(value) {
-            field = value
-            save()
-        }
     var displayProgressBarBelowCrosshair: Boolean = true
-        set(value) {
-            field = value
-            save()
-        }
     var progressBarOffsetY: Int = 0
-        set(value) {
-            field = value
-            save()
-        }
     var developmentMode: Boolean = false
-        set(value) {
-            field = value
-            save()
-        }
     var useRingCastingWheel: Boolean = true
-        set(value) {
-            field = value
-            save()
-        }
-
+    var disableLearningNotifications: Boolean = false
     var displayedSkills: MutableSet<String> = mutableSetOf()
-        set(value) {
-            field = value
-            save()
-        }
+    var topSkills: MutableList<String> = mutableListOf()
 
     fun toJson(): String = JSON.encodeToString(serializer(), this)
 
@@ -177,8 +98,15 @@ class ClientConfig {
         }
     }
 
+    fun isTopSkill(skill: Skill): Boolean = topSkills.contains(skill.id.toString())
+
     fun save() {
         try {
+            if (!file.exists()) {
+                file.parentFile.mkdirs()
+                file.createNewFile()
+            }
+
             file.writeText(instance.toJson(), Charsets.UTF_8)
         } catch (e: Exception) {
             LOGGER.error("Couldn't save $MOD_ID-client configuration file", e)

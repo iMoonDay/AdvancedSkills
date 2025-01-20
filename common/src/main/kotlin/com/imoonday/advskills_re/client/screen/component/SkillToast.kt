@@ -7,7 +7,7 @@ import net.minecraft.client.gui.*
 import net.minecraft.client.toast.*
 import net.minecraft.util.*
 
-private val texture = id("toasts.png")
+private val texture = id("textures/gui/toasts.png")
 
 class SkillToast(val skill: Skill, private val timeout: Long = 3000) : Toast {
 

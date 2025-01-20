@@ -18,7 +18,8 @@ class GlidingSkill : PassiveSkill(
     )
 ), TickTrigger, JumpStateTrigger, ProgressTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_GLIDE_DURATION,
             baseValue = DEFAULT_GLIDE_DURATION,
@@ -83,7 +84,7 @@ class GlidingSkill : PassiveSkill(
     }
 
     private fun PlayerEntity.isGliding(): Boolean =
-        !isOnGround && !abilities.flying && !isTouchingWater && !isClimbing && (this as LivingEntityAccessor).isJumping
+        !isOnGround && !abilities.flying && !isFallFlying && !isTouchingWater && !isClimbing && (this as LivingEntityAccessor).isJumping
 
     private fun PlayerEntity.canResetGliding(): Boolean =
         isOnGround || abilities.flying || isTouchingWater || isClimbing

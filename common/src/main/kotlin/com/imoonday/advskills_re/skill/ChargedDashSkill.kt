@@ -21,7 +21,8 @@ class ChargedDashSkill : LongPressSkill(
     override fun getMaxUseTime(player: PlayerEntity): Int =
         getIntParam(PARAM_CHARGE_TIME, player, DEFAULT_CHARGE_TIME, 0)
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_CHARGE_TIME,
             baseValue = DEFAULT_CHARGE_TIME,

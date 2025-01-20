@@ -17,7 +17,8 @@ class PerfectBounceSkill : BounceSkill(
     damageBoost = 1.5f
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(
                 name = PARAM_HEAL_RATIO,

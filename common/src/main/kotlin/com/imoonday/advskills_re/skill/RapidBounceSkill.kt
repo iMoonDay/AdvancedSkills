@@ -15,7 +15,8 @@ class RapidBounceSkill : BounceSkill(
     baseChance = 0.5f
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_DAMAGE_REDUCTION,
             baseValue = DEFAULT_DAMAGE_REDUCTION,

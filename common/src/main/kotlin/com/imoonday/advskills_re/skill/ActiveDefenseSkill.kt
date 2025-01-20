@@ -22,7 +22,8 @@ class ActiveDefenseSkill : LongPressSkill(
     )
 ), DamageTrigger, AttributeTrigger, UsingRenderTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(
                 name = PARAM_DURATION,

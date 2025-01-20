@@ -16,7 +16,8 @@ class PrimarySlownessSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_SLOW_SOUND, DEFAULT_SLOW_SOUND)
             .addParameter(

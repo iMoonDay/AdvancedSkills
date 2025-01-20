@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FFF",
+    "FFF",
+    "FFF"
+  ],
+  "key": {
+    "F": {
+      "item": "advskills_re:mythic_skill_fruit"
+    }
+  },
+  "result": {
+    "item": "advskills_re:unique_skill_fruit",
+    "count": 1
+  }
+}

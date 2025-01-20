@@ -9,6 +9,7 @@ import com.mojang.blaze3d.systems.*
 import net.minecraft.client.*
 import net.minecraft.client.gui.*
 import net.minecraft.client.gui.tooltip.*
+import net.minecraft.client.render.*
 import net.minecraft.entity.player.*
 import net.minecraft.text.*
 import net.minecraft.util.*
@@ -16,6 +17,8 @@ import java.awt.*
 import kotlin.math.*
 
 object SkillRenderer {
+
+    private const val PRECISION: Float = 2.5f / 360.0f
 
     @JvmStatic
     fun render(
@@ -86,11 +89,8 @@ object SkillRenderer {
             && (player.isUsing(skill) || skill !is UsingProgressTrigger)
         ) {
             val progress = skill.getProgress(player).coerceIn(0.0, 1.0)
-            val centerX =
-                if (skill.canBeEmpty(
-                        player
-                    )
-                ) x + (width * progress).toInt() else x + 1 + ((width - 1) * progress).toInt()
+            val centerX = if (skill.canBeEmpty(player)) x + (width * progress).toInt()
+            else x + 1 + ((width - 1) * progress).toInt()
             context.fill(x, y, centerX, y + height, ClientConfig.get().progressBarColor)
             context.fill(centerX, y, x + width, y + height, Color.GRAY.rgb)
         }
@@ -127,6 +127,78 @@ object SkillRenderer {
             )
             context.drawText(textRenderer, time, 0, textYOffset, 0xFFFFFF, false)
             context.matrices.pop()
+        }
+    }
+
+    @JvmStatic
+    fun renderCooldownOverlay(
+        context: DrawContext,
+        client: MinecraftClient,
+        skill: Skill,
+        x: Int,
+        y: Int,
+        size: Int,
+        player: PlayerEntity
+    ) {
+        if (!player.isCooling(skill)) return
+        val buffer = context.vertexConsumers.getBuffer(RenderLayer.getGui())
+        val cooldown = player.getCooldown(skill)
+        val maxCooldown = skill.cooldown
+        val progress = (cooldown.toDouble() / maxCooldown).coerceIn(0.0, 1.0)
+
+        val overlayColor = Color.BLACK.alpha(0.25).rgb
+        context.fill(x, y, x + size, y + size, overlayColor)
+        drawOverlay(buffer, x, y, size, progress, overlayColor)
+        if (cooldown < 4 * 20) {
+            val time = if (cooldown <= 20) String.format("%.1f", cooldown / 20.0) else (cooldown / 20).toString()
+            val textRenderer = client.textRenderer
+            context.drawText(
+                textRenderer, time, x + (size - textRenderer.getWidth(time)) / 2,
+                y + (size - textRenderer.fontHeight) / 2, 0xFFFFFF, false
+            )
+        }
+    }
+
+    private fun drawOverlay(
+        buffer: VertexConsumer,
+        x: Int,
+        y: Int,
+        size: Int,
+        progress: Double,
+        color: Int
+    ) {
+        val startAngle = progress * PI * 2
+        val endAngle = PI * 2
+
+        val radiusOut = size * sqrt(2.0) / 2.0
+
+        val centerX = (x + size / 2).toDouble()
+        val centerY = (y + size / 2).toDouble()
+
+        val r = (color shr 16) and 0xFF
+        val g = (color shr 8) and 0xFF
+        val b = (color shr 0) and 0xFF
+        val a = (color shr 24) and 0xFF
+
+        val angle = endAngle - startAngle
+        val sections = max(1.0, ceil(angle / PRECISION)).toInt()
+
+        val slice = angle / sections
+
+        val endX = (x + size).toDouble()
+        val endY = (y + size).toDouble()
+        for (i in 0 until sections) {
+            val angle1 = startAngle + i * slice
+            val angle2 = startAngle + (i + 1) * slice
+
+            val pos1OutX = (centerX + radiusOut * cos(angle1)).coerceIn(x.toDouble(), endX)
+            val pos1OutY = (centerY + radiusOut * sin(angle1)).coerceIn(y.toDouble(), endY)
+            val pos2OutX = (centerX + radiusOut * cos(angle2)).coerceIn(x.toDouble(), endX)
+            val pos2OutY = (centerY + radiusOut * sin(angle2)).coerceIn(y.toDouble(), endY)
+
+            buffer.vertex(centerX, centerY, 0.0).color(r, g, b, a).next()
+            buffer.vertex(pos1OutX, pos1OutY, 0.0).color(r, g, b, a).next()
+            buffer.vertex(pos2OutX, pos2OutY, 0.0).color(r, g, b, a).next()
         }
     }
 

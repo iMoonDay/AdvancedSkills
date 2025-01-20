@@ -479,6 +479,6 @@ class EnhancementListWidget(
     companion object {
 
         private val selectionTexture = id("textures/gui/selection.png")
-        private val onOffTexture = id("on_off.png")
+        private val onOffTexture = id("textures/gui/on_off.png")
     }
 }

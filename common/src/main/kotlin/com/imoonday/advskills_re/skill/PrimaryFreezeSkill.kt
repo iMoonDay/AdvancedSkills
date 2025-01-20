@@ -18,7 +18,8 @@ class PrimaryFreezeSkill : Skill(
     )
 ), SpecialStateRenderTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_FREEZE_SOUND, DEFAULT_FREEZE_SOUND)
             .addParameter(

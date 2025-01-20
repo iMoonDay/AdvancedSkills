@@ -19,7 +19,8 @@ class GrapplingHookSkill : LongPressSkill(
     )
 ), UsingRenderTrigger, WorldRendererTrigger, CrosshairTrigger, SaveMovingTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_HOOK_DURATION,
             baseValue = DEFAULT_HOOK_DURATION,

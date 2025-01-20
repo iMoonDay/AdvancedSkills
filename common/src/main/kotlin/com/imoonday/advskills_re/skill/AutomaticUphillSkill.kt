@@ -13,7 +13,8 @@ class AutomaticUphillSkill : PassiveSkill(
     ), toggleable = true
 ), StepHeightTrigger, PersistentTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_STEP_HEIGHT,
             baseValue = DEFAULT_STEP_HEIGHT,

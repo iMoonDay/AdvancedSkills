@@ -10,7 +10,6 @@ import net.minecraft.client.gui.screen.*
 import net.minecraft.client.render.*
 import net.minecraft.text.*
 import org.joml.*
-import java.awt.*
 import kotlin.math.*
 
 class SkillWheelScreen : Screen(Text.empty()) {
@@ -31,7 +30,7 @@ class SkillWheelScreen : Screen(Text.empty()) {
         var tipY = 6
 
         val textColor = 0xFFFFFF
-        val backgroundColor = Color.GRAY.alpha(0.4).rgb
+        val backgroundColor = 0x3F000000 // Color.GRAY.alpha(0.4).rgb
 
         textRenderer.wrapLines(tip, (context.scaledWindowWidth * 0.9).toInt()).forEach {
             context.drawTextWithBackground(textRenderer, it, centerX, tipY, textColor, backgroundColor)

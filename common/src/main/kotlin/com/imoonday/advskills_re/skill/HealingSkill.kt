@@ -11,26 +11,28 @@ import net.minecraft.server.network.*
 abstract class HealingSkill(
     settings: Settings,
     private val healingAmount: Float,
-    enhancementValue: Number? = null,
-    enhancementOperation: Enhancement.Operation? = null,
-    enhancementLevel: Int? = null,
-    enhancementDescArg: Enhancement.ArgFormatter? = null,
 ) : Skill(settings), SynchronousCoolingTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_HEAL_SOUND, DEFAULT_HEAL_SOUND)
             .addParameter(
                 name = PARAM_HEAL_AMOUNT,
                 baseValue = healingAmount,
                 enhancementId = ENHANCEMENT_AMOUNT,
-                value = enhancementValue ?: 0.2f,
-                operation = enhancementOperation ?: Enhancement.Operation.MULTIPLY_TOTAL,
-                maxLevel = enhancementLevel ?: 5,
-                descArg = enhancementDescArg ?: Enhancement.ArgFormatter.INT_PERCENT,
+                value = getDefaultEnhancementValue(),
+                operation = getDefaultEnhancementOperation(),
+                maxLevel = getDefaultEnhancementLevel(),
+                descArg = getDefaultEnhancementDescArg(),
                 genericText = true
             )
     }
+
+    protected open fun getDefaultEnhancementValue(): Number = 0.2f
+    protected open fun getDefaultEnhancementOperation(): Enhancement.Operation = Enhancement.Operation.MULTIPLY_TOTAL
+    protected open fun getDefaultEnhancementLevel(): Int = 5
+    protected open fun getDefaultEnhancementDescArg(): Enhancement.ArgFormatter = Enhancement.ArgFormatter.INT_PERCENT
 
     override fun use(user: ServerPlayerEntity): UseResult {
         val healingAmount = getHealingAmount(user)

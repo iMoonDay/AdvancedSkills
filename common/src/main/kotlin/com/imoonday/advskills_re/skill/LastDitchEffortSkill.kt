@@ -21,7 +21,8 @@ class LastDitchEffortSkill : Skill(
 ), DamageTrigger, AutoStopTrigger, AttackTrigger,
     AttributeTrigger, AutoTrigger, DeathTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_HEAL_SOUND, DEFAULT_HEAL_SOUND)
             .addParameter(PARAM_HEALTH_THRESHOLD, DEFAULT_HEALTH_THRESHOLD)

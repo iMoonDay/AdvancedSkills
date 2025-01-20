@@ -19,7 +19,8 @@ class JumpSkill : PassiveSkill(
     toggleable = true
 ), TickTrigger, UsingProgressTrigger, JumpStateTrigger, StopTrigger, FallFlyingTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(
                 name = PARAM_JUMP_FORCE,

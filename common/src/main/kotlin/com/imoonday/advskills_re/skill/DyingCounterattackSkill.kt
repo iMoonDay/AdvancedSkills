@@ -20,7 +20,8 @@ class DyingCounterattackSkill : Skill(
     )
 ), DeathTrigger, PersistentTrigger, AttackTrigger, TickTrigger, UnequipTrigger, StatusEffectTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_REVIVE_SOUND, DEFAULT_REVIVE_SOUND)
             .addParameter(

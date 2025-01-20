@@ -18,7 +18,8 @@ class ThunderFurySkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addEnhancement(ENHANCEMENT_LIGHTNING_IMMUNE)
             .addParameter(PARAM_TARGET_DISTANCE, DEFAULT_TARGET_DISTANCE)

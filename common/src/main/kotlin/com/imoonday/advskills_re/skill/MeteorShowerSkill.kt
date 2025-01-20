@@ -20,7 +20,8 @@ class MeteorShowerSkill : LongPressSkill(
     )
 ), AttributeTrigger, UsingRenderTrigger, DangerTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_MIN_METEOR_COUNT, DEFAULT_MIN_METEOR_COUNT)
             .addParameter(PARAM_MAX_METEOR_COUNT, DEFAULT_MAX_METEOR_COUNT)

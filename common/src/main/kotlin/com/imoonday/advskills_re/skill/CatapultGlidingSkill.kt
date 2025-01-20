@@ -19,7 +19,8 @@ class CatapultGlidingSkill : LongPressSkill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_LAUNCH_SOUND, DEFAULT_LAUNCH_SOUND)
             .addParameter(

@@ -1027,9 +1027,7 @@ advskills_re:
         inventory: Inventory
         learn: Learn
         enhance: Enhance
-      requiredLevel:
-        learn: 'Next level to learn: %d'
-        enhance: 'Next level to enhance: %d'
+      requiredLevel: 'Required level for next draw: %d'
       enhancedAll: You have learned and enhanced all skills
     slot:
       title: Left drag to move, right click to reset
@@ -1038,6 +1036,7 @@ advskills_re:
     inventory:
       title: 'Skill Inventory %d/%d'
       enhance: 'When equipped:'
+      tip: 'Tip: Alt + Left click to pin skill'
     wheel:
       cancel: Cancel
       tip: Release to select, left click to use, right click to cancel, middle click to view details, press %s to open Skill Inventory
@@ -1074,6 +1073,7 @@ advskills_re:
       displayProgressBarBelowCrosshair: Display progress bar below crosshair
       progressBarOffsetY: Progress Bar Y Offset
       useRingCastingWheel: Use Ring Casting Wheel style
+      disableLearningNotifications: Disable Learning Notifications
       invalidLayout: "Wrong input! Can only contain 1-10 and the delimiter ','"
       incompleteLayout: "Wrong input! Missing slots: %s"
       redundantNumbers: "Wrong input! Redundant numbers: %s"
@@ -1091,6 +1091,7 @@ advskills_re:
       buriedTreasureChestGenerationChance: Buried Treasure Chest
       endCityTreasureChestGenerationChance: End City Treasure Chest
       spawnBonusChestGenerationChance: Spawn Bonus Chest
+      initialDrawTimes: Initial Draw Times
       skillRarityWeights: Skill Rarity Weights
       skillConfig: Global Skill Config
       skillCooldownMultiplier: Skill Cooldown Multiplier

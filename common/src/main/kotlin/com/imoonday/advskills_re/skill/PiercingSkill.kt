@@ -21,7 +21,8 @@ class PiercingSkill : Skill(
     )
 ), AutoStopTrigger, DangerTrigger, GravityTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_PIERCE_SOUND, DEFAULT_PIERCE_SOUND)
             .addParameter(

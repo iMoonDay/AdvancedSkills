@@ -17,7 +17,8 @@ class CounterblastSkill : PassiveSkill(
     ), customToggles = true
 ), PostAttackedTrigger, ProgressTrigger, StopTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_BASE_TRIGGER_CHANCE, DEFAULT_BASE_TRIGGER_CHANCE)
             .addParameter(PARAM_BLAST_SOUND, DEFAULT_BLAST_SOUND)

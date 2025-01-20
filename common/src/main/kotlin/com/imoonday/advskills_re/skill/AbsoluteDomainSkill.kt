@@ -19,7 +19,8 @@ class AbsoluteDomainSkill : Skill(
     )
 ), AutoStopTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_MIN_HARDNESS, DEFAULT_MIN_HARDNESS)
             .addParameter(PARAM_MAX_HARDNESS, DEFAULT_MAX_HARDNESS)

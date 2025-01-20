@@ -13,7 +13,8 @@ class StrongPhysiqueSkill : PassiveSkill(
     ), customToggles = true
 ), StopTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_HEALTH_BOOST,
             baseValue = DEFAULT_HEALTH_BOOST,

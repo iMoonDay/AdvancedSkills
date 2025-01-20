@@ -215,6 +215,6 @@ class SkillGalleryScreen(
 
     companion object {
 
-        private val suggestionTexture = id("suggestion.png")
+        private val suggestionTexture = id("textures/gui/suggestion.png")
     }
 }

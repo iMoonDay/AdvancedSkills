@@ -18,7 +18,8 @@ class SelfRepairSkill : Skill(
     )
 ), AutoTrigger, AutoStopTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(
                 name = PARAM_CHARGE_DURATION,

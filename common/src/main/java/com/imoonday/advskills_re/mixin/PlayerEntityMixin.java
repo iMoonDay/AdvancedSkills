@@ -42,6 +42,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
     public PlayerDataComponent getDataComponent() {
         if (dataComponent == null) {
             dataComponent = new PlayerDataComponent((PlayerEntity) (Object) this);
+            dataComponent.getChoiceData().setCount(GlobalConfig.get().getInitialDrawTimes());
         }
         return dataComponent;
     }

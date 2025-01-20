@@ -20,7 +20,8 @@ class AdvancedPurificationSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_SUCCESS_SOUND, DEFAULT_SUCCESS_SOUND)
             .addParameter(

@@ -19,7 +19,8 @@ class InvisibleTrapSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_TRAP_RANGE,
             baseValue = DEFAULT_TRAP_RANGE,

@@ -5,7 +5,6 @@ import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import dev.architectury.platform.*
-import kotlinx.serialization.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import net.minecraft.nbt.*
@@ -15,45 +14,15 @@ import java.io.*
 @Serializable
 class GlobalConfig {
 
-    @Transient
-    private var loading: Boolean = false
-
     val defaultSkillSlots: MutableMap<String, Int> = SkillContainer.DEFAULT_SLOTS.toMutableMap()
     var disableSkillFruitGeneration: Boolean = false
-        set(value) {
-            field = value
-            if (!loading) save()
-        }
     var oakLeavesDropChance: Float = 0.005f
-        set(value) {
-            field = value
-            if (!loading) save()
-        }
     var darkOakLeavesDropChance: Float = 0.005f
-        set(value) {
-            field = value
-            if (!loading) save()
-        }
     var ancientCityChestGenerationChance: Float = 0.25f
-        set(value) {
-            field = value
-            if (!loading) save()
-        }
     var buriedTreasureChestGenerationChance: Float = 0.25f
-        set(value) {
-            field = value
-            if (!loading) save()
-        }
     var endCityTreasureChestGenerationChance: Float = 0.25f
-        set(value) {
-            field = value
-            if (!loading) save()
-        }
     var spawnBonusChestGenerationChance: Float = 1f
-        set(value) {
-            field = value
-            if (!loading) save()
-        }
+    var initialDrawTimes: Int = 5
     val skillConfig: SkillConfig = SkillConfig().apply {
         this.skillCooldownMultiplier = 1.0
         this.skillXpMultiplier = 1.0
@@ -64,7 +33,6 @@ class GlobalConfig {
 
     fun setDefaultSkillSlot(slot: String, count: Int) {
         defaultSkillSlots[slot] = count
-        save()
     }
 
     fun toJson(): String = JSON.encodeToString(serializer(), this)
@@ -122,6 +90,7 @@ class GlobalConfig {
         putFloat("buriedTreasureChestGenerationChance", buriedTreasureChestGenerationChance)
         putFloat("endCityTreasureChestGenerationChance", endCityTreasureChestGenerationChance)
         putFloat("spawnBonusChestGenerationChance", spawnBonusChestGenerationChance)
+        putInt("initialDrawTimes", initialDrawTimes)
         put("skillConfig", skillConfig.writeToNbt())
     }
 
@@ -130,8 +99,6 @@ class GlobalConfig {
     }
 
     fun loadFromNbt(nbt: NbtCompound) {
-        loading = true
-
         if (nbt.contains("defaultSkillSlots")) {
             defaultSkillSlots.clear()
             defaultSkillSlots.putAll(nbt.getCompound("defaultSkillSlots").toStringMap(NbtCompound::getInt))
@@ -157,11 +124,12 @@ class GlobalConfig {
         if (nbt.contains("spawnBonusChestGenerationChance")) {
             spawnBonusChestGenerationChance = nbt.getFloat("spawnBonusChestGenerationChance")
         }
+        if (nbt.contains("initialDrawTimes")) {
+            initialDrawTimes = nbt.getInt("initialDrawTimes")
+        }
         if (nbt.contains("skillConfig")) {
             skillConfig.loadFromNbt(nbt.getCompound("skillConfig"))
         }
-
-        loading = false
     }
 
     companion object {

@@ -19,7 +19,8 @@ class WallClimbingSkill : PassiveSkill(
     )
 ), ClimbingTrigger, AutoStopTrigger, AutoTrigger, SendPlayerDataTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_CLIMB_DURATION,
             baseValue = DEFAULT_CLIMB_DURATION,

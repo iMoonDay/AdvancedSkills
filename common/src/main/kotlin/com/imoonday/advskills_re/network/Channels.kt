@@ -56,9 +56,6 @@ object Channels {
     @JvmStatic
     val MODIFY_ENHANCEMENT_C2S: NetworkChannel = registerChannel("modify_enhancement_c2s")
 
-    @JvmStatic
-    val KEY_PRESSED_C2S: NetworkChannel = registerChannel("key_pressed_c2s")
-
     fun register() {
         USE_SKILL_C2S.register(::UseSkillC2SRequest)
         EQUIP_SKILL_C2S.register(::EquipSkillC2SRequest)

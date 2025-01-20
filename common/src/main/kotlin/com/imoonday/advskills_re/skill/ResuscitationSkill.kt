@@ -19,7 +19,8 @@ class ResuscitationSkill : Skill(
     )
 ), DeathTrigger, AutoStopTrigger, DamageTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_REVIVE_HEALTH, DEFAULT_REVIVE_HEALTH)
             .addParameter(

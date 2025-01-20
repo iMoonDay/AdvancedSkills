@@ -20,7 +20,8 @@ class ArrowRainSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_MAX_DISTANCE, DEFAULT_MAX_DISTANCE)
             .addParameter(PARAM_MIN_ARROWS, DEFAULT_MIN_ARROWS)

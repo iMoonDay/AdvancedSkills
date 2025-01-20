@@ -17,7 +17,8 @@ class HorizontalDashSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_DASH_SOUND, DEFAULT_DASH_SOUND)
             .addParameter(

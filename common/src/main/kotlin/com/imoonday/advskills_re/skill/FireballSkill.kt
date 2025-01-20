@@ -17,7 +17,8 @@ class FireballSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_SHOOT_SOUND, DEFAULT_SHOOT_SOUND)
             .addParameter(

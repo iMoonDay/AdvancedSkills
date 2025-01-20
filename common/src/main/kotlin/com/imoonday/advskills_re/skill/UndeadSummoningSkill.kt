@@ -17,7 +17,8 @@ class UndeadSummoningSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_SUMMON_SOUND, DEFAULT_SUMMON_SOUND)
             .addParameter(

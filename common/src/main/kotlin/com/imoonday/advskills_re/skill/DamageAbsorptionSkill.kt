@@ -21,7 +21,8 @@ class DamageAbsorptionSkill : Skill(
     )
 ), DamageTrigger, AutoStopTrigger, UsingRenderTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_ABSORB_SOUND, DEFAULT_ABSORB_SOUND)
             .addParameter(PARAM_BREAK_SOUND, DEFAULT_BREAK_SOUND)

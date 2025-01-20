@@ -20,7 +20,8 @@ class ExtremeEvasionSkill : Skill(
     )
 ), AutoStopTrigger, DamageTrigger, SendPlayerVelocityTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_EVASION_SOUND, DEFAULT_EVASION_SOUND)
             .addParameter(

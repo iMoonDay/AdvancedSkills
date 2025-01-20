@@ -272,8 +272,8 @@ class SkillListScreen(
             val text = if (player.choiceData.isCompleted()) {
                 translate("screen.list.enhancedAll")
             } else {
-                val requiredLevels = PlayerUtils.getLevelRequiredForLearningSkill(level)
-                translate("screen.list.requiredLevel.learn", requiredLevels)
+                val requiredLevels = PlayerUtils.calculateLevelRequiredForDrawing(level)
+                translate("screen.list.requiredLevel", requiredLevels)
             }
             context.drawText(
                 textRenderer,
@@ -488,6 +488,6 @@ class SkillListScreen(
 
     companion object {
 
-        private val equipTexture = id("equip.png")
+        private val equipTexture = id("textures/gui/equip.png")
     }
 }

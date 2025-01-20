@@ -22,7 +22,8 @@ class LaserEyeSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_LASER_SOUND, DEFAULT_LASER_SOUND)
             .addParameter(

@@ -19,7 +19,8 @@ class ItemAttractionSkill : LongPressSkill(
     )
 ), UsingRenderTrigger, GlowingTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_ATTRACT_EXP, DEFAULT_ATTRACT_EXP, ENHANCEMENT_EXP)
             .addParameter(

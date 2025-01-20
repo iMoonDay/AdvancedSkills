@@ -20,7 +20,8 @@ class WitheringTouchSkill : Skill(
     )
 ), UsingProgressTrigger, PostAttackTrigger, DangerTrigger, UnequipTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_MAX_EFFECT_DURATION, DEFAULT_MAX_EFFECT_DURATION)
             .addParameter(PARAM_TOUCH_SOUND, DEFAULT_TOUCH_SOUND)

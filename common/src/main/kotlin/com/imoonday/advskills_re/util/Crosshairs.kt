@@ -17,6 +17,6 @@ enum class Crosshairs(
     BOX(-1, 48f),
     RING(-1, 64f);
 
-    override val texture = id("crosshairs.png")
+    override val texture = id("textures/gui/crosshairs.png")
 }
 

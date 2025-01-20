@@ -7,7 +7,6 @@ loom {
         mixinConfig "advskills_re.mixins.json"
         mixinConfig "advskills_re_forge.mixins.json"
         convertAccessWideners = true
-//        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
     }
     accessWidenerPath = project(":common").loom.accessWidenerPath
 }

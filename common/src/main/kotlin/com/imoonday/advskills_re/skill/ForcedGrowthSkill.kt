@@ -19,7 +19,8 @@ class ForcedGrowthSkill : Skill(
     )
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_GROWTH_RANGE,
             baseValue = DEFAULT_GROWTH_RANGE,

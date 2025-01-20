@@ -15,7 +15,8 @@ class DoubleJumpSkill : Skill(
     ).withDisabled(true)
 ) {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings.addParameter(
             name = PARAM_JUMP_FORCE,
             baseValue = DEFAULT_JUMP_FORCE,

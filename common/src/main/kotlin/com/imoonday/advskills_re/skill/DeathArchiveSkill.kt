@@ -24,7 +24,8 @@ class DeathArchiveSkill : Skill(
     )
 ), UsingProgressTrigger, DeathTrigger, DamageTrigger, TickTrigger, UnequipTrigger, UsingRenderTrigger {
 
-    init {
+    override fun initSettings(settings: Settings) {
+        super.initSettings(settings)
         settings
             .addParameter(PARAM_TELEPORT_SOUND, DEFAULT_TELEPORT_SOUND)
             .addParameter(
