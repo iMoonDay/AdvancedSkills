@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:living_detection",
+    "name": {
+      "translate": "advskills_re.skill.living_detection.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.living_detection.description"
+    },
+    "icon": "advskills_re:textures/item/living_detection.png",
+    "types": [
+      "utility"
+    ],
+    "cooldown": 400,
+    "rarity": "superb",
+    "disabled": false,
+    "weight": 5,
+    "drawable": true,
+    "parameters": {
+      "detect_duration": {
+        "baseValue": 100,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "detect_range": {
+        "baseValue": 50.0,
+        "enhancements": [
+          "range"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.living_detection.duration.name"
+        },
+        "description": "advskills_re.skill.living_detection.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "range",
+        "name": {
+          "translate": "advskills_re.skill.living_detection.range.name"
+        },
+        "description": "advskills_re.skill.living_detection.range.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

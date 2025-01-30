@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:triple_jump",
+    "name": {
+      "translate": "advskills_re.skill.triple_jump.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.triple_jump.description"
+    },
+    "icon": "advskills_re:textures/item/triple_jump.png",
+    "types": [
+      "movement"
+    ],
+    "cooldown": 100,
+    "rarity": "rare",
+    "disabled": true,
+    "weight": 6,
+    "drawable": true,
+    "parameters": {
+      "jump_force": {
+        "baseValue": 1.7,
+        "enhancements": [
+          "force"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "force",
+        "name": {
+          "translate": "advskills_re.skill.triple_jump.force.name"
+        },
+        "description": "advskills_re.skill.triple_jump.force.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.1,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

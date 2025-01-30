@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:primary_confinement",
+    "name": {
+      "translate": "advskills_re.skill.primary_confinement.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.primary_confinement.description"
+    },
+    "icon": "advskills_re:textures/item/primary_confinement.png",
+    "types": [
+      "control"
+    ],
+    "cooldown": 240,
+    "rarity": "superb",
+    "disabled": false,
+    "weight": 5,
+    "drawable": true,
+    "parameters": {
+      "confine_sound": {
+        "baseValue": {
+          "sound_id": "minecraft:block.enchantment_table.use"
+        }
+      },
+      "charge_duration": {
+        "baseValue": 100,
+        "enhancements": [
+          "charge_time"
+        ]
+      },
+      "confine_range": {
+        "baseValue": 5.0,
+        "enhancements": [
+          "range"
+        ]
+      },
+      "success_chance": {
+        "baseValue": 0.8,
+        "enhancements": [
+          "chance"
+        ]
+      },
+      "effect_duration": {
+        "baseValue": 60,
+        "enhancements": [
+          "effect"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "charge_time",
+        "name": {
+          "translate": "advskills_re.enhancement.charge_time.name"
+        },
+        "description": "advskills_re.enhancement.charge_time.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "range",
+        "name": {
+          "translate": "advskills_re.skill.primary_confinement.range.name"
+        },
+        "description": "advskills_re.skill.primary_confinement.range.description",
+        "descArg": "int",
+        "valuePerLvl": 1.0,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "chance",
+        "name": {
+          "translate": "advskills_re.skill.primary_confinement.chance.name"
+        },
+        "description": "advskills_re.skill.primary_confinement.chance.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.03999999910593033,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "effect",
+        "name": {
+          "translate": "advskills_re.skill.primary_confinement.effect.name"
+        },
+        "description": "advskills_re.skill.primary_confinement.effect.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

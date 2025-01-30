@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:temporary_shield",
+    "name": {
+      "translate": "advskills_re.skill.temporary_shield.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.temporary_shield.description"
+    },
+    "icon": "advskills_re:textures/item/temporary_shield.png",
+    "types": [
+      "defense"
+    ],
+    "cooldown": 600,
+    "rarity": "legendary",
+    "disabled": false,
+    "weight": 3,
+    "drawable": true,
+    "parameters": {
+      "shield_duration": {
+        "baseValue": 200,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "charge_interval": {
+        "baseValue": 20,
+        "enhancements": [
+          "interval"
+        ]
+      },
+      "max_absorption": {
+        "baseValue": 10.0,
+        "enhancements": [
+          "absorption"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.temporary_shield.duration.name"
+        },
+        "description": "advskills_re.skill.temporary_shield.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "interval",
+        "name": {
+          "translate": "advskills_re.skill.temporary_shield.interval.name"
+        },
+        "description": "advskills_re.skill.temporary_shield.interval.description",
+        "descArg": "int",
+        "valuePerLvl": -2.0,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "absorption",
+        "name": {
+          "translate": "advskills_re.skill.temporary_shield.absorption.name"
+        },
+        "description": "advskills_re.skill.temporary_shield.absorption.description",
+        "descArg": "float",
+        "valuePerLvl": 2.0,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

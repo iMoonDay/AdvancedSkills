@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:pain_feedback",
+    "name": {
+      "translate": "advskills_re.skill.pain_feedback.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.pain_feedback.description"
+    },
+    "icon": "advskills_re:textures/item/pain_feedback.png",
+    "types": [
+      "passive"
+    ],
+    "cooldown": 100,
+    "rarity": "superb",
+    "disabled": false,
+    "weight": 5,
+    "drawable": true,
+    "parameters": {
+      "toggleable": {
+        "baseValue": false
+      },
+      "feedback_ratio": {
+        "baseValue": 0.5,
+        "enhancements": [
+          "ratio"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "ratio",
+        "name": {
+          "translate": "advskills_re.skill.pain_feedback.ratio.name"
+        },
+        "description": "advskills_re.skill.pain_feedback.ratio.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.20000000298023224,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

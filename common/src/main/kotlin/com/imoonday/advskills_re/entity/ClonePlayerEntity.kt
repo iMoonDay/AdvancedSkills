@@ -44,7 +44,9 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
         headYaw = player.headYaw
         customName = player.displayName
         health = player.health
+        val baseSpeed = attributes.getBaseValue(EntityAttributes.GENERIC_MOVEMENT_SPEED)
         attributes.setFrom(player.attributes)
+        attributes.getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)?.baseValue = baseSpeed
         EquipmentSlot.entries.forEach {
             val equippedStack = player.getEquippedStack(it)
             if (!equippedStack.isEmpty) {
@@ -84,12 +86,12 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
         if (moveTime <= 0) {
             if (goalSelector.goals.isEmpty()) {
                 goalSelector.add(0, SwimGoal(this))
-                goalSelector.add(1, EscapeDangerGoal(this, 3.2))
-                goalSelector.add(2, MeleeAttackGoal(this, 2.5, false))
-                goalSelector.add(3, WanderAroundFarGoal(this, 2.5))
+                goalSelector.add(1, MeleeAttackGoal(this, 1.0, false))
+                goalSelector.add(2, EscapeDangerGoal(this, 1.3))
+                goalSelector.add(3, WanderAroundFarGoal(this, 1.0))
                 goalSelector.add(4, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
                 goalSelector.add(5, LookAroundGoal(this))
-                goalSelector.add(6, WanderAroundGoal(this, 3.2))
+                goalSelector.add(6, WanderAroundGoal(this, 1.3))
             }
             if (targetSelector.goals.isEmpty()) {
                 targetSelector.add(0, ActiveTargetGoal(this, HostileEntity::class.java, true) { aggressive })
@@ -145,6 +147,7 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
             DataTracker.registerData(ClonePlayerEntity::class.java, TrackedDataHandlerRegistry.BOOLEAN)
 
         @JvmStatic
-        fun createAttributes(): DefaultAttributeContainer.Builder = HostileEntity.createHostileAttributes()
+        fun createAttributes(): DefaultAttributeContainer.Builder =
+            HostileEntity.createHostileAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3)
     }
 }

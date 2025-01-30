@@ -104,7 +104,7 @@ object ModEntities {
 
     @JvmField
     val CLONE_PLAYER: RegistrySupplier<EntityType<ClonePlayerEntity>> =
-        EntityType.Builder.create(::ClonePlayerEntity, SpawnGroup.MISC)
+        EntityType.Builder.create(::ClonePlayerEntity, SpawnGroup.CREATURE)
             .setDimensions(0.6f, 1.8f)
             .maxTrackingRange(32)
             .trackingTickInterval(2)

@@ -600,4 +600,6 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             }
         }
     }
+
+    data class SettingsWithVersion(val version: Int, val settings: Settings)
 }

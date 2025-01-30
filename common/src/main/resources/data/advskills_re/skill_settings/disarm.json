@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:disarm",
+    "name": {
+      "translate": "advskills_re.skill.disarm.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.disarm.description"
+    },
+    "icon": "advskills_re:textures/item/disarm.png",
+    "types": [
+      "enhancement"
+    ],
+    "cooldown": 300,
+    "rarity": "superb",
+    "disabled": false,
+    "weight": 5,
+    "drawable": true,
+    "parameters": {
+      "disarm_sound": {
+        "baseValue": {
+          "sound_id": "advskills_re:disarm"
+        }
+      },
+      "success_chance": {
+        "baseValue": 0.45,
+        "enhancements": [
+          "success_chance"
+        ]
+      },
+      "disarm_duration": {
+        "baseValue": 100,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "drop_chance": {
+        "baseValue": 0.01,
+        "enhancements": [
+          "drop_chance"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "success_chance",
+        "name": {
+          "translate": "advskills_re.skill.disarm.success_chance.name"
+        },
+        "description": "advskills_re.skill.disarm.success_chance.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.05000000074505806,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.disarm.duration.name"
+        },
+        "description": "advskills_re.skill.disarm.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "drop_chance",
+        "name": {
+          "translate": "advskills_re.skill.disarm.drop_chance.name"
+        },
+        "description": "advskills_re.skill.disarm.drop_chance.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.009999999776482582,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

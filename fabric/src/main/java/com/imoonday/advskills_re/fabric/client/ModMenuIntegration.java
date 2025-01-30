@@ -9,6 +9,6 @@ public class ModMenuIntegration implements ModMenuApi {
 
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return parent -> AdvancedSkillsClient.getClothConfigLoaded() ? ConfigScreenHandler.createScreen(parent) : null;
+        return parent -> AdvancedSkillsClient.clothConfigLoaded ? ConfigScreenHandler.createScreen(parent) : null;
     }
 }

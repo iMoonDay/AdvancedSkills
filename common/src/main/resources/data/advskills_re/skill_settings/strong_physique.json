@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:strong_physique",
+    "name": {
+      "translate": "advskills_re.skill.strong_physique.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.strong_physique.description"
+    },
+    "icon": "advskills_re:textures/item/strong_physique.png",
+    "types": [
+      "passive"
+    ],
+    "cooldown": 0,
+    "rarity": "superb",
+    "disabled": false,
+    "weight": 5,
+    "drawable": true,
+    "parameters": {
+      "toggleable": {
+        "baseValue": false
+      },
+      "health_boost": {
+        "baseValue": 4.0,
+        "enhancements": [
+          "boost"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "boost",
+        "name": {
+          "translate": "advskills_re.skill.strong_physique.boost.name"
+        },
+        "description": "advskills_re.skill.strong_physique.boost.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

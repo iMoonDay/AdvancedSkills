@@ -434,7 +434,7 @@ class EnhancementListWidget(
                 val enhancement = entry.key
                 val yPos = y + index * entryHeight
 
-                if (mouseX.toInt() in x..<(x + width) && mouseY.toInt() in yPos..<(yPos + entryHeight)) {
+                if (mouseX in x..<(x + width) && mouseY in yPos..<(yPos + entryHeight)) {
                     context.fill(x + 1, yPos + 1, x + width - 1, yPos + entryHeight, 0x50FFFFFF)
                 } else if (selected == enhancement) {
                     context.fill(x + 1, yPos + 1, x + width - 1, yPos + entryHeight, 0x25FFFFFF)

@@ -1,0 +1,96 @@
+{
+  "model": "epicfight:entity/biped_old_texture",
+  "armature": "epicfight:entity/biped",
+  "renderer": "minecraft:zombie",
+  "isHumanoid": true,
+  "faction": "neutral",
+  "attributes": {
+    "impact": 0.5,
+    "armor_negation": 0.0,
+    "max_strikes": 1,
+    "chasing_speed": 2.5,
+    "scale": 1.0
+  },
+  "default_livingmotions": {
+    "idle": "epicfight:biped/living/idle",
+    "walk": "epicfight:biped/living/walk",
+    "chase": "epicfight:biped/living/walk",
+    "mount": "epicfight:biped/living/mount",
+    "fall": "epicfight:biped/living/fall",
+    "death": "epicfight:biped/living/death"
+  },
+  "humanoid_weapon_motions": [
+    {
+      "weapon_categories": ["sword"],
+      "style":"one_hand",
+      "livingmotions": {
+        "walk": "epicfight:wither_skeleton/walk",
+        "chase": "epicfight:wither_skeleton/chase"
+      }
+    }
+  ],
+  "stun_animations": {
+    "short": "epicfight:biped/combat/hit_short",
+    "long": "epicfight:biped/combat/hit_long",
+    "knockdown": "epicfight:biped/combat/knockdown",
+    "fall": "epicfight:biped/living/landing"
+  },
+  "combat_behavior": [
+    {
+      "weapon_categories": ["axe", "hoe", "pickaxe", "shovel", "sword"],
+      "style": "one_hand",
+      "behavior_series": [
+        {
+          "weight": 100.0,
+          "canBeInterrupted": true,
+          "looping": true,
+          "behaviors": [
+            {
+              "conditions": [
+                {"predicate":"within_eye_height"}, {"predicate":"within_distance", "min": 0.0, "max": 2.2}
+              ],
+              "animation": "epicfight:biped/combat/mob_onehand1"
+            },
+            {
+              "conditions": [
+                {"predicate":"within_eye_height"}, {"predicate":"within_distance", "min": 0.0, "max": 2.2}
+              ],
+              "animation": "epicfight:biped/combat/mob_onehand2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "weapon_categories": ["fist"],
+      "style": "common",
+      "behavior_series": [
+        {
+          "weight": 100.0,
+          "canBeInterrupted": true,
+          "looping": false,
+          "behaviors": [
+            {
+              "conditions": [
+                {"predicate":"within_eye_height"}, {"predicate":"within_distance", "min": 0.0, "max": 2.0}
+              ],
+              "animation": "epicfight:zombie/attack1"
+            },
+            {
+              "conditions": [
+                {"predicate":"within_eye_height"}, {"predicate":"within_distance", "min": 0.0, "max": 2.0}
+              ],
+              "animation": "epicfight:zombie/attack2"
+            },
+            {
+              "conditions": [
+                {"predicate":"within_eye_height"}, {"predicate":"within_distance", "min": 0.0, "max": 2.0}
+              ],
+              "animation": "epicfight:zombie/attack3"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

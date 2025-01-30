@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:night_vision",
+    "name": {
+      "translate": "advskills_re.skill.night_vision.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.night_vision.description"
+    },
+    "icon": "advskills_re:textures/item/night_vision.png",
+    "types": [
+      "passive"
+    ],
+    "cooldown": 0,
+    "rarity": "superb",
+    "disabled": false,
+    "weight": 5,
+    "drawable": true,
+    "parameters": {
+      "toggleable": {
+        "baseValue": true
+      }
+    },
+    "enhancements": []
+  }
+}

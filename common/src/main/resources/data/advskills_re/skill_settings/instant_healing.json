@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:instant_healing",
+    "name": {
+      "translate": "advskills_re.skill.instant_healing.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.instant_healing.description"
+    },
+    "icon": "advskills_re:textures/item/instant_healing.png",
+    "types": [
+      "restoration"
+    ],
+    "cooldown": 500,
+    "rarity": "epic",
+    "disabled": false,
+    "weight": 4,
+    "drawable": true,
+    "parameters": {
+      "heal_sound": {
+        "baseValue": {
+          "sound_id": "advskills_re:heal"
+        }
+      },
+      "heal_amount": {
+        "baseValue": 6.0,
+        "enhancements": [
+          "heal_amount"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "heal_amount",
+        "name": {
+          "translate": "advskills_re.enhancement.heal_amount.name"
+        },
+        "description": "advskills_re.enhancement.heal_amount.description",
+        "descArg": "int",
+        "valuePerLvl": 2.0,
+        "maxLevel": 7,
+        "operation": "addition",
+        "weight": {
+          "start": 14,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

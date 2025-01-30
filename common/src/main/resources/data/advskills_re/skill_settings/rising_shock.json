@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:rising_shock",
+    "name": {
+      "translate": "advskills_re.skill.rising_shock.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.rising_shock.description"
+    },
+    "icon": "advskills_re:textures/item/rising_shock.png",
+    "types": [
+      "movement"
+    ],
+    "cooldown": 200,
+    "rarity": "rare",
+    "disabled": false,
+    "weight": 6,
+    "drawable": true,
+    "parameters": {
+      "rise_sound": {
+        "baseValue": {
+          "sound_id": "advskills_re:dash"
+        }
+      },
+      "rise_duration": {
+        "baseValue": 8,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "affect_range": {
+        "baseValue": 1.0,
+        "enhancements": [
+          "range"
+        ]
+      },
+      "rise_speed": {
+        "baseValue": 1.0,
+        "enhancements": [
+          "speed"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.rising_shock.duration.name"
+        },
+        "description": "advskills_re.skill.rising_shock.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "range",
+        "name": {
+          "translate": "advskills_re.skill.rising_shock.range.name"
+        },
+        "description": "advskills_re.skill.rising_shock.range.description",
+        "descArg": "float",
+        "valuePerLvl": 0.8,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "speed",
+        "name": {
+          "translate": "advskills_re.skill.rising_shock.speed.name"
+        },
+        "description": "advskills_re.skill.rising_shock.speed.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.01,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

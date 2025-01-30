@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:catapult_gliding",
+    "name": {
+      "translate": "advskills_re.skill.catapult_gliding.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.catapult_gliding.description"
+    },
+    "icon": "advskills_re:textures/item/catapult_gliding.png",
+    "types": [
+      "movement"
+    ],
+    "cooldown": 600,
+    "rarity": "rare",
+    "disabled": false,
+    "weight": 6,
+    "drawable": true,
+    "parameters": {
+      "launch_sound": {
+        "baseValue": {
+          "sound_id": "advskills_re:dash"
+        }
+      },
+      "charge_time": {
+        "baseValue": 60,
+        "enhancements": [
+          "charge_time"
+        ]
+      },
+      "catapult_force": {
+        "baseValue": 1.0,
+        "enhancements": [
+          "force"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "charge_time",
+        "name": {
+          "translate": "advskills_re.enhancement.charge_time.name"
+        },
+        "description": "advskills_re.enhancement.charge_time.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "force",
+        "name": {
+          "translate": "advskills_re.skill.catapult_gliding.force.name"
+        },
+        "description": "advskills_re.skill.catapult_gliding.force.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.1,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

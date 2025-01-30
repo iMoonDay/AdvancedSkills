@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:extreme_evasion",
+    "name": {
+      "translate": "advskills_re.skill.extreme_evasion.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.extreme_evasion.description"
+    },
+    "icon": "advskills_re:textures/item/extreme_evasion.png",
+    "types": [
+      "movement"
+    ],
+    "cooldown": 200,
+    "rarity": "epic",
+    "disabled": false,
+    "weight": 4,
+    "drawable": true,
+    "parameters": {
+      "evasion_sound": {
+        "baseValue": {
+          "sound_id": "advskills_re:dash"
+        }
+      },
+      "evasion_duration": {
+        "baseValue": 10,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "evasion_force": {
+        "baseValue": 2.0,
+        "enhancements": [
+          "force"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.extreme_evasion.duration.name"
+        },
+        "description": "advskills_re.skill.extreme_evasion.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "force",
+        "name": {
+          "translate": "advskills_re.skill.extreme_evasion.force.name"
+        },
+        "description": "advskills_re.skill.extreme_evasion.force.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:self_healing",
+    "name": {
+      "translate": "advskills_re.skill.self_healing.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.self_healing.description"
+    },
+    "icon": "advskills_re:textures/item/self_healing.png",
+    "types": [
+      "passive",
+      "restoration"
+    ],
+    "cooldown": 0,
+    "rarity": "rare",
+    "disabled": false,
+    "weight": 6,
+    "drawable": true,
+    "parameters": {
+      "charge_duration": {
+        "baseValue": 200,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "heal_amount": {
+        "baseValue": 2.0,
+        "enhancements": [
+          "heal_amount"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.self_healing.duration.name"
+        },
+        "description": "advskills_re.skill.self_healing.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "heal_amount",
+        "name": {
+          "translate": "advskills_re.enhancement.heal_amount.name"
+        },
+        "description": "advskills_re.enhancement.heal_amount.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

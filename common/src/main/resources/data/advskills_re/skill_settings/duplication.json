@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:duplication",
+    "name": {
+      "translate": "advskills_re.skill.duplication.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.duplication.description"
+    },
+    "icon": "advskills_re:textures/item/duplication.png",
+    "types": [
+      "summon"
+    ],
+    "cooldown": 600,
+    "rarity": "superb",
+    "disabled": false,
+    "weight": 5,
+    "drawable": true,
+    "parameters": {
+      "clone_interval": {
+        "baseValue": 10
+      },
+      "clone_move_time": {
+        "baseValue": 60
+      },
+      "invisible_duration": {
+        "baseValue": 60,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "clone_count": {
+        "baseValue": 1,
+        "enhancements": [
+          "count"
+        ]
+      },
+      "attack_hostiles": {
+        "baseValue": false,
+        "enhancements": [
+          "attack"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.duplication.duration.name"
+        },
+        "description": "advskills_re.skill.duplication.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "count",
+        "name": {
+          "translate": "advskills_re.skill.duplication.count.name"
+        },
+        "description": "advskills_re.skill.duplication.count.description",
+        "descArg": "int",
+        "valuePerLvl": 1.0,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "attack",
+        "name": {
+          "translate": "advskills_re.skill.duplication.attack.name"
+        },
+        "description": "advskills_re.skill.duplication.attack.description",
+        "operation": "none",
+        "weight": 5
+      }
+    ]
+  }
+}

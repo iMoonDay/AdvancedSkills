@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:static_invisibility",
+    "name": {
+      "translate": "advskills_re.skill.static_invisibility.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.static_invisibility.description"
+    },
+    "icon": "advskills_re:textures/item/static_invisibility.png",
+    "types": [
+      "passive"
+    ],
+    "cooldown": 0,
+    "rarity": "epic",
+    "disabled": false,
+    "weight": 4,
+    "drawable": true,
+    "parameters": {},
+    "enhancements": []
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:piercing",
+    "name": {
+      "translate": "advskills_re.skill.piercing.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.piercing.description"
+    },
+    "icon": "advskills_re:textures/item/piercing.png",
+    "types": [
+      "movement",
+      "attack"
+    ],
+    "cooldown": 300,
+    "rarity": "superb",
+    "disabled": false,
+    "weight": 5,
+    "drawable": true,
+    "parameters": {
+      "pierce_sound": {
+        "baseValue": {
+          "sound_id": "advskills_re:piercing"
+        }
+      },
+      "pierce_duration": {
+        "baseValue": 8,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "pierce_damage": {
+        "baseValue": 6.0,
+        "enhancements": [
+          "damage"
+        ]
+      },
+      "pierce_speed": {
+        "baseValue": 1.5,
+        "enhancements": [
+          "speed"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.piercing.duration.name"
+        },
+        "description": "advskills_re.skill.piercing.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "damage",
+        "name": {
+          "translate": "advskills_re.skill.piercing.damage.name"
+        },
+        "description": "advskills_re.skill.piercing.damage.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "speed",
+        "name": {
+          "translate": "advskills_re.skill.piercing.speed.name"
+        },
+        "description": "advskills_re.skill.piercing.speed.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.1,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

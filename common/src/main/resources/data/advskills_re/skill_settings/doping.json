@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:doping",
+    "name": {
+      "translate": "advskills_re.skill.doping.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.doping.description"
+    },
+    "icon": "advskills_re:textures/item/doping.png",
+    "types": [
+      "enhancement"
+    ],
+    "cooldown": 60,
+    "rarity": "mythic",
+    "disabled": false,
+    "weight": 2,
+    "drawable": true,
+    "parameters": {
+      "doping_duration": {
+        "baseValue": 200,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "speed_boost": {
+        "baseValue": 0.5,
+        "enhancements": [
+          "speed"
+        ]
+      },
+      "health_cost": {
+        "baseValue": 5.0,
+        "enhancements": [
+          "cost"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.doping.duration.name"
+        },
+        "description": "advskills_re.skill.doping.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "speed",
+        "name": {
+          "translate": "advskills_re.skill.doping.speed.name"
+        },
+        "description": "advskills_re.skill.doping.speed.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.05,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "cost",
+        "name": {
+          "translate": "advskills_re.skill.doping.cost.name"
+        },
+        "description": "advskills_re.skill.doping.cost.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.1599999964237213,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

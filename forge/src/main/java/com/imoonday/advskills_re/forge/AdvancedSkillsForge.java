@@ -25,7 +25,7 @@ public final class AdvancedSkillsForge {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             bus.addListener(ClientEventHandler::modifyKeyConflicts);
             forgeEventBus.addListener(ClientEventHandler::onRenderLevelStage);
-            if (AdvancedSkillsClient.getClothConfigLoaded()) {
+            if (AdvancedSkillsClient.clothConfigLoaded) {
                 ClientEventHandler.registerConfigScreenFactory();
             }
         });

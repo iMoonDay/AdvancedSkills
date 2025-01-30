@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:undead_summoning",
+    "name": {
+      "translate": "advskills_re.skill.undead_summoning.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.undead_summoning.description"
+    },
+    "icon": "advskills_re:textures/item/undead_summoning.png",
+    "types": [
+      "summon"
+    ],
+    "cooldown": 600,
+    "rarity": "epic",
+    "disabled": false,
+    "weight": 4,
+    "drawable": true,
+    "parameters": {
+      "summon_sound": {
+        "baseValue": {
+          "sound_id": "minecraft:entity.wither.spawn"
+        }
+      },
+      "total_count": {
+        "baseValue": 5,
+        "enhancements": [
+          "count"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "count",
+        "name": {
+          "translate": "advskills_re.skill.undead_summoning.count.name"
+        },
+        "description": "advskills_re.skill.undead_summoning.count.description",
+        "descArg": "int",
+        "valuePerLvl": 2.0,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

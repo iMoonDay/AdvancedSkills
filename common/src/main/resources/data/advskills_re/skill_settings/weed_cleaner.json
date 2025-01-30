@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:weed_cleaner",
+    "name": {
+      "translate": "advskills_re.skill.weed_cleaner.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.weed_cleaner.description"
+    },
+    "icon": "advskills_re:textures/item/weed_cleaner.png",
+    "types": [
+      "utility"
+    ],
+    "cooldown": 200,
+    "rarity": "common",
+    "disabled": false,
+    "weight": 8,
+    "drawable": true,
+    "parameters": {
+      "weed_blocks": {
+        "baseValue": [
+          "minecraft:grass",
+          "minecraft:tall_grass",
+          "minecraft:fern",
+          "minecraft:large_fern",
+          "minecraft:seagrass",
+          "minecraft:tall_seagrass",
+          "minecraft:dead_bush",
+          "minecraft:vine",
+          "minecraft:crimson_roots",
+          "minecraft:warped_roots",
+          "minecraft:nether_sprouts",
+          "minecraft:weeping_vines",
+          "minecraft:twisting_vines"
+        ]
+      },
+      "clean_range": {
+        "baseValue": 25.0,
+        "enhancements": [
+          "range"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "range",
+        "name": {
+          "translate": "advskills_re.skill.weed_cleaner.range.name"
+        },
+        "description": "advskills_re.skill.weed_cleaner.range.description",
+        "descArg": "float",
+        "valuePerLvl": 5.0,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

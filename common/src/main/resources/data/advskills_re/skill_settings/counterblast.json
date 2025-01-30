@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:counterblast",
+    "name": {
+      "translate": "advskills_re.skill.counterblast.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.counterblast.description"
+    },
+    "icon": "advskills_re:textures/item/counterblast.png",
+    "types": [
+      "passive"
+    ],
+    "cooldown": 0,
+    "rarity": "superb",
+    "disabled": false,
+    "weight": 5,
+    "drawable": true,
+    "parameters": {
+      "toggleable": {
+        "baseValue": false
+      },
+      "base_trigger_chance": {
+        "baseValue": 0.2
+      },
+      "blast_sound": {
+        "baseValue": {
+          "sound_id": "minecraft:entity.player.attack.sweep"
+        }
+      },
+      "blast_range": {
+        "baseValue": 5.0,
+        "enhancements": [
+          "range"
+        ]
+      },
+      "repel_force": {
+        "baseValue": 1.0,
+        "enhancements": [
+          "force"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "range",
+        "name": {
+          "translate": "advskills_re.skill.counterblast.range.name"
+        },
+        "description": "advskills_re.skill.counterblast.range.description",
+        "descArg": "float",
+        "valuePerLvl": 1.0,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "force",
+        "name": {
+          "translate": "advskills_re.skill.counterblast.force.name"
+        },
+        "description": "advskills_re.skill.counterblast.force.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.1,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "chance",
+        "name": {
+          "translate": "advskills_re.skill.counterblast.chance.name"
+        },
+        "description": "advskills_re.skill.counterblast.chance.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.04,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

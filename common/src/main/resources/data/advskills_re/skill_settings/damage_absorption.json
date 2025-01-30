@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:damage_absorption",
+    "name": {
+      "translate": "advskills_re.skill.damage_absorption.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.damage_absorption.description"
+    },
+    "icon": "advskills_re:textures/item/damage_absorption.png",
+    "types": [
+      "defense",
+      "restoration"
+    ],
+    "cooldown": 1200,
+    "rarity": "legendary",
+    "disabled": false,
+    "weight": 3,
+    "drawable": true,
+    "parameters": {
+      "absorb_sound": {
+        "baseValue": {
+          "sound_id": "minecraft:item.shield.block"
+        }
+      },
+      "break_sound": {
+        "baseValue": {
+          "sound_id": "minecraft:item.shield.break"
+        }
+      },
+      "duration": {
+        "baseValue": 600,
+        "enhancements": [
+          "duration"
+        ]
+      },
+      "absorb_count": {
+        "baseValue": 1,
+        "enhancements": [
+          "count"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.skill.damage_absorption.duration.name"
+        },
+        "description": "advskills_re.skill.damage_absorption.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "count",
+        "name": {
+          "translate": "advskills_re.skill.damage_absorption.count.name"
+        },
+        "description": "advskills_re.skill.damage_absorption.count.description",
+        "descArg": "int",
+        "valuePerLvl": 1.0,
+        "maxLevel": 4,
+        "operation": "addition",
+        "weight": {
+          "start": 8,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

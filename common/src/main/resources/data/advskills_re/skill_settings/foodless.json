@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:foodless",
+    "name": {
+      "translate": "advskills_re.skill.foodless.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.foodless.description"
+    },
+    "icon": "advskills_re:textures/item/foodless.png",
+    "types": [
+      "passive",
+      "utility"
+    ],
+    "cooldown": 0,
+    "rarity": "rare",
+    "disabled": false,
+    "weight": 6,
+    "drawable": true,
+    "parameters": {
+      "toggleable": {
+        "baseValue": false
+      },
+      "min_hunger": {
+        "baseValue": 2,
+        "enhancements": [
+          "min_hunger"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "min_hunger",
+        "name": {
+          "translate": "advskills_re.skill.foodless.min_hunger.name"
+        },
+        "description": "advskills_re.skill.foodless.min_hunger.description",
+        "descArg": "int",
+        "valuePerLvl": 2.0,
+        "maxLevel": 5,
+        "operation": "addition",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}

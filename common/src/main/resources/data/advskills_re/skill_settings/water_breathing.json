@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "settings": {
+    "id": "advskills_re:water_breathing",
+    "name": {
+      "translate": "advskills_re.skill.water_breathing.name"
+    },
+    "description": {
+      "translate": "advskills_re.skill.water_breathing.description"
+    },
+    "icon": "advskills_re:textures/item/water_breathing.png",
+    "types": [
+      "enhancement"
+    ],
+    "cooldown": 200,
+    "rarity": "rare",
+    "disabled": false,
+    "weight": 6,
+    "drawable": true,
+    "parameters": {
+      "breath_duration": {
+        "baseValue": 600,
+        "enhancements": [
+          "duration"
+        ]
+      }
+    },
+    "enhancements": [
+      {
+        "id": "cooldown",
+        "name": {
+          "translate": "advskills_re.enhancement.cooldown.name"
+        },
+        "description": "advskills_re.enhancement.cooldown.description",
+        "descArg": "int_percent",
+        "valuePerLvl": -0.16,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      },
+      {
+        "id": "duration",
+        "name": {
+          "translate": "advskills_re.enhancement.duration.name"
+        },
+        "description": "advskills_re.enhancement.duration.description",
+        "descArg": "int_percent",
+        "valuePerLvl": 0.2,
+        "maxLevel": 5,
+        "operation": "multiply_total",
+        "weight": {
+          "start": 10,
+          "increment": -2
+        }
+      }
+    ]
+  }
+}
