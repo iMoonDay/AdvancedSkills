@@ -232,4 +232,8 @@ object SkillTriggerHandler {
     @JvmStatic
     fun canStartFallFlying(player: PlayerEntity): Boolean =
         player.allTriggers<FallFlyingTrigger> { it.canStartFallFlying(player) }
+
+    @JvmStatic
+    fun canFallFly(player: PlayerEntity): Boolean =
+        player.anyTrigger<FallFlyingTrigger> { it.canFallFly(player) }
 }

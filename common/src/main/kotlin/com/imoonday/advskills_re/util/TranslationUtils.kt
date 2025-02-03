@@ -5,7 +5,7 @@ import com.imoonday.advskills_re.skill.*
 import net.minecraft.text.*
 
 fun translate(key: String, vararg args: Any): MutableText =
-    Text.translatable("$MOD_ID.$key", *args)
+    Text.translatable(translateKey(key), *args)
 
 fun translateKey(key: String): String = "$MOD_ID.$key"
 

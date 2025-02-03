@@ -163,18 +163,16 @@ val Entity.wasGroundCollision: Boolean
 
 fun Entity.hasMoved(): Boolean = prevX != x || prevY != y || prevZ != z
 
-inline fun <reified T : Number> Number.toNumber(): T {
-    return when (T::class) {
-        Byte::class -> this.toByte() as T
-        Short::class -> this.toShort() as T
-        Int::class -> this.toInt() as T
-        Long::class -> this.toLong() as T
-        Float::class -> this.toFloat() as T
-        Double::class -> this.toDouble() as T
-        Number::class -> this as T
-        else -> throw IllegalArgumentException("Unsupported type")
-    }
-}
+inline fun <reified T : Number> Number.toNumber(): T = when (T::class) {
+    Byte::class -> this.toByte()
+    Short::class -> this.toShort()
+    Int::class -> this.toInt()
+    Long::class -> this.toLong()
+    Float::class -> this.toFloat()
+    Double::class -> this.toDouble()
+    Number::class -> this
+    else -> throw IllegalArgumentException("Unsupported type")
+} as T
 
 fun ServerWorld.addTask(interval: Int, repeat: Int, task: () -> Boolean) {
     if (repeat <= 0) return

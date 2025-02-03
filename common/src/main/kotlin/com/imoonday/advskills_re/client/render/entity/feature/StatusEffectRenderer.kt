@@ -14,10 +14,10 @@ object StatusEffectRenderer {
 
     private val directions = Direction.entries
 
-    val silenceModelId = Skills.PRIMARY_SILENCE.modelId
-    val disarmModelId = Skills.DISARM.modelId
-    val confinementModelId = ModelIdentifier(Registries.ITEM.getId(Items.BARRIER), "inventory")
-    val vulnerableModelId = Skills.ARMOR_SHATTERER.modelId
+    private val silenceModelId = Skills.PRIMARY_SILENCE.modelId
+    private val disarmModelId = Skills.DISARM.modelId
+    private val confinementModelId = ModelIdentifier(Registries.ITEM.getId(Items.BARRIER), "inventory")
+    private val vulnerableModelId = Skills.ARMOR_SHATTERER.modelId
 
     @JvmStatic
     fun render(
@@ -67,11 +67,11 @@ object StatusEffectRenderer {
         horizonOffset: Float,
         count: Int,
     ) {
-        val client1 = client ?: return
+        val client = client ?: return
 
         val rotateAngleY = (entity.age + tickDelta) / 20.0f
 
-        val model = client1.bakedModelManager.getModel(modelIdentifier)
+        val model = client.bakedModelManager.getModel(modelIdentifier)
         val scale = entity.width.coerceAtMost(1f)
         val width = entity.width / 2f
         val height = entity.height / 2f
@@ -90,7 +90,7 @@ object StatusEffectRenderer {
             stack.translate(0f, height / scale, width / scale + horizonOffset)
 
             for (dir in directions) {
-                client1.itemRenderer.renderBakedItemQuads(
+                client.itemRenderer.renderBakedItemQuads(
                     stack,
                     provider.getBuffer(TexturedRenderLayers.getEntityTranslucentCull()),
                     model.getQuads(null, dir, entity.random).ifEmpty {

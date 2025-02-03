@@ -7,11 +7,9 @@ import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.mixin.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
-import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.trigger.*
 import dev.architectury.event.*
 import dev.architectury.event.events.common.*
-import dev.architectury.registry.*
 import net.minecraft.block.*
 import net.minecraft.enchantment.*
 import net.minecraft.loot.*
@@ -20,11 +18,8 @@ import net.minecraft.loot.entry.*
 import net.minecraft.loot.function.*
 import net.minecraft.loot.provider.number.*
 import net.minecraft.registry.tag.*
-import net.minecraft.resource.*
 import net.minecraft.server.*
 import net.minecraft.server.network.*
-import net.minecraft.util.*
-import java.util.concurrent.*
 
 object EventHandler {
 
@@ -102,23 +97,6 @@ object EventHandler {
         LifecycleEvent.SETUP.register {
             Skills.initDefaultSettings()
         }
-//        ReloadListenerRegistry.register(
-//            ResourceType.SERVER_DATA
-//        ) { _, manager, _, _, _, _ ->
-//            CompletableFuture.runAsync {
-//                val settings = manager.findResources("skill_settings") {
-//                    it.path.endsWith(".json")
-//                }.mapNotNull { (id, resource) ->
-//                    val handledId = Identifier(id.namespace, id.path.split("/").last().removeSuffix(".json"))
-//                    Skills.fromIdNullable(handledId)?.let {
-//                        resource.inputStream.use {
-//                            Skill.Settings.GSON.fromJson(it.reader(), Skill.Settings::class.java)
-//                        }
-//                    }
-//                }
-//                println("Loaded ${settings.size} skill settings")
-//            }
-//        }
     }
 
     private fun reloadSkillConfigs(server: MinecraftServer) {

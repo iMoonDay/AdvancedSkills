@@ -42,6 +42,7 @@ class ClientConfig {
     var developmentMode: Boolean = false
     var useRingCastingWheel: Boolean = true
     var disableLearningNotifications: Boolean = false
+    var disableStatusEffectRenderers: Boolean = false
     var displayedSkills: MutableSet<String> = mutableSetOf()
     var topSkills: MutableList<String> = mutableListOf()
 

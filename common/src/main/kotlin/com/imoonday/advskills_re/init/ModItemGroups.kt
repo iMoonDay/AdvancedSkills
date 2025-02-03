@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.init
 
 import com.imoonday.advskills_re.*
+import com.imoonday.advskills_re.item.*
 import com.imoonday.advskills_re.util.*
 import dev.architectury.registry.*
 import dev.architectury.registry.registries.*
@@ -20,7 +21,20 @@ object ModItemGroups {
     @Suppress("UnstableApiUsage")
     fun init() {
         ITEM_GROUPS.register()
-        ModItems.ITEMS.forEach { CreativeTabRegistry.append(GROUP, it) }
+//        ModItems.ITEMS.forEach { CreativeTabRegistry.append(GROUP, it) }
+        CreativeTabRegistry.modify(GROUP) { _, output, _ ->
+            ModItems.ITEMS.forEach {
+                val item = it.get()
+                if (item is SkillItem) {
+                    val skill = item.skill
+                    if (!skill.isEmpty && !skill.disabled) {
+                        output.add(item)
+                    }
+                } else {
+                    output.add(item)
+                }
+            }
+        }
     }
 
     private fun register(name: String, icon: () -> ItemStack): RegistrySupplier<ItemGroup> =

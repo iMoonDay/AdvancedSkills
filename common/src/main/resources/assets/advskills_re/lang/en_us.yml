@@ -135,6 +135,7 @@ advskills_re:
     active: Bounce is not finished
     early: '%ds early!'
     late: '%ds late!'
+  disabledSkill: '%s Disabled'
   skill:
     empty:
       name: Empty
@@ -560,9 +561,8 @@ advskills_re:
         description: '%s Rising Speed'
     catapult_gliding:
       name: Catapult Gliding
-      description: Charge up, then pop out and use elytra to glide
-      failed: You have no elytra or your elytra is broken
-      fallFlying: Cannot be used while gliding
+      description: Charge up, then pop out and start fall flying
+      fallFlying: Cannot use while fall flying
       force:
         name: Force Enhancement
         description: '%s Launch Force'
@@ -1074,6 +1074,7 @@ advskills_re:
       progressBarOffsetY: Progress Bar Y Offset
       useRingCastingWheel: Use Ring Casting Wheel style
       disableLearningNotifications: Disable Learning Notifications
+      disableStatusEffectRenderers: Disable Special Status Effect Renderers
       invalidLayout: "Wrong input! Can only contain 1-10 and the delimiter ','"
       incompleteLayout: "Wrong input! Missing slots: %s"
       redundantNumbers: "Wrong input! Redundant numbers: %s"

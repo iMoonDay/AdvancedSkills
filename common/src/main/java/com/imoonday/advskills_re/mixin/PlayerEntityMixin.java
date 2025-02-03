@@ -35,6 +35,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
     @Shadow
     protected abstract boolean method_30263();
 
+    @Shadow
+    public abstract void startFallFlying();
+
     @Unique
     private PlayerDataComponent dataComponent;
 
@@ -42,7 +45,6 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
     public PlayerDataComponent getDataComponent() {
         if (dataComponent == null) {
             dataComponent = new PlayerDataComponent((PlayerEntity) (Object) this);
-            dataComponent.getChoiceData().setCount(GlobalConfig.get().getInitialDrawTimes());
         }
         return dataComponent;
     }
@@ -56,7 +58,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
                 multiplier = GlobalConfig.get().getSkillConfig().getSkillXpMultiplier();
             }
             if (multiplier != null && multiplier != 1.0) {
-                experience = (int) (experience * multiplier);
+                experience = (int) Math.ceil(experience * multiplier);
             }
             PlayerUtilsKt.setSkillExp(player, PlayerUtilsKt.getSkillExp(player) + experience);
         }
@@ -138,6 +140,15 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (!SkillTriggerHandler.canStartFallFlying(player)) {
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"), method = "checkFallFlying()Z", cancellable = true)
+    void injectElytraCheck(CallbackInfoReturnable<Boolean> cir) {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (SkillTriggerHandler.canFallFly(player)) {
+            startFallFlying();
+            cir.setReturnValue(true);
         }
     }
 

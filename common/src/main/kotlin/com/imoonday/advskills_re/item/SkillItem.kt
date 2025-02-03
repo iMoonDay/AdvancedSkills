@@ -12,12 +12,12 @@ import net.minecraft.world.*
 class SkillItem(val skill: Skill, settings: Settings) : Item(settings) {
     constructor(skill: Skill) : this(skill, Settings().maxCount(1))
 
-    override fun getName(): Text {
-        val name = skill.formattedName
-        return if (skill.disabled) name.formatted(Formatting.STRIKETHROUGH) else name
-    }
+    override fun getName(): Text = skill.name
 
-    override fun getName(stack: ItemStack): Text = name
+    override fun getName(stack: ItemStack): Text {
+        val name = skill.formattedName
+        return if (skill.disabled) translate("disabledSkill", name.formatted(Formatting.STRIKETHROUGH)) else name
+    }
 
     override fun appendTooltip(
         stack: ItemStack,

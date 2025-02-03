@@ -43,7 +43,7 @@ object ModKeyBindings {
     }
 
     @JvmField
-    val SWITCH_PREVIOUS_SKILL = register("switchPreviousSkill", GLFW.GLFW_MOUSE_BUTTON_5, false) { client, _ ->
+    val SWITCH_PREVIOUS_SKILL = register("switchPreviousSkill", GLFW.GLFW_KEY_UNKNOWN, false) { client, _ ->
         val player = client.player ?: return@register
         quickCastSlot = quickCastSlot?.minus(1) ?: 1
         if (quickCastSlot!! < 1) {
@@ -52,7 +52,7 @@ object ModKeyBindings {
     }
 
     @JvmField
-    val SWITCH_NEXT_SKILL = register("switchNextSkill", GLFW.GLFW_MOUSE_BUTTON_4, false) { client, _ ->
+    val SWITCH_NEXT_SKILL = register("switchNextSkill", GLFW.GLFW_KEY_UNKNOWN, false) { client, _ ->
         val player = client.player ?: return@register
         quickCastSlot = quickCastSlot?.plus(1) ?: 1
         if (quickCastSlot!! > player.skillContainer.slotSize) {

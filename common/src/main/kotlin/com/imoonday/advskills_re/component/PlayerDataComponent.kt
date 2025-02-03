@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.component
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.client.screen.*
+import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.c2s.*
 import com.imoonday.advskills_re.network.s2c.*
@@ -19,6 +20,10 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
     var container: SkillContainer = SkillContainer()
     var level: SkillLevelData = SkillLevelData()
     var choiceData: ChoiceData = ChoiceData()
+
+    init {
+        choiceData.count = GlobalConfig.get().initialDrawTimes
+    }
 
     override fun readFromNbt(tag: NbtCompound) {
         if (tag.contains("container")) {

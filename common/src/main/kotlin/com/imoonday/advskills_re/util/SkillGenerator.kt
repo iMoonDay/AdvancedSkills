@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.util
 
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.component.choice.*
-import com.imoonday.advskills_re.config.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.entity.player.*
@@ -27,10 +26,10 @@ object SkillGenerator {
         player: PlayerEntity,
         exceptSkill: (Skill) -> Boolean = { false },
         exceptEnhancement: (Skill, Enhancement) -> Boolean = { _, _ -> false }
-    ): DynamicDrawPool<Skill, Pair<Skill, Enhancement>> {
+    ): DrawPool<Skill, Pair<Skill, Enhancement>> {
         val learnedSkills = player.learnedSkills.filter { it.settings.drawable }
 
-        return DynamicDrawPool(
+        return DrawPool(
             primaryItems = Skills.getLearnableSkills(learnedSkills),
             secondaryItems = generateEnhancements(learnedSkills),
             getPrimaryWeight = { it.weight },

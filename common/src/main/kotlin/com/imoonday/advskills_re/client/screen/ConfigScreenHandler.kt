@@ -470,6 +470,15 @@ object ConfigScreenHandler {
                     .setSaveConsumer { config.disableLearningNotifications = it }
                     .build()
             )
+
+            addEntry(
+                entryBuilder.startBooleanToggle(
+                    translate("screen.config.disableStatusEffectRenderers"),
+                    config.disableStatusEffectRenderers
+                ).setDefaultValue(false)
+                    .setSaveConsumer { config.disableStatusEffectRenderers = it }
+                    .build()
+            )
         }
     }
 }

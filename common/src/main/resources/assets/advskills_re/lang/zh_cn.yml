@@ -135,6 +135,7 @@ advskills_re:
     active: 反弹未结束
     early: 早了 %d 秒
     late: 晚了 %d 秒
+  disabledSkill: '%s 已禁用'
   skill:
     empty:
       name: 空
@@ -560,8 +561,7 @@ advskills_re:
         description: '%s 上升速度'
     catapult_gliding:
       name: 弹射滑翔
-      description: 蓄力然后弹出去并使用鞘翅滑翔
-      failed: 你没有鞘翅或者已损坏
+      description: 蓄力然后弹出去并开始滑翔
       fallFlying: 无法在滑翔时使用
       force:
         name: 力量增幅
@@ -1074,6 +1074,7 @@ advskills_re:
       progressBarOffsetY: 进度条Y偏移量
       useRingCastingWheel: 使用环形施法轮盘样式
       disableLearningNotifications: 禁用新技能通知
+      disableStatusEffectRenderers: 禁用状态效果特殊渲染
       invalidLayout: "错误输入! 只能包含1-10和分隔符','"
       incompleteLayout: "错误输入! 缺少栏位：%s"
       redundantNumbers: "错误输入! 栏位不能重复：%s"

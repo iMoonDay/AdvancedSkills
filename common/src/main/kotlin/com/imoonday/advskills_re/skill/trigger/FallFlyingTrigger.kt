@@ -4,5 +4,7 @@ import net.minecraft.entity.player.*
 
 interface FallFlyingTrigger : SkillTrigger {
 
-    fun canStartFallFlying(player: PlayerEntity): Boolean
+    fun canStartFallFlying(player: PlayerEntity): Boolean = true
+
+    fun canFallFly(player: PlayerEntity): Boolean = false
 }

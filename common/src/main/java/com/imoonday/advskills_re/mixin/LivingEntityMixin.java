@@ -3,7 +3,6 @@ package com.imoonday.advskills_re.mixin;
 import com.imoonday.advskills_re.effect.SeriousInjuryEffect;
 import com.imoonday.advskills_re.init.ModEffectsKt;
 import com.imoonday.advskills_re.skill.trigger.SkillTriggerHandler;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
@@ -195,6 +194,14 @@ public abstract class LivingEntityMixin extends EntityMixin {
     public void advskills_re$canTarget(LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
         if (target instanceof PlayerEntity player && SkillTriggerHandler.isDisguising(player)) {
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getEquippedStack(Lnet/minecraft/entity/EquipmentSlot;)Lnet/minecraft/item/ItemStack;"), method = "tickFallFlying()V", cancellable = true)
+    public void injectElytraTick(CallbackInfo ci) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        if (entity instanceof PlayerEntity player && SkillTriggerHandler.canFallFly(player)) {
+            ci.cancel();
         }
     }
 }

@@ -2,7 +2,7 @@ package com.imoonday.advskills_re.util
 
 import kotlin.random.*
 
-class DynamicDrawPool<P : Any, S : Any>(
+class DrawPool<P : Any, S : Any>(
     private val primaryItems: List<P>,
     private val secondaryItems: List<S>,
     private val getPrimaryWeight: (P) -> Int,
