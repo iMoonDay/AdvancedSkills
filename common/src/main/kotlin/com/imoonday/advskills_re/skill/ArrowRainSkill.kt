@@ -23,6 +23,7 @@ class ArrowRainSkill : Skill(
     override fun initSettings(settings: Settings) {
         super.initSettings(settings)
         settings
+            .addEnhancement(ENHANCEMENT_BURNING)
             .addParameter(PARAM_MAX_DISTANCE, DEFAULT_MAX_DISTANCE)
             .addParameter(PARAM_MIN_ARROWS, DEFAULT_MIN_ARROWS)
             .addParameter(PARAM_MAX_ARROWS, DEFAULT_MAX_ARROWS)
@@ -40,7 +41,7 @@ class ArrowRainSkill : Skill(
                 name = PARAM_WAVE_COUNT,
                 baseValue = DEFAULT_WAVE_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -56,7 +57,7 @@ class ArrowRainSkill : Skill(
                 name = PARAM_EXTRA_ARROWS,
                 baseValue = DEFAULT_EXTRA_ARROWS,
                 enhancementId = ENHANCEMENT_AMOUNT,
-                value = 10,
+                value = 10.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -75,8 +76,9 @@ class ArrowRainSkill : Skill(
         val maxAmount = getIntParam(PARAM_MAX_ARROWS, user, DEFAULT_MAX_ARROWS)
         val interval = getIntParam(PARAM_WAVE_INTERVAL, user, DEFAULT_WAVE_INTERVAL)
         val sound = getSoundEventParam(PARAM_LAUNCH_SOUND, DEFAULT_LAUNCH_SOUND)
+        val isBurning = user.hasEnhancement(ENHANCEMENT_BURNING)
         user.executeAndAddTask(interval, waveCount) {
-            spawnArrows(user, center, damage, range, minAmount, maxAmount, extraArrows, sound)
+            spawnArrows(user, center, damage, range, minAmount, maxAmount, extraArrows, sound, isBurning)
         }
         return UseResult.success()
     }
@@ -89,7 +91,8 @@ class ArrowRainSkill : Skill(
         min: Int,
         max: Int,
         extraAmount: Int,
-        sound: SoundEvent?
+        sound: SoundEvent?,
+        isBurning: Boolean
     ): Boolean {
         val random = user.random
         val amount = random.nextBetween(min, max) + extraAmount
@@ -108,6 +111,9 @@ class ArrowRainSkill : Skill(
                 ).apply {
                     pitch = -90f
                     this.damage = damage
+                    if (isBurning) {
+                        this.setOnFireFor(15)
+                    }
                 }.also {
                     particles.add(
                         ParticleS2CPacket(
@@ -159,5 +165,6 @@ class ArrowRainSkill : Skill(
         private const val ENHANCEMENT_COUNT = "count"  // 对应波次数量
         private const val ENHANCEMENT_RANGE = "range"  // 对应召唤范围
         private const val ENHANCEMENT_AMOUNT = "amount"  // 对应额外箭矢
+        private const val ENHANCEMENT_BURNING = "burning"  // 对应燃烧状态
     }
 }

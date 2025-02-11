@@ -15,13 +15,15 @@ class RapidBounceSkill : BounceSkill(
     baseChance = 0.5f
 ) {
 
+    override val alias: String = "rapid_reflection"
+
     override fun initSettings(settings: Settings) {
         super.initSettings(settings)
         settings.addParameter(
             name = PARAM_DAMAGE_REDUCTION,
             baseValue = DEFAULT_DAMAGE_REDUCTION,
             enhancementId = ENHANCEMENT_REDUCTION,
-            value = 0.05f,
+            value = 0.05,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT

@@ -8,10 +8,6 @@ import com.imoonday.advskills_re.util.*
 
 const val MOD_ID = "advskills_re"
 
-/***
- * TODO:
- * 1. 巨大化：变大一倍，攻击力和防御力提升，移动速度降低
- */
 object AdvancedSkills {
 
     @JvmStatic

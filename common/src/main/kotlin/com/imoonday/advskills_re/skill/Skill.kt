@@ -59,6 +59,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
     private val enhancementDescArgs: MutableMap<String, ((value: Double) -> Any)?> = mutableMapOf()
     val failedMessage get() = translateSkill(id.path, "failed")
     val isEmpty: Boolean get() = this === Skills.EMPTY || this == EmptySkill
+    open val alias: String? = null
 
     open fun initSettings(settings: Settings) {
         if (settings.cooldown > 0) {
@@ -381,7 +382,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             name: String,
             baseValue: Number,
             enhancementId: String,
-            value: Number,
+            value: Double,
             operation: Enhancement.Operation,
             maxLevel: Int,
             descArg: Enhancement.ArgFormatter?,
@@ -403,7 +404,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
 
         fun addEnhancement(
             id: String,
-            value: Number,
+            value: Double,
             operation: Enhancement.Operation,
             maxLevel: Int,
             descArg: Enhancement.ArgFormatter?,
@@ -416,7 +417,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
                     id = id,
                     name = name,
                     description = descriptionKey,
-                    valuePerLvl = value.toDouble(),
+                    valuePerLvl = value,
                     maxLevel = maxLevel,
                     weight = Enhancement.Weight.Incremental(maxLevel * 2, -2),
                     descArg = descArg
@@ -426,7 +427,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
                     id = id,
                     name = name,
                     description = descriptionKey,
-                    valuePerLvl = value.toDouble(),
+                    valuePerLvl = value,
                     maxLevel = maxLevel,
                     weight = Enhancement.Weight.Incremental(maxLevel * 2, -2),
                     descArg = descArg
@@ -436,7 +437,7 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
                     id = id,
                     name = name,
                     description = descriptionKey,
-                    valuePerLvl = value.toDouble(),
+                    valuePerLvl = value,
                     maxLevel = maxLevel,
                     weight = Enhancement.Weight.Incremental(maxLevel * 2, -2),
                     descArg = descArg
@@ -584,12 +585,8 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
                     val invalidVersion = !obj.has("version")
                         || obj.get("version").let { it !is JsonPrimitive || !it.isNumber || it.asInt != version }
                     if (invalidVersion) {
-                        return try {
-                            fromJson(GSON.toJson(obj.get("settings")))
-                        } catch (e: Exception) {
-                            LOGGER.warn("Serializer: Invalid version: ${obj.get("version")}, expected: $version")
-                            null
-                        }
+                        LOGGER.warn("Serializer: Invalid version: ${obj.get("version")}, expected: $version")
+                        return null
                     }
 
                     return fromJson(GSON.toJson(obj.get("settings")))
@@ -600,6 +597,4 @@ abstract class Skill(val settings: Settings) : SkillTrigger {
             }
         }
     }
-
-    data class SettingsWithVersion(val version: Int, val settings: Settings)
 }

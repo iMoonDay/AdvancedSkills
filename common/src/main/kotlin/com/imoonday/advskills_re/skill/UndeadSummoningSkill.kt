@@ -25,7 +25,7 @@ class UndeadSummoningSkill : Skill(
                 name = PARAM_TOTAL_COUNT,
                 baseValue = DEFAULT_TOTAL_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 2,
+                value = 2.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -40,7 +40,7 @@ class UndeadSummoningSkill : Skill(
         repeat(skeletonCount) {
             user.world.spawnEntity(ServantSkeletonEntity(user.world, user))
         }
-        repeat((1..min(totalCount - skeletonCount, maxSkeletonCount)).random()) {
+        repeat(min(totalCount - skeletonCount, maxSkeletonCount)) {
             user.world.spawnEntity(ServantWitherSkeletonEntity(user.world, user))
         }
 

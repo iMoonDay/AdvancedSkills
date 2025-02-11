@@ -46,7 +46,7 @@ class LastDitchEffortSkill : Skill(
                 name = PARAM_DAMAGE_BOOST,
                 baseValue = DEFAULT_DAMAGE_BOOST,
                 enhancementId = ENHANCEMENT_DAMAGE,
-                value = 0.2f,
+                value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT,
@@ -55,7 +55,7 @@ class LastDitchEffortSkill : Skill(
                 name = PARAM_DAMAGE_REDUCTION,
                 baseValue = DEFAULT_DAMAGE_REDUCTION,
                 enhancementId = ENHANCEMENT_REDUCTION,
-                value = -0.2f,
+                value = -0.2,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
@@ -63,7 +63,7 @@ class LastDitchEffortSkill : Skill(
                 name = PARAM_HEAL_BOOST,
                 baseValue = DEFAULT_HEAL_BOOST,
                 enhancementId = ENHANCEMENT_HEAL_BOOST,
-                value = 0.1f,
+                value = 0.1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

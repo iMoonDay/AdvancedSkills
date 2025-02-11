@@ -17,6 +17,8 @@ class PerfectBounceSkill : BounceSkill(
     damageBoost = 1.5f
 ) {
 
+    override val alias: String = "perfect_reflection"
+
     override fun initSettings(settings: Settings) {
         super.initSettings(settings)
         settings
@@ -24,7 +26,7 @@ class PerfectBounceSkill : BounceSkill(
                 name = PARAM_HEAL_RATIO,
                 baseValue = DEFAULT_HEAL_RATIO,
                 enhancementId = ENHANCEMENT_HEAL_RATIO,
-                value = 0.2f,
+                value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

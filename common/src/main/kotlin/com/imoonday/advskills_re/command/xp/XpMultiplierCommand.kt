@@ -1,4 +1,4 @@
-package com.imoonday.advskills_re.command
+package com.imoonday.advskills_re.command.xp
 
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
@@ -47,9 +47,9 @@ object XpMultiplierCommand : XpCommand("multiplier") {
                 )
         ).then(
             literal("get")
-                .then(literal("local").executes(::getLocalMultiplier))
-                .then(literal("global").executes(::getGlobalMultiplier))
-                .executes(::getMultiplier)
+                .then(literal("local").executes(XpMultiplierCommand::getLocalMultiplier))
+                .then(literal("global").executes(XpMultiplierCommand::getGlobalMultiplier))
+                .executes(XpMultiplierCommand::getMultiplier)
         )
 
     private fun getMultiplier(context: CommandContext<ServerCommandSource>): Int {

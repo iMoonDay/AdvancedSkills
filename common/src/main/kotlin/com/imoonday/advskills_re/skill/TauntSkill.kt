@@ -34,7 +34,7 @@ class TauntSkill : Skill(
                 name = PARAM_DAMAGE_REDUCTION,
                 baseValue = DEFAULT_DAMAGE_REDUCTION,
                 enhancementId = ENHANCEMENT_REDUCTION,
-                value = 0.05f,
+                value = 0.05,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

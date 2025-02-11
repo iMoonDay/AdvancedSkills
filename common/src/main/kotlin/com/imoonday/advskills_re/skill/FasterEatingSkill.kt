@@ -19,7 +19,7 @@ class FasterEatingSkill : PassiveSkill(
             name = PARAM_SPEED_BOOST,
             baseValue = DEFAULT_SPEED_BOOST,
             enhancementId = ENHANCEMENT_SPEED,
-            value = 0.05f,
+            value = 0.05,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT

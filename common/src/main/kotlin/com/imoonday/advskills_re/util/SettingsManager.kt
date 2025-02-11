@@ -13,7 +13,7 @@ import kotlin.io.path.*
 object SettingsManager {
 
     private val LOGGER = LogUtils.getLogger()
-    private const val VERSION = 1
+    private const val VERSION = 3
     private const val BACKUP_SUFFIX = ".bak"
     private val settingsDir = Platform.getConfigFolder().resolve("advskills_re/skills")
     private val settings: MutableMap<Identifier, Skill.Settings> = mutableMapOf()

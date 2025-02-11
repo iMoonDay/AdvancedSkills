@@ -15,6 +15,8 @@ class ExtremeBounceSkill : BounceSkill(
     baseChance = 0.75f
 ) {
 
+    override val alias: String = "extreme_reflection"
+
     override fun ignoreDamage(
         amount: Float,
         source: DamageSource,

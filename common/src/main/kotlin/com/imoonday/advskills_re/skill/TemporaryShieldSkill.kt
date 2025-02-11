@@ -32,7 +32,7 @@ class TemporaryShieldSkill : Skill(
                 name = PARAM_CHARGE_INTERVAL,
                 baseValue = DEFAULT_CHARGE_INTERVAL,
                 enhancementId = ENHANCEMENT_INTERVAL,
-                value = -2,
+                value = -2.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -40,7 +40,7 @@ class TemporaryShieldSkill : Skill(
                 name = PARAM_MAX_ABSORPTION,
                 baseValue = DEFAULT_MAX_ABSORPTION,
                 enhancementId = ENHANCEMENT_ABSORPTION,
-                value = 2.0f,
+                value = 2.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.FLOAT

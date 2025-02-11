@@ -22,7 +22,7 @@ class MagneticTrapSkill : Skill(
                 name = PARAM_ATTRACT_RANGE,
                 baseValue = DEFAULT_ATTRACT_RANGE,
                 enhancementId = ENHANCEMENT_RANGE,
-                value = 0.2f,
+                value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
@@ -30,7 +30,7 @@ class MagneticTrapSkill : Skill(
                 name = PARAM_TRAP_DURATION,
                 baseValue = DEFAULT_TRAP_DURATION,
                 enhancementId = ENHANCEMENT_DURATION,
-                value = 20 * 60,
+                value = 20 * 60.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

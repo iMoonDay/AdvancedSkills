@@ -28,7 +28,7 @@ class DyingCounterattackSkill : Skill(
                 name = PARAM_HEAL_RATIO,
                 baseValue = DEFAULT_HEAL_RATIO,
                 enhancementId = ENHANCEMENT_HEAL,
-                value = 0.1f,
+                value = 0.1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 4,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
@@ -36,7 +36,7 @@ class DyingCounterattackSkill : Skill(
                 name = PARAM_DAMAGE_PENALTY,
                 baseValue = DEFAULT_DAMAGE_PENALTY,
                 enhancementId = ENHANCEMENT_PENALTY,
-                value = -0.1f,
+                value = -0.1,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

@@ -1,4 +1,4 @@
-package com.imoonday.advskills_re.command
+package com.imoonday.advskills_re.command.xp
 
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.builder.*
@@ -12,9 +12,9 @@ object QueryXpCommand : XpCommand("query") {
     override fun buildAction(builder: LiteralArgumentBuilder<ServerCommandSource>): ArgumentBuilder<ServerCommandSource, *> =
         builder.then(
             argument("target", EntityArgumentType.player())
-                .executes(::queryPoints)
-                .then(literal("points").executes(::queryPoints))
-                .then(literal("levels").executes(::queryLevels))
+                .executes(QueryXpCommand::queryPoints)
+                .then(literal("points").executes(QueryXpCommand::queryPoints))
+                .then(literal("levels").executes(QueryXpCommand::queryLevels))
         )
 
     private fun queryPoints(context: CommandContext<ServerCommandSource>): Int {

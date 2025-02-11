@@ -1,4 +1,4 @@
-package com.imoonday.advskills_re.command
+package com.imoonday.advskills_re.command.xp
 
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.arguments.*
@@ -13,9 +13,9 @@ object SetXpCommand : XpCommand("set") {
         builder.then(
             argument("targets", EntityArgumentType.players()).then(
                 argument("amount", IntegerArgumentType.integer(0))
-                    .executes(::setPoints)
-                    .then(literal("points").executes(::setPoints))
-                    .then(literal("levels").executes(::setLevels))
+                    .executes(SetXpCommand::setPoints)
+                    .then(literal("points").executes(SetXpCommand::setPoints))
+                    .then(literal("levels").executes(SetXpCommand::setLevels))
             )
         )
 

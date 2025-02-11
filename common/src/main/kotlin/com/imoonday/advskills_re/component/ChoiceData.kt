@@ -19,6 +19,9 @@ data class ChoiceData(
         } else {
             choice = Choice.EMPTY
         }
+        if (refreshableCount <= 0) {
+            refreshableCount = 1
+        }
     }
 
     fun hasNext(player: PlayerEntity) = count > 0 && Choice.canGenerate(player)

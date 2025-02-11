@@ -209,6 +209,25 @@ class SkillGalleryScreen(
                 0xFFFFFF,
                 false
             )
+
+            val enhancements = skill.availableEnhancements
+            if (enhancements.isNotEmpty()) {
+                val enhancementText = translate(
+                    "screen.gallery.info.enhancements", enhancements.joinToString(" ") { it.name.string }
+                )
+                textRenderer.wrapLines(enhancementText, width - 15).forEach {
+                    yOffset += textRenderer.fontHeight + gap
+                    context.drawText(
+                        textRenderer,
+                        it,
+                        xOffset,
+                        yOffset,
+                        0x808080,
+                        false
+                    )
+                }
+            }
+
             return yOffset
         }
     }

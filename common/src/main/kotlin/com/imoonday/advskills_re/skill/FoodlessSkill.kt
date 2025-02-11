@@ -20,7 +20,7 @@ class FoodlessSkill : PassiveSkill(
             name = PARAM_MIN_HUNGER,
             baseValue = DEFAULT_MIN_HUNGER,
             enhancementId = ENHANCEMENT_MIN_HUNGER,
-            value = 2,
+            value = 2.0,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT

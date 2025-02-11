@@ -119,7 +119,7 @@ fun <T> Collection<T>.randomByWeight(
 }
 
 fun <T> Collection<T>.toText(
-    formatter: (T) -> MutableText?,
+    formatter: (T) -> Text?,
     separator: Text = ", ".toText(),
     prefix: Text = Text.empty(),
     suffix: Text = Text.empty(),

@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.client.screen
 
 import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.client.render.skill.*
-import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.component.choice.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.client.gui.*

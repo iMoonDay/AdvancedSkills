@@ -24,7 +24,7 @@ class PrimarySlownessSkill : Skill(
                 name = PARAM_SLOW_RANGE,
                 baseValue = DEFAULT_SLOW_RANGE,
                 enhancementId = ENHANCEMENT_RANGE,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -32,7 +32,7 @@ class PrimarySlownessSkill : Skill(
                 name = PARAM_BALL_COUNT,
                 baseValue = DEFAULT_BALL_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

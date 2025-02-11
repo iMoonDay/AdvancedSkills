@@ -28,7 +28,7 @@ class ArmorShattererSkill : Skill(
                 name = PARAM_PROJECTILE_COUNT,
                 baseValue = DEFAULT_PROJECTILE_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

@@ -26,7 +26,7 @@ class SuperShadowCloneSkill : Skill(
                 name = PARAM_CLONE_COUNT,
                 baseValue = DEFAULT_CLONE_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 2,
+                value = 2.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

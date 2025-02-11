@@ -15,6 +15,7 @@ object Skills {
     private val LOGGER: Logger = LogUtils.getLogger()
     private val factories = mutableMapOf<Identifier, () -> Skill>()
     private val skills = linkedMapOf<Identifier, Skill>()
+    private val aliases = mutableMapOf<Identifier, Identifier>()
 
     @JvmField
     val EMPTY = register { EmptySkill }
@@ -323,9 +324,7 @@ object Skills {
         skills.forEach { skill ->
             (serverSkills[skill.id]
                 ?: SettingsManager.getSettings(skill)
-                ?: createDefaultSkill(skill.id)?.let {
-                    it.settings.apply { it.initSettings(this) }
-                })
+                ?: createDefaultSkill(skill.id)?.settings)
                 ?.run { skill.updateSettings(this) }
         }
     }
@@ -338,13 +337,15 @@ object Skills {
     @JvmStatic
     fun <T : Skill> register(factory: () -> T): T {
         val skill = factory()
-        if (skill.id in skills.keys || skill in skills.values) {
-            LOGGER.warn("Skill ${skill.id} is already registered")
+        val id = skill.id
+        if (id in skills.keys || skill in skills.values) {
+            LOGGER.warn("Skill $id is already registered")
             return skill
         }
-        if (!skill.isEmpty) ITEMS.register(skill.id.path) { SkillItem(skill) }
-        factories[skill.id] = factory
-        skills[skill.id] = skill
+        if (!skill.isEmpty) ITEMS.register(id.path) { SkillItem(skill) }
+        factories[id] = factory
+        skills[id] = skill
+        skill.alias?.let { aliases[id.withPath(it)] = id }
         return skill
     }
 
@@ -361,14 +362,14 @@ object Skills {
     fun getEnabledSkills(): List<Skill> = skills.values.filterNot { it.disabled }
 
     @JvmStatic
-    fun fromId(id: Identifier): Skill = skills.getOrDefault(id, EMPTY)
+    fun fromId(id: Identifier): Skill = fromIdNullable(id) ?: EMPTY
 
     @JvmStatic
     fun fromId(id: String): Skill =
         if (id.contains(":")) id.toIdentifier()?.let { fromId(it) } ?: EMPTY else fromId(id(id))
 
     @JvmStatic
-    fun fromIdNullable(id: Identifier?): Skill? = skills[id]
+    fun fromIdNullable(id: Identifier?): Skill? = skills[id] ?: skills[aliases[id]]
 
     @JvmStatic
     fun fromIdNullable(id: String?): Skill? =
@@ -393,5 +394,5 @@ object Skills {
     ): Skill = getLearnableSkills(except, filter).randomByWeight(Skill::weight, EMPTY)
 
     @JvmStatic
-    fun createDefaultSkill(id: Identifier): Skill? = factories[id]?.invoke()
+    fun createDefaultSkill(id: Identifier): Skill? = factories[id]?.invoke()?.apply { initSettings(settings) }
 }

@@ -33,7 +33,7 @@ class ForcedGrowthSkill : Skill(
             name = PARAM_GROWTH_TIMES,
             baseValue = DEFAULT_GROWTH_TIMES,
             enhancementId = ENHANCEMENT_TIMES,
-            value = 1,
+            value = 1.0,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT
@@ -41,7 +41,7 @@ class ForcedGrowthSkill : Skill(
             name = PARAM_GROWTH_CHANCE,
             baseValue = DEFAULT_GROWTH_CHANCE,
             enhancementId = ENHANCEMENT_CHANCE,
-            value = 0.1f,
+            value = 0.1,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT

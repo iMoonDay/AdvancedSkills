@@ -25,7 +25,7 @@ class InvisibleTrapSkill : Skill(
             name = PARAM_TRAP_RANGE,
             baseValue = DEFAULT_TRAP_RANGE,
             enhancementId = ENHANCEMENT_RANGE,
-            value = 1,
+            value = 1.0,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 3,
             descArg = Enhancement.ArgFormatter.INT
@@ -33,7 +33,7 @@ class InvisibleTrapSkill : Skill(
             name = PARAM_TRAP_COUNT,
             baseValue = DEFAULT_TRAP_COUNT,
             enhancementId = ENHANCEMENT_COUNT,
-            value = 1,
+            value = 1.0,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT
@@ -41,7 +41,7 @@ class InvisibleTrapSkill : Skill(
             name = PARAM_TRAP_DAMAGE,
             baseValue = DEFAULT_TRAP_DAMAGE,
             enhancementId = ENHANCEMENT_DAMAGE,
-            value = 0.2f,
+            value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT

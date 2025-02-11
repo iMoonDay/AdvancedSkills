@@ -20,7 +20,7 @@ class PainFeedbackSkill : PassiveSkill(
             name = PARAM_FEEDBACK_RATIO,
             baseValue = DEFAULT_FEEDBACK_RATIO,
             enhancementId = ENHANCEMENT_RATIO,
-            value = 0.2f,
+            value = 0.2,
             operation = Enhancement.Operation.MULTIPLY_TOTAL,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.INT_PERCENT

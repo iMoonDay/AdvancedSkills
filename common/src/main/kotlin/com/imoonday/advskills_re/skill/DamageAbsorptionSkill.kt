@@ -38,7 +38,7 @@ class DamageAbsorptionSkill : Skill(
                 name = PARAM_ABSORB_COUNT,
                 baseValue = DEFAULT_ABSORB_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 4,
                 descArg = Enhancement.ArgFormatter.INT

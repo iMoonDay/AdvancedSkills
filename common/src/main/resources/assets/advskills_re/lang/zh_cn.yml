@@ -848,6 +848,9 @@ advskills_re:
       amount:
         name: 数量增幅
         description: '%s 箭矢数量'
+      burning:
+        name: 燃烧增幅
+        description: 点燃箭矢
     weed_cleaner:
       name: 杂草清理者
       description: 扫除周围杂草
@@ -1014,6 +1017,7 @@ advskills_re:
         cooldown: '冷却：%s'
         cooldown_with_default: 冷却：%s (默认：%s)
         rarity: '稀有度：%s'
+        enhancements: '可用增幅：%s'
       suggestion: 有新的技能建议?点击前往github提交issue或PR!
     list:
       level: '等级：%s'
@@ -1031,7 +1035,6 @@ advskills_re:
       enhancedAll: 已学习并强化所有技能
     slot:
       title: 左键拖动移动，右键重置
-      compact: 紧凑技能显示
       config: 设置
     inventory:
       title: '技能背包 %d/%d'

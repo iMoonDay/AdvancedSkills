@@ -19,7 +19,7 @@ class AutomaticUphillSkill : PassiveSkill(
             name = PARAM_STEP_HEIGHT,
             baseValue = DEFAULT_STEP_HEIGHT,
             enhancementId = ENHANCEMENT_HEIGHT,
-            value = 0.5f,
+            value = 0.5,
             operation = Enhancement.Operation.ADDITION,
             maxLevel = 5,
             descArg = Enhancement.ArgFormatter.FLOAT

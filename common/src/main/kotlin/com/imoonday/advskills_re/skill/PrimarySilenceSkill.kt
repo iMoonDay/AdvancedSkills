@@ -24,7 +24,7 @@ class PrimarySilenceSkill : Skill(
                 name = PARAM_SILENCE_RANGE,
                 baseValue = DEFAULT_SILENCE_RANGE,
                 enhancementId = ENHANCEMENT_RANGE,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -32,7 +32,7 @@ class PrimarySilenceSkill : Skill(
                 name = PARAM_BALL_COUNT,
                 baseValue = DEFAULT_BALL_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

@@ -2,6 +2,7 @@ package com.imoonday.advskills_re.init
 
 import com.imoonday.advskills_re.command.*
 import com.imoonday.advskills_re.command.Command.Companion.register
+import com.imoonday.advskills_re.command.xp.*
 import dev.architectury.event.events.common.*
 
 object ModCommands {

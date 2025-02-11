@@ -45,7 +45,7 @@ class WitheringTouchSkill : Skill(
                 name = PARAM_WITHER_LEVEL,
                 baseValue = DEFAULT_WITHER_LEVEL,
                 enhancementId = ENHANCEMENT_LEVEL,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

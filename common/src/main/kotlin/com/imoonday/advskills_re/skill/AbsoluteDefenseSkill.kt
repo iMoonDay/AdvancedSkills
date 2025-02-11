@@ -38,7 +38,7 @@ class AbsoluteDefenseSkill : Skill(
                 name = PARAM_DEFENSE_COUNT,
                 baseValue = DEFAULT_DEFENSE_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 4,
                 descArg = Enhancement.ArgFormatter.INT

@@ -7,8 +7,8 @@ import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import net.minecraft.nbt.*
 import net.minecraft.text.*
+import net.objecthunter.exp4j.*
 import java.lang.reflect.*
-import javax.script.*
 import kotlin.math.*
 
 sealed class Enhancement {
@@ -268,9 +268,9 @@ sealed class Enhancement {
             override fun getWeight(level: Int): Int = eval(expression.replace("{level}", level.toString()))
 
             private fun eval(expression: String): Int = try {
-                val engine = ScriptEngineManager().getEngineByName("JavaScript")
-                (engine.eval(expression) as Double).roundToInt()
+                ExpressionBuilder(expression).build().evaluate().roundToInt()
             } catch (e: Exception) {
+                LOGGER.warn("Failed to evaluate expression: $expression", e)
                 0
             }
 
@@ -285,6 +285,7 @@ sealed class Enhancement {
             override fun getWeight(level: Int): Int = try {
                 java.io.File(filePath.replace("{level}", level.toString())).readText().trim().toInt()
             } catch (e: Exception) {
+                LOGGER.warn("Failed to read weight file: $filePath", e)
                 0
             }
 

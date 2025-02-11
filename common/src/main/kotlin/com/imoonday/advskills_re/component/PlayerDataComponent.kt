@@ -49,10 +49,10 @@ class PlayerDataComponent(override val entity: PlayerEntity) : Component<PlayerE
         container.getAllSkills { skill, _ -> !entity.hasLearned(skill) }.forEach { container.forget(it) }
         container.forEachData { it.tick() }
         container.getAllSlots { it.skill.disabled && !it.isEmpty() }.forEach {
-            val name = it.skill.name
+            val skill = it.skill
             it.unequip()
             if (!entity.world.isClient) {
-                entity.sendMessage(translate("unequipSkill.banned", name))
+                entity.sendMessage(translate("unequipSkill.banned", skill.name))
             } else {
                 entity.updateScreen()
             }

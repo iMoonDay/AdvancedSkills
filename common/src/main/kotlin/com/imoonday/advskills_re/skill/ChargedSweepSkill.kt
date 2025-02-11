@@ -58,7 +58,7 @@ class ChargedSweepSkill : LongPressSkill(
                 name = PARAM_DAMAGE_BOOST,
                 baseValue = DEFAULT_DAMAGE_BOOST,
                 enhancementId = ENHANCEMENT_DAMAGE,
-                value = 0.2f,
+                value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT,

@@ -1,6 +1,6 @@
-package com.imoonday.advskills_re.component
+package com.imoonday.advskills_re.component.choice
 
-import com.imoonday.advskills_re.component.choice.*
+import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.skill.*
 import net.minecraft.nbt.*

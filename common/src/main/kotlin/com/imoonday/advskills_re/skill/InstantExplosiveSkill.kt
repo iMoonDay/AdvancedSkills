@@ -26,7 +26,7 @@ class InstantExplosiveSkill : Skill(
                 name = PARAM_TNT_COUNT,
                 baseValue = DEFAULT_TNT_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

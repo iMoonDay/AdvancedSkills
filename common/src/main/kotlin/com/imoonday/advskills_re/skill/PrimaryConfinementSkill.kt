@@ -47,7 +47,7 @@ class PrimaryConfinementSkill : LongPressSkill(
                 name = PARAM_SUCCESS_CHANCE,
                 baseValue = DEFAULT_SUCCESS_CHANCE,
                 enhancementId = ENHANCEMENT_CHANCE,
-                value = 0.04f,
+                value = 0.04,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

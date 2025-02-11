@@ -1,5 +1,6 @@
-package com.imoonday.advskills_re.command
+package com.imoonday.advskills_re.command.xp
 
+import com.imoonday.advskills_re.command.*
 import com.mojang.brigadier.builder.*
 import net.minecraft.server.command.*
 

@@ -29,7 +29,7 @@ class DisarmSkill : Skill(
                 name = PARAM_SUCCESS_CHANCE,
                 baseValue = DEFAULT_SUCCESS_CHANCE,
                 enhancementId = ENHANCEMENT_SUCCESS_CHANCE,
-                value = 0.05f,
+                value = 0.05,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
@@ -45,7 +45,7 @@ class DisarmSkill : Skill(
                 name = PARAM_DROP_CHANCE,
                 baseValue = DEFAULT_DROP_CHANCE,
                 enhancementId = ENHANCEMENT_DROP_CHANCE,
-                value = 0.01f,
+                value = 0.01,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

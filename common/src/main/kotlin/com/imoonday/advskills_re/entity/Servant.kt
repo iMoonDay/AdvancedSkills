@@ -12,8 +12,8 @@ interface Servant : Ownable {
 
     var ownerUuid: UUID?
 
-    fun canAttackWithOwner(target: LivingEntity?, owner: LivingEntity): Boolean {
-        return if (target is CreeperEntity || target is GhastEntity) {
+    fun canAttackWithOwner(target: LivingEntity?, owner: LivingEntity): Boolean =
+        if (target is CreeperEntity || target is GhastEntity) {
             false
         } else if (target is Servant) {
             target.owner !== owner
@@ -23,14 +23,14 @@ interface Servant : Ownable {
             if (target is AbstractHorseEntity && target.isTame) false
             else target !is TameableEntity || !target.isTamed
         }
-    }
 
     companion object {
 
+        @JvmStatic
         fun invulnerableToServant(
             damageSource: DamageSource,
-            cir: CallbackInfoReturnable<Boolean?>,
             player: PlayerEntity,
+            cir: CallbackInfoReturnable<Boolean>,
         ) {
             val attacker = damageSource.attacker
             val source = damageSource.source

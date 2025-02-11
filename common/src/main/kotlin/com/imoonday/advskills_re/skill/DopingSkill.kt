@@ -43,7 +43,7 @@ class DopingSkill : Skill(
                 name = PARAM_HEALTH_COST,
                 baseValue = DEFAULT_HEALTH_COST,
                 enhancementId = ENHANCEMENT_COST,
-                value = -0.16f,
+                value = -0.16,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

@@ -39,10 +39,9 @@ class ServantSkeletonEntity(
             1,
             ActiveTargetGoal(this, LivingEntity::class.java, true) { it is Servant && it.ownerUuid != this.ownerUuid }
         )
-        targetSelector.add(2, ActiveTargetGoal(this, PlayerEntity::class.java, true) { it.uuid != ownerUuid })
-        targetSelector.add(3, ActiveTargetGoal(this, HostileEntity::class.java, true) { it !is Servant })
-        targetSelector.add(4, TrackOwnerAttackerGoal(this))
-        targetSelector.add(5, AttackWithOwnerGoal(this))
+        targetSelector.add(2, ActiveTargetGoal(this, HostileEntity::class.java, true) { it !is Servant })
+        targetSelector.add(3, TrackOwnerAttackerGoal(this))
+        targetSelector.add(4, AttackWithOwnerGoal(this))
     }
 
     override fun isAffectedByDaylight(): Boolean = false

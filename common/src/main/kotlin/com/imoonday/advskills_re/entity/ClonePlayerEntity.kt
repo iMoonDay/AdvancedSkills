@@ -34,6 +34,7 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
     var aggressive: Boolean
         get() = dataTracker.get(AGGRESSIVE_DATA)
         set(value) = dataTracker.set(AGGRESSIVE_DATA, value)
+    private var goalAdded: Boolean = false
 
     constructor(world: World, player: PlayerEntity, aggressive: Boolean = false) : this(
         ModEntities.CLONE_PLAYER.get(), world
@@ -53,6 +54,7 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
                 equipStack(it, equippedStack.copy())
             }
         }
+        addCustomGoals()
     }
 
     override fun tick() {
@@ -83,19 +85,16 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
     }
 
     private fun addCustomGoals() {
-        if (moveTime <= 0) {
-            if (goalSelector.goals.isEmpty()) {
-                goalSelector.add(0, SwimGoal(this))
-                goalSelector.add(1, MeleeAttackGoal(this, 1.0, false))
-                goalSelector.add(2, EscapeDangerGoal(this, 1.3))
-                goalSelector.add(3, WanderAroundFarGoal(this, 1.0))
-                goalSelector.add(4, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
-                goalSelector.add(5, LookAroundGoal(this))
-                goalSelector.add(6, WanderAroundGoal(this, 1.3))
-            }
-            if (targetSelector.goals.isEmpty()) {
-                targetSelector.add(0, ActiveTargetGoal(this, HostileEntity::class.java, true) { aggressive })
-            }
+        if (moveTime <= 0 && !goalAdded) {
+            goalAdded = true
+            goalSelector.add(0, SwimGoal(this))
+            goalSelector.add(1, MeleeAttackGoal(this, 1.0, false))
+            goalSelector.add(2, EscapeDangerGoal(this, 1.3))
+            goalSelector.add(3, WanderAroundFarGoal(this, 1.0))
+            goalSelector.add(4, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
+            goalSelector.add(5, LookAroundGoal(this))
+            goalSelector.add(6, WanderAroundGoal(this, 1.3))
+            targetSelector.add(0, ActiveTargetGoal(this, HostileEntity::class.java, true) { aggressive })
         }
     }
 
@@ -125,8 +124,6 @@ class ClonePlayerEntity(entityType: EntityType<out ClonePlayerEntity>, world: Wo
         nbt.put("Data", dataTracker.get(NBT_DATA))
         nbt.putBoolean("Aggressive", aggressive)
     }
-
-    override fun isPlayer(): Boolean = true
 
     override fun shouldRenderName(): Boolean = true
 

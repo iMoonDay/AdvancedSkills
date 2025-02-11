@@ -1,6 +1,5 @@
-package com.imoonday.advskills_re.component
+package com.imoonday.advskills_re.component.choice
 
-import com.imoonday.advskills_re.component.choice.*
 import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.util.*
 import net.minecraft.entity.player.*
@@ -23,7 +22,7 @@ data class Choice(
 
         for (i in choices.indices) {
             for (j in i + 1 until choices.size) {
-                if (!Companion.areCompatible(choices[i], choices[j])) {
+                if (!areCompatible(choices[i], choices[j])) {
                     return true
                 }
             }

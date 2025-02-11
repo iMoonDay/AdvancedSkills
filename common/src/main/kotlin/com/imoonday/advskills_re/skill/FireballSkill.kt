@@ -25,7 +25,7 @@ class FireballSkill : Skill(
                 name = PARAM_FIREBALL_POWER,
                 baseValue = DEFAULT_FIREBALL_POWER,
                 enhancementId = ENHANCEMENT_POWER,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -33,7 +33,7 @@ class FireballSkill : Skill(
                 name = PARAM_FIREBALL_COUNT,
                 baseValue = DEFAULT_FIREBALL_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

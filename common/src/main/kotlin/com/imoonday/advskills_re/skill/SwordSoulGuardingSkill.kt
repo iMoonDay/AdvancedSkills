@@ -38,7 +38,7 @@ class SwordSoulGuardingSkill : Skill(
                 name = PARAM_TRIGGER_CHANCE,
                 baseValue = DEFAULT_TRIGGER_CHANCE,
                 enhancementId = ENHANCEMENT_CHANCE,
-                value = 0.1f,
+                value = 0.1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT
@@ -46,7 +46,7 @@ class SwordSoulGuardingSkill : Skill(
                 name = PARAM_SWORD_COUNT,
                 baseValue = DEFAULT_SWORD_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -54,7 +54,7 @@ class SwordSoulGuardingSkill : Skill(
                 name = PARAM_SPAWN_INTERVAL,
                 baseValue = DEFAULT_SPAWN_INTERVAL,
                 enhancementId = ENHANCEMENT_INTERVAL,
-                value = -2,
+                value = -2.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

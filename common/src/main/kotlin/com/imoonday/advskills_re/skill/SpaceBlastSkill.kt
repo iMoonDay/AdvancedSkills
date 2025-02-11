@@ -42,7 +42,7 @@ class SpaceBlastSkill : LongPressSkill(
                 name = PARAM_BLAST_RANGE,
                 baseValue = DEFAULT_BLAST_RANGE,
                 enhancementId = ENHANCEMENT_RANGE,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT

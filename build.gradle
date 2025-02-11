@@ -41,6 +41,12 @@ subprojects {
     dependencies {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
         mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
+
+        if (project.name == 'common') {
+            implementation 'net.objecthunter:exp4j:0.4.8'
+        } else {
+            implementation include('net.objecthunter:exp4j:0.4.8')
+        }
     }
 
     java {

@@ -30,7 +30,7 @@ class LaserEyeSkill : Skill(
                 name = PARAM_LASER_COUNT,
                 baseValue = DEFAULT_LASER_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 1,
+                value = 1.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -46,7 +46,7 @@ class LaserEyeSkill : Skill(
                 name = PARAM_LASER_DAMAGE,
                 baseValue = DEFAULT_LASER_DAMAGE,
                 enhancementId = ENHANCEMENT_DAMAGE,
-                value = 0.2f,
+                value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

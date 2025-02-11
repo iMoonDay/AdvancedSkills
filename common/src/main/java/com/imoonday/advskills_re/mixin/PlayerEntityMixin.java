@@ -67,7 +67,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerDa
     @Inject(method = "isInvulnerableTo", at = @At("HEAD"), cancellable = true)
     public void advskills_re$isInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
-        Servant.Companion.invulnerableToServant(damageSource, cir, player);
+        Servant.invulnerableToServant(damageSource, player, cir);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))

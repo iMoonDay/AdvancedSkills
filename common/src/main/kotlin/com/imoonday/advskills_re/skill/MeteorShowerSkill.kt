@@ -46,7 +46,7 @@ class MeteorShowerSkill : LongPressSkill(
                 name = PARAM_BONUS_METEOR_COUNT,
                 baseValue = DEFAULT_BONUS_METEOR_COUNT,
                 enhancementId = ENHANCEMENT_COUNT,
-                value = 2,
+                value = 2.0,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT
@@ -62,7 +62,7 @@ class MeteorShowerSkill : LongPressSkill(
                 name = PARAM_METEOR_SIZE,
                 baseValue = DEFAULT_METEOR_SIZE,
                 enhancementId = ENHANCEMENT_SIZE,
-                value = 0.2f,
+                value = 0.2,
                 operation = Enhancement.Operation.MULTIPLY_TOTAL,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

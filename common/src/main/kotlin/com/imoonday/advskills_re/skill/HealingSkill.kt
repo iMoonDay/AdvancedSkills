@@ -29,7 +29,7 @@ abstract class HealingSkill(
             )
     }
 
-    protected open fun getDefaultEnhancementValue(): Number = 0.2f
+    protected open fun getDefaultEnhancementValue(): Double = 0.2
     protected open fun getDefaultEnhancementOperation(): Enhancement.Operation = Enhancement.Operation.MULTIPLY_TOTAL
     protected open fun getDefaultEnhancementLevel(): Int = 5
     protected open fun getDefaultEnhancementDescArg(): Enhancement.ArgFormatter = Enhancement.ArgFormatter.INT_PERCENT

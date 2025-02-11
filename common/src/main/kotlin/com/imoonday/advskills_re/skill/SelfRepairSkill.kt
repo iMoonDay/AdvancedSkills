@@ -33,7 +33,7 @@ class SelfRepairSkill : Skill(
                 name = PARAM_REPAIR_THRESHOLD,
                 baseValue = DEFAULT_REPAIR_THRESHOLD,
                 enhancementId = ENHANCEMENT_THRESHOLD,
-                value = 0.1f,
+                value = 0.1,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

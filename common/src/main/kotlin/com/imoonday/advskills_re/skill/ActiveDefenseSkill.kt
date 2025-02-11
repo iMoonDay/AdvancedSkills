@@ -37,7 +37,7 @@ class ActiveDefenseSkill : LongPressSkill(
                 name = PARAM_DEFENSE_VALUE,
                 baseValue = DEFAULT_DEFENSE_VALUE,
                 enhancementId = ENHANCEMENT_DEFENSE,
-                value = 0.06f,
+                value = 0.06,
                 operation = Enhancement.Operation.ADDITION,
                 maxLevel = 5,
                 descArg = Enhancement.ArgFormatter.INT_PERCENT

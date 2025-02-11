@@ -1,4 +1,4 @@
-package com.imoonday.advskills_re.command
+package com.imoonday.advskills_re.command.xp
 
 import com.imoonday.advskills_re.util.*
 import com.mojang.brigadier.builder.*
@@ -11,7 +11,7 @@ object ResetXpCommand : XpCommand("reset") {
     override fun buildAction(builder: LiteralArgumentBuilder<ServerCommandSource>): ArgumentBuilder<ServerCommandSource, *> =
         builder.then(
             argument("targets", EntityArgumentType.players())
-                .executes(::resetXp)
+                .executes(ResetXpCommand::resetXp)
         )
 
     private fun resetXp(context: CommandContext<ServerCommandSource>): Int {

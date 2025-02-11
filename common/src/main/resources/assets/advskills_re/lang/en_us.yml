@@ -848,6 +848,9 @@ advskills_re:
       amount:
         name: Count Enhancement
         description: '%s Arrow Count'
+      burning:
+        name: Burning Enhancement
+        description: Ignite Arrows
     weed_cleaner:
       name: Weed Cleaner
       description: Clean up weeds around
@@ -1014,6 +1017,7 @@ advskills_re:
         cooldown: 'Cooldown: %s'
         cooldown_with_default: 'Cooldown: %s (default: %s)'
         rarity: 'Rarity: %s'
+        enhancements: 'Enhancements: %s'
       suggestion: Have a new skill suggestion? Click to go to github to submit an issue or PR!
     list:
       level: 'Level: %s'
@@ -1031,7 +1035,6 @@ advskills_re:
       enhancedAll: You have learned and enhanced all skills
     slot:
       title: Left drag to move, right click to reset
-      compact: Compact skill display
       config: Config
     inventory:
       title: 'Skill Inventory %d/%d'
