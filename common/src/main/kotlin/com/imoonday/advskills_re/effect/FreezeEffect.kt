@@ -4,7 +4,6 @@ import net.minecraft.entity.*
 import net.minecraft.entity.attribute.*
 import net.minecraft.entity.effect.*
 import net.minecraft.util.math.*
-import org.joml.*
 import java.awt.*
 
 class FreezeEffect : StatusEffect(

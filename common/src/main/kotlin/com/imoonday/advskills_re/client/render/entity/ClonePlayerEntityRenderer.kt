@@ -2,7 +2,6 @@ package com.imoonday.advskills_re.client.render.entity
 
 import com.imoonday.advskills_re.client.*
 import com.imoonday.advskills_re.entity.*
-import net.minecraft.client.render.*
 import net.minecraft.client.render.entity.*
 import net.minecraft.client.render.entity.feature.*
 import net.minecraft.client.render.entity.model.*

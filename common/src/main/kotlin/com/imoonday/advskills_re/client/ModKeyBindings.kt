@@ -11,7 +11,6 @@ import dev.architectury.registry.client.keymappings.*
 import net.fabricmc.api.*
 import net.minecraft.client.*
 import net.minecraft.client.option.*
-import net.minecraft.client.resource.language.*
 import org.lwjgl.glfw.*
 
 @Environment(EnvType.CLIENT)

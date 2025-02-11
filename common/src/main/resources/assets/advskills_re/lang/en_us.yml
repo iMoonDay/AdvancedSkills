@@ -877,7 +877,7 @@ advskills_re:
         description: '%s Disguise Duration'
     wall_jump:
       name: Wall Jump
-      description: You can jump while on the wall
+      description: You can jump on the wall. Halving fall damage when landing
       force:
         name: Force Enhancement
         description: '%s Jump Force'

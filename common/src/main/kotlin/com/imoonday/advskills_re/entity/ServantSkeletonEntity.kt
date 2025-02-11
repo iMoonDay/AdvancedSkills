@@ -3,7 +3,6 @@ package com.imoonday.advskills_re.entity
 import com.imoonday.advskills_re.entity.goal.AttackWithOwnerGoal
 import com.imoonday.advskills_re.entity.goal.TrackOwnerAttackerGoal
 import com.imoonday.advskills_re.init.*
-import com.imoonday.advskills_re.skill.trigger.*
 import net.minecraft.entity.*
 import net.minecraft.entity.ai.goal.*
 import net.minecraft.entity.attribute.*

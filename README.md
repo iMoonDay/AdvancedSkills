@@ -33,6 +33,12 @@
 
 ---
 
+### **增幅系统介绍:**
+
+**在抽取技能时有概率出现已学习技能的增幅效果，增幅可提升技能的数值或者提供额外效果。不同类型的增幅效果不同，可以提升技能的伤害、速度、范围、持续时间等。**
+
+---
+
 ### **指令介绍:**
 
 <details>
@@ -63,30 +69,33 @@
   - `add [amount: 数量] [points: 点数/levels: 等级]` - 增加技能经验/等级
   - `set [amount: 数量] [points: 点数/levels: 等级]` - 设置技能经验/等级
   - `query [points: 点数/levels: 等级]` - 查询当前技能经验/等级
-  - `multiplier [multiplier: 倍率]` - 设置全局技能经验获取倍率
+  - `multiplier`
+    - `get [local: 存档/global: 全局]` - 获取存档/全局技能经验倍率
+    - `set [local: 存档/global: 全局] [multiplier: 倍率]` - 设置存档/全局技能经验倍率
+    - `reset [local: 存档/global: 全局]` - 重置存档/全局技能经验倍率
   - `reset` - 重置技能经验和等级
 - `cooldown` - 查询全局技能冷却倍率
-  - `reset` - 重置全局技能冷却倍率
-  - `[multiplier: 倍率]` - 设置全局技能冷却倍率
-- `modify [skill: 技能]`
-  - `cooldown [seconds: 冷却时间]` - 修改技能冷却时间
-  - `rarity [rarity: 稀有度]` - 修改技能稀有度
-  - `time [seconds: 持续(蓄力)时间]` - 修改技能持续(蓄力)时间
-  - `reset` - 清除所有技能修改
+  - `reset [local: 存档/global: 全局]` - 重置存档/全局技能冷却倍率
+  - `get [local: 存档/global: 全局] [multiplier: 倍率]` - 获取存档/全局技能冷却倍率
+  - `set [local: 存档/global: 全局] [multiplier: 倍率]` - 设置存档/全局技能冷却倍率
 - `blacklist`
-  - `add [skill: 技能]` - 将技能加入黑名单
-  - `remove [id: 技能id]` - 将技能移出黑名单
-  - `list` - 列出所有黑名单中的技能
-  - `clear` - 清空技能黑名单
+  - `add [local: 存档/global: 全局] [skill: 技能]` - 将技能加入存档/全局黑名单
+  - `remove [local: 存档/global: 全局] [id: 技能id]` - 将技能移出存档/全局黑名单
+  - `list [local: 存档/global: 全局]` - 列出存档/全局黑名单技能
+  - `clear [local: 存档/global: 全局]` - 清空存档/全局技能黑名单
+- `enhance [skill: 技能]`
+  - `[id: 增幅id] [level: 等级]` - 强化技能至指定等级
+  - `all` - 强化所有技能至最大等级
+- `de-enhance [skill: 技能] [id: 增幅id/all: 所有]` - 撤销技能强化
 </details>
 
 ---
 
 ### **技能果实:**
 
-**每个稀有度有一个对应的技能果实，食用后可以随机学习一个技能，其稀有度最高取决于技能果实的稀有度。**
+**每个稀有度有一个对应的技能果实，食用后可以随机学习/强化一个技能，其稀有度最高取决于技能果实的稀有度。**
 
-#### **获取方式:**
+#### **获取方式: (概率可通过配置文件修改)**
 1. 橡树树叶掉落 - 0.5%
 2. 深色橡树树叶掉落 - 0.5%
 3. 钓鱼 - 与原版宝藏概率一致
@@ -95,7 +104,7 @@
 6. 末地城战利品箱 - 25%
 7. 开局奖励箱 - 100%
 
-#### **稀有度权重:**
+#### **稀有度权重: (权重可通过配置文件修改)**
 
 | **稀有度** | **权重** |
 |:-------:|:------:|
@@ -114,22 +123,20 @@
 
 1. 在背包界面中，按下**查看技能列表**快捷键（默认K）可以直接打开技能背包。
 2. 创造模式可以在**技能列表**界面中快速学习所有技能和重置技能冷却（需要权限）。
-3. 在**技能列表**界面中，左键双击技能可以跳转至图鉴的详细介绍，按住**Shift**可以显示完整技能介绍。
+3. 在**技能列表**界面中，左键双击技能可以跳转至图鉴的详细介绍，右击可以**管理技能增幅设置**。
 4. **技能背包**界面可以通过快捷键（键盘上方的1-0）快速装备/交换技能，**Shift+鼠标左键**可以快速装备/卸下技能，按住**Shift**可以查看技能详情。
 5. **快捷施法**界面可以按下**开启/关闭物品栏**快捷键（默认E）直接打开技能背包。
 6. 在**快捷施法**界面且选中技能时，在**取消**区域按下鼠标中键可以取消选中技能。
 7. 可以使用快捷键（默认N）移动技能栏的位置。
-8. 如果觉得部分技能的**冷却时间**、**稀有度**或者**持续时间**不合适，可以用指令（`/skills modify`）来修改。当然，也可以给我反馈不合理的情况，我可以直接修改默认值。
+8. 可以通过配置文件修改所有技能的大部分参数及其增幅的参数。
 
 ---
 
 ### **图片展示:**
 
-![抽卡](screenshots/抽卡.png)
-![物品栏](screenshots/物品栏.png)
-![技能背包](screenshots/技能背包.png)
-![快捷施法](screenshots/快捷施法.png)
-![技能列表](screenshots/技能列表.png)
-![技能图鉴](screenshots/技能图鉴.png)
-
----
+![抽卡](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/抽卡.png)
+![物品栏](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/物品栏.png)
+![技能背包](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/技能背包.png)
+![快捷施法](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/快捷施法.png)
+![技能列表](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/技能列表.png)
+![技能图鉴](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/技能图鉴.png)

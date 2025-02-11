@@ -41,6 +41,8 @@ dependencies {
 
     implementation "thedarkcolour:kotlinforforge:${rootProject.forge_kotlin_version}"
     modApi "me.shedaniel.cloth:cloth-config-forge:${rootProject.cloth_config_version}"
+
+//    implementation "curse.maven:weapons-of-miracles-epicfight-918614:5889471"
 }
 
 processResources {

@@ -25,34 +25,33 @@
 
 ---
 
-### **Sample Skills Introduction:**
+### **Sample Skills:**
 
 - **Reflective Skills**: Skills that have a certain chance of reflecting the first incoming damage within a specific time.  
    Different types of reflective effects exist.
-
 - **Movement Skills**: Includes various movement abilities, such as dashing, teleporting, dodging, jumping, grappling, etc.
-
 - **Control Skills**: Includes various control abilities, such as immobilizing, slowing, silencing, etc.
-
 - **Passive Skills**: All skills that are not passive are considered active. Passive skills include self-healing, passive effects, wall climbing, invisibility, and more.
-
 - **Enhancement Skills**: Various enhancement skills, such as X-ray vision, water bypassing, and resistance to negative effects.
-
 - **Summoning Skills**: Includes summoning duplicates, mounts, minions, etc.
-
 - **Healing Skills**: Different healing skills restore varying amounts of health.
-
 - **Destructive Skills**: Includes fireballs, TNT, meteorites, etc.
+
+---
+
+### **Enhancement System:**
+
+**When drawing skills, there is a chance to get enhancements for learned skills. Enhancements can improve skill values or provide additional effects. Different types of enhancements have different effects, which can increase the skill's damage, speed, range, duration, and more.**
 
 ---
 
 ### **Command Overview:**
 
 <details>
-  <summary> /skills </summary>
+  <summary> /skills (Click to expand) </summary>
 
-- `equip [skill] [slot]` - Equip a skill to a skill slot
-- `unequip [slot]` - Unequip the skill from the specified slot
+- `equip [skill] [slot: 1-10]` - Equip a skill to a skill slot
+- `unequip [slot: 1-10]` - Unequip the skill from the specified slot
 - `list` - List all learned skills
 - `learn [skill]` - Learn a new skill
 - `learn-all` - Learn all skills
@@ -60,55 +59,40 @@
 - `forget-all` - Forget all skills
 - `reset` - Reset all skill data
 - `reset-cooldown` - Reset all skills' cooldowns
-
-#### Skill Slot Commands:
-
 - `slot`
-    - `add [active/passive/generic]` - Add a new skill slot
-    - `remove [slot]` - Remove a skill slot
-    - `reset` - Reset to default skill slots
-
-#### Slot Queries & Settings:
-
-- `slots` - Query the number of default skill slots
-    - `active` - Query the number of default active skill slots
-        - `[slot]` - Set the number of default active skill slots
-    - `generic` - Query the number of default generic skill slots
-        - `[slot]` - Set the number of default generic skill slots
-    - `passive` - Query the number of default passive skill slots
-        - `[slot]` - Set the number of default passive skill slots
-    - `reset` - Reset to the default number of skill slots
-
-#### Skill Experience:
-
+  - `add [active/passive/generic]` - Add a new skill slot
+  - `remove [slot: 1-10]` - Remove a skill slot
+  - `reset` - Reset to default skill slots
+- `slots` - Query default skill slot numbers
+  - `active` - Query default active skill slot number
+    - `[slot: 1-10]` - Set default active skill slot number
+  - `generic` - Query default generic skill slot number
+    - `[slot: 1-10]` - Set default generic skill slot number
+  - `passive` - Query default passive skill slot number
+    - `[slot: 1-10]` - Set default passive skill slot number
+  - `reset` - Reset to default skill slot numbers
 - `xp`
-    - `add [amount] [points/levels]` - Add skill experience or levels
-    - `set [amount] [points/levels]` - Set skill experience or levels
-    - `query [points/levels]` - Query current skill experience or levels
-    - `multiplier [multiplier]` - Set global skill experience gain multiplier
-    - `reset` - Reset skill experience and levels
-
-#### Global Cooldown:
-
+  - `add [amount] [points/levels]` - Add skill experience/levels
+  - `set [amount] [points/levels]` - Set skill experience/levels
+  - `query [points/levels]` - Query current skill experience/levels
+  - `multiplier`
+    - `get [local/global]` - Get local/global skill experience multiplier
+    - `set [local/global] [multiplier]` - Set local/global skill experience multiplier
+    - `reset [local/global]` - Reset local/global skill experience multiplier
+  - `reset` - Reset skill experience and levels
 - `cooldown` - Query global skill cooldown multiplier
-    - `reset` - Reset global skill cooldown multiplier
-    - `[multiplier]` - Set global skill cooldown multiplier
-
-#### Modify Skill Settings:
-
-- `modify [skill]`
-    - `cooldown [seconds]` - Modify skill cooldown time
-    - `rarity [rarity]` - Modify skill rarity
-    - `time [seconds]` - Modify skill duration (charging time)
-    - `reset` - Remove all modifications to the skill
-
-#### Blacklist Commands:
-
+  - `reset [local/global]` - Reset local/global skill cooldown multiplier
+  - `get [local/global]` - Get local/global skill cooldown multiplier
+  - `set [local/global] [multiplier]` - Set local/global skill cooldown multiplier
 - `blacklist`
-    - `add [skill]` - Add skill to blacklist
-    - `remove [id]` - Remove skill from blacklist by ID
-    - `list` - List all blacklisted skills
-    - `clear` - Clear skill blacklist
+  - `add [local/global] [skill]` - Add skill to local/global blacklist
+  - `remove [local/global] [id]` - Remove skill from local/global blacklist
+  - `list [local/global]` - List local/global blacklisted skills
+  - `clear [local/global]` - Clear local/global skill blacklist
+- `enhance [skill]`
+  - `[id] [level]` - Enhance skill to specified level
+  - `all` - Enhance all skills to maximum level
+- `de-enhance [skill] [id/all]` - Remove skill enhancement
 </details>
 
 ---
@@ -117,7 +101,7 @@
 
 **Each rarity has a corresponding skill fruit. After eating it, you can randomly learn a skill. The highest rarity depends on the rarity of the skill fruit.**
 
-#### How to get it:
+#### How to get it (Probability can be modified through configuration file):
 
 - Oak Leaves - 0.5%
 - Dark Oak Leaves - 0.5%
@@ -127,7 +111,7 @@
 - End City Treasure Chest - 25%
 - Spawn Bonus Chest - 100%
 
-#### Rarity Weight:
+#### Rarity Weight (Weight can be modified through configuration file):
 
 |  **Rarity**   | **Weight** |
 |:-------------:|:----------:|
@@ -146,20 +130,20 @@
 
 1. In the inventory screen, press the **View Skill List** hotkey (**K** by default) to directly open the skill inventory.
 2. In creative mode, you can quickly learn all skills and reset skill cooldowns in the **Skill List** screen (requires permission).
-3. In the **Skill List** screen, left-click to double-click a skill to view its detailed description in the skill gallery. Hold **Shift** to display the full skill description.
-4. In the **Skill Inventory** screen, you can quickly equip/swap skills using the hotkeys (**1-0** on the top row of the keyboard), and **Shift + Left Click** can quickly equip or unequip skills. Otherwise, you can press and hold **Shift** to view skill details.
+3. In the **Skill List** screen, double-click a skill with left mouse button to jump to its detailed description in the gallery, right-click to **manage skill enhancement settings**.
+4. In the **Skill Inventory** screen, you can quickly equip/swap skills using the hotkeys (**1-0** on the top row of the keyboard), **Shift + Left Click** to quickly equip/unequip skills, and hold **Shift** to view skill details.
 5. In the **Quick Cast** screen, press the **Open/Close Inventory** hotkey (**E** by default) to directly open the skill inventory.
 6. In the **Quick Cast** screen, when a skill is selected, press the middle mouse button in the **Cancel** area to deselect the skill.
-7. You can use the hotkey (**N** by default) to move the skill slots.
-8. If you feel that the **cooldown**, **rarity**, or **duration** of some skills are inappropriate, you can use the command (`/skills modify`) to modify them. Of course, you can also give me feedback on unreasonable situations, and I can directly modify the default value.
+7. You can use the hotkey (**N** by default) to move the skill bar position.
+8. You can modify most parameters of all skills and their enhancements through the configuration file.
 
 ---
 
 ### **Images:**
 
-![Learn](screenshots/learn.png) 
-![Inventory](screenshots/skills.png)
-![Skill Inventory](screenshots/inventory.png)
-![Quick Cast](screenshots/wheel.png)
-![Skill List](screenshots/list.png)
-![Skill Gallery](screenshots/gallery.png)
+![Learn](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/learn.png)
+![Inventory](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/skills.png)
+![Skill Inventory](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/inventory.png)
+![Quick Cast](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/wheel.png)
+![Skill List](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/list.png)
+![Skill Gallery](https://github.com/iMoonDay/AdvancedSkills/raw/1.20.1/screenshots/gallery.png)

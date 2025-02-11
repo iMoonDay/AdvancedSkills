@@ -877,7 +877,7 @@ advskills_re:
         description: '%s 伪装时长'
     wall_jump:
       name: 蹬墙跳
-      description: 可以在墙上跳跃
+      description: 可以在墙上跳跃，落地时摔落伤害减半
       force:
         name: 力量增幅
         description: '%s 跳跃力度'
