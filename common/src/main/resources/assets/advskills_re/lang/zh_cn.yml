@@ -711,6 +711,7 @@ advskills_re:
     thunder_fury:
       name: 雷霆之怒
       description: 召唤一道闪电
+      failed: 无效的召唤坐标
       lightning_immune:
         name: 免疫增幅
         description: 免疫己方闪电
@@ -1055,6 +1056,7 @@ advskills_re:
         render: 渲染
         general: 通用
         global: 全局
+        editor: 简易技能编辑器
       uiOffsetX: 技能栏X偏移量
       uiOffsetY: 技能栏Y偏移量
       skillSorter: 技能排序方式
@@ -1101,6 +1103,13 @@ advskills_re:
       skillCooldownMultiplier: 技能冷却倍率
       skillXpMultiplier: 技能经验倍率
       skillBlackList: 技能黑名单
+      skillSettingsLocation: '全局配置路径: ./config/advskills_re/skills'
+      skillParameter:
+        cooldown: 冷却时间 (Tick)
+        rarity: 稀有度
+        disabled: 禁用
+        weight: 权重
+        drawable: 可抽取
   widget:
     enhancement_list:
       empty: 尚未获得增幅

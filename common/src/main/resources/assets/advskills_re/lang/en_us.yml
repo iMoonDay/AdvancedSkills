@@ -711,6 +711,7 @@ advskills_re:
     thunder_fury:
       name: Thunder Fury
       description: Summon a lightning bolt
+      failed: Invalid summoning coordinates
       lightning_immune:
         name: Immunity Enhancement
         description: Immune to Self Lightning
@@ -1055,6 +1056,7 @@ advskills_re:
         render: Render
         general: General
         global: Global
+        editor: Simple Skill Editor
       uiOffsetX: Skill Slot X Offset
       uiOffsetY: Skill Slot Y Offset
       skillSorter: Skill Sorter
@@ -1101,6 +1103,13 @@ advskills_re:
       skillCooldownMultiplier: Skill Cooldown Multiplier
       skillXpMultiplier: Skill Xp Multiplier
       skillBlackList: Skill Black List
+      skillSettingsLocation: 'Global config path: ./config/advskills_re/skills'
+      skillParameter:
+        cooldown: Cooldown (Tick)
+        rarity: Rarity
+        disabled: Disabled
+        weight: Weight
+        drawable: Drawable
   widget:
     enhancement_list:
       empty: Empty

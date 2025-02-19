@@ -5,26 +5,29 @@ import com.imoonday.advskills_re.client.ClientConfig.Companion.DEFAULT_LAYOUT_ST
 import com.imoonday.advskills_re.client.render.*
 import com.imoonday.advskills_re.component.*
 import com.imoonday.advskills_re.config.*
+import com.imoonday.advskills_re.init.*
 import com.imoonday.advskills_re.network.*
 import com.imoonday.advskills_re.network.s2c.*
+import com.imoonday.advskills_re.skill.*
 import com.imoonday.advskills_re.skill.enums.*
 import com.imoonday.advskills_re.util.*
 import com.mojang.logging.*
 import me.shedaniel.clothconfig2.api.*
+import me.shedaniel.clothconfig2.gui.entries.*
 import net.minecraft.client.gui.screen.*
 import java.util.*
 
-object ConfigScreenHandler {
+class ModConfigScreenFactory {
 
-    private val LOGGER = LogUtils.getLogger()
+    private var cache: Screen? = null
+    private val clientConfig = ClientConfig.get()
+    private val globalConfig = GlobalConfig.get()
+    private val modifiedSettings = mutableMapOf<Skill, Skill.Settings>()
 
-    @JvmStatic
     fun createScreen(parent: Screen?): Screen? {
         if (!AdvancedSkillsClient.clothConfigLoaded) return parent
+        if (cache != null) return cache
         try {
-            val config = ClientConfig.get()
-            val globalConfig = GlobalConfig.get()
-
             val builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(translate("screen.config.title"))
@@ -32,11 +35,12 @@ object ConfigScreenHandler {
 
             val entryBuilder = builder.entryBuilder()
 
-            addRenderCategory(builder, entryBuilder, config)
-            addGeneralCategory(builder, entryBuilder, config)
-            addGlobalCategory(builder, entryBuilder, globalConfig)
+            addRenderCategory(builder, entryBuilder)
+            addGeneralCategory(builder, entryBuilder)
+            addGlobalCategory(builder, entryBuilder)
+            addSkillEditorCategory(builder, entryBuilder)
 
-            return builder.build()
+            return builder.build().also { cache = it }
         } catch (e: Exception) {
             LOGGER.error("Error while creating config screen", e)
             return parent
@@ -44,9 +48,11 @@ object ConfigScreenHandler {
     }
 
     private fun save() {
-        ClientConfig.get().save()
-        val globalConfig = GlobalConfig.get()
+        clientConfig.save()
         globalConfig.save()
+        modifiedSettings.forEach { (_, settings) ->
+            SettingsManager.saveSettings(settings)
+        }
 
         val client = client
         if (client?.isIntegratedServerRunning == true) {
@@ -55,14 +61,110 @@ object ConfigScreenHandler {
                     it.playerManager.playerList,
                     SyncConfigS2CPacket(globalConfig.toNbt(), SyncConfigS2CPacket.ConfigType.GLOBAL)
                 )
+                if (modifiedSettings.isNotEmpty()) {
+                    Channels.SYNC_SETTINGS_S2C.sendToPlayers(
+                        it.playerManager.playerList,
+                        SyncSettingsS2CPacket(modifiedSettings.values.toList())
+                    )
+                }
             }
         }
     }
 
+    private fun addSkillEditorCategory(builder: ConfigBuilder, entryBuilder: ConfigEntryBuilder) {
+        SettingsManager.loadFiles()
+
+        builder.getOrCreateCategory(translate("screen.config.category.editor")).run {
+
+            addEntry(
+                entryBuilder.startTextDescription(translate("screen.config.skillSettingsLocation")).build()
+            )
+
+            Skills.getSkills().forEach {
+                val entry = createEntry(entryBuilder, it)
+                if (entry != null) {
+                    addEntry(entry)
+                }
+            }
+        }
+    }
+
+    private fun createEntry(
+        builder: ConfigEntryBuilder,
+        skill: Skill
+    ): SubCategoryListEntry? {
+        val defaultSettings = Skills.createDefaultSkill(skill.id)?.settings ?: return null
+        val settings = Skill.Settings(SettingsManager.getSettings(skill) ?: return null)
+        return builder.startSubCategory(skill.name)
+            .setExpanded(false)
+            .apply {
+                add(builder.startIntField(translate("screen.config.skillParameter.cooldown"), settings.cooldown)
+                    .setDefaultValue(defaultSettings.cooldown)
+                    .setMin(0)
+                    .setSaveConsumer {
+                        if (it != settings.cooldown) {
+                            settings.cooldown = it
+                            modifiedSettings.putIfAbsent(skill, settings)
+                        }
+                    }
+                    .build()
+                )
+
+                add(builder.startSelector(
+                    translate("screen.config.skillParameter.rarity"), SkillRarity.rarities.toTypedArray(),
+                    settings.rarity
+                )
+                    .setDefaultValue(defaultSettings.rarity)
+                    .setNameProvider { it.format(it.displayName) }
+                    .setSaveConsumer {
+                        if (it != settings.rarity) {
+                            settings.rarity = it
+                            modifiedSettings.putIfAbsent(skill, settings)
+                        }
+                    }
+                    .build()
+                )
+
+                add(builder.startBooleanToggle(translate("screen.config.skillParameter.disabled"), settings.disabled)
+                    .setDefaultValue(defaultSettings.disabled)
+                    .setSaveConsumer {
+                        if (it != settings.disabled) {
+                            settings.disabled = it
+                            modifiedSettings.putIfAbsent(skill, settings)
+                        }
+                    }
+                    .build()
+                )
+
+                add(builder.startIntField(translate("screen.config.skillParameter.weight"), settings.weight)
+                    .setDefaultValue(defaultSettings.weight)
+                    .setMin(0)
+                    .setSaveConsumer {
+                        if (it != settings.weight) {
+                            settings.weight = it
+                            modifiedSettings.putIfAbsent(skill, settings)
+                        }
+                    }
+                    .build()
+                )
+
+                add(builder.startBooleanToggle(translate("screen.config.skillParameter.drawable"), settings.drawable)
+                    .setDefaultValue(defaultSettings.drawable)
+                    .setSaveConsumer {
+                        if (it != settings.drawable) {
+                            settings.drawable = it
+                            modifiedSettings.putIfAbsent(skill, settings)
+                        }
+                    }
+                    .build()
+                )
+            }
+            .build()
+    }
+
     private fun addGlobalCategory(
         builder: ConfigBuilder,
-        entryBuilder: ConfigEntryBuilder,
-        globalConfig: GlobalConfig
+        entryBuilder: ConfigEntryBuilder
     ) {
         builder.getOrCreateCategory(translate("screen.config.category.global")).run {
 
@@ -247,26 +349,25 @@ object ConfigScreenHandler {
 
     private fun addGeneralCategory(
         builder: ConfigBuilder,
-        entryBuilder: ConfigEntryBuilder,
-        config: ClientConfig
+        entryBuilder: ConfigEntryBuilder
     ) {
         builder.getOrCreateCategory(translate("screen.config.category.general")).run {
             addEntry(
                 entryBuilder.startIntField(
                     translate("screen.config.quickCastWheelHoldTime"),
-                    config.quickCastWheelHoldTime
+                    clientConfig.quickCastWheelHoldTime
                 ).setDefaultValue(250)
                     .setMin(0)
-                    .setSaveConsumer { config.quickCastWheelHoldTime = it }
+                    .setSaveConsumer { clientConfig.quickCastWheelHoldTime = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.developmentMode"),
-                    config.developmentMode
+                    clientConfig.developmentMode
                 ).setDefaultValue(false)
-                    .setSaveConsumer { config.developmentMode = it }
+                    .setSaveConsumer { clientConfig.developmentMode = it }
                     .build()
             )
         }
@@ -274,21 +375,20 @@ object ConfigScreenHandler {
 
     private fun addRenderCategory(
         builder: ConfigBuilder,
-        entryBuilder: ConfigEntryBuilder,
-        config: ClientConfig
+        entryBuilder: ConfigEntryBuilder
     ) {
         builder.getOrCreateCategory(translate("screen.config.category.render")).run {
             addEntry(
-                entryBuilder.startIntField(translate("screen.config.uiOffsetX"), config.uiOffsetX)
+                entryBuilder.startIntField(translate("screen.config.uiOffsetX"), clientConfig.uiOffsetX)
                     .setDefaultValue(0)
-                    .setSaveConsumer { config.uiOffsetX = it }
+                    .setSaveConsumer { clientConfig.uiOffsetX = it }
                     .build()
             )
 
             addEntry(
-                entryBuilder.startIntField(translate("screen.config.uiOffsetY"), config.uiOffsetY)
+                entryBuilder.startIntField(translate("screen.config.uiOffsetY"), clientConfig.uiOffsetY)
                     .setDefaultValue(0)
-                    .setSaveConsumer { config.uiOffsetY = it }
+                    .setSaveConsumer { clientConfig.uiOffsetY = it }
                     .build()
             )
 
@@ -296,15 +396,15 @@ object ConfigScreenHandler {
                 entryBuilder.startEnumSelector(
                     translate("screen.config.skillSorter"),
                     SkillSorter::class.java,
-                    config.skillSorter
+                    clientConfig.skillSorter
                 ).setDefaultValue(SkillSorter.DEFAULT)
                     .setEnumNameProvider { (it as SkillSorter).displayName }
-                    .setSaveConsumer { config.skillSorter = it }
+                    .setSaveConsumer { clientConfig.skillSorter = it }
                     .build()
             )
 
             addEntry(
-                entryBuilder.startStrList(translate("screen.config.layout"), config.getLayoutOfStringList())
+                entryBuilder.startStrList(translate("screen.config.layout"), clientConfig.getLayoutOfStringList())
                     .setDefaultValue(DEFAULT_LAYOUT_STRING_LIST)
                     .setCellErrorSupplier {
                         if (ClientConfig.isValidStringLayout(it)) Optional.empty()
@@ -326,24 +426,24 @@ object ConfigScreenHandler {
                                 missingNumbers.joinToString(", ")
                             )
                         )
-                    }.setSaveConsumer { config.setLayoutFromStringList(it) }.build()
+                    }.setSaveConsumer { clientConfig.setLayoutFromStringList(it) }.build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.hideSkillCrosshair"),
-                    config.hideSkillCrosshair
+                    clientConfig.hideSkillCrosshair
                 ).setDefaultValue(false)
-                    .setSaveConsumer { config.hideSkillCrosshair = it }
+                    .setSaveConsumer { clientConfig.hideSkillCrosshair = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.hideSkillInfo"),
-                    config.hideSkillInfo
+                    clientConfig.hideSkillInfo
                 ).setDefaultValue(false)
-                    .setSaveConsumer { config.hideSkillInfo = it }
+                    .setSaveConsumer { clientConfig.hideSkillInfo = it }
                     .build()
             )
 
@@ -351,10 +451,10 @@ object ConfigScreenHandler {
                 entryBuilder.startEnumSelector(
                     translate("screen.config.hideSkillSlots"),
                     HideMode::class.java,
-                    config.hideSkillSlots
+                    clientConfig.hideSkillSlots
                 ).setDefaultValue(HideMode.DYNAMICALLY_HIDE)
                     .setEnumNameProvider { (it as HideMode).displayName }
-                    .setSaveConsumer { config.hideSkillSlots = it }
+                    .setSaveConsumer { clientConfig.hideSkillSlots = it }
                     .build()
             )
 
@@ -362,65 +462,65 @@ object ConfigScreenHandler {
                 entryBuilder.startEnumSelector(
                     translate("screen.config.dynamicallyHideDirection"),
                     AnimationDirection::class.java,
-                    config.dynamicallyHideDirection
+                    clientConfig.dynamicallyHideDirection
                 ).setDefaultValue(AnimationDirection.RIGHT)
                     .setEnumNameProvider { (it as AnimationDirection).displayName }
-                    .setSaveConsumer { config.dynamicallyHideDirection = it }
+                    .setSaveConsumer { clientConfig.dynamicallyHideDirection = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startAlphaColorField(
                     translate("screen.config.progressBarColor"),
-                    config.progressBarColor
+                    clientConfig.progressBarColor
                 ).setDefaultValue(0xFFFFEE58.toInt())
                     .setAlphaMode(true)
-                    .setSaveConsumer { config.progressBarColor = it }
+                    .setSaveConsumer { clientConfig.progressBarColor = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.displayProgressBarBelowCrosshair"),
-                    config.displayProgressBarBelowCrosshair
+                    clientConfig.displayProgressBarBelowCrosshair
                 ).setDefaultValue(true)
-                    .setSaveConsumer { config.displayProgressBarBelowCrosshair = it }
+                    .setSaveConsumer { clientConfig.displayProgressBarBelowCrosshair = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startIntField(
                     translate("screen.config.progressBarOffsetY"),
-                    config.progressBarOffsetY
+                    clientConfig.progressBarOffsetY
                 ).setDefaultValue(0)
-                    .setSaveConsumer { config.progressBarOffsetY = it }
+                    .setSaveConsumer { clientConfig.progressBarOffsetY = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.displaySelectedSkillSlot"),
-                    config.displaySelectedSkillSlot
+                    clientConfig.displaySelectedSkillSlot
                 ).setDefaultValue(true)
-                    .setSaveConsumer { config.displaySelectedSkillSlot = it }
+                    .setSaveConsumer { clientConfig.displaySelectedSkillSlot = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.displayQuickCastKey"),
-                    config.displayQuickCastKey
+                    clientConfig.displayQuickCastKey
                 ).setDefaultValue(true)
-                    .setSaveConsumer { config.displayQuickCastKey = it }
+                    .setSaveConsumer { clientConfig.displayQuickCastKey = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.useVanillaSlot"),
-                    config.useVanillaSlot
+                    clientConfig.useVanillaSlot
                 ).setDefaultValue(false)
-                    .setSaveConsumer { config.useVanillaSlot = it }
+                    .setSaveConsumer { clientConfig.useVanillaSlot = it }
                     .build()
             )
 
@@ -428,57 +528,62 @@ object ConfigScreenHandler {
                 entryBuilder.startEnumSelector(
                     translate("screen.config.selectedSlotPosition"),
                     SlotPosition::class.java,
-                    config.selectedSlotPosition
+                    clientConfig.selectedSlotPosition
                 ).setDefaultValue(SlotPosition.LEFT_OF_HOTBAR)
                     .setEnumNameProvider { (it as SlotPosition).displayName }
-                    .setSaveConsumer { config.selectedSlotPosition = it }
+                    .setSaveConsumer { clientConfig.selectedSlotPosition = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startIntField(
                     translate("screen.config.selectedSlotOffsetX"),
-                    config.selectedSlotOffsetX
+                    clientConfig.selectedSlotOffsetX
                 ).setDefaultValue(0)
-                    .setSaveConsumer { config.selectedSlotOffsetX = it }
+                    .setSaveConsumer { clientConfig.selectedSlotOffsetX = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startIntField(
                     translate("screen.config.selectedSlotOffsetY"),
-                    config.selectedSlotOffsetY
+                    clientConfig.selectedSlotOffsetY
                 ).setDefaultValue(0)
-                    .setSaveConsumer { config.selectedSlotOffsetY = it }
+                    .setSaveConsumer { clientConfig.selectedSlotOffsetY = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.useRingCastingWheel"),
-                    config.useRingCastingWheel
+                    clientConfig.useRingCastingWheel
                 ).setDefaultValue(true)
-                    .setSaveConsumer { config.useRingCastingWheel = it }
+                    .setSaveConsumer { clientConfig.useRingCastingWheel = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.disableLearningNotifications"),
-                    config.disableLearningNotifications
+                    clientConfig.disableLearningNotifications
                 ).setDefaultValue(false)
-                    .setSaveConsumer { config.disableLearningNotifications = it }
+                    .setSaveConsumer { clientConfig.disableLearningNotifications = it }
                     .build()
             )
 
             addEntry(
                 entryBuilder.startBooleanToggle(
                     translate("screen.config.disableStatusEffectRenderers"),
-                    config.disableStatusEffectRenderers
+                    clientConfig.disableStatusEffectRenderers
                 ).setDefaultValue(false)
-                    .setSaveConsumer { config.disableStatusEffectRenderers = it }
+                    .setSaveConsumer { clientConfig.disableStatusEffectRenderers = it }
                     .build()
             )
         }
+    }
+
+    companion object {
+
+        private val LOGGER = LogUtils.getLogger()
     }
 }

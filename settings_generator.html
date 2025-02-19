@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>进阶技能：技能配置生成器 v3</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <style>
+        :root {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .form-row {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        label {
+            flex: 0 0 180px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .dynamic-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .config-group {
+            margin-left: 25px;
+            padding-left: 15px;
+            border-left: 3px solid #3498db;
+        }
+        
+        .error {
+            border-color: #e74c3c !important;
+        }
+        
+        .warning-tag {
+            color: #e67e22;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        #output {
+            margin-top: 30px;
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            max-height: 600px;
+            overflow: auto;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .rarity-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .rarity-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+        
+        .rarity-option:hover {
+            border-color: #3498db;
+        }
+        
+        .rarity-option.selected {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .rarity-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 0 2px rgba(0,0,0,0.1);
+        }
+        
+        .rarity-option span {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .types-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .type-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+        
+        .type-option:hover {
+            border-color: #3498db;
+        }
+        
+        .type-option.selected {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .type-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .type-option span {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            flex: 0 0 50px;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .toggle-container:hover {
+            border-color: #3498db;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #3498db;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .toggle-label {
+            margin-left: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .enhancement-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            min-height: 42px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .enhancement-selector:hover {
+            border-color: #3498db;
+        }
+        
+        .enhancement-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            font-size: 14px;
+        }
+        
+        .enhancement-option:hover {
+            border-color: #3498db;
+            background: #f0f7fc;
+        }
+        
+        .enhancement-option.selected {
+            border-color: #3498db;
+            background: #ebf5fb;
+        }
+        
+        .enhancement-option .operation-icon {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .option-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+        
+        .option-item:hover {
+            border-color: #3498db;
+        }
+        
+        .option-item.selected {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        .option-item span {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .option-item .icon {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>进阶技能：技能配置生成器 v3</h1>
+
+        <!-- 基础属性 -->
+        <div class="section">
+            <h2>基础参数</h2>
+            <div class="form-row">
+                <label>技能ID</label>
+                <input type="text" id="base_id" placeholder="advskills_re:example">
+            </div>
+            <div class="form-row">
+                <label>名称</label>
+                <div style="flex:1">
+                    <div class="input-type-selector" style="margin-bottom:8px;display:flex">
+                        <label style="flex:0 0 auto;margin-right:15px">
+                            <input type="radio" name="name_type" value="translate" checked> 翻译键
+                        </label>
+                        <label style="flex:0 0 auto">
+                            <input type="radio" name="name_type" value="text"> 文本
+                        </label>
+                    </div>
+                    <div style="display:flex">
+                        <input type="text" id="name" placeholder="advskills_re.skill.example.name" style="flex:1">
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>描述</label>
+                <div style="flex:1">
+                    <div class="input-type-selector" style="margin-bottom:8px;display:flex">
+                        <label style="flex:0 0 auto;margin-right:15px">
+                            <input type="radio" name="desc_type" value="translate" checked> 翻译键
+                        </label>
+                        <label style="flex:0 0 auto">
+                            <input type="radio" name="desc_type" value="text"> 文本
+                        </label>
+                    </div>
+                    <div style="display:flex">
+                        <textarea id="description" rows="1" 
+                            placeholder="advskills_re.skill.example.description" 
+                            style="flex:1;resize:vertical;min-height:38px;padding-top:7px;padding-bottom:7px"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>图标路径</label>
+                <input type="text" id="icon" placeholder="modid:textures/item/example.png">
+            </div>
+            <div class="form-row">
+                <label>冷却时间(tick)</label>
+                <input type="number" id="cooldown" min="0">
+            </div>
+            <div class="form-row">
+                <label>稀有度</label>
+                <div class="rarity-selector">
+                    <div class="rarity-option" data-value="common">
+                        <div class="rarity-color" style="background:#F0F0F0"></div>
+                        <span>普通</span>
+                    </div>
+                    <div class="rarity-option" data-value="uncommon">
+                        <div class="rarity-color" style="background:#55FF55"></div>
+                        <span>罕见</span>
+                    </div>
+                    <div class="rarity-option" data-value="rare">
+                        <div class="rarity-color" style="background:#55FFFF"></div>
+                        <span>稀有</span>
+                    </div>
+                    <div class="rarity-option" data-value="superb">
+                        <div class="rarity-color" style="background:#FFAA00"></div>
+                        <span>卓越</span>
+                    </div>
+                    <div class="rarity-option" data-value="epic">
+                        <div class="rarity-color" style="background:#FF5555"></div>
+                        <span>史诗</span>
+                    </div>
+                    <div class="rarity-option" data-value="legendary">
+                        <div class="rarity-color" style="background:#FF55FF"></div>
+                        <span>传奇</span>
+                    </div>
+                    <div class="rarity-option" data-value="mythic">
+                        <div class="rarity-color" style="background:#AA00AA"></div>
+                        <span>神话</span>
+                    </div>
+                    <div class="rarity-option" data-value="unique">
+                        <div class="rarity-color" style="background:#AA0000"></div>
+                        <span>无双</span>
+                    </div>
+                </div>
+                <input type="hidden" id="rarity" value="common">
+            </div>
+            <div class="form-row">
+                <label>权重</label>
+                <input type="number" id="weight" min="0">
+            </div>
+            <div class="form-row">
+                <label>禁用技能</label>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="disabled">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">禁用后该技能将隐藏</span>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>可抽取</label>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="drawable" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">是否可以通过抽取获得</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 技能类型 -->
+        <div class="section">
+            <h2>技能类型（多选）</h2>
+            <div class="types-selector">
+                <div class="type-option" data-value="attack">
+                    <div class="type-icon">⚔️</div>
+                    <span>攻击类</span>
+                </div>
+                <div class="type-option" data-value="defense">
+                    <div class="type-icon">🛡️</div>
+                    <span>防御类</span>
+                </div>
+                <div class="type-option" data-value="utility">
+                    <div class="type-icon">🔧</div>
+                    <span>实用类</span>
+                </div>
+                <div class="type-option" data-value="control">
+                    <div class="type-icon">🎯</div>
+                    <span>控制类</span>
+                </div>
+                <div class="type-option" data-value="passive">
+                    <div class="type-icon">💫</div>
+                    <span>被动类</span>
+                </div>
+                <div class="type-option" data-value="enhancement">
+                    <div class="type-icon">⚡</div>
+                    <span>强化类</span>
+                </div>
+                <div class="type-option" data-value="summon">
+                    <div class="type-icon">🌟</div>
+                    <span>召唤类</span>
+                </div>
+                <div class="type-option" data-value="restoration">
+                    <div class="type-icon">❤️</div>
+                    <span>恢复类</span>
+                </div>
+                <div class="type-option" data-value="movement">
+                    <div class="type-icon">🏃</div>
+                    <span>移动类</span>
+                </div>
+                <div class="type-option" data-value="destruction">
+                    <div class="type-icon">💥</div>
+                    <span>破坏类</span>
+                </div>
+            </div>
+            <input type="hidden" id="types" value="">
+        </div>
+
+        <!-- 参数配置 -->
+        <div class="section">
+            <h2>参数配置</h2>
+            <div id="parameters-container"></div>
+            <div class="form-row" style="margin-top: 15px">
+                <button onclick="addParameter()" style="width: 100%">+ 添加参数</button>
+            </div>
+        </div>
+
+        <!-- 增幅配置 -->
+        <div class="section">
+            <h2>增幅配置</h2>
+            <div id="enhancements-container"></div>
+            <div class="form-row" style="margin-top: 15px">
+                <button onclick="addEnhancement()" style="width: 100%">+ 添加增幅</button>
+            </div>
+        </div>
+
+        <!-- 操作区 -->
+        <div class="section">
+            <button onclick="exportJSON()" style="background:#f39c12">导出JSON</button>
+            <button onclick="loadExample()" style="background:#8e44ad">加载示例</button>
+            <button onclick="resetForm()" style="background:#e74c3c">重置</button>
+        </div>
+
+        <!-- 输出预览 -->
+        <pre id="output"></pre>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>
+        // 参数类型配置
+        const paramTemplates = {
+            int: {
+                name: "整数",
+                template: `<input type="number" class="base-value" step="1" placeholder="整数值">`,
+                parser: el => {
+                    const value = parseInt(el.querySelector('.base-value').value);
+                    return isNaN(value) ? 0 : value;
+                }
+            },
+            float: {
+                name: "浮点数",
+                template: `<input type="number" class="base-value" step="0.1" placeholder="浮点值">`,
+                parser: el => {
+                    const value = parseFloat(el.querySelector('.base-value').value);
+                    return isNaN(value) ? 0.0 : value;
+                }
+            },
+            double: {
+                name: "双精度",
+                template: `<input type="number" class="base-value" step="0.1" placeholder="双精度值">`,
+                parser: el => {
+                    const value = parseFloat(el.querySelector('.base-value').value);
+                    return isNaN(value) ? 0.0 : value;
+                }
+            },
+            string: {
+                name: "字符串",
+                template: `<input type="text" class="base-value" placeholder="字符串值">`,
+                parser: el => el.querySelector('.base-value').value
+            },
+            boolean: {
+                name: "布尔值",
+                template: `
+                    <div class="toggle-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="base-value">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">切换开关状态</span>
+                    </div>`,
+                parser: el => el.querySelector('.base-value').checked
+            },
+            sound: {
+                name: "音效",
+                template: `
+                    <div class="config-group">
+                        <div class="form-row">
+                            <label>音效ID</label>
+                            <input type="text" class="sound_id">
+                        </div>
+                        <div class="form-row">
+                            <label>音效范围 <span style="color:#7f8c8d;font-size:12px">(可选)</span></label>
+                            <input type="text" class="range">
+                        </div>
+                    </div>`,
+                parser: el => {
+                    const soundId = el.querySelector('.sound_id').value.trim();
+                    if (!soundId) return undefined;
+                    
+                    const range = el.querySelector('.range').value.trim();
+                    return {
+                        sound_id: soundId,
+                        ...(range && { range })
+                    };
+                }
+            },
+            list: {
+                name: "列表",
+                template: `
+                    <div class="config-group" style="display:flex;flex-direction:column;gap:10px">
+                        <div style="display:flex;gap:10px;align-items:center">
+                            <label style="flex:0 0 auto">列表类型</label>
+                            <div class="option-selector list-type-selector" style="flex:1">
+                                <div class="option-item" data-value="int">
+                                    <span>整数</span>
+                                </div>
+                                <div class="option-item" data-value="float">
+                                    <span>浮点数</span>
+                                </div>
+                                <div class="option-item" data-value="double">
+                                    <span>双精度</span>
+                                </div>
+                                <div class="option-item" data-value="boolean">
+                                    <span>布尔值</span>
+                                </div>
+                                <div class="option-item" data-value="string">
+                                    <span>字符串</span>
+                                </div>
+                            </div>
+                            <input type="hidden" class="list-type" value="int">
+                        </div>
+                        <div class="list-items-container"></div>
+                        <button type="button" onclick="addListItem(this)" style="align-self:stretch">+ 添加项目</button>
+                    </div>`,
+                parser: el => {
+                    const type = el.querySelector('.list-type').value;
+                    const items = el.querySelectorAll('.list-item input');
+                    const values = Array.from(items)
+                        .map(input => input.value.trim())
+                        .filter(Boolean);
+                    
+                    if (values.length === 0) return undefined;
+                    
+                    return values.map(v => {
+                        if (type === 'int') {
+                            const num = parseInt(v);
+                            return isNaN(num) ? 0 : num;
+                        }
+                        if (type === 'float' || type === 'double') {
+                            const num = parseFloat(v);
+                            return isNaN(num) ? 0.0 : num;
+                        }
+                        if (type === 'boolean') {
+                            return v.toLowerCase() === 'true';
+                        }
+                        return v;
+                    });
+                }
+            }
+        }
+
+        // 完整权重配置
+        const weightConfigs = {
+            fixed: {
+                name: "固定权重",
+                template: `
+                    <div class="form-row">
+                        <label>固定值</label>
+                        <input type="number" class="fixed-value">
+                    </div>`,
+                parser: el => parseInt(el.querySelector('.fixed-value').value) || 0
+            },
+            random: {
+                name: "随机权重",
+                template: `
+                    <div class="config-group">
+                        <div class="form-row">
+                            <label>最小值</label>
+                            <input type="number" class="min">
+                        </div>
+                        <div class="form-row">
+                            <label>最大值</label>
+                            <input type="number" class="max">
+                        </div>
+                    </div>`,
+                parser: el => ({
+                    min: parseInt(el.querySelector('.min').value) || 0,
+                    max: parseInt(el.querySelector('.max').value) || 0
+                })
+            },
+            level: {
+                name: "等级权重",
+                template: `
+                    <div class="form-row">
+                        <label>倍率系数</label>
+                        <input type="number" class="multiplier" step="0.01">
+                    </div>`,
+                parser: el => ({
+                    multiplier: parseFloat(el.querySelector('.multiplier').value) || 1.0
+                })
+            },
+            custom: {
+                name: "自定义权重",
+                template: `
+                    <div class="config-group">
+                        <div class="form-row">
+                            <label>默认权重</label>
+                            <input type="number" class="default">
+                        </div>
+                        <button type="button" onclick="addCustomPair(this)" style="width:100%;margin:10px 0">+ 添加等级权重</button>
+                        <div class="custom-pairs-container"></div>
+                    </div>`,
+                parser: el => {
+                    const pairs = el.querySelectorAll('.custom-pair');
+                    const map = {};
+                    pairs.forEach(pair => {
+                        const key = pair.querySelector('.pair-key').value.trim();
+                        const value = parseInt(pair.querySelector('.pair-value').value);
+                        if (key && !isNaN(value)) {
+                            map[key] = value;
+                        }
+                    });
+                    return {
+                        map: map,
+                        default: parseInt(el.querySelector('.default').value) || 0
+                    }
+                }
+            },
+            expression: {
+                name: "表达式权重",
+                template: `
+                    <div class="form-row">
+                        <label>数学表达式</label>
+                        <input type="text" class="expr" 
+                            placeholder="{level}*2+5">
+                    </div>`,
+                parser: el => ({
+                    expression: el.querySelector('.expr').value
+                })
+            },
+            file: {
+                name: "文件权重",
+                template: `
+                    <div class="form-row">
+                        <label>文件路径</label>
+                        <input type="text" class="file-path" 
+                            placeholder="path/to/config_{level}.json">
+                    </div>`,
+                parser: el => ({
+                    filePath: el.querySelector('.file-path').value
+                })
+            },
+            increment: {
+                name: "递增权重",
+                template: `
+                    <div class="config-group">
+                        <div class="form-row">
+                            <label>初始权重</label>
+                            <input type="number" class="start">
+                        </div>
+                        <div class="form-row">
+                            <label>增量</label>
+                            <input type="number" class="increment">
+                        </div>
+                    </div>`,
+                parser: el => ({
+                    start: parseInt(el.querySelector('.start').value) || 0,
+                    increment: parseInt(el.querySelector('.increment').value) || 0
+                })
+            }
+        }
+
+        // 添加防抖函数
+        const debounce = (func, delay = 300) => {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => func.apply(this, args), delay);
+            };
+        };
+
+        // 修改DOMContentLoaded事件监听器
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化时生成一次
+            generateJSON();
+            
+            // 监听所有输入变化
+            const observer = new MutationObserver(debounce(generateJSON));
+            const config = { 
+                childList: true,
+                subtree: true,
+                attributes: true,
+                characterData: true 
+            };
+            
+            // 观察整个容器
+            observer.observe(document.querySelector('.container'), config);
+
+            // 手动监听特殊输入
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                el.addEventListener('input', debounce(generateJSON));
+            });
+
+            // 技能类型选择器初始化
+            const typesSelector = document.querySelector('.types-selector');
+            const typesInput = document.getElementById('types');
+            
+            // 处理技能类型点击事件
+            typesSelector.addEventListener('click', e => {
+                const option = e.target.closest('.type-option');
+                if (!option) return;
+                
+                // 切换选中状态
+                option.classList.toggle('selected');
+                
+                // 更新隐藏的input值
+                const selectedTypes = Array.from(typesSelector.querySelectorAll('.type-option.selected'))
+                    .map(opt => opt.dataset.value);
+                typesInput.value = selectedTypes.join(',');
+            });
+
+            // 稀有度选择器初始化
+            const raritySelector = document.querySelector('.rarity-selector');
+            const rarityInput = document.getElementById('rarity');
+            
+            // 设置初始选中状态
+            const initialOption = raritySelector.querySelector(`[data-value="${rarityInput.value}"]`);
+            if (initialOption) {
+                initialOption.classList.add('selected');
+            }
+            
+            // 处理稀有度点击事件
+            raritySelector.addEventListener('click', e => {
+                const option = e.target.closest('.rarity-option');
+                if (!option) return;
+                
+                // 移除其他选项的选中状态
+                raritySelector.querySelectorAll('.rarity-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // 设置当前选项的选中状态
+                option.classList.add('selected');
+                
+                // 更新隐藏的input值
+                rarityInput.value = option.dataset.value;
+            });
+        });
+
+        // 修改generateJSON函数（移除手动调用）
+        function generateJSON() {
+            const config = {
+                version: 3,
+                settings: {}
+            };
+
+            // 基础属性
+            const baseId = document.getElementById('base_id').value.trim();
+            if (baseId) config.settings.id = baseId;
+
+            const nameType = document.querySelector('input[name="name_type"]:checked').value;
+            const nameValue = document.getElementById('name').value.trim();
+            if (nameValue) {
+                config.settings.name = nameType === 'translate' ? { translate: nameValue } : nameValue;
+            }
+
+            const descType = document.querySelector('input[name="desc_type"]:checked').value;
+            const descValue = document.getElementById('description').value.trim();
+            if (descValue) {
+                config.settings.description = descType === 'translate' ? { translate: descValue } : descValue;
+            }
+
+            const icon = document.getElementById('icon').value.trim();
+            if (icon) config.settings.icon = icon;
+
+            const types = document.getElementById('types').value.split(',').filter(Boolean);
+            if (types.length > 0) config.settings.types = types;
+
+            const cooldown = parseInt(document.getElementById('cooldown').value);
+            if (!isNaN(cooldown) && cooldown > 0) config.settings.cooldown = cooldown;
+
+            const rarity = document.getElementById('rarity').value;
+            if (rarity) config.settings.rarity = rarity;
+
+            const weight = parseInt(document.getElementById('weight').value);
+            if (!isNaN(weight) && weight > 0) config.settings.weight = weight;
+
+            if (document.getElementById('disabled').checked) {
+                config.settings.disabled = true;
+            }
+
+            if (!document.getElementById('drawable').checked) {
+                config.settings.drawable = false;
+            }
+
+            // 参数配置
+            const parameters = {};
+            document.querySelectorAll('#parameters-container .dynamic-item').forEach(item => {
+                try {
+                    const paramName = item.querySelector('.param-name').value.trim();
+                    if (!paramName) return;
+
+                    const paramType = item.querySelector('.param-type').value;
+                    const enhSelector = item.querySelector('.enhancement-selector');
+                    const enhList = enhSelector ? 
+                        Array.from(enhSelector.querySelectorAll('.enhancement-option.selected')) : [];
+                    
+                    const baseValue = paramTemplates[paramType].parser(item.querySelector('.param-config-area'));
+                    if (baseValue === undefined) return;
+
+                    const param = {
+                        baseValue: baseValue
+                    };
+
+                    if (enhList.length > 0) {
+                        param.enhancements = enhList.map(opt => opt.dataset.id);
+                    }
+
+                    parameters[paramName] = param;
+                } catch (error) {
+                    showError(item, error.message);
+                }
+            });
+
+            if (Object.keys(parameters).length > 0) {
+                config.settings.parameters = parameters;
+            }
+
+            // 增幅配置
+            const enhancements = [];
+            document.querySelectorAll('#enhancements-container .dynamic-item').forEach(item => {
+                try {
+                    const enhId = item.querySelector('.enh-id').value.trim();
+                    if (!enhId) return;
+
+                    const operation = item.querySelector('.enh-operation').value;
+                    const enh = {
+                        id: enhId,
+                        operation: operation,
+                        descArg: item.querySelector('.desc-arg').value
+                    };
+
+                    if (operation !== 'none') {
+                        const valuePerLvl = parseFloat(item.querySelector('.value-per-lvl').value);
+                        const maxLevel = parseInt(item.querySelector('.max-level').value);
+                        if (!isNaN(valuePerLvl)) enh.valuePerLvl = valuePerLvl;
+                        if (!isNaN(maxLevel) && maxLevel > 0) enh.maxLevel = maxLevel;
+                    }
+
+                    const weightType = item.querySelector('.weight-type').value;
+                    const weight = weightConfigs[weightType].parser(item.querySelector('.weight-config-area'));
+                    if (weight !== undefined && (
+                        typeof weight === 'number' ? weight > 0 : 
+                        Object.values(weight).some(v => typeof v === 'number' ? v > 0 : true)
+                    )) {
+                        enh.weight = weight;
+                    }
+
+                    if (Object.keys(enh).length > 2) { // 至少要有id和operation以外的字段
+                        enhancements.push(enh);
+                    }
+                } catch (error) {
+                    showError(item, error.message);
+                }
+            });
+
+            if (enhancements.length > 0) {
+                config.settings.enhancements = enhancements;
+            }
+
+            // 输出结果
+            const output = document.getElementById('output');
+            output.textContent = JSON.stringify(config, null, 2);
+            hljs.highlightElement(output);
+        }
+
+        function showError(element, message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            element.appendChild(errorDiv);
+            element.classList.add('error');
+            setTimeout(() => {
+                errorDiv.remove();
+                element.classList.remove('error');
+            }, 3000);
+        }
+
+        function exportJSON() {
+            const data = document.getElementById('output').textContent;
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'skill_config.json';
+            a.click();
+        }
+
+        function resetForm() {
+            // 清空所有输入
+            document.getElementById('base_id').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('icon').value = '';
+            document.getElementById('cooldown').value = '';
+            document.getElementById('rarity').value = 'common';
+            document.getElementById('weight').value = '';
+            document.getElementById('disabled').checked = false;
+            document.getElementById('drawable').checked = true;
+            document.getElementById('types').value = '';
+            document.getElementById('parameters-container').innerHTML = '';
+            document.getElementById('enhancements-container').innerHTML = '';
+            document.getElementById('output').textContent = '';
+            
+            // 重置稀有度选择
+            document.getElementById('rarity').value = 'common';
+            document.querySelectorAll('.rarity-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.value === 'common') {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            // 重置技能类型选择
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            document.querySelector('input[name="name_type"][value="translate"]').checked = true;
+            document.querySelector('input[name="desc_type"][value="translate"]').checked = true;
+            document.getElementById('name').value = '';
+            document.getElementById('description').value = '';
+        }
+
+        function loadExample() {
+            // 清空现有配置
+            resetForm();
+
+            // 基础示例
+            document.getElementById('base_id').value = 'advskills_re:absolute_defense';
+            document.getElementById('name').value = 'advskills_re.skill.absolute_defense.name';
+            document.getElementById('description').value = 'advskills_re.skill.absolute_defense.description';
+            document.getElementById('icon').value = 'advskills_re:textures/item/absolute_defense.png';
+            document.getElementById('cooldown').value = 600;
+            document.getElementById('rarity').value = 'superb';
+            document.getElementById('weight').value = 5;
+            document.getElementById('disabled').checked = false;
+            document.getElementById('drawable').checked = true;
+            
+            // 选择多个类型
+            const types = ['defense', 'passive', 'enhancement'];
+            document.getElementById('types').value = types.join(',');
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (types.includes(opt.dataset.value)) {
+                    opt.classList.add('selected');
+                }
+            });
+
+            // 添加增幅配置示例
+            addEnhancement();
+            const powerEnh = document.querySelector('#enhancements-container .dynamic-item:last-child');
+            powerEnh.querySelector('.enh-id').value = 'power';
+            
+            // 设置操作类型
+            const powerOperation = powerEnh.querySelector('.operation-selector [data-value="multiply_total"]');
+            powerOperation.click();
+            
+            // 设置描述参数类型
+            const powerDescArg = powerEnh.querySelector('.desc-arg-selector [data-value="float_percent"]');
+            powerDescArg.click();
+            
+            powerEnh.querySelector('.value-per-lvl').value = 0.15;
+            powerEnh.querySelector('.max-level').value = 5;
+            
+            // 设置权重类型
+            const powerWeight = powerEnh.querySelector('.weight-type-selector [data-value="fixed"]');
+            powerWeight.click();
+            updateWeightConfig(powerEnh.querySelector('.weight-type'));
+            powerEnh.querySelector('.fixed-value').value = 10;
+
+            addEnhancement();
+            const durationEnh = document.querySelector('#enhancements-container .dynamic-item:last-child');
+            durationEnh.querySelector('.enh-id').value = 'duration';
+            
+            // 设置操作类型
+            const durationOperation = durationEnh.querySelector('.operation-selector [data-value="addition"]');
+            durationOperation.click();
+            
+            // 设置描述参数类型
+            const durationDescArg = durationEnh.querySelector('.desc-arg-selector [data-value="int"]');
+            durationDescArg.click();
+            
+            durationEnh.querySelector('.value-per-lvl').value = 20;
+            durationEnh.querySelector('.max-level').value = 5;
+            
+            // 设置权重类型
+            const durationWeight = durationEnh.querySelector('.weight-type-selector [data-value="increment"]');
+            durationWeight.click();
+            updateWeightConfig(durationEnh.querySelector('.weight-type'));
+            durationEnh.querySelector('.start').value = 10;
+            durationEnh.querySelector('.increment').value = -2;
+
+            // 更新增幅ID选择框
+            updateEnhancementSelects();
+
+            // 添加参数示例
+            addParameter();
+            const intParam = document.querySelector('#parameters-container .dynamic-item:last-child');
+            intParam.querySelector('.param-name').value = 'duration';
+            
+            // 设置参数类型
+            const paramType = intParam.querySelector('.param-type-selector [data-value="int"]');
+            paramType.click();
+            updateParamConfig(intParam.querySelector('.param-type'));
+            intParam.querySelector('.base-value').value = 100;
+            intParam.querySelector('.enhancement-ids').value = 'duration,power';
+            updateEnhancementSelects();
+            
+            // 设置稀有度
+            const rarityValue = 'superb';
+            document.getElementById('rarity').value = rarityValue;
+            document.querySelectorAll('.rarity-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.value === rarityValue) {
+                    opt.classList.add('selected');
+                }
+            });
+        }
+
+        // 添加自定义键值对的函数
+        function addCustomPair(button) {
+            const container = button.nextElementSibling;
+            const pairDiv = document.createElement('div');
+            pairDiv.className = 'form-row custom-pair';
+            pairDiv.style.marginBottom = '10px';
+            
+            // 获取当前键值对数量，用于自动填充等级
+            const currentPairs = container.querySelectorAll('.custom-pair').length;
+            const nextLevel = currentPairs + 1;
+            
+            pairDiv.innerHTML = `
+                <input type="text" class="pair-key" placeholder="等级" value="${nextLevel}" style="flex:1;margin-right:10px">
+                <input type="number" class="pair-value" placeholder="权重" style="flex:1;margin-right:10px">
+                <button type="button" onclick="this.parentElement.remove()" style="background:#e74c3c;padding:5px 10px">×</button>
+            `;
+            container.appendChild(pairDiv);
+        }
+
+        // 添加列表项目的函数
+        function addListItem(button) {
+            const container = button.previousElementSibling;
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'form-row list-item';
+            itemDiv.style.marginBottom = '5px';
+            itemDiv.innerHTML = `
+                <input type="text" style="flex:1;margin-right:10px">
+                <button type="button" onclick="this.parentElement.remove()" style="background:#e74c3c;padding:5px 10px">×</button>
+            `;
+            container.appendChild(itemDiv);
+        }
+
+        // 添加增幅删除函数
+        function removeEnhancement(button) {
+            button.closest('.dynamic-item').remove();
+            updateEnhancementSelects();
+        }
+
+        // 修改updateParamConfig函数
+        function updateParamConfig(select) {
+            const type = select.value;
+            const container = select.closest('.dynamic-item');
+            const area = container.querySelector('.param-config-area');
+            area.innerHTML = paramTemplates[type].template;
+            
+            // 如果是列表类型，初始化列表类型选择器
+            if (type === 'list') {
+                initializeOptionSelectors(area);
+            }
+        }
+
+        // 修改updateWeightConfig函数
+        function updateWeightConfig(select) {
+            const type = select.value;
+            const container = select.closest('.dynamic-item');
+            const area = container.querySelector('.weight-config-area');
+            area.innerHTML = weightConfigs[type].template;
+        }
+
+        // 动态添加参数
+        function addParameter() {
+            const container = document.createElement('div');
+            container.className = 'dynamic-item';
+            container.innerHTML = `
+                <div class="form-row">
+                    <label>参数名称</label>
+                    <input type="text" class="param-name" style="flex:1">
+                    <button onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+                <div class="form-row">
+                    <label>参数类型</label>
+                    <div class="option-selector param-type-selector" style="flex:1">
+                        ${Object.entries(paramTemplates).map(([key, value]) => `
+                            <div class="option-item" data-value="${key}">
+                                <span>${value.name}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <input type="hidden" class="param-type" value="int">
+                </div>
+                <div class="form-row">
+                    <label>参数值</label>
+                    <div class="param-config-area" style="flex:1;display:flex"></div>
+                </div>
+                <div class="form-row">
+                    <label>可用增幅</label>
+                    <div class="enhancement-selector">
+                        <span style="color:#7f8c8d;font-size:12px">暂无可用增幅配置</span>
+                    </div>
+                    <input type="hidden" class="enhancement-ids">
+                </div>
+            `;
+            document.getElementById('parameters-container').appendChild(container);
+            initializeOptionSelectors(container);
+            updateParamConfig(container.querySelector('.param-type'));
+            updateEnhancementSelects();
+        }
+
+        // 修改更新增幅选择框的函数
+        function updateEnhancementSelects() {
+            // 获取所有增幅配置，包括位置信息
+            const enhancements = Array.from(document.querySelectorAll('#enhancements-container .dynamic-item'))
+                .map((item, index) => ({
+                    id: item.querySelector('.enh-id')?.value.trim(),
+                    operation: item.querySelector('.enh-operation')?.value,
+                    position: index
+                }))
+                .filter(enh => enh.id);
+            
+            // 更新所有参数的增幅选择框
+            document.querySelectorAll('.form-row').forEach(row => {
+                const selector = row.querySelector('.enhancement-selector');
+                if (!selector) return;
+                
+                // 如果没有增幅配置，隐藏整个行
+                if (enhancements.length === 0) {
+                    row.style.display = 'none';
+                    return;
+                } else {
+                    row.style.display = 'flex';
+                }
+
+                const hiddenInput = row.querySelector('.enhancement-ids');
+                const selectedValues = hiddenInput.value.split(',').filter(Boolean);
+                
+                // 获取当前选择器中的选中项位置信息
+                const oldSelections = Array.from(selector.querySelectorAll('.enhancement-option'))
+                    .map((opt, index) => ({
+                        id: opt.dataset.id,
+                        selected: opt.classList.contains('selected'),
+                        position: index
+                    }));
+                
+                selector.innerHTML = enhancements.map(enh => {
+                    // 查找相同位置的旧选项
+                    const oldOption = oldSelections.find(old => old.position === enh.position);
+                    // 如果找到旧选项且它是选中的，或者新ID在selectedValues中，则选中
+                    const isSelected = (oldOption && oldOption.selected) || selectedValues.includes(enh.id);
+                    
+                    return `
+                        <div class="enhancement-option ${isSelected ? 'selected' : ''}" data-id="${enh.id}">
+                            <span class="operation-icon">${getOperationIcon(enh.operation)}</span>
+                            <span>${enh.id}</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                // 更新隐藏input的值
+                const newSelectedIds = Array.from(selector.querySelectorAll('.enhancement-option.selected'))
+                    .map(opt => opt.dataset.id);
+                hiddenInput.value = newSelectedIds.join(',');
+                
+                // 添加点击事件
+                selector.querySelectorAll('.enhancement-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        option.classList.toggle('selected');
+                        const selectedIds = Array.from(selector.querySelectorAll('.enhancement-option.selected'))
+                            .map(opt => opt.dataset.id);
+                        hiddenInput.value = selectedIds.join(',');
+                    });
+                });
+            });
+        }
+
+        // 添加获取操作类型图标的函数
+        function getOperationIcon(operation) {
+            switch (operation) {
+                case 'addition': return '➕';
+                case 'multiply_base': return '✖️';
+                case 'multiply_total': return '⭐';
+                case 'none': return '⚪';
+                default: return '❔';
+            }
+        }
+
+        // 修改增幅配置的事件监听
+        document.addEventListener('input', e => {
+            if (e.target.matches('.enh-id, .enh-operation')) {
+                updateEnhancementSelects();
+            }
+        });
+
+        // 动态添加增幅
+        function addEnhancement() {
+            const container = document.createElement('div');
+            container.className = 'dynamic-item';
+            container.innerHTML = `
+                <div class="form-row">
+                    <label>增幅ID</label>
+                    <input type="text" class="enh-id">
+                    <button onclick="removeEnhancement(this)">×</button>
+                </div>
+                <div class="form-row">
+                    <label>操作类型</label>
+                    <div class="option-selector operation-selector">
+                        <div class="option-item" data-value="addition">
+                            <span class="icon">➕</span>
+                            <span>增量增幅</span>
+                        </div>
+                        <div class="option-item" data-value="multiply_base">
+                            <span class="icon">✖️</span>
+                            <span>基础乘法</span>
+                        </div>
+                        <div class="option-item" data-value="multiply_total">
+                            <span class="icon">⭐</span>
+                            <span>总体乘法</span>
+                        </div>
+                        <div class="option-item" data-value="none">
+                            <span class="icon">⚪</span>
+                            <span>无增幅</span>
+                        </div>
+                    </div>
+                    <input type="hidden" class="enh-operation" value="addition">
+                </div>
+                <div class="form-row">
+                    <label>描述参数类型</label>
+                    <div class="option-selector desc-arg-selector">
+                        <div class="option-item" data-value="int">
+                            <span>整数</span>
+                        </div>
+                        <div class="option-item" data-value="float">
+                            <span>浮点</span>
+                        </div>
+                        <div class="option-item" data-value="int_percent">
+                            <span>整数百分比</span>
+                        </div>
+                        <div class="option-item" data-value="float_percent">
+                            <span>浮点百分比</span>
+                        </div>
+                    </div>
+                    <input type="hidden" class="desc-arg" value="int">
+                </div>
+                <div class="form-row">
+                    <label>每级增幅值</label>
+                    <input type="number" class="value-per-lvl" step="0.01">
+                </div>
+                <div class="form-row">
+                    <label>最大等级</label>
+                    <input type="number" class="max-level" min="1">
+                </div>
+                <div class="form-row">
+                    <label>权重类型</label>
+                    <div class="option-selector weight-type-selector">
+                        <div class="option-item" data-value="fixed">
+                            <span>固定权重</span>
+                        </div>
+                        <div class="option-item" data-value="random">
+                            <span>随机权重</span>
+                        </div>
+                        <div class="option-item" data-value="level">
+                            <span>等级权重</span>
+                        </div>
+                        <div class="option-item" data-value="custom">
+                            <span>自定义权重</span>
+                        </div>
+                        <div class="option-item" data-value="expression">
+                            <span>表达式权重</span>
+                        </div>
+                        <div class="option-item" data-value="file">
+                            <span>文件权重</span>
+                        </div>
+                        <div class="option-item" data-value="increment">
+                            <span>递增权重</span>
+                        </div>
+                    </div>
+                    <input type="hidden" class="weight-type" value="fixed">
+                </div>
+                <div class="weight-config-area"></div>
+            `;
+            
+            // 初始化选择器
+            initializeOptionSelectors(container);
+            document.getElementById('enhancements-container').appendChild(container);
+            updateWeightConfig(container.querySelector('.weight-type'));
+            updateEnhancementSelects();
+        }
+
+        // 修改初始化选择器函数
+        function initializeOptionSelectors(container) {
+            container.querySelectorAll('.option-selector').forEach(selector => {
+                const hiddenInput = selector.nextElementSibling;
+                
+                // 设置初始选中状态
+                const initialOption = selector.querySelector(`[data-value="${hiddenInput.value}"]`);
+                if (initialOption) {
+                    initialOption.classList.add('selected');
+                }
+                
+                // 添加点击事件
+                selector.addEventListener('click', e => {
+                    const option = e.target.closest('.option-item');
+                    if (!option) return;
+                    
+                    // 移除其他选项的选中状态
+                    selector.querySelectorAll('.option-item').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // 设置当前选项的选中状态
+                    option.classList.add('selected');
+                    
+                    // 更新隐藏的input值
+                    hiddenInput.value = option.dataset.value;
+                    
+                    // 如果是操作类型选择器，立即更新显示状态
+                    if (selector.classList.contains('operation-selector')) {
+                        toggleEnhancementFields(hiddenInput);
+                        updateEnhancementSelects();
+                    }
+                    
+                    // 根据选择器类型执行不同的更新操作
+                    if (selector.classList.contains('operation-selector')) {
+                        toggleEnhancementFields(hiddenInput);
+                    } else if (selector.classList.contains('param-type-selector')) {
+                        updateParamConfig(hiddenInput);
+                    } else if (selector.classList.contains('weight-type-selector')) {
+                        updateWeightConfig(hiddenInput);
+                    }
+                });
+            });
+        }
+
+        // 修改切换字段显示函数
+        function toggleEnhancementFields(select) {
+            const container = select.closest('.dynamic-item');
+            const operation = select.value;
+            
+            // 获取相关字段容器
+            const valuePerLvlRow = container.querySelector('.form-row:nth-child(4)');
+            const maxLevelRow = container.querySelector('.form-row:nth-child(5)');
+            
+            // 根据操作类型切换显示
+            if (operation === 'none') {
+                valuePerLvlRow.style.display = 'none';
+                maxLevelRow.style.display = 'none';
+            } else {
+                valuePerLvlRow.style.display = 'flex';
+                maxLevelRow.style.display = 'flex';
+            }
+        }
+    </script>
+</body>
+</html>

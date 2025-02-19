@@ -14,7 +14,7 @@ class SkillSlotScreen : Screen(translate("screen.slot.title")) {
         super.init()
         if (AdvancedSkillsClient.clothConfigLoaded) {
             ButtonWidget.builder(translate("screen.slot.config")) {
-                client!!.setScreen(ConfigScreenHandler.createScreen(this))
+                client!!.setScreen(ModConfigScreenFactory().createScreen(this))
             }.dimensions(5, 5, 50, 20)
                 .build()
                 .also(::addDrawableChild)

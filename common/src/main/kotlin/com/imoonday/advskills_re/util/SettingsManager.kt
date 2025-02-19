@@ -44,10 +44,9 @@ object SettingsManager {
     }
 
     @JvmStatic
-    fun saveSettings(skill: Skill) {
+    fun saveSettings(settings: Skill.Settings) {
         if (!checkOrCreateDirectory(settingsDir)) return
 
-        val settings = skill.settings
         val id = settings.id
         val namespaceDir = getNamespaceDir(id)
         if (!checkOrCreateDirectory(namespaceDir)) return

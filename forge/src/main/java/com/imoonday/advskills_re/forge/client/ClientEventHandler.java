@@ -1,6 +1,7 @@
 package com.imoonday.advskills_re.forge.client;
 
 import com.imoonday.advskills_re.api.WorldRenderEvents;
+import com.imoonday.advskills_re.client.screen.ModConfigScreenFactory;
 import com.imoonday.advskills_re.forge.api.WorldRenderContextForgeImpl;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
@@ -43,7 +44,7 @@ public class ClientEventHandler {
         ModLoadingContext.get().registerExtensionPoint(
                 ConfigScreenHandler.ConfigScreenFactory.class,
                 () -> new ConfigScreenHandler.ConfigScreenFactory(
-                        (client, parent) -> com.imoonday.advskills_re.client.screen.ConfigScreenHandler.createScreen(parent)
+                        (client, parent) -> new ModConfigScreenFactory().createScreen(parent)
                 )
         );
     }
