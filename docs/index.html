@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>进阶技能：技能配置生成器 v3</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>进阶技能：技能配置生成器 v3</h1>
+
+        <!-- 基础属性 -->
+        <div class="section">
+            <h2>基础参数</h2>
+            <div class="form-row">
+                <label>技能ID</label>
+                <input type="text" id="base_id" placeholder="advskills_re:example">
+            </div>
+            <div class="form-row">
+                <label>名称</label>
+                <div style="flex:1">
+                    <div class="input-type-selector" style="margin-bottom:8px;display:flex">
+                        <label style="flex:0 0 auto;margin-right:15px">
+                            <input type="radio" name="name_type" value="translate" checked> 翻译键
+                        </label>
+                        <label style="flex:0 0 auto">
+                            <input type="radio" name="name_type" value="text"> 文本
+                        </label>
+                    </div>
+                    <div style="display:flex">
+                        <input type="text" id="name" placeholder="advskills_re.skill.example.name" style="flex:1"
+                            data-translate-ph="advskills_re.skill.example.name" data-text-ph="Example Name">
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>描述</label>
+                <div style="flex:1">
+                    <div class="input-type-selector" style="margin-bottom:8px;display:flex">
+                        <label style="flex:0 0 auto;margin-right:15px">
+                            <input type="radio" name="desc_type" value="translate" checked> 翻译键
+                        </label>
+                        <label style="flex:0 0 auto">
+                            <input type="radio" name="desc_type" value="text"> 文本
+                        </label>
+                    </div>
+                    <div style="display:flex">
+                        <textarea id="description" rows="1" placeholder="advskills_re.skill.example.description"
+                            style="flex:1;resize:vertical;min-height:38px;padding-top:7px;padding-bottom:7px"
+                            data-translate-ph="advskills_re.skill.example.description"
+                            data-text-ph="Example Description"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>图标路径</label>
+                <input type="text" id="icon" placeholder="modid:textures/item/example.png">
+            </div>
+            <div class="form-row">
+                <label>冷却时间(tick)</label>
+                <input type="number" id="cooldown" min="0">
+            </div>
+            <div class="form-row">
+                <label>稀有度</label>
+                <div class="rarity-selector">
+                    <div class="rarity-option" data-value="common">
+                        <div class="rarity-color" style="background:#F0F0F0"></div>
+                        <span>普通</span>
+                    </div>
+                    <div class="rarity-option" data-value="uncommon">
+                        <div class="rarity-color" style="background:#55FF55"></div>
+                        <span>罕见</span>
+                    </div>
+                    <div class="rarity-option" data-value="rare">
+                        <div class="rarity-color" style="background:#55FFFF"></div>
+                        <span>稀有</span>
+                    </div>
+                    <div class="rarity-option" data-value="superb">
+                        <div class="rarity-color" style="background:#FFAA00"></div>
+                        <span>卓越</span>
+                    </div>
+                    <div class="rarity-option" data-value="epic">
+                        <div class="rarity-color" style="background:#FF5555"></div>
+                        <span>史诗</span>
+                    </div>
+                    <div class="rarity-option" data-value="legendary">
+                        <div class="rarity-color" style="background:#FF55FF"></div>
+                        <span>传奇</span>
+                    </div>
+                    <div class="rarity-option" data-value="mythic">
+                        <div class="rarity-color" style="background:#AA00AA"></div>
+                        <span>神话</span>
+                    </div>
+                    <div class="rarity-option" data-value="unique">
+                        <div class="rarity-color" style="background:#AA0000"></div>
+                        <span>无双</span>
+                    </div>
+                </div>
+                <input type="hidden" id="rarity" value="common">
+            </div>
+            <div class="form-row">
+                <label>权重</label>
+                <input type="number" id="weight" min="0">
+            </div>
+            <div class="form-row">
+                <label>禁用技能</label>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="disabled">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">禁用后该技能将隐藏</span>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>可抽取</label>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="drawable" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">是否可以通过抽取获得</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 技能类型 -->
+        <div class="section">
+            <h2>技能类型（多选）</h2>
+            <div class="types-selector">
+                <div class="type-option" data-value="attack">
+                    <div class="type-icon">⚔️</div>
+                    <span>攻击类</span>
+                </div>
+                <div class="type-option" data-value="defense">
+                    <div class="type-icon">🛡️</div>
+                    <span>防御类</span>
+                </div>
+                <div class="type-option" data-value="utility">
+                    <div class="type-icon">🔧</div>
+                    <span>实用类</span>
+                </div>
+                <div class="type-option" data-value="control">
+                    <div class="type-icon">🎯</div>
+                    <span>控制类</span>
+                </div>
+                <div class="type-option" data-value="passive">
+                    <div class="type-icon">💫</div>
+                    <span>被动类</span>
+                </div>
+                <div class="type-option" data-value="enhancement">
+                    <div class="type-icon">⚡</div>
+                    <span>强化类</span>
+                </div>
+                <div class="type-option" data-value="summon">
+                    <div class="type-icon">🌟</div>
+                    <span>召唤类</span>
+                </div>
+                <div class="type-option" data-value="restoration">
+                    <div class="type-icon">❤️</div>
+                    <span>恢复类</span>
+                </div>
+                <div class="type-option" data-value="movement">
+                    <div class="type-icon">🏃</div>
+                    <span>移动类</span>
+                </div>
+                <div class="type-option" data-value="destruction">
+                    <div class="type-icon">💥</div>
+                    <span>破坏类</span>
+                </div>
+            </div>
+            <input type="hidden" id="types" value=[]>
+        </div>
+
+        <!-- 参数配置 -->
+        <div class="section">
+            <h2>参数配置</h2>
+            <div id="parameters-container"></div>
+            <div class="form-row" style="margin-top: 15px">
+                <button onclick="addParameter()" style="width: 100%">+ 添加参数</button>
+            </div>
+        </div>
+
+        <!-- 增幅配置 -->
+        <div class="section">
+            <h2>增幅配置</h2>
+            <div id="enhancements-container"></div>
+            <div class="form-row" style="margin-top: 15px">
+                <button onclick="addEnhancement()" style="width: 100%">+ 添加增幅</button>
+            </div>
+        </div>
+
+        <!-- 操作区 -->
+        <div class="section">
+            <button onclick="exportJSON()" style="background:#f39c12">导出JSON</button>
+            <button onclick="document.getElementById('jsonFileInput').click()" style="background:#27ae60">导入JSON</button>
+            <button onclick="resetForm()" style="background:#e74c3c">重置</button>
+            <input type="file" id="jsonFileInput" accept=".json" style="display: none">
+        </div>
+
+        <!-- 输出预览 -->
+        <pre id="output"></pre>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // 监听名称类型切换
+        document.querySelectorAll('input[name="name_type"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const nameInput = document.getElementById('name');
+                nameInput.placeholder = radio.value === 'text'
+                    ? nameInput.dataset.textPh
+                    : nameInput.dataset.translatePh;
+            });
+        });
+
+        // 监听描述类型切换
+        document.querySelectorAll('input[name="desc_type"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const descInput = document.getElementById('description');
+                descInput.placeholder = radio.value === 'text'
+                    ? descInput.dataset.textPh
+                    : descInput.dataset.translatePh;
+            });
+        });
+    </script>
+</body>
+
+</html>
