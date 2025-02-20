@@ -732,8 +732,14 @@ function exportJSON() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'skill_config.json';
+    a.download = 'settings.json';
     a.click();
+}
+
+function copyJSON() {
+    const data = document.getElementById('output').textContent;
+    navigator.clipboard.writeText(data);
+    alert('JSON已复制到剪贴板');
 }
 
 function resetForm() {

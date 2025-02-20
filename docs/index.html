@@ -195,8 +195,9 @@
 
         <!-- 操作区 -->
         <div class="section">
-            <button onclick="exportJSON()" style="background:#f39c12">导出JSON</button>
-            <button onclick="document.getElementById('jsonFileInput').click()" style="background:#27ae60">导入JSON</button>
+            <button onclick="copyJSON()" style="background:#0cc5ea">复制</button>
+            <button onclick="exportJSON()" style="background:#f39c12">下载</button>
+            <button onclick="document.getElementById('jsonFileInput').click()" style="background:#27ae60">上传</button>
             <button onclick="resetForm()" style="background:#e74c3c">重置</button>
             <input type="file" id="jsonFileInput" accept=".json" style="display: none">
         </div>
